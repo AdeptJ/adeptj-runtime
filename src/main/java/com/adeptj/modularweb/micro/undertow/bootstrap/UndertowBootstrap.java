@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.undertow.bootstrap;
+package com.adeptj.modularweb.micro.undertow.bootstrap;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,11 +16,11 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 
 /**
- * UndertowOSGiBootstrap: Bootstrap the Undertow server and OSGi Framework.
+ * UndertowBootstrap: Bootstrap the Undertow server and OSGi Framework.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class UndertowOSGiBootstrap {
+public class UndertowBootstrap {
 
 	private static int port = 8080;
 
@@ -28,7 +28,7 @@ public class UndertowOSGiBootstrap {
 
 	private static DeploymentManager manager;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowOSGiBootstrap.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
 
 	public static void main(String[] args) throws ServletException {
 		LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Undertow @@@@@@");
@@ -57,7 +57,7 @@ public class UndertowOSGiBootstrap {
 
 	private static DeploymentInfo constructDeploymentInfo(ServletContainerInitializerInfo sciInfo) {
 		return Servlets.deployment().addServletContainerInitalizer(sciInfo)
-				.setClassLoader(UndertowOSGiBootstrap.class.getClassLoader()).setContextPath("/")
+				.setClassLoader(UndertowBootstrap.class.getClassLoader()).setContextPath("/")
 				.setDeploymentName("AdeptJ Modular Web Undertow");
 	}
 }

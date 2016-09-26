@@ -1,7 +1,7 @@
-package com.adeptj.modularweb.undertow.bootstrap;
+package com.adeptj.modularweb.micro.undertow.bootstrap;
 
-import static com.adeptj.modularweb.undertow.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
-import static com.adeptj.modularweb.undertow.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_VALUE;
+import static com.adeptj.modularweb.micro.undertow.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.modularweb.micro.undertow.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_VALUE;
 
 import java.util.Set;
 

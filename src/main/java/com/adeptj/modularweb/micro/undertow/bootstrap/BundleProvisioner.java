@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.undertow.bootstrap;
+package com.adeptj.modularweb.micro.undertow.bootstrap;
 
 import java.io.IOException;
 import java.net.JarURLConnection;

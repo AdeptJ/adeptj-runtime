@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.undertow.bootstrap;
+package com.adeptj.modularweb.micro.undertow.bootstrap;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

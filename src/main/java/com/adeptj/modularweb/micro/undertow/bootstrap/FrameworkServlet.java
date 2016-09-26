@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.adeptj.modularweb.undertow.bootstrap;
+package com.adeptj.modularweb.micro.undertow.bootstrap;
 
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
