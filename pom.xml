@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adeptj</groupId>
-	<artifactId>adeptj-undertow-osgi-http</artifactId>
+	<artifactId>adeptj-modularweb-undertow-micro</artifactId>
 	<version>1.0.0.RELEASE</version>
 	<packaging>jar</packaging>
-	<name>AdeptJ Modular Web :: Undertow Bootstrapper</name>
-	<description>Bootstraping AdeptJ Modular Web Project in Undertow</description>
+	<name>AdeptJ Modular Web :: Undertow Micro Bootstrap</name>
+	<description>Bootstraping Micro AdeptJ Modular Web in Undertow Server</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,7 @@
 	</properties>
 
 	<build>
-		<finalName>undertow-osgi-bootstrap</finalName>
+		<finalName>adeptj-modularweb-undertow-micro</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -37,7 +37,6 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>2.4.3</version>
 				<executions>
-					<!-- Run shade goal on package phase -->
 					<execution>
 						<phase>package</phase>
 						<goals>
@@ -45,8 +44,7 @@
 						</goals>
 						<configuration>
 							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>com.adeptj.modularweb.undertow.bootstrap.UndertowOSGiBootstrap</mainClass>
 								</transformer>
 							</transformers>
@@ -115,6 +113,12 @@
 		</dependency>
 
 		<!-- Undertow Dependencies Ends -->
+		
+		<dependency>
+		    <groupId>org.yaml</groupId>
+		    <artifactId>snakeyaml</artifactId>
+		    <version>1.17</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

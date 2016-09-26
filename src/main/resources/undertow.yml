@@ -18,7 +18,7 @@ server:
   undertow:
     io-threads: -1
     worker-threads: -1
-    buffer-size: 1024
+    buffer-size: 16384
 
     server-options:
       ENABLE_STATISTICS: false
