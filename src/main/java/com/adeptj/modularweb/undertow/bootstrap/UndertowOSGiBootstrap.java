@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.undertow.Undertow;
-import io.undertow.server.HttpHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
@@ -40,8 +39,7 @@ public class UndertowOSGiBootstrap {
 						new ImmediateInstanceFactory<>(new FrameworkServletContainerInitializer()), handlesTypes));
 		manager = Servlets.defaultContainer().addDeployment(deploymentInfo);
 		manager.deploy();
-		HttpHandler httpHandler = manager.start();
-		server = Undertow.builder().addHttpListener(port, "localhost").setHandler(httpHandler).build();
+		server = Undertow.builder().addHttpListener(port, "localhost").setHandler(manager.start()).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		LOGGER.info("@@@@@@ AdeptJ Modular Web Undertow Initialized!! @@@@@@");

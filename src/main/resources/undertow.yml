@@ -1,0 +1,29 @@
+server:
+
+  # HTTP server mode
+  http:
+    host: '0.0.0.0'
+    port: 9007
+    enabled: true
+
+  # HTTPS server mode
+  https:
+    host: '0.0.0.0'
+    port: 9008
+    enabled: false
+
+    redirect-to-http: true
+
+  # Undertow internals
+  undertow:
+    io-threads: -1
+    worker-threads: -1
+    buffer-size: 1024
+
+    server-options:
+      ENABLE_STATISTICS: false
+      RECORD_REQUEST_START_TIME: false
+      ALWAYS_SET_KEEP_ALIVE: true
+
+    socket-options:
+      BACKLOG: 20000

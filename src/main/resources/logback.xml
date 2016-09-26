@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{100} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="CONSOLE_ERROR" class="ch.qos.logback.core.ConsoleAppender" target="System.err">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{100}) - %msg %n</pattern>
+		</encoder>
+	</appender>
+  
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${user.dir}/modularweb-micro/log/amw-micro.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{300} - %msg%n</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${user.dir}/modularweb-micro/log/amw-micro-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+	</appender>
+
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE_ERROR" />
+		<appender-ref ref="FILE" />
+	</root>
+
+	<logger name="com.adeptj" level="INFO" additivity="false">
+		<appender-ref ref="FILE" />
+	</logger>
+
+	<logger name="io.undertow" level="DEBUG" additivity="false">
+		<appender-ref ref="FILE" />
+	</logger>
+	
+	<logger name="io.undertow.request.security" level="ERROR" additivity="false">
+		<appender-ref ref="FILE" />
+	</logger>
+
+</configuration>
