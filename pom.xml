@@ -11,7 +11,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<undertow.version>1.4.0.Final</undertow.version>
+		<undertow.version>1.4.3.Final</undertow.version>
 		<jdk.version>1.8</jdk.version>
 		<version.compiler.plugin>3.5.1</version.compiler.plugin>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -112,12 +112,6 @@
 		</dependency>
 
 		<!-- Undertow Dependencies Ends -->
-		
-		<dependency>
-		    <groupId>org.yaml</groupId>
-		    <artifactId>snakeyaml</artifactId>
-		    <version>1.17</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
