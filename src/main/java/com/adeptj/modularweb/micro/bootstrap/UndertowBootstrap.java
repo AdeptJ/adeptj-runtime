@@ -39,11 +39,16 @@ public class UndertowBootstrap {
 		DeploymentInfo deploymentInfo = constructDeploymentInfo(
 				new ServletContainerInitializerInfo(FrameworkServletContainerInitializer.class,
 						new ImmediateInstanceFactory<>(new FrameworkServletContainerInitializer()), handlesTypes));
+		deploymentInfo.setIgnoreFlush(true);
 		manager = Servlets.newContainer().addDeployment(deploymentInfo);
 		manager.deploy();
 		Configs config = Configs.INSTANCE;
-		
-		server = Undertow.builder().addHttpListener(config.httpPort(), config.httpHost()).setHandler(manager.start()).build();
+		Builder builder = Undertow.builder();
+		builder.setBufferSize(config.bufferSize());
+		builder.setIoThreads(config.ioThreads());
+		builder.setWorkerThreads(config.workerThreads());
+		builder.setDirectBuffers(true);
+		server = builder.addHttpListener(config.httpPort(), config.httpHost()).setHandler(manager.start()).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 		LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized!! @@@@@@");
