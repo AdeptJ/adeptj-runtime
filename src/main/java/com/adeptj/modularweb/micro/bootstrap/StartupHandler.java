@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.micro.undertow.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

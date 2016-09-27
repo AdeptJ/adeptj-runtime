@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.micro.undertow.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
