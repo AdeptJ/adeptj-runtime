@@ -62,17 +62,13 @@ public enum BundleProvisioner {
 
 	private void startBundles(Set<Bundle> installedBundles) {
 		// Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-		BundleStartConsumer consumer = (Bundle bundle) -> {
-			bundle.start();
-		};
+		BundleStartConsumer consumer = (bundle) -> bundle.start();
 		installedBundles.stream().filter(bundle -> bundle.getHeaders().get(HEADER_FRAGMENT_HOST) == null)
 				.forEach(consumer);
 	}
 
 	private Set<Bundle> installBundles(BundleContext systemBundleContext) throws Exception {
-		BundleInstallFunction installFunc = (url) -> {
-			return systemBundleContext.installBundle(url.toExternalForm());
-		};
+		BundleInstallFunction installFunc = (url) -> systemBundleContext.installBundle(url.toExternalForm());
 		// First install all the Bundles.
 		return this.collectBundles().stream().map(installFunc).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
