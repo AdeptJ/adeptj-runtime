@@ -48,11 +48,21 @@
 
 
 	<root level="INFO">
-		<appender-ref ref="CONSOLE_ERROR" />
+		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE" />
 	</root>
 
 	<logger name="com.adeptj" level="INFO" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</logger>
+	
+	<logger name="org.xnio.nio" level="INFO" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</logger>
+	
+	<logger name="io.undertow" level="DEBUG" additivity="false">
 		<appender-ref ref="FILE" />
 	</logger>
 

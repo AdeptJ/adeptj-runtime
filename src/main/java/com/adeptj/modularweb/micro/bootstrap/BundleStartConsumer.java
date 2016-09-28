@@ -36,15 +36,21 @@ public interface BundleStartConsumer extends Consumer<Bundle> {
 
 	Logger LOGGER = LoggerFactory.getLogger(BundleStartConsumer.class);
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	default void accept(Bundle bundle) {
 		LOGGER.info("Starting bundle: [{}] version: [{}]", bundle, bundle.getVersion());
 		try {
-			this.acceptThrows(bundle);
+			this.acceptWithThrows(bundle);
 		} catch (Exception ex) {
 			LOGGER.error("Exception while starting bundle: [{}]. Exception: {}", bundle, ex);
 		}
 	}
 
-	void acceptThrows(Bundle bundle) throws Exception;
+	/**
+	 * To deal with checked exception in Lambda function.
+	 */
+	void acceptWithThrows(Bundle bundle) throws Exception;
 }

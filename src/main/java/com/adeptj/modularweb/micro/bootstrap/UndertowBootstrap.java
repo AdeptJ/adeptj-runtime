@@ -23,6 +23,7 @@ package com.adeptj.modularweb.micro.bootstrap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -53,22 +54,27 @@ import io.undertow.util.HttpString;
  */
 public class UndertowBootstrap {
 
+	private static final String STARTUP_INFO = "/adeptj-startup-info.txt";
+	
+	private static final String SHUTDOWN_INFO = "/adeptj-shutdown-info.txt";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
 
 	private static final String CONTEXT_PATH = "/";
+	
+	private static final String UTF8 = StandardCharsets.UTF_8.name();
 
 	private static Undertow server;
 
 	private static DeploymentManager manager;
 
-	public static void main(String[] args) throws Exception {
-		String startupInfo = stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-startup-info.txt"))
-				.toString("UTF-8");
-		System.out.println(startupInfo);
-		LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
-		LOGGER.info(startupInfo);
+	public static void main(String[] args) {
 		try {
 			long startTime = System.currentTimeMillis();
+			String startupInfo = stringify(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO));
+			// System.out.println(startupInfo);
+			LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
+			LOGGER.info(startupInfo);
 			// Order of StartupHandler matters.
 			Set<Class<?>> handlesTypes = new LinkedHashSet<>();
 			handlesTypes.add(FrameworkStartupHandler.class);
@@ -84,6 +90,7 @@ public class UndertowBootstrap {
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 			long endTime = System.currentTimeMillis() - startTime;
+			// System.out.println(String.format("@@@@@@ AdeptJ Modular Web Micro Initialized in [%s] ms @@@@@@", endTime));
 			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@@", endTime);
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
@@ -91,18 +98,19 @@ public class UndertowBootstrap {
 	}
 
 	/**
-	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then
-	 * stops Undertow server.
+	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then stops Undertow server.
 	 * 
 	 * Rakesh.Kumar, AdeptJ
 	 */
 	private static class ShutdownHook extends Thread {
 
 		/**
-		 * Handles CTRL+C
+		 * Handles Graceful server shutdown and resource cleanup.
 		 */
 		@Override
 		public void run() {
+			long startTime = System.currentTimeMillis();
+			// System.out.println("@@@@ Stopping AdeptJ Modular Web Micro!! @@@@");
 			LOGGER.info("@@@@ Stopping AdeptJ Modular Web Micro!! @@@@");
 			try {
 				manager.stop();
@@ -112,22 +120,24 @@ public class UndertowBootstrap {
 			}
 			server.stop();
 			try {
-				System.out.println(stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-shutdown-info.txt"))
-						.toString("UTF-8"));
+				LOGGER.info(stringify(UndertowBootstrap.class.getResourceAsStream(SHUTDOWN_INFO)));
 			} catch (Exception ex) {
 				// do nothing
 			}
+			long endTime = System.currentTimeMillis() - startTime;
+			// System.out.println(String.format("@@@@@@ AdeptJ Modular Web Micro stopped in [%s] ms @@@@@@", endTime));
+			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro stopped in [{}] ms @@@@@@", endTime);
 		}
 	}
 
-	private static ByteArrayOutputStream stringify(InputStream startupInfoStream) throws IOException {
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
+	private static String stringify(InputStream inputStream) throws IOException {
 		byte[] buffer = new byte[1024];
 		int length;
-		while ((length = startupInfoStream.read(buffer)) != -1) {
-			result.write(buffer, 0, length);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		while ((length = inputStream.read(buffer)) != -1) {
+			out.write(buffer, 0, length);
 		}
-		return result;
+		return out.toString(UTF8);
 	}
 
 	/**

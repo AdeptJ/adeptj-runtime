@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration.Dynamic;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -43,7 +45,9 @@ public enum FrameworkBootstrap {
 
     INSTANCE;
 
-    public static final String DISPATCHER = "DispatcherProxyServlet";
+    private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
+
+	public static final String DISPATCHER = "DispatcherProxyServlet";
 
 	public static final String ROOT_MAPPING = "/*";
 
@@ -116,7 +120,7 @@ public enum FrameworkBootstrap {
 
     private Map<String, String> createFrameworkConfigs() throws Exception {
         Properties props = new Properties();
-        props.load(FrameworkBootstrap.class.getResourceAsStream("/framework.properties"));
+        props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> {
         	configs.put((String) key, (String) val);
@@ -127,12 +131,12 @@ public enum FrameworkBootstrap {
 		 * attributes of the ServletContext to which the HttpSession is linked). Otherwise leave this property unset.
 		 */
         configs.put("org.apache.felix.http.shared_servlet_context_attributes", "true");
-        String frameworkArtifactsDir = System.getProperty("user.dir") + "/modularweb-micro";
-        configs.put("org.osgi.framework.storage", frameworkArtifactsDir + "/felix");
-        configs.put("felix.cm.dir", frameworkArtifactsDir + "/osgi-config");
+        String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
+        configs.put("org.osgi.framework.storage", frameworkArtifactsDir + File.separator + "felix");
+        configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-config");
         configs.put("org.osgi.framework.bundle.parent", "framework");
         // set felix.log.level debug
-        // configs.put("felix.log.level", "4");
+        configs.put("felix.log.level", System.getProperty("felix.log.level", "1"));
         /*
          * WARNING: This breaks OSGi Modularity, But EhCache won't work without this.
          * Declaring on Sun specific classes only.

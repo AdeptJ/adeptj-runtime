@@ -29,6 +29,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
@@ -77,8 +79,9 @@ public enum BundleProvisioner {
 		String rootPath = ServletContextAware.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
 		JarURLConnection conn = (JarURLConnection) BundleProvisioner.class.getResource(rootPath).openConnection();
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
-		List<URL> bundles = conn.getJarFile().stream()
-				.filter(entry -> entry.getName().startsWith(BUNDLES_JAR_DIR) && entry.getName().endsWith(EXTN_JAR))
+		Predicate<JarEntry> bundlePredicate = (entry) -> entry.getName().startsWith(BUNDLES_JAR_DIR)
+				&& entry.getName().endsWith(EXTN_JAR);
+		List<URL> bundles = conn.getJarFile().stream().filter(bundlePredicate)
 				.map(entry -> classLoader.getResource(entry.getName())).collect(Collectors.toList());
 		LOGGER.info("Total:[{}] Bundles(excluding system bundle) collected from location:[{}]", bundles.size(), conn);
 		return bundles;

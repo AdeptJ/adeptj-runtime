@@ -37,18 +37,23 @@ public interface BundleInstallFunction extends Function<URL, Bundle> {
 	
 	Logger LOGGER = LoggerFactory.getLogger(BundleInstallFunction.class);
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	default Bundle apply(URL url) {
 		LOGGER.debug("Installing Bundle from location: [{}]", url);
 		Bundle bundle = null;
 		try {
-			bundle = this.applyThrows(url);
+			bundle = this.applyWithThrows(url);
 		} catch (Exception ex) {
 			LOGGER.error("Exception while installing bundle: [{}]. Exception: {}", url, ex);
 		}
 		return bundle;
 	}
 	
-	Bundle applyThrows(URL url) throws Exception;
-
+	/**
+	 * To deal with checked exception in Lambda function.
+	 */
+	Bundle applyWithThrows(URL url) throws Exception;
 }
