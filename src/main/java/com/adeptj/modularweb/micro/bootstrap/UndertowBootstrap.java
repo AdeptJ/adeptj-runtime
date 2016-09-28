@@ -40,6 +40,7 @@ public class UndertowBootstrap {
 	public static void main(String[] args) throws ServletException {
 		LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
 		try {
+			long startTime = System.currentTimeMillis();
 			// Order of StartupHandler matters.
 			Set<Class<?>> handlesTypes = new LinkedHashSet<>();
 			handlesTypes.add(FrameworkStartupHandler.class);
@@ -50,16 +51,12 @@ public class UndertowBootstrap {
 			manager = Servlets.newContainer().addDeployment(deploymentInfo);
 			manager.deploy();
 			Configs config = Configs.INSTANCE;
-			Builder builder = Undertow.builder();
-			builder.setBufferSize(config.bufferSize());
-			builder.setIoThreads(config.ioThreads());
-			builder.setWorkerThreads(config.workerThreads());
-			builder.setDirectBuffers(true);
-			builder.setHandler(buildGracefulShutdownHandler(null));
-			server = builder.addHttpListener(config.httpPort(), config.httpHost()).setHandler(manager.start()).build();
+			server = undertowBuilder(config).addHttpListener(config.httpPort(), config.httpHost())
+					.setHandler(manager.start()).build();
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized!! @@@@@@");
+			long endTime = System.currentTimeMillis() - startTime;
+			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@@", endTime);
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
 		}
@@ -90,12 +87,25 @@ public class UndertowBootstrap {
 	}
 	
 	/**
-	 * buildGracefulShutdownHandler
+	 *  Build the Undertow internals.
+	 */
+	private static Builder undertowBuilder(Configs config) {
+		Builder builder = Undertow.builder();
+		builder.setBufferSize(config.bufferSize());
+		builder.setIoThreads(config.ioThreads());
+		builder.setWorkerThreads(config.workerThreads());
+		builder.setDirectBuffers(true);
+		builder.setHandler(gracefulShutdownHandler(null));
+		return builder;
+	}
+	
+	/**
+	 * gracefulShutdownHandler
 	 *
 	 * @param paths
-	 * @return
+	 * @return GracefulShutdownHandler
 	 */
-	private static GracefulShutdownHandler buildGracefulShutdownHandler(PathHandler paths) {
+	private static GracefulShutdownHandler gracefulShutdownHandler(PathHandler paths) {
 		return new GracefulShutdownHandler(new RequestLimitingHandler(new RequestLimit(1000),
 				new AllowedMethodsHandler(new BlockingHandler(),
 						HttpString.tryFromString("GET"), HttpString.tryFromString("POST"),
