@@ -61,11 +61,10 @@ public class UndertowBootstrap {
 
 	private static DeploymentManager manager;
 
-	private static String startupInfo;
-
 	public static void main(String[] args) throws Exception {
-		System.out.println(
-				stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-startup-info.txt")).toString("UTF-8"));
+		String startupInfo = stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-startup-info.txt"))
+				.toString("UTF-8");
+		System.out.println(startupInfo);
 		LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
 		LOGGER.info(startupInfo);
 		try {
