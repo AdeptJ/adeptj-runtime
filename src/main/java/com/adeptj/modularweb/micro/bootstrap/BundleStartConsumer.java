@@ -20,23 +20,31 @@
 */
 package com.adeptj.modularweb.micro.bootstrap;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.function.Consumer;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
- * StartupOrder#order() specified.
+ * BundleStartConsumer.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-@Target(TYPE)
-@Retention(RUNTIME)
-@Documented
-public @interface StartupOrder {
+@FunctionalInterface
+public interface BundleStartConsumer extends Consumer<Bundle> {
 
-	public int value() default 0;
+	Logger LOGGER = LoggerFactory.getLogger(BundleStartConsumer.class);
+
+	@Override
+	default void accept(Bundle bundle) {
+		LOGGER.info("Starting bundle: [{}] version: [{}]", bundle, bundle.getVersion());
+		try {
+			this.acceptThrows(bundle);
+		} catch (Exception ex) {
+			LOGGER.error("Exception while starting bundle: [{}]. Exception: {}", bundle, ex);
+		}
+	}
+
+	void acceptThrows(Bundle bundle) throws Exception;
 }

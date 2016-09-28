@@ -1,3 +1,20 @@
+
+
+   _____       .___             __     ____.                                                                   
+  /  _  \    __| _/____ _______/  |_  |    |                                                                   
+ /  /_\  \  / __ |/ __ \\____ \   __\ |    |                                                                   
+/    |    \/ /_/ \  ___/|  |_> >  /\__|    |                                                                   
+\____|__  /\____ |\___  >   __/|__\________|                                                                   
+        \/      \/    \/|__|                                                                                   
+          ___________.__                _____             .___    .__                  __      __      ___.    
+          \__    ___/|  |__   ____     /     \   ____   __| _/_ __|  | _____ _______  /  \    /  \ ____\_ |__  
+            |    |   |  |  \_/ __ \   /  \ /  \ /  _ \ / __ |  |  \  | \__  \\_  __ \ \   \/\/   // __ \| __ \ 
+            |    |   |   Y  \  ___/  /    Y    (  <_> ) /_/ |  |  /  |__/ __ \|  | \/  \        /\  ___/| \_\ \
+            |____|   |___|  /\___  > \____|__  /\____/\____ |____/|____(____  /__|      \__/\  /  \___  >___  /
+                          \/     \/          \/            \/               \/               \/       \/    \/ 
+
+
+
 ############################################################################
 #                                                                          # 
 # Copyright (c) 2016 AdeptJ                                                #
@@ -18,20 +35,3 @@
 ############################################################################
 
 
-# Undertow Server Configurations
-
-# HTTP server configs
-undertow.server.http.host=0.0.0.0
-undertow.server.http.port=9007
-undertow.server.http.enabled=true
-
-# HTTPS server configs
-undertow.server.https.host=0.0.0.0
-undertow.server.https.port=9008
-undertow.server.https.enabled=false
-undertow.server.https.redirect-to-http=true
-
-# Undertow internals
-undertow.server.io-threads=8
-undertow.server.worker-threads=64
-undertow.server.buffer-size=16384

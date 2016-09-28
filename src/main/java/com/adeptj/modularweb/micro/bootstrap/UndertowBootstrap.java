@@ -1,5 +1,28 @@
+/* 
+ * =============================================================================
+ * 
+ * Copyright (c) 2016 AdeptJ
+ * Copyright (c) 2016 Rakesh Kumar <irakeshk@outlook.com>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * =============================================================================
+*/
 package com.adeptj.modularweb.micro.bootstrap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,15 +53,21 @@ import io.undertow.util.HttpString;
  */
 public class UndertowBootstrap {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
+
 	private static final String CONTEXT_PATH = "/";
 
 	private static Undertow server;
 
 	private static DeploymentManager manager;
-	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
 
-	public static void main(String[] args) throws ServletException {
+	private static String startupInfo;
+
+	public static void main(String[] args) throws Exception {
+		System.out.println(
+				stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-startup-info.txt")).toString("UTF-8"));
 		LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
+		LOGGER.info(startupInfo);
 		try {
 			long startTime = System.currentTimeMillis();
 			// Order of StartupHandler matters.
@@ -63,12 +92,13 @@ public class UndertowBootstrap {
 	}
 
 	/**
-	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then stops Undertow server.
+	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then
+	 * stops Undertow server.
 	 * 
 	 * Rakesh.Kumar, AdeptJ
 	 */
 	private static class ShutdownHook extends Thread {
-		
+
 		/**
 		 * Handles CTRL+C
 		 */
@@ -82,12 +112,27 @@ public class UndertowBootstrap {
 				LOGGER.error("Exception while stopping DeploymentManager!!", ex);
 			}
 			server.stop();
+			try {
+				System.out.println(stringify(UndertowBootstrap.class.getResourceAsStream("/adeptj-shutdown-info.txt"))
+						.toString("UTF-8"));
+			} catch (Exception ex) {
+				// do nothing
+			}
 		}
-
 	}
-	
+
+	private static ByteArrayOutputStream stringify(InputStream startupInfoStream) throws IOException {
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = startupInfoStream.read(buffer)) != -1) {
+			result.write(buffer, 0, length);
+		}
+		return result;
+	}
+
 	/**
-	 *  Build the Undertow internals.
+	 * Build the Undertow internals.
 	 */
 	private static Builder undertowBuilder(Configs config) {
 		Builder builder = Undertow.builder();
@@ -98,7 +143,7 @@ public class UndertowBootstrap {
 		builder.setHandler(gracefulShutdownHandler(null));
 		return builder;
 	}
-	
+
 	/**
 	 * gracefulShutdownHandler
 	 *
@@ -107,10 +152,10 @@ public class UndertowBootstrap {
 	 */
 	private static GracefulShutdownHandler gracefulShutdownHandler(PathHandler paths) {
 		return new GracefulShutdownHandler(new RequestLimitingHandler(new RequestLimit(1000),
-				new AllowedMethodsHandler(new BlockingHandler(),
-						HttpString.tryFromString("GET"), HttpString.tryFromString("POST"),
-						HttpString.tryFromString("PUT"), HttpString.tryFromString("DELETE"),
-						HttpString.tryFromString("PATCH"), HttpString.tryFromString("OPTIONS"))));
+				new AllowedMethodsHandler(new BlockingHandler(), HttpString.tryFromString("GET"),
+						HttpString.tryFromString("POST"), HttpString.tryFromString("PUT"),
+						HttpString.tryFromString("DELETE"), HttpString.tryFromString("PATCH"),
+						HttpString.tryFromString("OPTIONS"))));
 	}
 
 	private static DeploymentInfo constructDeploymentInfo(ServletContainerInitializerInfo sciInfo) {

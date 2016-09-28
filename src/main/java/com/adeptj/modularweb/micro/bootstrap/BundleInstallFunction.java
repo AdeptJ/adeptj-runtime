@@ -20,23 +20,35 @@
 */
 package com.adeptj.modularweb.micro.bootstrap;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.net.URL;
+import java.util.function.Function;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
- * StartupOrder#order() specified.
+ * BundleInstallFunction.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-@Target(TYPE)
-@Retention(RUNTIME)
-@Documented
-public @interface StartupOrder {
+@FunctionalInterface
+public interface BundleInstallFunction extends Function<URL, Bundle> {
+	
+	Logger LOGGER = LoggerFactory.getLogger(BundleInstallFunction.class);
 
-	public int value() default 0;
+	@Override
+	default Bundle apply(URL url) {
+		LOGGER.debug("Installing Bundle from location: [{}]", url);
+		Bundle bundle = null;
+		try {
+			bundle = this.applyThrows(url);
+		} catch (Exception ex) {
+			LOGGER.error("Exception while installing bundle: [{}]. Exception: {}", url, ex);
+		}
+		return bundle;
+	}
+	
+	Bundle applyThrows(URL url) throws Exception;
+
 }

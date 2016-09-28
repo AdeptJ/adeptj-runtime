@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--  
+	Copyright (c) 2016 AdeptJ
+	Copyright (c) 2016 Rakesh Kumar <irakeshk@outlook.com>
+	
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	
+	    http://www.apache.org/licenses/LICENSE-2.0
+	
+	Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -7,23 +23,115 @@
 	<version>1.0.0.RELEASE</version>
 	<packaging>jar</packaging>
 	<name>AdeptJ Modular Web :: Undertow Micro Bootstrap</name>
-	<description>Bootstraping Micro AdeptJ Modular Web in Undertow Server</description>
+	<description>
+		Bootstraping Micro AdeptJ Modular Web in Undertow Server
+	</description>
+	<url>http://www.adeptj.com</url>
+    <inceptionYear>2016</inceptionYear>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<undertow.version>1.4.3.Final</undertow.version>
+		<xnio.version>3.3.6.Final</xnio.version>
+		<slf4j-api.version>1.7.21</slf4j-api.version>
+		<logback-core.version>1.1.7</logback-core.version>
+		<logback-classic.version>1.1.7</logback-classic.version>
+		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
 		<jdk.version>1.8</jdk.version>
-		<version.compiler.plugin>3.5.1</version.compiler.plugin>
+		<compiler.plugin.version>3.5.1</compiler.plugin.version>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<mvn.skipITs>true</mvn.skipITs>
+		<github.global.server>github</github.global.server>
+		<org.json.version>20160212</org.json.version>
+		<commons-fileupload.version>1.3.1</commons-fileupload.version>
+		<commons-io.version>2.5</commons-io.version>
+		<!-- Apache Felix and OSGi Dependencies Version -->
+		<felix.framework.version>5.4.0</felix.framework.version>
+		<felix.http.proxy.version>3.0.2</felix.http.proxy.version>
+		<felix.scr.version>2.0.6</felix.scr.version>
+		<felix.configadmin.version>1.8.10</felix.configadmin.version>
+		<felix.eventadmin.version>1.4.6</felix.eventadmin.version>
+		<felix.webconsole.plugins.packageadmin.version>1.0.2</felix.webconsole.plugins.packageadmin.version>
+		<felix.webconsole.plugins.ds.version>2.0.2</felix.webconsole.plugins.ds.version>
+		<felix.webconsole.plugins.event.version>1.1.4</felix.webconsole.plugins.event.version>
+		<felix.webconsole.plugins.memoryusage.version>1.0.6</felix.webconsole.plugins.memoryusage.version>
+		<felix.inventory.version>1.0.4</felix.inventory.version>
+		<felix.webconsole.version>4.2.16</felix.webconsole.version>
+		<felix.http.bridge.version>3.0.12</felix.http.bridge.version>
+		<felix.http.servlet-api.version>1.1.2</felix.http.servlet-api.version>
+		<felix.log.version>1.0.1</felix.log.version>
+		<felix.metatype.version>1.1.2</felix.metatype.version>
+		<!-- AdeptJ Modular Web Dependencies Version -->
+		<adeptj.modularweb-webconsole-branding.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-branding.version>
 	</properties>
+	
+	<prerequisites>
+        <maven>3.3.9</maven>
+    </prerequisites>
+    
+    <!-- Project Information -->
+    <organization>
+        <name>AdeptJ</name>
+        <url>http://www.adeptj.com</url>
+    </organization>
+    
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <id>rakeshk15</id>
+            <name>Rakesh Kumar</name>
+            <email>irakeshk@outlook.com</email>
+            <url>https://www.linkedin.com/in/iamrakesh</url>
+            <organization>AdeptJ</organization>
+            <organizationUrl>http://www.adeptj.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+5:30</timezone>
+            <properties>
+                <picUrl>https://media.licdn.com/mpr/mpr/shrinknp_200_200/p/6/005/0b5/282/397d47f.jpg</picUrl>
+            </properties>
+        </developer>
+    </developers>
+    
+     <issueManagement>
+        <url>https://github.com/AdeptJ/adeptj-modularweb-micro/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <url>https://github.com/AdeptJ/adeptj-modularweb-micro</url>
+        <connection>scm:git:git@github.com:AdeptJ/adeptj-modularweb-micro.git</connection>
+        <developerConnection>scm:git:git@github.com:AdeptJ/adeptj-modularweb-micro.git</developerConnection>
+    </scm>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.compiler.plugin}</version>
+				<version>${compiler.plugin.version}</version>
 				<configuration>
 					<compilerArgument>-parameters</compilerArgument>
 					<source>${jdk.version}</source>
@@ -34,7 +142,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>${maven-shade-plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -55,7 +163,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
+				<version>${maven-dependency-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -84,20 +192,20 @@
 	</build>
 
 	<dependencies>
+	
+		<!-- Undertow Dependencies Starts -->
 
 		<dependency>
 			<groupId>org.jboss.xnio</groupId>
 			<artifactId>xnio-api</artifactId>
-			<version>3.3.6.Final</version>
+			<version>${xnio.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jboss.xnio</groupId>
 			<artifactId>xnio-nio</artifactId>
-			<version>3.3.6.Final</version>
+			<version>${xnio.version}</version>
 		</dependency>
-
-		<!-- Undertow Dependencies Starts -->
 
 		<dependency>
 			<groupId>io.undertow</groupId>
@@ -116,31 +224,31 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.21</version>
+			<version>${slf4j-api.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>1.1.7</version>
+			<version>${logback-core.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
+			<version>${logback-classic.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.framework</artifactId>
-			<version>5.4.0</version>
+			<version>${felix.framework.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.http.proxy</artifactId>
-			<version>3.0.2</version>
+			<version>${felix.http.proxy.version}</version>
 		</dependency>
 
 		<!-- OSGi Bundles Starts -->
@@ -148,124 +256,127 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20160212</version>
+			<version>${org.json.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.3.1</version>
+			<version>${commons-fileupload.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.5</version>
+			<version>${commons-io.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.scr</artifactId>
-			<version>2.0.6</version>
+			<version>${felix.scr.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.configadmin</artifactId>
-			<version>1.8.10</version>
+			<version>${felix.configadmin.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.eventadmin</artifactId>
-			<version>1.4.6</version>
+			<version>${felix.eventadmin.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.metatype</artifactId>
-			<version>1.1.2</version>
+			<version>${felix.metatype.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.log</artifactId>
-			<version>1.0.1</version>
+			<version>${felix.log.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.http.servlet-api</artifactId>
-			<version>1.1.2</version>
+			<version>${felix.http.servlet-api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.http.bridge</artifactId>
-			<version>3.0.12</version>
+			<version>${felix.http.bridge.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.webconsole</artifactId>
-			<version>4.2.16</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modularweb-webconsole-branding</artifactId>
-			<version>1.0.0.RELEASE</version>
+			<version>${felix.webconsole.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.inventory</artifactId>
-			<version>1.0.4</version>
+			<version>${felix.inventory.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.webconsole.plugins.memoryusage</artifactId>
-			<version>1.0.6</version>
+			<version>${felix.webconsole.plugins.memoryusage.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.webconsole.plugins.event</artifactId>
-			<version>1.1.4</version>
+			<version>${felix.webconsole.plugins.event.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.webconsole.plugins.ds</artifactId>
-			<version>2.0.2</version>
+			<version>${felix.webconsole.plugins.ds.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.webconsole.plugins.packageadmin</artifactId>
-			<version>1.0.2</version>
+			<version>${felix.webconsole.plugins.packageadmin.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<!-- OSGi Bundles Ends -->
+		
+		<!-- AdeptJ Modular Web Bundles Starts-->
 
+		<dependency>
+			<groupId>com.adeptj</groupId>
+			<artifactId>adeptj-modularweb-webconsole-branding</artifactId>
+			<version>${adeptj.modularweb-webconsole-branding.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- AdeptJ Modular Web Bundles Ends-->
 
 	</dependencies>
 </project>

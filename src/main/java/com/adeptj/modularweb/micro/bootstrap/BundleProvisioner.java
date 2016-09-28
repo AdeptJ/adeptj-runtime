@@ -1,18 +1,38 @@
+/* 
+ * =============================================================================
+ * 
+ * Copyright (c) 2016 AdeptJ
+ * Copyright (c) 2016 Rakesh Kumar <irakeshk@outlook.com>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * =============================================================================
+*/
 package com.adeptj.modularweb.micro.bootstrap;
 
 import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +45,7 @@ public enum BundleProvisioner {
 	
 	INSTANCE;
 	
-	private static final String BUNDLES_JAR_DIR = "bundles/";
+	private static final String BUNDLES_JAR_DIR = "bundles" + File.separator;
 	
 	private static final String HEADER_FRAGMENT_HOST = "Fragment-Host";
 
@@ -42,29 +62,19 @@ public enum BundleProvisioner {
 
 	private void startBundles(Set<Bundle> installedBundles) {
 		// Fragment Bundles can't be started so put a check for [Fragment-Host] header.
+		BundleStartConsumer consumer = (Bundle bundle) -> {
+			bundle.start();
+		};
 		installedBundles.stream().filter(bundle -> bundle.getHeaders().get(HEADER_FRAGMENT_HOST) == null)
-				.forEach(bundle -> {
-					LOGGER.info("Starting bundle: [{}] version: [{}]", bundle, bundle.getVersion());
-					try {
-						bundle.start();
-					} catch (BundleException | IllegalStateException | SecurityException  ex) {
-						LOGGER.error("Exception while starting bundle: [{}]. Exception: {}", bundle, ex);
-					}
-				});
+				.forEach(consumer);
 	}
 
 	private Set<Bundle> installBundles(BundleContext systemBundleContext) throws Exception {
-		Set<Bundle> installedBundles = new HashSet<>();
+		BundleInstallFunction installFunc = (url) -> {
+			return systemBundleContext.installBundle(url.toExternalForm());
+		};
 		// First install all the Bundles.
-		this.collectBundles().forEach(url -> {
-			LOGGER.debug("Installing Bundle from location: [{}]", url);
-			try {
-				installedBundles.add(systemBundleContext.installBundle(url.toExternalForm()));
-			} catch (BundleException | IllegalStateException | SecurityException ex) {
-				LOGGER.error("Exception while installing bundle: [{}]. Exception: {}", url, ex);
-			}
-		});
-		return installedBundles;
+		return this.collectBundles().stream().map(installFunc).filter(Objects::nonNull).collect(Collectors.toSet());
 	}
 
 	private List<URL> collectBundles() throws IOException {
