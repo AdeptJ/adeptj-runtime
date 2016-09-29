@@ -23,6 +23,9 @@ package com.adeptj.modularweb.micro.bootstrap;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.BindException;
+import java.net.DatagramSocket;
+import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -74,8 +77,20 @@ public class UndertowBootstrap {
 		try {
 			long startTime = System.currentTimeMillis();
 			Config rootConf = Configs.INSTANCE.root();
+			Config undertowConf = rootConf.getConfig("undertow");
+			Config httpConf = undertowConf.getConfig("http");
+			String propertyPort = System.getProperty("adeptj.server.port");
+			int port = httpConf.getInt("port");
+			if (propertyPort == null || propertyPort.isEmpty()) {
+				LOGGER.warn("No port specified, using default port: [{}]", port);
+			} else {
+				port = Integer.parseInt(propertyPort);
+			}
+			if (!isPortAvailable(port)) {
+				System.exit(-1);
+			}
 			String startupInfo = stringify(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO));
-			LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
+			LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
 			LOGGER.info(startupInfo);
 			// Order of StartupHandler matters.
 			Set<Class<?>> handlesTypes = new LinkedHashSet<>();
@@ -86,16 +101,14 @@ public class UndertowBootstrap {
 			deploymentInfo.setIgnoreFlush(true);
 			manager = Servlets.newContainer().addDeployment(deploymentInfo);
 			manager.deploy();
-			Config undertowConf = rootConf.getConfig("undertow");
-			Config httpConf = undertowConf.getConfig("http");
-			server = undertowBuilder(undertowConf).addHttpListener(httpConf.getInt("port"), httpConf.getString("host"))
+			server = undertowBuilder(undertowConf).addHttpListener(port, httpConf.getString("host"))
 					.setHandler(manager.start()).build();
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
-			long endTime = System.currentTimeMillis() - startTime;
-			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@@", endTime);
+			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - startTime));
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
+			System.exit(-1);
 		}
 	}
 
@@ -113,7 +126,7 @@ public class UndertowBootstrap {
 		@Override
 		public void run() {
 			long startTime = System.currentTimeMillis();
-			LOGGER.info("@@@@ Stopping AdeptJ Modular Web Micro!! @@@@");
+			LOGGER.info("Stopping AdeptJ Modular Web Micro!!");
 			try {
 				manager.stop();
 				manager.undeploy();
@@ -127,8 +140,21 @@ public class UndertowBootstrap {
 				// do nothing, we don't care at this moment.
 			}
 			long endTime = System.currentTimeMillis() - startTime;
-			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro stopped in [{}] ms @@@@@@", endTime);
+			LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", endTime);
 		}
+	}
+	
+	public static boolean isPortAvailable(int port) {
+		boolean isAvailable = false;
+		try (ServerSocket ss = new ServerSocket(port); DatagramSocket ds = new DatagramSocket(port);) {
+			ss.setReuseAddress(true);
+			ds.setReuseAddress(true);
+			isAvailable = true;
+		} catch (IOException ex) {
+			LOGGER.error("Exception while aquiring port: [{}], cause:", port, ex);
+			isAvailable = !(ex instanceof BindException);
+		}
+		return isAvailable;
 	}
 
 	private static String stringify(InputStream inputStream) throws IOException {

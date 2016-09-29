@@ -37,7 +37,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		LOGGER.info("@@@@ FrameworkShutdownHandler.contextInitialized @@@@");
+		// Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
 	}
 
 	@Override

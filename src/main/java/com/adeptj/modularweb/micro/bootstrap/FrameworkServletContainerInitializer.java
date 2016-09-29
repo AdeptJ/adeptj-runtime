@@ -57,7 +57,7 @@ public class FrameworkServletContainerInitializer implements ServletContainerIni
 			ServletContextAware.INSTANCE.setServletContext(context);
 			context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
 			handlers.forEach(handler -> {
-				LOGGER.info("Handling @HandlesTypes: [{}]", handler);
+				LOGGER.debug("Handling @HandlesTypes: [{}]", handler);
 				try {
 					if (StartupHandler.class.isAssignableFrom(handler)) {
 						StartupHandler.class.cast(handler.newInstance()).onStartup(context);

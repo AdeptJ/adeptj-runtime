@@ -41,7 +41,7 @@ public interface BundleStartConsumer extends Consumer<Bundle> {
 	 */
 	@Override
 	default void accept(Bundle bundle) {
-		LOGGER.info("Starting bundle: [{}] version: [{}]", bundle, bundle.getVersion());
+		LOGGER.debug("Starting bundle: [{}] version: [{}]", bundle, bundle.getVersion());
 		try {
 			this.acceptWithThrows(bundle);
 		} catch (Exception ex) {

@@ -65,6 +65,8 @@ public enum FrameworkBootstrap {
 
     public void startFramework() {
         try {
+        	LOGGER.info("Starting the OSGi Framework!!");
+    		long startTime = System.currentTimeMillis();
             this.framework = this.createFramework();
             this.framework.start();
             this.systemBundleContext = this.framework.getBundleContext();
@@ -75,23 +77,15 @@ public enum FrameworkBootstrap {
             ServletContext context = ServletContextAware.INSTANCE.getServletContext();
             context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
             BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
-            LOGGER.info("OSGi Framework Started!!");
-            /*
-			 * Register the FrameworkServlet after the OSGi Framework started successfully.
-			 * This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
-			 * {@link FrameworkServlet} collect the DispatcherServlet service and delegates all the service calls to it.
-			 */
-            Dynamic registration = context.addServlet(DISPATCHER, frameworkServlet);
-            registration.setLoadOnStartup(1);
-            registration.addMapping(ROOT_MAPPING);
-            LOGGER.info("DispatcherProxyServlet registered successfully!!");
+            LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
+            this.registerFrameworkServlet(frameworkServlet, context);
         } catch (Exception ex) {
             LOGGER.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the BundleProvisioner throws exception.
             this.stopFramework();
         }
     }
-    
+
     protected void setSystemBundleContext(BundleContext bundleContext) {
     	this.systemBundleContext = bundleContext;
     }
@@ -111,6 +105,18 @@ public enum FrameworkBootstrap {
             LOGGER.error("Error Stopping OSGi Framework!!", ex);
         }
     }
+    
+    private void registerFrameworkServlet(FrameworkServlet servlet, ServletContext context) {
+		/*
+		 * Register the FrameworkServlet after the OSGi Framework started successfully.
+		 * This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
+		 * {@link FrameworkServlet} collect the DispatcherServlet service and delegates all the service calls to it.
+		 */
+		Dynamic registration = context.addServlet(DISPATCHER, servlet);
+		registration.addMapping(ROOT_MAPPING);
+		registration.setLoadOnStartup(1);
+		LOGGER.info("DispatcherProxyServlet registered successfully!!");
+	}
 
 	private Framework createFramework() throws Exception {
 		Framework framework = null;

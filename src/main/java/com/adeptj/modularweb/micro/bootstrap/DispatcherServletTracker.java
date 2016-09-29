@@ -127,7 +127,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         filterExpr.append(HttpServlet.class.getName()).append(")");
         filterExpr.append(DEFAULT_FILTER).append(")");
         String filter = filterExpr.toString();
-        LOGGER.info("ServiceTracker Filter: [{}]", filter);
+        LOGGER.debug("ServiceTracker Filter: [{}]", filter);
         return context.createFilter(filter);
     }
 }
