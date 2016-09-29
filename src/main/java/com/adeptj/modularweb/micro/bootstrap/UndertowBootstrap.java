@@ -146,13 +146,47 @@ public class UndertowBootstrap {
 	 */
 	private static Builder undertowBuilder(Config undertowConf) {
 		Builder builder = Undertow.builder();
+		int ioThreadsRuntime = Math.max(Runtime.getRuntime().availableProcessors(), 2);
+        int workerThreadsRuntime = ioThreadsRuntime * 8;
 		Config internals = undertowConf.getConfig("internals");
-		builder.setBufferSize(internals.getInt("buffer-size"));
-		builder.setIoThreads(internals.getInt("io-threads"));
-		builder.setWorkerThreads(internals.getInt("worker-threads"));
-		builder.setDirectBuffers(internals.getBoolean("direct-buffers"));
+		handleIOThreads(builder, ioThreadsRuntime, internals);
+		handleWorkerThreads(builder, workerThreadsRuntime, internals);
+		handleUndertowBuffer(builder, internals);
 		builder.setHandler(gracefulShutdownHandler(null));
 		return builder;
+	}
+
+	private static void handleWorkerThreads(Builder builder, int workerThreadsRuntime, Config internals) {
+		int workerThreadsConf = internals.getInt("worker-threads");
+		int workerThreads = workerThreadsRuntime > workerThreadsConf ? workerThreadsRuntime
+				: (workerThreadsConf > workerThreadsRuntime ? workerThreadsRuntime : workerThreadsConf);
+		builder.setWorkerThreads(workerThreads);
+	}
+
+	private static void handleIOThreads(Builder builder, int ioThreadsRuntime, Config internals) {
+		int ioThreadsConf = internals.getInt("io-threads");
+		int ioThreads = ioThreadsRuntime > ioThreadsConf ? ioThreadsRuntime
+				: (ioThreadsConf > ioThreadsRuntime ? ioThreadsRuntime : ioThreadsConf);
+		builder.setIoThreads(ioThreads);
+	}
+	
+	private static void handleUndertowBuffer(Builder builder, Config internals) {
+		long maxMemory = Runtime.getRuntime().maxMemory();
+		//smaller than 64mb of ram we use 512b buffers
+        if (maxMemory < internals.getLong("max-mem-64m")) {
+            //use 512b buffers
+        	builder.setDirectBuffers(false);
+        	builder.setBufferSize(512);
+        } else if (maxMemory < internals.getLong("max-mem-128m")) {
+            //use 1k buffers
+            builder.setDirectBuffers(internals.getBoolean("direct-buffers"));
+        	builder.setBufferSize(1024);
+        } else {
+            //use 16k buffers for best performance
+            //as 16k is generally the max amount of data that can be sent in a single write() call
+            builder.setDirectBuffers(internals.getBoolean("direct-buffers"));
+        	builder.setBufferSize(internals.getInt("buffer-size"));
+        }
 	}
 
 	/**
