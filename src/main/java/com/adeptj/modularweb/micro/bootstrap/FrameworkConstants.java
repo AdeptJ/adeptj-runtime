@@ -32,4 +32,8 @@ public final class FrameworkConstants {
 	public static final String BUNDLES_ROOT_DIR_KEY = "BundlesRootDir";
 
 	public static final String BUNDLES_ROOT_DIR_VALUE = File.separator + "bundles" + File.separator;
+	
+	public static final String CONF_FILE = "bootstrap";
+	
+	public static final String ROOT_CONF = "root";
 }

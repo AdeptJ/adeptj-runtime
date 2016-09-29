@@ -32,6 +32,8 @@ import javax.servlet.ServletException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.typesafe.config.Config;
+
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.handlers.AllowedMethodsHandler;
@@ -55,13 +57,13 @@ import io.undertow.util.HttpString;
 public class UndertowBootstrap {
 
 	private static final String STARTUP_INFO = "/adeptj-startup-info.txt";
-	
+
 	private static final String SHUTDOWN_INFO = "/adeptj-shutdown-info.txt";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
 
 	private static final String CONTEXT_PATH = "/";
-	
+
 	private static final String UTF8 = StandardCharsets.UTF_8.name();
 
 	private static Undertow server;
@@ -71,8 +73,8 @@ public class UndertowBootstrap {
 	public static void main(String[] args) {
 		try {
 			long startTime = System.currentTimeMillis();
+			Config rootConf = Configs.INSTANCE.root();
 			String startupInfo = stringify(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO));
-			// System.out.println(startupInfo);
 			LOGGER.info("@@@@@@ Bootstraping AdeptJ Modular Web Micro @@@@@@");
 			LOGGER.info(startupInfo);
 			// Order of StartupHandler matters.
@@ -84,13 +86,13 @@ public class UndertowBootstrap {
 			deploymentInfo.setIgnoreFlush(true);
 			manager = Servlets.newContainer().addDeployment(deploymentInfo);
 			manager.deploy();
-			Configs config = Configs.INSTANCE;
-			server = undertowBuilder(config).addHttpListener(config.httpPort(), config.httpHost())
+			Config undertowConf = rootConf.getConfig("undertow");
+			Config httpConf = undertowConf.getConfig("http");
+			server = undertowBuilder(undertowConf).addHttpListener(httpConf.getInt("port"), httpConf.getString("host"))
 					.setHandler(manager.start()).build();
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
 			long endTime = System.currentTimeMillis() - startTime;
-			// System.out.println(String.format("@@@@@@ AdeptJ Modular Web Micro Initialized in [%s] ms @@@@@@", endTime));
 			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@@", endTime);
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
@@ -98,7 +100,8 @@ public class UndertowBootstrap {
 	}
 
 	/**
-	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then stops Undertow server.
+	 * ShutdownHook for handling CTRL+C, this first un-deploy the app and then
+	 * stops Undertow server.
 	 * 
 	 * Rakesh.Kumar, AdeptJ
 	 */
@@ -110,7 +113,6 @@ public class UndertowBootstrap {
 		@Override
 		public void run() {
 			long startTime = System.currentTimeMillis();
-			// System.out.println("@@@@ Stopping AdeptJ Modular Web Micro!! @@@@");
 			LOGGER.info("@@@@ Stopping AdeptJ Modular Web Micro!! @@@@");
 			try {
 				manager.stop();
@@ -122,10 +124,9 @@ public class UndertowBootstrap {
 			try {
 				LOGGER.info(stringify(UndertowBootstrap.class.getResourceAsStream(SHUTDOWN_INFO)));
 			} catch (Exception ex) {
-				// do nothing
+				// do nothing, we don't care at this moment.
 			}
 			long endTime = System.currentTimeMillis() - startTime;
-			// System.out.println(String.format("@@@@@@ AdeptJ Modular Web Micro stopped in [%s] ms @@@@@@", endTime));
 			LOGGER.info("@@@@@@ AdeptJ Modular Web Micro stopped in [{}] ms @@@@@@", endTime);
 		}
 	}
@@ -143,12 +144,13 @@ public class UndertowBootstrap {
 	/**
 	 * Build the Undertow internals.
 	 */
-	private static Builder undertowBuilder(Configs config) {
+	private static Builder undertowBuilder(Config undertowConf) {
 		Builder builder = Undertow.builder();
-		builder.setBufferSize(config.bufferSize());
-		builder.setIoThreads(config.ioThreads());
-		builder.setWorkerThreads(config.workerThreads());
-		builder.setDirectBuffers(true);
+		Config internals = undertowConf.getConfig("internals");
+		builder.setBufferSize(internals.getInt("buffer-size"));
+		builder.setIoThreads(internals.getInt("io-threads"));
+		builder.setWorkerThreads(internals.getInt("worker-threads"));
+		builder.setDirectBuffers(internals.getBoolean("direct-buffers"));
 		builder.setHandler(gracefulShutdownHandler(null));
 		return builder;
 	}

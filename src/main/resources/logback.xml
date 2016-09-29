@@ -32,13 +32,13 @@
   
 	<appender name="FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${user.dir}/modularweb-micro/log/amw-micro.log</file>
+		<file>${user.dir}/modularweb-micro/logs/amw-micro.log</file>
 		<append>true</append>
 		<encoder>
 			<pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{300} - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${user.dir}/modularweb-micro/log/amw-micro-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<fileNamePattern>${user.dir}/modularweb-micro/logs/amw-micro-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
 				<maxFileSize>10MB</maxFileSize>
 			</timeBasedFileNamingAndTriggeringPolicy>

@@ -27,6 +27,8 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.typesafe.config.Config;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration.Dynamic;
 
@@ -45,7 +47,9 @@ public enum FrameworkBootstrap {
 
     INSTANCE;
 
-    private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
+    public static final String SHARED_SERVLET_CONTEXT_ATTRS = "org.apache.felix.http.shared_servlet_context_attributes";
+
+	private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
 	public static final String DISPATCHER = "DispatcherProxyServlet";
 
@@ -130,18 +134,25 @@ public enum FrameworkBootstrap {
 		 * (for example you implement an HttpSessionListener and want to access {@ link ServletContext}
 		 * attributes of the ServletContext to which the HttpSession is linked). Otherwise leave this property unset.
 		 */
-        configs.put("org.apache.felix.http.shared_servlet_context_attributes", "true");
+        Config felix = Configs.INSTANCE.root().getConfig("felix");
+        configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felix.getString("shared-servlet-context-attributes"));
         String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
-        configs.put("org.osgi.framework.storage", frameworkArtifactsDir + File.separator + "felix");
-        configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-config");
-        configs.put("org.osgi.framework.bundle.parent", "framework");
+        configs.put("org.osgi.framework.storage", frameworkArtifactsDir + File.separator + "osgi-bundles");
+        configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-configs");
+        configs.put("felix.memoryusage.dump.location", frameworkArtifactsDir + File.separator + "heap-dumps");
+        configs.put("org.osgi.framework.bundle.parent", felix.getString("framework-bundle-parent"));
         // set felix.log.level debug
-        configs.put("felix.log.level", System.getProperty("felix.log.level", "1"));
+        String felixLogProp = System.getProperty("felix.log.level");
+        if (felixLogProp != null && !felixLogProp.isEmpty()) {
+        	configs.put("felix.log.level", felixLogProp);
+        } else {
+			configs.put("felix.log.level", felix.getString("felix-config-log"));
+        }
         /*
          * WARNING: This breaks OSGi Modularity, But EhCache won't work without this.
          * Declaring on Sun specific classes only.
          */
-        configs.put("org.osgi.framework.bootdelegation", "com.yourkit.*,sun.*,com.sun.*");
+        configs.put("org.osgi.framework.bootdelegation", felix.getString("osgi-bootdelegation"));
 		/*
 		 * Register the OsgiManager HttpServlet using the prefix "/" so that it could be resolved by Felix DispatcherServlet
 		 * which is registered on "/" itself. This is optional as "/system/console" is default.
