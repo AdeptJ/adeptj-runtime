@@ -52,11 +52,11 @@
 		<typesafe.config.version>1.3.1</typesafe.config.version>
 		
 		<!-- Apache Felix and OSGi Dependencies Version -->
-		<felix.framework.version>5.4.0</felix.framework.version>
+		<felix.framework.version>5.6.0</felix.framework.version>
 		<felix.http.proxy.version>3.0.2</felix.http.proxy.version>
 		<felix.scr.version>2.0.6</felix.scr.version>
 		<felix.configadmin.version>1.8.10</felix.configadmin.version>
-		<felix.eventadmin.version>1.4.6</felix.eventadmin.version>
+		<felix.eventadmin.version>1.4.8</felix.eventadmin.version>
 		<felix.webconsole.plugins.packageadmin.version>1.0.2</felix.webconsole.plugins.packageadmin.version>
 		<felix.webconsole.plugins.ds.version>2.0.2</felix.webconsole.plugins.ds.version>
 		<felix.webconsole.plugins.event.version>1.1.4</felix.webconsole.plugins.event.version>
