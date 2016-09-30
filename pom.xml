@@ -354,6 +354,23 @@
 			<version>${felix.webconsole.plugins.memoryusage.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.threaddump</artifactId>
+			<version>1.0.0</version>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.osgi</groupId>
+					<artifactId>org.osgi.core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>org.apache.felix.inventory</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
