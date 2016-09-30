@@ -24,10 +24,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -72,7 +74,7 @@ public class UndertowBootstrap {
 	private static Undertow server;
 
 	private static DeploymentManager manager;
-
+	
 	public static void main(String[] args) {
 		try {
 			long startTime = System.currentTimeMillis();
@@ -101,10 +103,16 @@ public class UndertowBootstrap {
 			deploymentInfo.setIgnoreFlush(true);
 			manager = Servlets.newContainer().addDeployment(deploymentInfo);
 			manager.deploy();
+			Map<HttpString, String> headers = new HashMap<>();
+			headers.put(HttpString.tryFromString("Server"), "AdeptJ Modular Web Micro");
+			headers.put(HttpString.tryFromString("X-Powered-By"), "Undertow/1");
 			server = undertowBuilder(undertowConf).addHttpListener(port, httpConf.getString("host"))
-					.setHandler(manager.start()).build();
+					.setHandler(new FrameworkHttpHandler(manager.start(), headers)).build();
 			server.start();
-			Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+			Runtime.getRuntime().addShutdownHook(new ShutdownHook("AdeptJ Modular Web Micro Terminator"));
+			if (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
+				Runtime.getRuntime().exec("open " + "http://" + "localhost" + ":" + port + "/system/console");
+			}
 			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - startTime));
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
@@ -120,6 +128,10 @@ public class UndertowBootstrap {
 	 */
 	private static class ShutdownHook extends Thread {
 
+		public ShutdownHook(String name) {
+			super(name);
+		}
+
 		/**
 		 * Handles Graceful server shutdown and resource cleanup.
 		 */
@@ -133,22 +145,27 @@ public class UndertowBootstrap {
 			} catch (ServletException ex) {
 				LOGGER.error("Exception while stopping DeploymentManager!!", ex);
 			}
-			server.stop();
+			try {
+				server.stop();
+			} catch (Throwable th) {
+				LOGGER.error("Fatal error while stopping AdeptJ Modular Web Micro!!", th);
+				System.exit(-1);
+			}
 			try {
 				LOGGER.info(stringify(UndertowBootstrap.class.getResourceAsStream(SHUTDOWN_INFO)));
 			} catch (Exception ex) {
-				// do nothing, we don't care at this moment.
+				LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", (System.currentTimeMillis() - startTime));
+				System.exit(-1);
 			}
-			long endTime = System.currentTimeMillis() - startTime;
-			LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", endTime);
+			LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", (System.currentTimeMillis() - startTime));
 		}
 	}
 	
 	public static boolean isPortAvailable(int port) {
 		boolean isAvailable = false;
-		try (ServerSocket ss = new ServerSocket(port); DatagramSocket ds = new DatagramSocket(port);) {
-			ss.setReuseAddress(true);
-			ds.setReuseAddress(true);
+		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
+			channel.socket().setReuseAddress(true);
+			channel.socket().bind(new InetSocketAddress(port));
 			isAvailable = true;
 		} catch (IOException ex) {
 			LOGGER.error("Exception while aquiring port: [{}], cause:", port, ex);
@@ -179,6 +196,7 @@ public class UndertowBootstrap {
 		handleWorkerThreads(builder, workerThreadsRuntime, internals);
 		handleUndertowBuffer(builder, internals);
 		builder.setHandler(gracefulShutdownHandler(null));
+		UndertowOptionsBuilder.build(builder, undertowConf);
 		return builder;
 	}
 
