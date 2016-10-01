@@ -14,10 +14,9 @@
                           \/     \/          \/            \/               \/               \/       \/    \/ 
 
 
-
 ############################################################################
 #                                                                          # 
-# Copyright (c) 2016 AdeptJ                                                #
+# Copyright (c) 2016 AdeptJ (http://adeptj.com)                            #
 # Copyright (c) 2016 Rakesh Kumar <irakeshk@outlook.com>                   #
 #                                                                          #
 # Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -33,5 +32,4 @@
 # limitations under the License.                                           #
 #                                                                          #
 ############################################################################
-
 

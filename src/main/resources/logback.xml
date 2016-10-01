@@ -16,7 +16,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<configuration>
+<configuration debug="true" packagingData="true">
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -47,7 +47,8 @@
 	</appender>
 
 
-	<root level="INFO">
+	<!-- root logger is always at debug level by default -->
+	<root>
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="FILE" />
 	</root>

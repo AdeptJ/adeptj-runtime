@@ -20,16 +20,16 @@
 */
 package com.adeptj.modularweb.micro.bootstrap;
 
-import org.osgi.framework.InvalidSyntaxException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.osgi.framework.InvalidSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * HttpServlet acting as a front controller for all of the incoming requests and
@@ -80,13 +80,7 @@ public class FrameworkServlet extends HttpServlet {
             	res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             	return;
             } else {
-                DispatcherType dispatcherType = req.getDispatcherType();
-                LOGGER.debug("DispatcherType: {}", dispatcherType);
-                if (DispatcherType.INCLUDE.equals(dispatcherType)) {
-                    dispatcher.service(new IncludeHttpServletRequest(req), res);
-                } else {
-                    dispatcher.service(req, res);
-                }
+            	dispatcher.service(req, res);
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);

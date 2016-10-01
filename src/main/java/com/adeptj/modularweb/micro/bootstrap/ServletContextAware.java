@@ -25,7 +25,7 @@ import javax.servlet.ServletContext;
 import org.osgi.framework.BundleContext;
 
 /**
- * This enum provides the access to the {@link ServletContext}
+ * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -49,5 +49,9 @@ public enum ServletContextAware {
 	
 	public BundleContext getBundleContext() {
 		return this.getAttr(BundleContext.class.getName(), BundleContext.class);
+	}
+	
+	public void setBundleContext(BundleContext bundleContext) {
+		context.setAttribute(BundleContext.class.getName(), bundleContext);
 	}
 }

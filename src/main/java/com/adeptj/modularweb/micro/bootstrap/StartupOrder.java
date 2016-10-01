@@ -29,7 +29,8 @@ import java.lang.annotation.Target;
 
 /**
  * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
- * StartupOrder#order() specified.
+ * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
+ * are called in an unspecified order.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */

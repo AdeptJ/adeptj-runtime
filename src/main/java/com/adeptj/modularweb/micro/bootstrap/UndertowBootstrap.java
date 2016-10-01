@@ -61,9 +61,11 @@ import io.undertow.util.HttpString;
  */
 public class UndertowBootstrap {
 
-	private static final String STARTUP_INFO = "/adeptj-startup-info.txt";
+	private static final long START_TIME = System.currentTimeMillis();
+	
+	private static final String STARTUP_INFO = "/startup-info.txt";
 
-	private static final String SHUTDOWN_INFO = "/adeptj-shutdown-info.txt";
+	private static final String SHUTDOWN_INFO = "/shutdown-info.txt";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
 
@@ -77,13 +79,15 @@ public class UndertowBootstrap {
 	
 	public static void main(String[] args) {
 		try {
-			long startTime = System.currentTimeMillis();
 			Config rootConf = Configs.INSTANCE.root();
 			Config undertowConf = rootConf.getConfig("undertow");
 			Config httpConf = undertowConf.getConfig("http");
+			//String startupLogFile = rootConf.getConfig("common").getString("startup-log-file");
+			//Files.exists(Paths.get(startupLogFile));
 			String propertyPort = System.getProperty("adeptj.server.port");
-			int port = httpConf.getInt("port");
+			int port;
 			if (propertyPort == null || propertyPort.isEmpty()) {
+				port = httpConf.getInt("port");
 				LOGGER.warn("No port specified, using default port: [{}]", port);
 			} else {
 				port = Integer.parseInt(propertyPort);
@@ -105,7 +109,7 @@ public class UndertowBootstrap {
 			manager.deploy();
 			Map<HttpString, String> headers = new HashMap<>();
 			headers.put(HttpString.tryFromString("Server"), "AdeptJ Modular Web Micro");
-			headers.put(HttpString.tryFromString("X-Powered-By"), "Undertow/1");
+			headers.put(HttpString.tryFromString("X-Powered-By"), "Undertow");
 			server = undertowBuilder(undertowConf).addHttpListener(port, httpConf.getString("host"))
 					.setHandler(new FrameworkHttpHandler(manager.start(), headers)).build();
 			server.start();
@@ -113,7 +117,7 @@ public class UndertowBootstrap {
 			if (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
 				Runtime.getRuntime().exec("open " + "http://" + "localhost" + ":" + port + "/system/console");
 			}
-			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - startTime));
+			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - START_TIME));
 		} catch (Throwable ex) {
 			LOGGER.error("Unexpected!!", ex);
 			System.exit(-1);
