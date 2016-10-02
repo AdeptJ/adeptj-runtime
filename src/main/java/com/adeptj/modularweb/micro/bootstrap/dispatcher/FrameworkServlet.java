@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.dispatcher;
 
 import java.io.IOException;
 
@@ -30,6 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.bootstrap.common.ServletContextAware;
+import com.adeptj.modularweb.micro.bootstrap.osgi.DispatcherServletTracker;
 
 /**
  * HttpServlet acting as a front controller for all of the incoming requests and

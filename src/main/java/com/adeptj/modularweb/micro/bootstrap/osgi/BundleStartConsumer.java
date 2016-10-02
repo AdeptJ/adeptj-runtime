@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
 import java.util.function.Consumer;
 

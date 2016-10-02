@@ -17,41 +17,19 @@
  * limitations under the License.
  * 
  * =============================================================================
-*/
-package com.adeptj.modularweb.micro.bootstrap;
-
-import javax.servlet.ServletContext;
-
-import org.osgi.framework.BundleContext;
+ */
+package com.adeptj.modularweb.micro.bootstrap.common;
 
 /**
- * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
+ * Execution mode for optimizing server settings according to the mode provided.
  * 
+ * Note: Defaults to DEV mode.
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServletContextAware {
+public enum ServerMode {
 
-	INSTANCE;
-
-	private ServletContext context;
-
-	protected void setServletContext(ServletContext context) {
-		this.context = context;
-	}
-
-	public ServletContext getServletContext() {
-		return this.context;
-	}
-
-	public <T> T getAttr(String name, Class<T> type) {
-		return type.cast(this.context.getAttribute(name));
-	}
+	DEV,
 	
-	public BundleContext getBundleContext() {
-		return this.getAttr(BundleContext.class.getName(), BundleContext.class);
-	}
-	
-	public void setBundleContext(BundleContext bundleContext) {
-		context.setAttribute(BundleContext.class.getName(), bundleContext);
-	}
+	PROD
 }

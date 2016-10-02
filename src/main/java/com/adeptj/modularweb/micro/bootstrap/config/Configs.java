@@ -18,25 +18,28 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 /**
- * StartupHandler that will be called by the FrameworkServletContainerInitializer while startup is in
- * progress.
- * 
+ * Initializes the application configurations.
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
-public interface StartupHandler {
+public enum Configs {
 
-	/**
-	 * This method will be called by the FrameworkServletContainerInitializer while startup is in
-	 * progress.
-	 * 
-	 * @param context
-	 * @throws ServletException
-	 */
-	void onStartup(ServletContext context) throws ServletException;
+	INSTANCE;
+
+	private final Config root;
+
+	Configs() {
+		this.root = ConfigFactory.load(FrameworkConstants.CONF_FILE).getConfig(FrameworkConstants.ROOT_CONF);
+	}
+
+	public Config root() {
+		return root;
+	}
 }

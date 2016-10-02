@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;

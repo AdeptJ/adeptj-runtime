@@ -18,7 +18,7 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.common;
 
 import java.io.PrintStream;
 import java.text.DateFormat;

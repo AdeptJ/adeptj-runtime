@@ -18,9 +18,9 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.undertow;
 
-import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.SHUTDOWN_INFO;
+import static com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants.SHUTDOWN_INFO;
 
 import java.io.IOException;
 
@@ -28,6 +28,9 @@ import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.bootstrap.common.CommonUtils;
+import com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
@@ -45,8 +48,8 @@ public class UndertowShutdownHook extends Thread {
 
 	private DeploymentManager manager;
 
-	public UndertowShutdownHook(String name, Undertow server, DeploymentManager manager) {
-		super(name);
+	public UndertowShutdownHook(Undertow server, DeploymentManager manager) {
+		super(FrameworkConstants.SHUTDOWN_HOOK);
 		this.server = server;
 		this.manager = manager;
 	}
@@ -62,7 +65,7 @@ public class UndertowShutdownHook extends Thread {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			LOGGER.info(CommonUtils.toString(UndertowBootstrap.class.getResourceAsStream(SHUTDOWN_INFO)));
+			LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(SHUTDOWN_INFO)));
 			LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", (System.currentTimeMillis() - startTime));
 		} catch (ServletException | IOException ex) {
 			LOGGER.error("Exception while stopping Undertow!!", ex);

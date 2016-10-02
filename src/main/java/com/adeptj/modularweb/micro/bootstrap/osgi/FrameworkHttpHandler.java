@@ -18,18 +18,38 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
+
+import java.util.Map;
+
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HeaderMap;
+import io.undertow.util.HttpString;
 
 /**
- * Execution mode for optimizing server settings according to the mode provided.
+ * FrameworkHttpHandler
  * 
- * Note: Defaults to DEV mode.
- *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServerMode {
-
-	DEV,
+public class FrameworkHttpHandler implements HttpHandler {
 	
-	PROD
+	private final HttpHandler delegatee;
+	
+	private Map<HttpString, String> headers;
+	
+	public FrameworkHttpHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
+		this.delegatee = delegatee;
+		this.headers = headers;
+	}
+
+	@Override
+	public void handleRequest(HttpServerExchange exchange) throws Exception {
+		HeaderMap responseHeaders = exchange.getResponseHeaders();
+		this.headers.forEach((headerName, headerValue) -> {
+			responseHeaders.put(headerName, headerValue);
+		});
+		delegatee.handleRequest(exchange);
+	}
+
 }

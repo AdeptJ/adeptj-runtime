@@ -18,9 +18,9 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
-import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.bootstrap.common.ServletContextAware;
 
 /**
  * BundleProvisioner that handles the installation/activation of required bundles after the system bundle is up and running.

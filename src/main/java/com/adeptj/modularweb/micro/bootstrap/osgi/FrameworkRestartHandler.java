@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -28,6 +28,9 @@ import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.bootstrap.common.ServletContextAware;
+import com.adeptj.modularweb.micro.bootstrap.dispatcher.FrameworkServlet;
 
 /**
  * OSGi FrameworkListener.

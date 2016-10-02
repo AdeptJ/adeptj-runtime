@@ -18,10 +18,10 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.initializer;
 
-import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
-import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.BUNDLES_ROOT_DIR_VALUE;
+import static com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants.BUNDLES_ROOT_DIR_VALUE;
 
 import java.util.Set;
 
@@ -32,6 +32,10 @@ import javax.servlet.annotation.HandlesTypes;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.bootstrap.common.ServletContextAware;
+import com.adeptj.modularweb.micro.bootstrap.core.StartupHandler;
+import com.adeptj.modularweb.micro.bootstrap.osgi.FrameworkShutdownHandler;
 
 /**
  * An Initializer that is called by the Container while initialization is in progress.

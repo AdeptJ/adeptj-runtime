@@ -18,9 +18,9 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.core;
 
-import static com.adeptj.modularweb.micro.bootstrap.FrameworkConstants.STARTUP_INFO;
+import static com.adeptj.modularweb.micro.bootstrap.common.FrameworkConstants.STARTUP_INFO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +28,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.bootstrap.common.CommonUtils;
+import com.adeptj.modularweb.micro.bootstrap.config.Configs;
+import com.adeptj.modularweb.micro.bootstrap.undertow.UndertowProvisioner;
 import com.typesafe.config.Config;
 
 /**
@@ -46,12 +49,12 @@ public class Main {
 			Config rootConf = Configs.INSTANCE.root();
 			Config undertowConf = rootConf.getConfig("undertow");
 			Config httpConf = undertowConf.getConfig("http");
-			String port = getPort(httpConf);
-			String startupInfo = CommonUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO));
+			int port = getPort(httpConf);
+			String startupInfo = CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO));
 			LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
 			LOGGER.info(startupInfo);
-			UndertowBootstrap undertow = new UndertowBootstrap();
-			undertow.bootstrap(parseCommands(args, port, httpConf.getString("host")), undertowConf);
+			UndertowProvisioner provisioner = new UndertowProvisioner();
+			provisioner.provision(parseCommands(args), port, undertowConf);
 			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - START_TIME));
 		} catch (Throwable th) {
 			LOGGER.error("Fatal, exiting JVM!!", th);
@@ -59,23 +62,22 @@ public class Main {
 		}
 	}
 	
-	private static Map<String, String> parseCommands(String[] args, String port, String host) {
+	private static Map<String, String> parseCommands(String[] args) {
 		Map<String, String> arguments = new HashMap<>();
-		arguments.put("port", port);
-		arguments.put("host", host);
+		// Parse the command line.
 		return arguments;
 	}
 
-	private static String getPort(Config httpConf) {
+	private static int getPort(Config httpConf) {
 		String propertyPort = System.getProperty("adeptj.server.port");
-		String port = null;
+		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
-			port = httpConf.getString("port");
+			port = httpConf.getInt("port");
 			LOGGER.warn("No port specified, using default port: [{}]", port);
 		} else {
-			port = propertyPort;
+			port = Integer.parseInt(propertyPort);
 		}
-		if (!CommonUtils.isPortAvailable(Integer.parseInt(port))) {
+		if (!CommonUtils.isPortAvailable(port)) {
 			System.exit(-1);
 		}
 		return port;

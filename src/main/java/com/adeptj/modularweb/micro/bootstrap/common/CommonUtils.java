@@ -18,7 +18,7 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
  * @author Rakesh.Kumar, AdeptJ
  */
 public class CommonUtils {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
-	
+
 	private static final int BUFFER_SIZE = 1024;
 
 	/**
@@ -46,7 +46,7 @@ public class CommonUtils {
 	 */
 	private CommonUtils() {
 	}
-	
+
 	public static String toString(InputStream input) throws IOException {
 		byte[] buffer = new byte[BUFFER_SIZE];
 		int length;
@@ -56,7 +56,7 @@ public class CommonUtils {
 		}
 		return out.toString(FrameworkConstants.UTF8);
 	}
-	
+
 	public static boolean isPortAvailable(int port) {
 		boolean isAvailable = false;
 		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
@@ -69,4 +69,13 @@ public class CommonUtils {
 		}
 		return isAvailable;
 	}
+
+	public static boolean isMac() {
+		return System.getProperty("os.name").startsWith("Mac");
+	}
+	
+	public static boolean isWindows() {
+		return System.getProperty("os.name").startsWith("Windows");
+	}
+
 }

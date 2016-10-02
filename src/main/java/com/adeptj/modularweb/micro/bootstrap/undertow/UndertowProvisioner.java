@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.undertow;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +28,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.bootstrap.common.CommonUtils;
+import com.adeptj.modularweb.micro.bootstrap.initializer.FrameworkServletContainerInitializer;
+import com.adeptj.modularweb.micro.bootstrap.osgi.FrameworkHttpHandler;
+import com.adeptj.modularweb.micro.bootstrap.osgi.FrameworkStartupHandler;
 import com.typesafe.config.Config;
 
 import io.undertow.Undertow;
@@ -46,27 +50,25 @@ import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 
 /**
- * UndertowBootstrap: Bootstrap the Undertow server and OSGi Framework.
+ * UndertowProvisioner: Provision the Undertow server and OSGi Framework.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class UndertowBootstrap {
+public class UndertowProvisioner {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowBootstrap.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowProvisioner.class);
 
 	private static final String CONTEXT_PATH = "/";
 
-	public void bootstrap(Map<String, String> arguments, Config undertowConf) {
+	public void provision(Map<String, String> arguments, int port, Config undertowConf) {
 		try {
 			DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 			manager.deploy();
-			int port = Integer.parseInt(arguments.get("port"));
 			Undertow server = this.undertowBuilder(undertowConf).addHttpListener(port, arguments.get("host"))
 					.setHandler(new FrameworkHttpHandler(manager.start(), this.buildHeaders())).build();
 			server.start();
-			Runtime.getRuntime()
-					.addShutdownHook(new UndertowShutdownHook("AdeptJ Modular Web Micro Terminator", server, manager));
-			if (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
+			Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
+			if (CommonUtils.isMac()) {
 				Runtime.getRuntime().exec("open " + "http://" + "localhost" + ":" + port + "/system/console");
 			}
 		} catch (Throwable ex) {
@@ -82,9 +84,6 @@ public class UndertowBootstrap {
 		return headers;
 	}
 
-	/**
-	 * Build the Undertow internals.
-	 */
 	private Builder undertowBuilder(Config undertowConf) {
 		Builder builder = Undertow.builder();
 		int ioThreadsRuntime = Math.max(Runtime.getRuntime().availableProcessors(), 2);
@@ -147,7 +146,7 @@ public class UndertowBootstrap {
 				.addServletContainerInitalizer(new ServletContainerInitializerInfo(
 						FrameworkServletContainerInitializer.class,
 						new ImmediateInstanceFactory<>(new FrameworkServletContainerInitializer()), handlesTypes))
-				.setClassLoader(UndertowBootstrap.class.getClassLoader()).setContextPath(CONTEXT_PATH)
+				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setContextPath(CONTEXT_PATH)
 				.setIgnoreFlush(true).setDeploymentName("AdeptJ Modular Web Micro Deployment");
 	}
 }

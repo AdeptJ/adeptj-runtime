@@ -17,39 +17,41 @@
  * limitations under the License.
  * 
  * =============================================================================
- */
-package com.adeptj.modularweb.micro.bootstrap;
+*/
+package com.adeptj.modularweb.micro.bootstrap.common;
 
-import java.util.Map;
+import javax.servlet.ServletContext;
 
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.HttpString;
+import org.osgi.framework.BundleContext;
 
 /**
- * FrameworkHttpHandler
+ * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class FrameworkHttpHandler implements HttpHandler {
-	
-	private final HttpHandler delegatee;
-	
-	private Map<HttpString, String> headers;
-	
-	public FrameworkHttpHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
-		this.delegatee = delegatee;
-		this.headers = headers;
+public enum ServletContextAware {
+
+	INSTANCE;
+
+	private ServletContext context;
+
+	public void setServletContext(ServletContext context) {
+		this.context = context;
 	}
 
-	@Override
-	public void handleRequest(HttpServerExchange exchange) throws Exception {
-		HeaderMap responseHeaders = exchange.getResponseHeaders();
-		this.headers.forEach((headerName, headerValue) -> {
-			responseHeaders.put(headerName, headerValue);
-		});
-		delegatee.handleRequest(exchange);
+	public ServletContext getServletContext() {
+		return this.context;
 	}
 
+	public <T> T getAttr(String name, Class<T> type) {
+		return type.cast(this.context.getAttribute(name));
+	}
+	
+	public BundleContext getBundleContext() {
+		return this.getAttr(BundleContext.class.getName(), BundleContext.class);
+	}
+	
+	public void setBundleContext(BundleContext bundleContext) {
+		context.setAttribute(BundleContext.class.getName(), bundleContext);
+	}
 }

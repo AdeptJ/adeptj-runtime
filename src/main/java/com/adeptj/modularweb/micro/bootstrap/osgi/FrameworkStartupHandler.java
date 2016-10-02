@@ -18,10 +18,14 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+
+import com.adeptj.modularweb.micro.bootstrap.common.StartupOrder;
+import com.adeptj.modularweb.micro.bootstrap.core.StartupHandler;
+import com.adeptj.modularweb.micro.bootstrap.initializer.FrameworkServletContainerInitializer;
 
 /**
  * StartupHandler is a {@link javax.servlet.annotation.HandlesTypes} that handles the OSGi Framework startup.

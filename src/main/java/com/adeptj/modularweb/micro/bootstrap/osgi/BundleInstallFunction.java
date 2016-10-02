@@ -17,27 +17,43 @@
  * limitations under the License.
  * 
  * =============================================================================
-*/
-package com.adeptj.modularweb.micro.bootstrap;
+ */
+package com.adeptj.modularweb.micro.bootstrap.osgi;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.net.URL;
+import java.util.function.Function;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
- * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
- * are called in an unspecified order.
+ * BundleInstallFunction.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-@Target(TYPE)
-@Retention(RUNTIME)
-@Documented
-public @interface StartupOrder {
+@FunctionalInterface
+public interface BundleInstallFunction extends Function<URL, Bundle> {
+	
+	Logger LOGGER = LoggerFactory.getLogger(BundleInstallFunction.class);
 
-	public int value() default 0;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	default Bundle apply(URL url) {
+		LOGGER.debug("Installing Bundle from location: [{}]", url);
+		Bundle bundle = null;
+		try {
+			bundle = this.applyWithThrows(url);
+		} catch (Exception ex) {
+			LOGGER.error("Exception while installing bundle: [{}]. Exception: {}", url, ex);
+		}
+		return bundle;
+	}
+	
+	/**
+	 * To deal with checked exception in Lambda function.
+	 */
+	Bundle applyWithThrows(URL url) throws Exception;
 }

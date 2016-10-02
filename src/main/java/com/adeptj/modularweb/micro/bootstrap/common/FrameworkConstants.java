@@ -18,7 +18,7 @@
  * 
  * =============================================================================
 */
-package com.adeptj.modularweb.micro.bootstrap;
+package com.adeptj.modularweb.micro.bootstrap.common;
 
 import java.io.File;
 
@@ -42,4 +42,6 @@ public final class FrameworkConstants {
 	public static final String SHUTDOWN_INFO = "/shutdown-info.txt";
 	
 	public static final String UTF8 = "UTF-8";
+	
+	public static final String SHUTDOWN_HOOK = "AdeptJ Modular Web Micro Terminator"; 
 }
