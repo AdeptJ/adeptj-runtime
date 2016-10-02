@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(0)
 public class FrameworkShutdownHandler implements ServletContextListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkShutdownHandler.class);

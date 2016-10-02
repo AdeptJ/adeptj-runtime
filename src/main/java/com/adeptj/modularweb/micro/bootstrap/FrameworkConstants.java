@@ -36,4 +36,10 @@ public final class FrameworkConstants {
 	public static final String CONF_FILE = "bootstrap";
 	
 	public static final String ROOT_CONF = "root";
+	
+	public static final String STARTUP_INFO = "/startup-info.txt";
+	
+	public static final String SHUTDOWN_INFO = "/shutdown-info.txt";
+	
+	public static final String UTF8 = "UTF-8";
 }

@@ -28,7 +28,7 @@ import javax.servlet.ServletException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(1)
+@StartupOrder(0)
 public class FrameworkStartupHandler implements StartupHandler {
 	
     /**
