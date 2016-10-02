@@ -34,7 +34,7 @@ public class BootstrapLogger {
 
 	private static final DateFormat FMT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS ");
 
-	private BootstrapLogger(int logLevel) {
+	private BootstrapLogger() {
 	}
 
 	static void debug(String message, Throwable th) {
@@ -42,11 +42,11 @@ public class BootstrapLogger {
 	}
 
 	static void info(String message, Throwable th) {
-		log(System.out, "*INFO *", message, th);
+		log(System.out, "*INFO*", message, th);
 	}
 
 	static void warn(String message, Throwable th) {
-		log(System.out, "*WARN *", message, th);
+		log(System.out, "*WARN*", message, th);
 	}
 
 	static void error(String message, Throwable th) {
