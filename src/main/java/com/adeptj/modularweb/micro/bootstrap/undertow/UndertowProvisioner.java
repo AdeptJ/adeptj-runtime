@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.bootstrap.common.CommonUtils;
 import com.adeptj.modularweb.micro.bootstrap.initializer.FrameworkServletContainerInitializer;
-import com.adeptj.modularweb.micro.bootstrap.osgi.FrameworkHttpHandler;
 import com.adeptj.modularweb.micro.bootstrap.osgi.FrameworkStartupHandler;
 import com.typesafe.config.Config;
 
@@ -65,7 +64,7 @@ public class UndertowProvisioner {
 			DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 			manager.deploy();
 			Undertow server = this.undertowBuilder(undertowConf).addHttpListener(port, arguments.get("host"))
-					.setHandler(new FrameworkHttpHandler(manager.start(), this.buildHeaders())).build();
+					.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 			if (CommonUtils.isMac()) {

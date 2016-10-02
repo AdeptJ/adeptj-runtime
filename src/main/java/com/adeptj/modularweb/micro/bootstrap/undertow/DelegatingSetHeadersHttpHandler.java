@@ -18,7 +18,7 @@
  * 
  * =============================================================================
  */
-package com.adeptj.modularweb.micro.bootstrap.osgi;
+package com.adeptj.modularweb.micro.bootstrap.undertow;
 
 import java.util.Map;
 
@@ -28,17 +28,17 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
 /**
- * FrameworkHttpHandler
+ * DelegatingSetHeadersHttpHandler
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class FrameworkHttpHandler implements HttpHandler {
+public class DelegatingSetHeadersHttpHandler implements HttpHandler {
 	
 	private final HttpHandler delegatee;
 	
 	private Map<HttpString, String> headers;
 	
-	public FrameworkHttpHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
+	public DelegatingSetHeadersHttpHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
 		this.delegatee = delegatee;
 		this.headers = headers;
 	}
