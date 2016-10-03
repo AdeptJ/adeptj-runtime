@@ -12,3 +12,5 @@
 hs_err_pid*
 dependency-reduced-pom.xml
 modularweb-micro/log
+.idea
+adeptj-modularweb-micro.iml
