@@ -159,7 +159,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.adeptj.modularweb.micro.bootstrap.core.Main</mainClass>
+									<mainClass>com.adeptj.modularweb.micro.core.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
