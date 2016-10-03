@@ -83,7 +83,9 @@ public class UndertowProvisioner {
 					.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 			server.start();
 			Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
-			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
+            if (arguments.get("launchBrowser") != null) {
+                CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
+            }
 		} catch (Throwable ex) {
 			LOGGER.error("Problem starting server!!", ex);
 			System.exit(-1);

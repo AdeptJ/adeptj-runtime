@@ -45,11 +45,25 @@ import com.adeptj.modularweb.micro.config.Configs;
  */
 public class CommonUtils {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 
 	private static final int BUFFER_SIZE = 1024;
 
-	/**
+	public static final String REGEX_COMMA = ",";
+
+    public static final String EMPTY = "";
+
+    public static final String SPACE = " ";
+
+    public static final String PIPE = " || ";
+
+    public static final String CMD_SH = "sh";
+
+    public static final String CMD_OPT = "-c";
+
+    public static final int INDEX_ZERO = 0;
+
+    /**
 	 * Deny direct instantiation.
 	 */
 	private CommonUtils() {
@@ -60,7 +74,7 @@ public class CommonUtils {
 		int length;
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		while ((length = input.read(buffer)) != -1) {
-			out.write(buffer, 0, length);
+			out.write(buffer, INDEX_ZERO, length);
 		}
 		return out.toString(Constants.UTF8);
 	}
@@ -97,18 +111,18 @@ public class CommonUtils {
 		} else if (isWindows()) {
 			Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
 		} else if (isUnix()) {
-			String[] browsers = Configs.INSTANCE.main().getString(CONF_KEY_BROWSERS).split(",");
+			String[] browsers = Configs.INSTANCE.main().getString(CONF_KEY_BROWSERS).split(REGEX_COMMA);
 			StringBuilder cmdBuilder = new StringBuilder();
-			int index = 0;
+			int index = INDEX_ZERO;
 			for (String browser : browsers) {
-				if (index == 0) {
-					cmdBuilder.append("").append(browser).append(" ").append(url);
+				if (index == INDEX_ZERO) {
+					cmdBuilder.append(EMPTY).append(browser).append(SPACE).append(url);
 				} else {
-					cmdBuilder.append(" || ").append(browser).append(" ").append(url);
+					cmdBuilder.append(PIPE).append(browser).append(SPACE).append(url);
 				}
 				index++;
 			}
-			Runtime.getRuntime().exec(new String[] { "sh", "-c", cmdBuilder.toString() });
+			Runtime.getRuntime().exec(new String[] {CMD_SH, CMD_OPT, cmdBuilder.toString() });
 		}
 	}
 }

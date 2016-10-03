@@ -37,19 +37,19 @@ public class StartupLogger {
 	private StartupLogger() {
 	}
 
-	static void debug(String message, Throwable th) {
+	public static void debug(String message, Throwable th) {
 		log(System.out, "*DEBUG*", message, th);
 	}
 
-	static void info(String message, Throwable th) {
+	public static void info(String message, Throwable th) {
 		log(System.out, "*INFO*", message, th);
 	}
 
-	static void warn(String message, Throwable th) {
+	public static void warn(String message, Throwable th) {
 		log(System.out, "*WARN*", message, th);
 	}
 
-	static void error(String message, Throwable th) {
+	public static void error(String message, Throwable th) {
 		log(System.err, "*ERROR*", message, th);
 	}
 

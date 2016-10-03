@@ -158,7 +158,7 @@ public enum FrameworkProvisioner {
 			configs.put("felix.log.level", felix.getString("felix-config-log"));
         }
         /*
-         * WARNING: This breaks OSGi Modularity, But EhCache won't work without this.
+         * WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
          * Declaring on Sun specific classes only.
          */
         configs.put("org.osgi.framework.bootdelegation", felix.getString("osgi-bootdelegation"));
