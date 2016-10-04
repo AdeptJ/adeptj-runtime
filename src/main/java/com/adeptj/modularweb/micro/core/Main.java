@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.LogbackInitializer;
+import com.adeptj.modularweb.micro.common.ServletContextAware;
+import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
 //import com.adeptj.modularweb.micro.common.LogbackInitializer;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
@@ -54,6 +56,11 @@ public class Main {
 			provisioner.provision(parseCommands(args));
 			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - START_TIME));
 		} catch (Throwable th) {
+			// Check if OSGi Framework was already started, try to stop the framework gracefully.
+			if (ServletContextAware.INSTANCE.getBundleContext() != null) {
+				LOGGER.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
+				FrameworkProvisioner.INSTANCE.stopFramework();
+			}
 			LOGGER.error("Fatal, exiting JVM!!", th);
 			System.exit(-1);
 		}

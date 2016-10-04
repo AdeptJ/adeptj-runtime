@@ -20,7 +20,7 @@
  */
 package com.adeptj.modularweb.micro.common;
 
-import static com.adeptj.modularweb.micro.common.Constants.CONF_KEY_BROWSERS;
+import static com.adeptj.modularweb.micro.common.Constants.KEY_BROWSERS;
 import static com.adeptj.modularweb.micro.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.modularweb.micro.common.Constants.OS;
 import static com.adeptj.modularweb.micro.common.Constants.WIN_BROWSER_LAUNCH_CMD;
@@ -111,7 +111,7 @@ public class CommonUtils {
 		} else if (isWindows()) {
 			Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
 		} else if (isUnix()) {
-			String[] browsers = Configs.INSTANCE.main().getString(CONF_KEY_BROWSERS).split(REGEX_COMMA);
+			String[] browsers = Configs.INSTANCE.main().getString(KEY_BROWSERS).split(REGEX_COMMA);
 			StringBuilder cmdBuilder = new StringBuilder();
 			int index = INDEX_ZERO;
 			for (String browser : browsers) {
