@@ -41,14 +41,14 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
-    private final static String DEFAULT_FILTER = "(http.felix.dispatcher=org.apache.felix.http.base.internal.DispatcherServlet)";
+	private final static String OSGI_FILTER_EXPR = "(http.felix.dispatcher=org.apache.felix.http.base.internal.DispatcherServlet)";
 
-    private final ServletConfig config;
+	private final ServletConfig config;
 
     private HttpServlet dispatcher;
 
     public DispatcherServletTracker(BundleContext context, ServletConfig config) throws InvalidSyntaxException {
-        super(context, DispatcherServletTracker.createFilter(context), null);
+        super(context, createFilter(context), null);
         this.config = config;
     }
 
@@ -81,7 +81,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * Otherwise this will cause [java.lang.IllegalStateException: Invalid BundleContext] on Framework restart.
          * When Framework is being restarted from Web console then tracker is still open with stale BundleContext.
          * Now with the Framework restart DispatcherServlet OSGi service becomes available and Framework calls addingService method.
-         * Which further tries to get DispatcherServlet OSGi service using the stale the BundleContext
+         * Which further tries to get DispatcherServlet OSGi service using the stale BundleContext
          * from which this ServiceTracker was created and causes the [java.lang.IllegalStateException: Invalid BundleContext].
          * Since a Framework restart creates a new BundleContext and this tracker will again be opened with
          * the new BundleContext therefore closing it here make sense.
@@ -125,7 +125,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         StringBuilder filterExpr = new StringBuilder();
         filterExpr.append("(&(").append(Constants.OBJECTCLASS).append("=");
         filterExpr.append(HttpServlet.class.getName()).append(")");
-        filterExpr.append(DEFAULT_FILTER).append(")");
+        filterExpr.append(OSGI_FILTER_EXPR).append(")");
         String filter = filterExpr.toString();
         LOGGER.debug("Felix DispatcherServlet ServiceTracker Filter: [{}]", filter);
         return context.createFilter(filter);

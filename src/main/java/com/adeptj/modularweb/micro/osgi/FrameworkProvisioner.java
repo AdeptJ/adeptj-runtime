@@ -20,6 +20,15 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration.Dynamic;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
@@ -31,15 +40,6 @@ import com.adeptj.modularweb.micro.common.ServletContextAware;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
 
 /**
  * FrameworkProvisioner that handles the OSGi Framework startup and shutdown.
@@ -78,6 +78,7 @@ public enum FrameworkProvisioner {
             this.systemBundleContext.addFrameworkListener(this.listener);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             ServletContext context = ServletContextAware.INSTANCE.getServletContext();
+            EventDispatcherSupport.INSTANCE.initListeners(context);
             context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
             BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
             LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
@@ -112,11 +113,12 @@ public enum FrameworkProvisioner {
     private void registerProxyDispatcherServlet(ProxyDispatcherServlet servlet, ServletContext context) {
 		/*
 		 * Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
-		 * This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
-		 * {@link ProxyDispatcherServlet} collect the DispatcherServlet service and delegates all the service calls to it.
+		 * This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
+		 * {@link ProxyDispatcherServlet} delegates all the service calls to the DispatcherServlet.
 		 */
 		Dynamic registration = context.addServlet(DISPATCHER, servlet);
 		registration.addMapping(ROOT_MAPPING);
+		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
 		registration.setLoadOnStartup(1);
 		LOGGER.info("ProxyDispatcherServlet registered successfully!!");
 	}
@@ -138,11 +140,6 @@ public enum FrameworkProvisioner {
         props.forEach((key, val) -> {
         	configs.put((String) key, (String) val);
         });
-		/*
-		 * WARNING: Only set this property if absolutely needed.
-		 * (for example you implement an HttpSessionListener and want to access {@ link ServletContext}
-		 * attributes of the ServletContext to which the HttpSession is linked). Otherwise leave this property unset.
-		 */
         Config felix = Configs.INSTANCE.main().getConfig("felix");
         configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felix.getString("shared-servlet-context-attributes"));
         String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
@@ -150,22 +147,14 @@ public enum FrameworkProvisioner {
         configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-configs");
         configs.put("felix.memoryusage.dump.location", frameworkArtifactsDir + File.separator + "heap-dumps");
         configs.put("org.osgi.framework.bundle.parent", felix.getString("framework-bundle-parent"));
-        // set felix.log.level debug
         String felixLogProp = System.getProperty("felix.log.level");
-        if (felixLogProp != null && !felixLogProp.isEmpty()) {
-        	configs.put("felix.log.level", felixLogProp);
+        if (felixLogProp == null || felixLogProp.isEmpty()) {
+        	configs.put("felix.log.level", felix.getString("felix-config-log"));
         } else {
-			configs.put("felix.log.level", felix.getString("felix-config-log"));
+        	configs.put("felix.log.level", felixLogProp);
         }
-        /*
-         * WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
-         * Declaring on Sun specific classes only.
-         */
+        // WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
         configs.put("org.osgi.framework.bootdelegation", felix.getString("osgi-bootdelegation"));
-		/*
-		 * Register the OsgiManager HttpServlet using the prefix "/" so that it could be resolved by Felix DispatcherServlet
-		 * which is registered on "/" itself. This is optional as "/system/console" is default.
-		 */
         configs.put("felix.webconsole.manager.root", "/system/console");
         LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;

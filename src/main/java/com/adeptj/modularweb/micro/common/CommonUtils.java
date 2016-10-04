@@ -122,7 +122,7 @@ public class CommonUtils {
 				}
 				index++;
 			}
-			Runtime.getRuntime().exec(new String[] {CMD_SH, CMD_OPT, cmdBuilder.toString() });
+			Runtime.getRuntime().exec(new String[] { CMD_SH, CMD_OPT, cmdBuilder.toString() });
 		}
 	}
 }
