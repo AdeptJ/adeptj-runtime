@@ -59,10 +59,10 @@ public class ProxyDispatcherServlet extends HttpServlet {
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         if (!initialized) {
             try {
+            	LOGGER.info("Opening Felix DispatcherServlet ServiceTracker!!");
                 this.tracker = new DispatcherServletTracker(ServletContextAware.INSTANCE.getBundleContext(),
                         this.getServletConfig());
                 this.tracker.open();
-                LOGGER.info("DispatcherServletTracker opened!!");
                 initialized = true;
             } catch (InvalidSyntaxException ise) {
                 LOGGER.error("Could not register the DispatcherServletTracker!!", ise);

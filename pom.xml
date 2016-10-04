@@ -50,7 +50,6 @@
 		<commons-fileupload.version>1.3.1</commons-fileupload.version>
 		<commons-io.version>2.5</commons-io.version>
 		<typesafe.config.version>1.3.1</typesafe.config.version>
-		<tinylog.version>1.1</tinylog.version>
 		<boon-json.version>0.34</boon-json.version>
 		
 		<!-- Apache Felix and OSGi Dependencies Version -->
@@ -233,28 +232,8 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j-api.version}</version>
 		</dependency>
-		
-		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-simple</artifactId>
-		    <version>${slf4j-api.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.tinylog</groupId>
-		    <artifactId>tinylog</artifactId>
-		    <version>${tinylog.version}</version>
-		    <scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>io.fastjson</groupId>
-		    <artifactId>boon</artifactId>
-		    <version>${boon-json.version}</version>
-		    <scope>provided</scope>
-		</dependency>
 
-		<!-- <dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
 			<version>${logback-core.version}</version>
@@ -264,7 +243,14 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback-classic.version}</version>
-		</dependency> -->
+		</dependency>
+		
+		<dependency>
+		    <groupId>io.fastjson</groupId>
+		    <artifactId>boon</artifactId>
+		    <version>${boon-json.version}</version>
+		    <scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>

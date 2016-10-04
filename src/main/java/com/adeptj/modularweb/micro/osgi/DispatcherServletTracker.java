@@ -61,18 +61,18 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         HttpServlet dispatcherServlet = null;
         try {
             dispatcherServlet = super.addingService(reference);
-            LOGGER.info("Adding Service: [{}]", dispatcherServlet);
+			LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
             this.handleDispatcher(dispatcherServlet);
         } catch (Exception ex) {
             // This might be due to the OSGi framework restart from Felix WebConsole.
-            LOGGER.error("addingService failed!!", ex);
+            LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
         }
         return dispatcherServlet;
     }
 
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
-        LOGGER.info("Removing Service: [{}]", service);
+        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
         // Passing null so that DispatcherServlet.init() won't be called again.
         this.handleDispatcher(null);
         super.removedService(reference, service);
@@ -103,7 +103,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcher == null) {
             return;
         }
-        LOGGER.info("Destroying DispatcherServlet: [{}]", this.dispatcher);
+        LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcher);
         this.dispatcher.destroy();
         this.dispatcher = null;
     }
@@ -113,11 +113,11 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
             return;
         }
         try {
-            LOGGER.info("Initializing DispatcherServlet!!");
+            LOGGER.info("Initializing Felix DispatcherServlet!!");
             this.dispatcher.init(this.config);
-            LOGGER.info("DispatcherServlet Initialized: [{}]", this.dispatcher);
+            LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcher);
         } catch (Exception ex) {
-            LOGGER.error("Failed to initialize dispatcher!!", ex);
+            LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
         }
     }
 
@@ -127,7 +127,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         filterExpr.append(HttpServlet.class.getName()).append(")");
         filterExpr.append(DEFAULT_FILTER).append(")");
         String filter = filterExpr.toString();
-        LOGGER.debug("ServiceTracker Filter: [{}]", filter);
+        LOGGER.debug("Felix DispatcherServlet ServiceTracker Filter: [{}]", filter);
         return context.createFilter(filter);
     }
 }

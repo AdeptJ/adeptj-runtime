@@ -26,6 +26,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.LogbackInitializer;
+//import com.adeptj.modularweb.micro.common.LogbackInitializer;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
 /**
@@ -35,9 +37,16 @@ import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
  */
 public class Main {
 
+	public static final String REGEX_EQ = "=";
+
 	private static final long START_TIME = System.currentTimeMillis();
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+	private static final Logger LOGGER;
+
+	static {
+		LogbackInitializer.init();
+		LOGGER = LoggerFactory.getLogger(Main.class);
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -50,9 +59,13 @@ public class Main {
 		}
 	}
 
-	private static Map<String, String> parseCommands(String[] args) {
+	private static Map<String, String> parseCommands(String[] commands) {
 		Map<String, String> arguments = new HashMap<>();
 		// Parse the command line.
+		for (String cmd : commands) {
+			int indexOf = cmd.indexOf(REGEX_EQ);
+			arguments.put(cmd.substring(0, indexOf), cmd.substring(indexOf + 1, cmd.length()));
+		}
 		return arguments;
 	}
 

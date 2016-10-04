@@ -85,7 +85,7 @@ public enum BundleProvisioner {
 				&& entry.getName().endsWith(EXTN_JAR);
 		List<URL> bundles = conn.getJarFile().stream().filter(bundlePredicate)
 				.map(entry -> classLoader.getResource(entry.getName())).collect(Collectors.toList());
-		LOGGER.info("Total:[{}] Bundles(excluding system bundle) collected from location:[{}]", bundles.size(), conn);
+		LOGGER.debug("Total:[{}] Bundles(excluding system bundle) collected from location:[{}]", bundles.size(), conn);
 		return bundles;
 	}
 }
