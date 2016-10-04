@@ -56,15 +56,17 @@ public class ProxyDispatcherServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
+    	long startTime = System.currentTimeMillis();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         if (!initialized) {
             try {
-            	LOGGER.info("Opening Felix DispatcherServlet ServiceTracker!!");
-                this.tracker = new DispatcherServletTracker(ServletContextAware.INSTANCE.getBundleContext(),
-                        this.getServletConfig());
-                this.tracker.open();
-                initialized = true;
-            } catch (InvalidSyntaxException ise) {
+				LOGGER.info("Opening Felix DispatcherServlet ServiceTracker!!");
+				this.tracker = new DispatcherServletTracker(ServletContextAware.INSTANCE.getBundleContext(),
+						this.getServletConfig());
+				this.tracker.open();
+				initialized = true;
+				LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", (System.currentTimeMillis() - startTime));
+			} catch (InvalidSyntaxException ise) {
                 LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
                 throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
             }

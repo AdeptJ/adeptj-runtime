@@ -54,7 +54,6 @@
 		
 		<!-- Apache Felix and OSGi Dependencies Version -->
 		<felix.framework.version>5.6.0</felix.framework.version>
-		<felix.http.proxy.version>3.0.2</felix.http.proxy.version>
 		<felix.scr.version>2.0.6</felix.scr.version>
 		<felix.configadmin.version>1.8.10</felix.configadmin.version>
 		<felix.eventadmin.version>1.4.8</felix.eventadmin.version>
@@ -249,19 +248,13 @@
 		    <groupId>io.fastjson</groupId>
 		    <artifactId>boon</artifactId>
 		    <version>${boon-json.version}</version>
-		    <scope>test</scope>
+		    <scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.framework</artifactId>
 			<version>${felix.framework.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.http.proxy</artifactId>
-			<version>${felix.http.proxy.version}</version>
 		</dependency>
 		
 		<dependency>

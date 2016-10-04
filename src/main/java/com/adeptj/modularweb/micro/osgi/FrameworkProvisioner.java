@@ -21,6 +21,7 @@
 package com.adeptj.modularweb.micro.osgi;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -54,7 +55,7 @@ public enum FrameworkProvisioner {
 
 	private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
-	public static final String DISPATCHER = "ProxyDispatcherServlet";
+	public static final String PROXY_DISPATCHER_SERVLET = "ProxyDispatcherServlet";
 
 	public static final String ROOT_MAPPING = "/*";
 
@@ -77,11 +78,11 @@ public enum FrameworkProvisioner {
             this.listener = new FrameworkRestartHandler(proxyDispatcherServlet);
             this.systemBundleContext.addFrameworkListener(this.listener);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
+            BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
+            LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
             ServletContext context = ServletContextAware.INSTANCE.getServletContext();
             EventDispatcherSupport.INSTANCE.initListeners(context);
             context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
-            BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
-            LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
             this.registerProxyDispatcherServlet(proxyDispatcherServlet, context);
         } catch (Exception ex) {
             LOGGER.error("Failed to start OSGi Framework!!", ex);
@@ -111,12 +112,10 @@ public enum FrameworkProvisioner {
     }
     
     private void registerProxyDispatcherServlet(ProxyDispatcherServlet servlet, ServletContext context) {
-		/*
-		 * Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
-		 * This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
-		 * {@link ProxyDispatcherServlet} delegates all the service calls to the DispatcherServlet.
-		 */
-		Dynamic registration = context.addServlet(DISPATCHER, servlet);
+		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
+		// This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
+		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
+		Dynamic registration = context.addServlet(PROXY_DISPATCHER_SERVLET, servlet);
 		registration.addMapping(ROOT_MAPPING);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
 		registration.setLoadOnStartup(1);
@@ -133,13 +132,8 @@ public enum FrameworkProvisioner {
 		return framework;
 	}
 
-    private Map<String, String> createFrameworkConfigs() throws Exception {
-        Properties props = new Properties();
-        props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
-        Map<String, String> configs = new HashMap<>();
-        props.forEach((key, val) -> {
-        	configs.put((String) key, (String) val);
-        });
+    private Map<String, String> createFrameworkConfigs() throws IOException {
+        Map<String, String> configs = this.loadFrameworkProps();
         Config felix = Configs.INSTANCE.main().getConfig("felix");
         configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felix.getString("shared-servlet-context-attributes"));
         String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
@@ -147,11 +141,11 @@ public enum FrameworkProvisioner {
         configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-configs");
         configs.put("felix.memoryusage.dump.location", frameworkArtifactsDir + File.separator + "heap-dumps");
         configs.put("org.osgi.framework.bundle.parent", felix.getString("framework-bundle-parent"));
-        String felixLogProp = System.getProperty("felix.log.level");
-        if (felixLogProp == null || felixLogProp.isEmpty()) {
+        String felixLogLevel = System.getProperty("felix.log.level");
+        if (felixLogLevel == null || felixLogLevel.isEmpty()) {
         	configs.put("felix.log.level", felix.getString("felix-config-log"));
         } else {
-        	configs.put("felix.log.level", felixLogProp);
+        	configs.put("felix.log.level", felixLogLevel);
         }
         // WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
         configs.put("org.osgi.framework.bootdelegation", felix.getString("osgi-bootdelegation"));
@@ -159,4 +153,14 @@ public enum FrameworkProvisioner {
         LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
+
+	private Map<String, String> loadFrameworkProps() throws IOException {
+		Properties props = new Properties();
+        props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
+        Map<String, String> configs = new HashMap<>();
+        props.forEach((key, val) -> {
+        	configs.put((String) key, (String) val);
+        });
+		return configs;
+	}
 }
