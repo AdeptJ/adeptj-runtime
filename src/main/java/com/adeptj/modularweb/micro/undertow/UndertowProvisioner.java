@@ -106,20 +106,37 @@ public class UndertowProvisioner {
 		manager.deploy();
 		Builder undertowBuilder = this.undertowBuilder(undertowConf).addHttpListener(port,
 				httpConf.getString(KEY_HOST));
-		String enableHttp2 = System.getProperty("enable.http2");
-		if (TRUE.equalsIgnoreCase(enableHttp2)) {
-			Config httpsConf = undertowConf.getConfig("https");
-			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
-			SSLContext sslContext = this.createSSLContext(this.loadKeyStore(httpsConf.getString("keyStore"), storePwd),
-					this.loadKeyStore(httpsConf.getString("trustStore"), storePwd), storePwd);
-			undertowBuilder.addHttpsListener(httpsConf.getInt("port"), httpsConf.getString(KEY_HOST), sslContext);
-		}
+		this.enableAJP(undertowConf, undertowBuilder);
+		this.enableHttp2(undertowConf, undertowBuilder);
 		Undertow server = undertowBuilder
 				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (TRUE.equals(arguments.get(CMD_LAUNCH_BROWSER))) {
 			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
+		}
+	}
+
+	private void enableHttp2(Config undertowConf, Builder undertowBuilder) throws Exception {
+		String enableHttp2 = System.getProperty("enable.http2");
+		if (TRUE.equalsIgnoreCase(enableHttp2)) {
+			Config httpsConf = undertowConf.getConfig("https");
+			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
+			SSLContext sslContext = this.createSSLContext(this.loadKeyStore(httpsConf.getString("keyStore"), storePwd),
+					this.loadKeyStore(httpsConf.getString("trustStore"), storePwd), storePwd);
+			int httpsPort = httpsConf.getInt(KEY_PORT);
+			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
+			LOGGER.info("HTTP2 enabled on port: [{}]", httpsPort);
+		}
+	}
+
+	private void enableAJP(Config undertowConf, Builder undertowBuilder) {
+		String enableAjp = System.getProperty("enable.ajp");
+		if (TRUE.equalsIgnoreCase(enableAjp)) {
+			Config ajpConf = undertowConf.getConfig("ajp");
+			int ajpPort = ajpConf.getInt(KEY_PORT);
+			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
+			LOGGER.info("AJP enabled on port: [{}]", ajpPort);
 		}
 	}
 
