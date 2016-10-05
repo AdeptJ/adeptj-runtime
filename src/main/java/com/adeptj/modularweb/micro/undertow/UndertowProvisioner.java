@@ -48,10 +48,17 @@ import static com.adeptj.modularweb.micro.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.modularweb.micro.common.Constants.TRUE;
 
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +92,8 @@ import io.undertow.util.HttpString;
  */
 public class UndertowProvisioner {
 
+	private static final String PROTOCOL_TLS = "TLS";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowProvisioner.class);
 
 	public void provision(Map<String, String> arguments) throws Exception {
@@ -95,7 +104,17 @@ public class UndertowProvisioner {
 		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 		manager.deploy();
-		Undertow server = this.undertowBuilder(undertowConf).addHttpListener(port, httpConf.getString(KEY_HOST))
+		Builder undertowBuilder = this.undertowBuilder(undertowConf).addHttpListener(port,
+				httpConf.getString(KEY_HOST));
+		String enableHttp2 = System.getProperty("enable.http2");
+		if (TRUE.equalsIgnoreCase(enableHttp2)) {
+			Config httpsConf = undertowConf.getConfig("https");
+			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
+			SSLContext sslContext = this.createSSLContext(this.loadKeyStore(httpsConf.getString("keyStore"), storePwd),
+					this.loadKeyStore(httpsConf.getString("trustStore"), storePwd), storePwd);
+			undertowBuilder.addHttpsListener(httpsConf.getInt("port"), httpsConf.getString(KEY_HOST), sslContext);
+		}
+		Undertow server = undertowBuilder
 				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
@@ -188,5 +207,25 @@ public class UndertowProvisioner {
 						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), handlesTypes))
 				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setContextPath(CONTEXT_PATH)
 				.setIgnoreFlush(true).setDeploymentName(DEPLOYMENT_NAME);
+	}
+	
+	private KeyStore loadKeyStore(String name, char[] pwd) throws Exception {
+		KeyStore loadedKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
+		loadedKeystore.load(UndertowProvisioner.class.getResourceAsStream(name), pwd);
+		return loadedKeystore;
+	}
+
+	private SSLContext createSSLContext(KeyStore keyStore, KeyStore trustStore, char[] keyStorePwd) throws Exception {
+		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		keyManagerFactory.init(keyStore, keyStorePwd);
+		KeyManager[] keyManagers = keyManagerFactory.getKeyManagers();
+		
+		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		trustManagerFactory.init(trustStore);
+		TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+		
+		SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
+		sslContext.init(keyManagers, trustManagers, null);
+		return sslContext;
 	}
 }

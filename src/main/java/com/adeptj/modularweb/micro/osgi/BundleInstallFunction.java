@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Rakesh.Kumar, AdeptJ.
  */
 @FunctionalInterface
-public interface BundleInstallFunction extends Function<URL, Bundle> {
+interface BundleInstallFunction extends Function<URL, Bundle> {
 	
 	Logger LOGGER = LoggerFactory.getLogger(BundleInstallFunction.class);
 

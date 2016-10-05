@@ -58,10 +58,8 @@ public enum BundleProvisioner {
 	private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvisioner.class);
 
 	public void provisionBundles(BundleContext systemBundleContext) throws Exception {
-		Set<Bundle> installedBundles = this.installBundles(systemBundleContext);
-		LOGGER.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
 		// Now start all the installed Bundles.
-		this.startBundles(installedBundles);
+		this.startBundles(this.installBundles(systemBundleContext));
 	}
 
 	private void startBundles(Set<Bundle> installedBundles) {
@@ -74,7 +72,10 @@ public enum BundleProvisioner {
 	private Set<Bundle> installBundles(BundleContext systemBundleContext) throws Exception {
 		BundleInstallFunction installFunc = (url) -> systemBundleContext.installBundle(url.toExternalForm());
 		// First install all the Bundles.
-		return this.collectBundles().stream().map(installFunc).filter(Objects::nonNull).collect(Collectors.toSet());
+		Set<Bundle> installedBundles = this.collectBundles().stream().map(installFunc).filter(Objects::nonNull)
+				.collect(Collectors.toSet());
+		LOGGER.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
+		return installedBundles;
 	}
 
 	private List<URL> collectBundles() throws IOException {

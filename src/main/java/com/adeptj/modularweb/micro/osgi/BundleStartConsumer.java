@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author Rakesh.Kumar, AdeptJ.
  */
 @FunctionalInterface
-public interface BundleStartConsumer extends Consumer<Bundle> {
+interface BundleStartConsumer extends Consumer<Bundle> {
 
 	Logger LOGGER = LoggerFactory.getLogger(BundleStartConsumer.class);
 

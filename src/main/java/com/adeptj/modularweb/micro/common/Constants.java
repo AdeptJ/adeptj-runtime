@@ -20,8 +20,6 @@
 */
 package com.adeptj.modularweb.micro.common;
 
-import java.io.File;
-
 /**
  * Constants.
  * 
@@ -31,7 +29,7 @@ public final class Constants {
 
 	public static final String BUNDLES_ROOT_DIR_KEY = "BundlesRootDir";
 
-	public static final String BUNDLES_ROOT_DIR_VALUE = File.separator + "bundles" + File.separator;
+	public static final String BUNDLES_ROOT_DIR_VALUE = "/bundles/";
 
 	public static final String PROVISIONING_FILE = "provisioning";
 

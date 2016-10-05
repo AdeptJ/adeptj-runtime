@@ -109,19 +109,7 @@ public enum FrameworkProvisioner {
         }
     }
     
-    /**
-	 * Adds the following to ServletContext.
-	 * 
-	 * HttpSessionListener
-	 * 
-	 * HttpSessionIdListener
-	 * 
-	 * HttpSessionAttributeListener
-	 * 
-	 * ServletContextAttributeListener
-	 * 
-	 */
-	public void initBridgeListeners(ServletContext servletContext) {
+	private void initBridgeListeners(ServletContext servletContext) {
 		// add all required listeners
 		servletContext.addListener(new BridgeServletContextAttributeListener());
 		servletContext.addListener(new BridgeHttpSessionListener());

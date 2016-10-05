@@ -54,6 +54,7 @@ public class UndertowOptionsBuilder {
 		OPTIONS_BOOL = new HashSet<>();
 		OPTIONS_BOOL.add(UndertowOptions.ALWAYS_SET_KEEP_ALIVE);
 		OPTIONS_BOOL.add(UndertowOptions.ALWAYS_SET_DATE);
+		OPTIONS_BOOL.add(UndertowOptions.ENABLE_HTTP2);
 	}
 
 	public static void build(Builder builder, Config undertowConf) {

@@ -67,6 +67,7 @@ public class StartupHandlerInitializer implements ServletContainerInitializer {
 						StartupHandler.class.cast(handler.newInstance()).onStartup(context);
 					} else {
 						LOGGER.warn("Unknown @HandlesTypes: [{}]", handler);
+						throw new IllegalStateException("Only StartupHandler types are supported!!");
 					}
 				} catch (Exception ex) {
 					LOGGER.error("StartupHandler Exception!!", ex);
