@@ -20,16 +20,10 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
-
+import com.adeptj.modularweb.micro.common.ServletContextAware;
+import com.adeptj.modularweb.micro.config.Configs;
+import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
+import com.typesafe.config.Config;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
@@ -37,10 +31,14 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.micro.common.ServletContextAware;
-import com.adeptj.modularweb.micro.config.Configs;
-import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
-import com.typesafe.config.Config;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration.Dynamic;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * FrameworkProvisioner that handles the OSGi Framework startup and shutdown.
@@ -154,27 +152,31 @@ public enum FrameworkProvisioner {
 
     private Map<String, String> createFrameworkConfigs() throws IOException {
         Map<String, String> configs = this.loadFrameworkProps();
-        Config felix = Configs.INSTANCE.main().getConfig("felix");
-        configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felix.getString("shared-servlet-context-attributes"));
+        Config felixConf = Configs.INSTANCE.main().getConfig("felix");
+        configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felixConf.getString("shared-servlet-context-attributes"));
         String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
         configs.put("org.osgi.framework.storage", frameworkArtifactsDir + File.separator + "osgi-bundles");
         configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-configs");
         configs.put("felix.memoryusage.dump.location", frameworkArtifactsDir + File.separator + "heap-dumps");
-        configs.put("org.osgi.framework.bundle.parent", felix.getString("framework-bundle-parent"));
+        configs.put("org.osgi.framework.bundle.parent", felixConf.getString("framework-bundle-parent"));
+        this.handleFelixLog(configs, felixConf);
+        // WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
+        configs.put("org.osgi.framework.bootdelegation", felixConf.getString("osgi-bootdelegation"));
+        configs.put("felix.webconsole.manager.root", "/system/console");
+        LOGGER.debug("OSGi Framework Configurations: {}", configs);
+        return configs;
+    }
+
+    private void handleFelixLog(Map<String, String> configs, Config felix) {
         String felixLogLevel = System.getProperty("felix.log.level");
         if (felixLogLevel == null || felixLogLevel.isEmpty()) {
         	configs.put("felix.log.level", felix.getString("felix-config-log"));
         } else {
         	configs.put("felix.log.level", felixLogLevel);
         }
-        // WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
-        configs.put("org.osgi.framework.bootdelegation", felix.getString("osgi-bootdelegation"));
-        configs.put("felix.webconsole.manager.root", "/system/console");
-        LOGGER.debug("OSGi Framework Configurations: {}", configs);
-        return configs;
     }
 
-	private Map<String, String> loadFrameworkProps() throws IOException {
+    private Map<String, String> loadFrameworkProps() throws IOException {
 		Properties props = new Properties();
         props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
