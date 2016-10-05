@@ -61,20 +61,23 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
 			FrameworkProvisioner.INSTANCE.setSystemBundleContext(bundleContext);
 			try {
-				this.proxyDispatcherServlet.disposeTracker();
+				this.proxyDispatcherServlet.stopTracker();
 				this.proxyDispatcherServlet.init();
 			} catch (ServletException ex) {
+				// Note: What shall we do if ProxyDispatcherServlet initialization failed.
+				// Log it as of now, we may need to stop the OSGi Framework, will decide later.
+				// Have not seen this yet.
 				LOGGER.error("ServletException!!", ex);
 			}
 			break;
 		case FrameworkEvent.STOPPED_UPDATE:
 			LOGGER.info("Disposing DispatcherServletTracker!!");
-			this.proxyDispatcherServlet.disposeTracker();
+			this.proxyDispatcherServlet.stopTracker();
 			EventDispatcherSupport.INSTANCE.stopTracker();
 			break;
 		default:
 			// log it and ignore.
-			LOGGER.warn("Ignoring the FrameworkEvent: [{}]", type);
+			LOGGER.debug("Ignoring the FrameworkEvent: [{}]", type);
 			break;
 		}
 	}

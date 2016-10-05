@@ -200,15 +200,15 @@ public enum EventDispatcherSupport {
 			LOGGER.info("Opening EventDispatcherTracker!!");
 			this.eventDispatcherTracker.open();
 		} catch (final InvalidSyntaxException ise) {
-			// not expected for our simple filter
+			// not expected for our simple filter, just log it.
 			LOGGER.error("InvalidSyntaxException!!", ise);
 		}
 	}
 
 	public void stopTracker() {
 		if (this.eventDispatcherTracker != null) {
-			this.eventDispatcherTracker.close();
 			LOGGER.info("Closing EventDispatcherTracker!!");
+			this.eventDispatcherTracker.close();
 			this.eventDispatcherTracker = null;
 		}
 	}

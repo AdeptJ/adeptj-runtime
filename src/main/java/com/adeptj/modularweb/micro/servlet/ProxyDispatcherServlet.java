@@ -105,7 +105,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
         super.destroy();
     }
 
-    public void disposeTracker() {
+    public void stopTracker() {
         initialized = false;
         this.tracker.close();
     }

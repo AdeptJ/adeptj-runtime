@@ -20,23 +20,18 @@
  */
 package com.adeptj.modularweb.micro.undertow;
 
-import static com.adeptj.modularweb.micro.common.Constants.SHUTDOWN_INFO;
-
-import java.io.IOException;
-
 import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.micro.common.CommonUtils;
 import com.adeptj.modularweb.micro.common.Constants;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
 
 /**
- * ShutdownHook for handling CTRL+C, this first un-deploy the app and then stops Undertow server.
+ * ShutdownHook for graceful handling of CTRL+C, this first cleans up the deployment and then stops UNDERTOW server.
  * 
  * Rakesh.Kumar, AdeptJ
  */
@@ -65,10 +60,9 @@ public class UndertowShutdownHook extends Thread {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(SHUTDOWN_INFO)));
-			LOGGER.info("AdeptJ Modular Web Micro stopped in [{}] ms", (System.currentTimeMillis() - startTime));
-		} catch (ServletException | IOException ex) {
-			LOGGER.error("Exception while stopping Undertow!!", ex);
+			LOGGER.info("@@@@@ AdeptJ Modular Web Micro stopped in [{}] ms @@@@@", (System.currentTimeMillis() - startTime));
+		} catch (ServletException ex) {
+			LOGGER.error("Exception while stopping Undertow, shutting down JVM!!", ex);
 			System.exit(-1);
 		}
 	}

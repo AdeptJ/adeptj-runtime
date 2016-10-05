@@ -42,6 +42,8 @@ public final class Constants {
 	public static final String STARTUP_INFO = "/startup-info.txt";
 
 	public static final String SHUTDOWN_INFO = "/shutdown-info.txt";
+	
+	public static final String REGEX_EQ = "=";
 
 	public static final String UTF8 = "UTF-8";
 

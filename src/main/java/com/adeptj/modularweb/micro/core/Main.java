@@ -26,42 +26,46 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.LogbackInitializer;
 import com.adeptj.modularweb.micro.common.ServletContextAware;
 import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
-//import com.adeptj.modularweb.micro.common.LogbackInitializer;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
 /**
- * Main class bootstrapping the AdeptJ runtime.
+ * Main class bootstrapping the AdeptJ Runtime.
  * 
  * Rakesh.Kumar, AdeptJ
  */
 public class Main {
 
-	public static final String REGEX_EQ = "=";
-
-	private static final long START_TIME = System.currentTimeMillis();
-
-	private static final Logger LOGGER;
-
-	static {
-		LogbackInitializer.init();
-		LOGGER = LoggerFactory.getLogger(Main.class);
-	}
-
+	/**
+	 * Entry point for initializing the AdeptJ Runtime.
+	 * 
+	 * It does the following tasks in order.
+	 * 
+	 * 1. Initializes the LOGBACK logging framework.
+	 * 2. Does the deployment to embedded UNDERTOW.
+	 * 3. Starts the OSGi Framework.
+	 * 4. Starts the UNDERTOW server.
+	 * 5. Registers the runtime ShutdownHook. 
+	 */
 	public static void main(String[] args) {
+		final long startTime = System.currentTimeMillis();
+		// First of all initialize LOGBACK.
+		LogbackInitializer.init();
+		final Logger logger = LoggerFactory.getLogger(Main.class);
 		try {
 			UndertowProvisioner provisioner = new UndertowProvisioner();
 			provisioner.provision(parseCommands(args));
-			LOGGER.info("AdeptJ Modular Web Micro Initialized in [{}] ms", (System.currentTimeMillis() - START_TIME));
+			logger.info("@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@", (System.currentTimeMillis() - startTime));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
 			if (ServletContextAware.INSTANCE.getBundleContext() != null) {
-				LOGGER.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
+				logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
 				FrameworkProvisioner.INSTANCE.stopFramework();
 			}
-			LOGGER.error("Fatal, exiting JVM!!", th);
+			logger.error("Fatal error, shutting down JVM!!", th);
 			System.exit(-1);
 		}
 	}
@@ -70,7 +74,7 @@ public class Main {
 		Map<String, String> arguments = new HashMap<>();
 		// Parse the command line.
 		for (String cmd : commands) {
-			int indexOf = cmd.indexOf(REGEX_EQ);
+			int indexOf = cmd.indexOf(Constants.REGEX_EQ);
 			arguments.put(cmd.substring(0, indexOf), cmd.substring(indexOf + 1, cmd.length()));
 		}
 		return arguments;

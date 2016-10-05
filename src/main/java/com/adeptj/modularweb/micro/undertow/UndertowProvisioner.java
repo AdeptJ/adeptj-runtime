@@ -87,20 +87,15 @@ public class UndertowProvisioner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowProvisioner.class);
 
-	private Config undertowConf;
-
-	public UndertowProvisioner() {
-		this.undertowConf = Configs.INSTANCE.main().getConfig("undertow");
-	}
-
 	public void provision(Map<String, String> arguments) throws Exception {
-		Config httpConf = this.undertowConf.getConfig(KEY_HTTP);
+		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
+		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		int port = getPort(httpConf);
 		LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
 		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 		manager.deploy();
-		Undertow server = this.undertowBuilder(this.undertowConf).addHttpListener(port, httpConf.getString(KEY_HOST))
+		Undertow server = this.undertowBuilder(undertowConf).addHttpListener(port, httpConf.getString(KEY_HOST))
 				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
