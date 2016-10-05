@@ -48,7 +48,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent event) {
 		LOGGER.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
 		long startTime = System.currentTimeMillis();
-		EventDispatcherSupport.INSTANCE.stopTracker();
+		EventDispatcherTrackerSupport.INSTANCE.stopTracker();
 		FrameworkProvisioner.INSTANCE.stopFramework();
 		ServletContextAware.INSTANCE.setServletContext(null);
 		LOGGER.info("OSGi Framework stopped in [{}] ms!!", (System.currentTimeMillis() - startTime));

@@ -53,7 +53,6 @@ public class FrameworkRestartHandler implements FrameworkListener {
 		switch (type) {
 		case FrameworkEvent.STARTED:
 			LOGGER.info("System Bundle Started!!");
-			EventDispatcherSupport.INSTANCE.stopTracker();
 			// Add the new BundleContext as a ServletContext attribute replacing the stale BundleContext.
 			ServletContext servletContext = ServletContextAware.INSTANCE.getServletContext();
             servletContext.removeAttribute(BundleContext.class.getName());
@@ -73,7 +72,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 		case FrameworkEvent.STOPPED_UPDATE:
 			LOGGER.info("Disposing DispatcherServletTracker!!");
 			this.proxyDispatcherServlet.stopTracker();
-			EventDispatcherSupport.INSTANCE.stopTracker();
+			EventDispatcherTrackerSupport.INSTANCE.stopTracker();
 			break;
 		default:
 			// log it and ignore.

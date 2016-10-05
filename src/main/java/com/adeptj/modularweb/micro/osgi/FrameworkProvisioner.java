@@ -81,7 +81,7 @@ public enum FrameworkProvisioner {
             BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
             LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
             ServletContext context = ServletContextAware.INSTANCE.getServletContext();
-            EventDispatcherSupport.INSTANCE.initListeners(context);
+            this.initBridgeListeners(context);
             context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
             this.registerProxyDispatcherServlet(proxyDispatcherServlet, context);
         } catch (Exception ex) {
@@ -110,6 +110,26 @@ public enum FrameworkProvisioner {
             LOGGER.error("Error Stopping OSGi Framework!!", ex);
         }
     }
+    
+    /**
+	 * Adds the following to ServletContext.
+	 * 
+	 * HttpSessionListener
+	 * 
+	 * HttpSessionIdListener
+	 * 
+	 * HttpSessionAttributeListener
+	 * 
+	 * ServletContextAttributeListener
+	 * 
+	 */
+	public void initBridgeListeners(ServletContext servletContext) {
+		// add all required listeners
+		servletContext.addListener(new BridgeServletContextAttributeListener());
+		servletContext.addListener(new BridgeHttpSessionListener());
+		servletContext.addListener(new BridgeHttpSessionIdListener());
+		servletContext.addListener(new BridgeHttpSessionAttributeListener());
+	}
     
     private void registerProxyDispatcherServlet(ProxyDispatcherServlet servlet, ServletContext context) {
 		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
