@@ -57,8 +57,6 @@ import java.util.Set;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,10 +120,9 @@ public class UndertowProvisioner {
 		if (TRUE.equalsIgnoreCase(enableHttp2)) {
 			Config httpsConf = undertowConf.getConfig("https");
 			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
-			SSLContext sslContext = this.createSSLContext(this.loadKeyStore(httpsConf.getString("keyStore"), storePwd),
-					this.loadKeyStore(httpsConf.getString("trustStore"), storePwd), storePwd);
 			int httpsPort = httpsConf.getInt(KEY_PORT);
-			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
+			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
+					this.sslContext(this.keyStore(httpsConf.getString("keyStore"), storePwd), storePwd));
 			LOGGER.info("HTTP2 enabled on port: [{}]", httpsPort);
 		}
 	}
@@ -225,24 +222,22 @@ public class UndertowProvisioner {
 				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setContextPath(CONTEXT_PATH)
 				.setIgnoreFlush(true).setDeploymentName(DEPLOYMENT_NAME);
 	}
-	
-	private KeyStore loadKeyStore(String name, char[] pwd) throws Exception {
-		KeyStore loadedKeystore = KeyStore.getInstance(KeyStore.getDefaultType());
-		loadedKeystore.load(UndertowProvisioner.class.getResourceAsStream(name), pwd);
-		return loadedKeystore;
+
+	private KeyStore keyStore(String ks, char[] pwd) throws Exception {
+		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		keyStore.load(UndertowProvisioner.class.getResourceAsStream(ks), pwd);
+		return keyStore;
 	}
 
-	private SSLContext createSSLContext(KeyStore keyStore, KeyStore trustStore, char[] keyStorePwd) throws Exception {
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		keyManagerFactory.init(keyStore, keyStorePwd);
-		KeyManager[] keyManagers = keyManagerFactory.getKeyManagers();
-		
-		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		trustManagerFactory.init(trustStore);
-		TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-		
+	private SSLContext sslContext(KeyStore keyStore, char[] keyStorePwd) throws Exception {
 		SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-		sslContext.init(keyManagers, trustManagers, null);
+		sslContext.init(this.keyMgrs(keyStore, keyStorePwd), null, null);
 		return sslContext;
+	}
+
+	private KeyManager[] keyMgrs(KeyStore keyStore, char[] keyStorePwd) throws Exception {
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		kmf.init(keyStore, keyStorePwd);
+		return kmf.getKeyManagers();
 	}
 }
