@@ -88,12 +88,12 @@ public class UndertowProvisioner {
 		int port = this.getPort(httpConf);
 		LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
 		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
-		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
-		manager.deploy();
 		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
 		this.enableAJP(undertowConf, undertowBuilder);
 		this.enableHttp2(undertowConf, undertowBuilder);
+		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
+		manager.deploy();
 		Undertow server = undertowBuilder
 				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 		server.start();
@@ -104,18 +104,19 @@ public class UndertowProvisioner {
 	}
 
 	private void enableHttp2(Config undertowConf, Builder undertowBuilder) throws Exception {
-		if (Boolean.getBoolean(System.getProperty("enable.http2"))) {
+		if (Boolean.getBoolean("enable.http2")) {
 			Config httpsConf = undertowConf.getConfig("https");
-			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
+			char[] keyStorePwd = httpsConf.getString("keyStorePwd").toCharArray();
+			char[] keyPwd = httpsConf.getString("keyPwd").toCharArray();
 			int httpsPort = httpsConf.getInt(KEY_PORT);
 			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-					this.sslContext(this.keyStore(httpsConf.getString("keyStore"), storePwd), storePwd));
+					this.sslContext(this.keyStore(httpsConf.getString("keyStore"), keyStorePwd), keyPwd));
 			LOGGER.info("HTTP2 enabled on port: [{}]", httpsPort);
 		}
 	}
 
 	private void enableAJP(Config undertowConf, Builder undertowBuilder) {
-		if (Boolean.getBoolean(System.getProperty("enable.ajp"))) {
+		if (Boolean.getBoolean("enable.ajp")) {
 			Config ajpConf = undertowConf.getConfig("ajp");
 			int ajpPort = ajpConf.getInt(KEY_PORT);
 			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
@@ -162,21 +163,21 @@ public class UndertowProvisioner {
 				.setIgnoreFlush(true).setDeploymentName(DEPLOYMENT_NAME);
 	}
 
-	private KeyStore keyStore(String ks, char[] pwd) throws Exception {
+	private KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
 		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keyStore.load(UndertowProvisioner.class.getResourceAsStream(ks), pwd);
+		keyStore.load(UndertowProvisioner.class.getResourceAsStream(keyStoreName), keyStorePwd);
 		return keyStore;
 	}
 
-	private SSLContext sslContext(KeyStore keyStore, char[] keyStorePwd) throws Exception {
+	private SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
 		SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-		sslContext.init(this.keyMgrs(keyStore, keyStorePwd), null, null);
+		sslContext.init(this.keyMgrs(keyStore, keyPwd), null, null);
 		return sslContext;
 	}
 
-	private KeyManager[] keyMgrs(KeyStore keyStore, char[] keyStorePwd) throws Exception {
+	private KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(keyStore, keyStorePwd);
+		kmf.init(keyStore, keyPwd);
 		return kmf.getKeyManagers();
 	}
 }
