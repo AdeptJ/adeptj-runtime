@@ -43,30 +43,34 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent event) {
-		String evtName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", evtName);
-		if (BundleContext.class.getName().equals(evtName)) {
-			this.startTracker(ServletContextAware.INSTANCE.getAttr(evtName, BundleContext.class));
+		String attrName = event.getName();
+		LOGGER.debug("Adding context attribute: [{}]", attrName);
+		if (this.isAttrBundleContext(attrName)) {
+			this.startTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
 		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent event) {
-		String evtName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", evtName);
-		if (BundleContext.class.getName().equals(evtName)) {
+		String attrName = event.getName();
+		LOGGER.debug("Adding context attribute: [{}]", attrName);
+		if (this.isAttrBundleContext(attrName)) {
 			this.stopTracker();
 		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent event) {
-		String evtName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", evtName);
-		if (BundleContext.class.getName().equals(evtName)) {
+		String attrName = event.getName();
+		LOGGER.debug("Adding context attribute: [{}]", attrName);
+		if (this.isAttrBundleContext(attrName)) {
 			this.stopTracker();
-			this.startTracker(ServletContextAware.INSTANCE.getAttr(evtName, BundleContext.class));
+			this.startTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
 		}
+	}
+	
+	private boolean isAttrBundleContext(String attrName) {
+		return BundleContext.class.getName().equals(attrName);
 	}
 	
 	private void startTracker(BundleContext bundleContext) {

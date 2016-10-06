@@ -20,8 +20,6 @@
 */
 package com.adeptj.modularweb.micro.undertow;
 
-import static com.adeptj.modularweb.micro.common.Constants.BUFF_SIZE_1K;
-import static com.adeptj.modularweb.micro.common.Constants.BUFF_SIZE_512_BYTES;
 import static com.adeptj.modularweb.micro.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.modularweb.micro.common.Constants.CONTEXT_PATH;
 import static com.adeptj.modularweb.micro.common.Constants.DEPLOYMENT_NAME;
@@ -29,23 +27,13 @@ import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY_VALUE;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER_VALUE;
-import static com.adeptj.modularweb.micro.common.Constants.IOTHREAD_MULTIPLIER;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HOST;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HTTP;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_PORT;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_BUFFER_SIZE;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_DIRECT_BUFFERS;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_INTERNALS;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_IOTHREADS;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_MAX_MEM_128M;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_MAX_MEM_64M;
-import static com.adeptj.modularweb.micro.common.Constants.KEY_UT_WORKER_THREADS;
 import static com.adeptj.modularweb.micro.common.Constants.MAX_REQ_WHEN_SHUTDOWN;
-import static com.adeptj.modularweb.micro.common.Constants.MIN_PROCESSORS;
 import static com.adeptj.modularweb.micro.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.modularweb.micro.common.Constants.STARTUP_INFO;
 import static com.adeptj.modularweb.micro.common.Constants.SYS_PROP_SERVER_PORT;
-import static com.adeptj.modularweb.micro.common.Constants.TRUE;
 
 import java.net.URL;
 import java.security.KeyStore;
@@ -97,27 +85,26 @@ public class UndertowProvisioner {
 	public void provision(Map<String, String> arguments) throws Exception {
 		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
-		int port = getPort(httpConf);
+		int port = this.getPort(httpConf);
 		LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
 		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 		manager.deploy();
-		Builder undertowBuilder = this.undertowBuilder(undertowConf).addHttpListener(port,
-				httpConf.getString(KEY_HOST));
+		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
+		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
 		this.enableAJP(undertowConf, undertowBuilder);
 		this.enableHttp2(undertowConf, undertowBuilder);
 		Undertow server = undertowBuilder
 				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
-		if (TRUE.equals(arguments.get(CMD_LAUNCH_BROWSER))) {
+		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
 			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
 		}
 	}
 
 	private void enableHttp2(Config undertowConf, Builder undertowBuilder) throws Exception {
-		String enableHttp2 = System.getProperty("enable.http2");
-		if (TRUE.equalsIgnoreCase(enableHttp2)) {
+		if (Boolean.getBoolean(System.getProperty("enable.http2"))) {
 			Config httpsConf = undertowConf.getConfig("https");
 			char[] storePwd = httpsConf.getString("keyStorePwd").toCharArray();
 			int httpsPort = httpsConf.getInt(KEY_PORT);
@@ -128,8 +115,7 @@ public class UndertowProvisioner {
 	}
 
 	private void enableAJP(Config undertowConf, Builder undertowBuilder) {
-		String enableAjp = System.getProperty("enable.ajp");
-		if (TRUE.equalsIgnoreCase(enableAjp)) {
+		if (Boolean.getBoolean(System.getProperty("enable.ajp"))) {
 			Config ajpConf = undertowConf.getConfig("ajp");
 			int ajpPort = ajpConf.getInt(KEY_PORT);
 			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
@@ -142,7 +128,7 @@ public class UndertowProvisioner {
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
 			port = httpConf.getInt(KEY_PORT);
-			LOGGER.warn("No port specified, using default port: [{}]", port);
+			LOGGER.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
@@ -159,54 +145,7 @@ public class UndertowProvisioner {
 		return headers;
 	}
 
-	private Builder undertowBuilder(Config undertowConf) {
-		Builder builder = Undertow.builder();
-		int ioThreadsRuntime = Math.max(Runtime.getRuntime().availableProcessors(), MIN_PROCESSORS);
-		int workerThreadsRuntime = ioThreadsRuntime * IOTHREAD_MULTIPLIER;
-		Config internals = undertowConf.getConfig(KEY_UT_INTERNALS);
-		handleIOThreads(builder, ioThreadsRuntime, internals);
-		handleWorkerThreads(builder, workerThreadsRuntime, internals);
-		handleUndertowBuffer(builder, internals);
-		builder.setHandler(gracefulShutdownHandler(null));
-		UndertowOptionsBuilder.build(builder, undertowConf);
-		return builder;
-	}
-
-	private void handleWorkerThreads(Builder builder, int workerThreadsRuntime, Config internals) {
-		int workerThreadsConf = internals.getInt(KEY_UT_WORKER_THREADS);
-		int workerThreads = workerThreadsRuntime > workerThreadsConf ? workerThreadsRuntime
-				: (workerThreadsConf > workerThreadsRuntime ? workerThreadsRuntime : workerThreadsConf);
-		builder.setWorkerThreads(workerThreads);
-	}
-
-	private void handleIOThreads(Builder builder, int ioThreadsRuntime, Config internals) {
-		int ioThreadsConf = internals.getInt(KEY_UT_IOTHREADS);
-		int ioThreads = ioThreadsRuntime > ioThreadsConf ? ioThreadsRuntime
-				: (ioThreadsConf > ioThreadsRuntime ? ioThreadsRuntime : ioThreadsConf);
-		builder.setIoThreads(ioThreads);
-	}
-
-	private void handleUndertowBuffer(Builder builder, Config internals) {
-		long maxMemory = Runtime.getRuntime().maxMemory();
-		// smaller than 64mb of ram we use 512b buffers
-		if (maxMemory < internals.getLong(KEY_UT_MAX_MEM_64M)) {
-			// use 512b buffers
-			builder.setDirectBuffers(false);
-			builder.setBufferSize(BUFF_SIZE_512_BYTES);
-		} else if (maxMemory < internals.getLong(KEY_UT_MAX_MEM_128M)) {
-			// use 1k buffers
-			builder.setDirectBuffers(internals.getBoolean(KEY_UT_DIRECT_BUFFERS));
-			builder.setBufferSize(BUFF_SIZE_1K);
-		} else {
-			// use 16k buffers for best performance
-			// as 16k is generally the max amount of data that can be sent in a
-			// single write() call
-			builder.setDirectBuffers(internals.getBoolean(KEY_UT_DIRECT_BUFFERS));
-			builder.setBufferSize(internals.getInt(KEY_UT_BUFFER_SIZE));
-		}
-	}
-
-	private GracefulShutdownHandler gracefulShutdownHandler(PathHandler handler) {
+	GracefulShutdownHandler gracefulShutdownHandler(PathHandler handler) {
 		return new GracefulShutdownHandler(new RequestLimitingHandler(new RequestLimit(MAX_REQ_WHEN_SHUTDOWN),
 				new AllowedMethodsHandler(new BlockingHandler(), Verb.GET.toHttpString(), Verb.POST.toHttpString(),
 						Verb.PUT.toHttpString(), Verb.DELETE.toHttpString(), Verb.OPTIONS.toHttpString(),
