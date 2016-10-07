@@ -13,23 +13,20 @@
 **Pluggable Modules:**
 
 1. DI (OSGi Declarative Services)
-2. JAX-RS 2.0(RESTEasy)
+2. JAX-RS 2.0 (RESTEasy)
 3. Web Security Framework
    - Apache Shiro 
-   - ESAPI - (Optional)
-4. Polyglot Persistence(SQL & NOSQL)
-   - JPA(EclipseLink)
-   - MongoDB
-5. Datasource/JDBC Connection Pool Provider(Hikari)
+   - ESAPI - (Only if template engine is opted)
+4. Persistence(SQL/NOSQL)
+   - JPA or MongoDB
+5. Hikari Datasource/JDBC Connection Pool Provider(Only if JPA is opted)
 6. HTML Template Engine - Thymeleaf (Optional)
 7. I18n/ResourceBundle Support
 
 
-Basic idea behind this architecture is to run OSGi in embedded(inside a servlet container) mode and deploy the required modules as and when required.
+The platform embeds OSGi and Undertow with modules described above.
 
-Undertow Servlet container(Embedded) is used for deployment.
-
-**Steps for deployment:**
+**Steps to build and run:**
 
 1. Clone adeptj-modularweb-micro
 2. cd adeptj-modularweb-micro
