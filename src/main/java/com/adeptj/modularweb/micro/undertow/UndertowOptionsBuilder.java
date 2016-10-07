@@ -31,7 +31,7 @@ import io.undertow.Undertow.Builder;
 import io.undertow.UndertowOptions;
 
 /**
- * Undertow Server Options.
+ * UNDERTOW Server Options.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -47,10 +47,8 @@ public class UndertowOptionsBuilder {
 		OPTIONS_LONG = new HashSet<>();
 		OPTIONS_LONG.add(UndertowOptions.MAX_ENTITY_SIZE);
 		OPTIONS_LONG.add(UndertowOptions.MULTIPART_MAX_ENTITY_SIZE);
-
 		OPTIONS_INT = new HashSet<>();
 		OPTIONS_INT.add(UndertowOptions.MAX_HEADER_SIZE);
-
 		OPTIONS_BOOL = new HashSet<>();
 		OPTIONS_BOOL.add(UndertowOptions.ALWAYS_SET_KEEP_ALIVE);
 		OPTIONS_BOOL.add(UndertowOptions.ALWAYS_SET_DATE);
@@ -58,9 +56,9 @@ public class UndertowOptionsBuilder {
 	}
 
 	public static void build(Builder builder, Config undertowConf) {
-		Config connConfig = undertowConf.getConfig("connection-options");
-		OPTIONS_LONG.forEach(option -> builder.setServerOption(option, connConfig.getLong(option.getName())));
-		OPTIONS_INT.forEach(option -> builder.setServerOption(option, connConfig.getInt(option.getName())));
-		OPTIONS_BOOL.forEach(option -> builder.setServerOption(option, connConfig.getBoolean(option.getName())));
+		Config serverOptionsConf = undertowConf.getConfig("serverOptions");
+		OPTIONS_LONG.forEach(option -> builder.setServerOption(option, serverOptionsConf.getLong(option.getName())));
+		OPTIONS_INT.forEach(option -> builder.setServerOption(option, serverOptionsConf.getInt(option.getName())));
+		OPTIONS_BOOL.forEach(option -> builder.setServerOption(option, serverOptionsConf.getBoolean(option.getName())));
 	}
 }
