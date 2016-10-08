@@ -1,4 +1,4 @@
-**AdeptJ Modular Web Micro Version**
+**AdeptJ ModularWeb Micro**
 
 **High performance, dynamic, modular platform for developing web applications and µServices.**
 
