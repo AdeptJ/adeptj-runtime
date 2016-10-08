@@ -19,39 +19,45 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.osgi.framework.InvalidSyntaxException;
 
 import com.adeptj.modularweb.micro.common.ServletContextAware;
 
 /**
- * ContextListener that handles the OSGi Framework shutdown.
+ * Support for DispatcherServletTracker.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebListener("Stops the OSGi Framework when ServletContext is destroyed")
-public class FrameworkShutdownHandler implements ServletContextListener {
+public enum DispatcherServletTrackerSupport {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
+	INSTANCE;
 
-	@Override
-	public void contextInitialized(ServletContextEvent event) {
-		// Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
+	private volatile boolean isDispatcherServletInitialized;
+
+	private volatile DispatcherServletTracker dispatcherServletTracker;
+
+	public void openDispatcherServletTracker(ServletConfig servletConfig) throws InvalidSyntaxException {
+		if (!this.isDispatcherServletInitialized && this.dispatcherServletTracker == null) {
+			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(
+					ServletContextAware.INSTANCE.getBundleContext(), servletConfig);
+			dispatcherServletTracker.open();
+			this.dispatcherServletTracker = dispatcherServletTracker;
+			this.isDispatcherServletInitialized = true;
+		}
 	}
 
-	@Override
-	public void contextDestroyed(ServletContextEvent event) {
-		LOGGER.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
-		long startTime = System.currentTimeMillis();
-		LOGGER.info("Closing EventDispatcherTracker!!");
-		EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-		FrameworkProvisioner.INSTANCE.stopFramework();
-		ServletContextAware.INSTANCE.setServletContext(null);
-		LOGGER.info("OSGi Framework stopped in [{}] ms!!", (System.currentTimeMillis() - startTime));
+	public HttpServlet getDispatcherServlet() {
+		return this.dispatcherServletTracker.getDispatcherServlet();
 	}
 
+	public void closeDispatcherServletTracker() {
+		this.isDispatcherServletInitialized = false;
+		if (this.dispatcherServletTracker != null) {
+			this.dispatcherServletTracker.close();
+		}
+		this.dispatcherServletTracker = null;
+	}
 }

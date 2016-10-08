@@ -30,13 +30,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.micro.common.ServletContextAware;
-import com.adeptj.modularweb.micro.osgi.DispatcherServletTracker;
+import com.adeptj.modularweb.micro.osgi.DispatcherServletTrackerSupport;
 
 /**
  * HttpServlet acting as a front controller for all of the incoming requests and
- * delegates the actual service request to Felix DispatcherServlet, so in other
- * words it is acting as a proxy for Felix DispatcherServlet.
+ * delegates the actual service request to FELIX DispatcherServlet, so in other
+ * words it is acting as a Proxy for FELIX DispatcherServlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -46,10 +45,6 @@ public class ProxyDispatcherServlet extends HttpServlet {
 
     private static final long serialVersionUID = 702778293237417284L;
 
-    private DispatcherServletTracker tracker;
-
-    private static volatile boolean initialized;
-
     /**
      * Open the DispatcherServletTracker.
      */
@@ -57,35 +52,28 @@ public class ProxyDispatcherServlet extends HttpServlet {
     public void init() throws ServletException {
     	long startTime = System.currentTimeMillis();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
-        if (!initialized) {
-            try {
-				LOGGER.info("Opening Felix DispatcherServlet ServiceTracker!!");
-				this.tracker = new DispatcherServletTracker(ServletContextAware.INSTANCE.getBundleContext(),
-						this.getServletConfig());
-				this.tracker.open();
-				initialized = true;
-				LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", (System.currentTimeMillis() - startTime));
-			} catch (InvalidSyntaxException ise) {
-                LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
-                throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
-            }
-        }
+        try {
+        	DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
+		} catch (InvalidSyntaxException ise) {
+			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
+			throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
+		}
+        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", (System.currentTimeMillis() - startTime));
     }
 
     /**
-     * Proxy for Felix DispatcherServlet, delegates all the calls to the underlying DispatcherServlet.
+     * Proxy for FELIX DispatcherServlet, delegates all the calls to the underlying DispatcherServlet.
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         LOGGER.debug("Handling request: {}", req.getRequestURI());
-        HttpServlet dispatcher = this.tracker.getDispatcher();
+        HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
         try {
-            if (dispatcher == null) {
-            	LOGGER.warn("DispatcherServlet not ready yet!!");
+            if (dispatcherServlet == null) {
+            	LOGGER.warn("Felix DispatcherServlet is unavailable!!");
             	res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-            	return;
             } else {
-            	dispatcher.service(req, res);
+            	dispatcherServlet.service(req, res);
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);
@@ -99,18 +87,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
     @Override
     public void destroy() {
         LOGGER.info("Destroying ProxyDispatcherServlet!!");
-        this.tracker.close();
-        initialized = false;
+        DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
         super.destroy();
     }
-
-    public void stopTracker() {
-        initialized = false;
-        this.tracker.close();
-    }
-
-    public boolean isInitialized() {
-        return initialized;
-    }
-
 }

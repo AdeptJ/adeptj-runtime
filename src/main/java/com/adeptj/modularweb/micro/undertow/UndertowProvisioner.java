@@ -85,7 +85,7 @@ public class UndertowProvisioner {
 		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		int port = this.getPort(httpConf);
-		LOGGER.info("Starting AdeptJ Modular Web Micro on port: [{}]", port);
+		LOGGER.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
 		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);

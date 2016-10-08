@@ -64,9 +64,9 @@ public final class Constants {
 
 	public static final String DATE_FORMAT_LOGGING = "dd.MM.yyyy HH:mm:ss.SSS ";
 
-	public static final String SHUTDOWN_HOOK = "AdeptJ Modular Web Micro Terminator";
+	public static final String SHUTDOWN_HOOK = "AdeptJ ModularWeb Micro Terminator";
 
-	public static final String DEPLOYMENT_NAME = "AdeptJ Modular Web Micro Deployment";
+	public static final String DEPLOYMENT_NAME = "AdeptJ ModularWeb Micro Deployment";
 
 	public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
 

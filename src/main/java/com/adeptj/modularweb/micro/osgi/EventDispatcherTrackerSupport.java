@@ -19,9 +19,6 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * EventDispatcherTrackerSupport.
  * 
@@ -30,8 +27,6 @@ import org.slf4j.LoggerFactory;
 public enum EventDispatcherTrackerSupport {
 
 	INSTANCE;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTrackerSupport.class);
 
 	private volatile EventDispatcherTracker eventDispatcherTracker;
 	
@@ -43,9 +38,8 @@ public enum EventDispatcherTrackerSupport {
 		this.eventDispatcherTracker = eventDispatcherTracker;
 	}
 
-	protected void stopTracker() {
+	protected void closeEventDispatcherTracker() {
 		if (this.eventDispatcherTracker != null) {
-			LOGGER.info("Closing EventDispatcherTracker!!");
 			this.eventDispatcherTracker.close();
 			this.eventDispatcherTracker = null;
 		}

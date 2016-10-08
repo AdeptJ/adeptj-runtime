@@ -61,7 +61,7 @@ public enum FrameworkProvisioner {
 
     private Framework framework;
 
-    private FrameworkRestartHandler listener;
+    private FrameworkRestartHandler frameworkListener;
 
     private BundleContext systemBundleContext;
 
@@ -73,8 +73,8 @@ public enum FrameworkProvisioner {
             this.framework.start();
             this.systemBundleContext = this.framework.getBundleContext();
             ProxyDispatcherServlet proxyDispatcherServlet = new ProxyDispatcherServlet();
-            this.listener = new FrameworkRestartHandler(proxyDispatcherServlet);
-            this.systemBundleContext.addFrameworkListener(this.listener);
+            this.frameworkListener = new FrameworkRestartHandler(proxyDispatcherServlet);
+            this.systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
             LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
             this.initBridgeListeners(context);
@@ -91,7 +91,7 @@ public enum FrameworkProvisioner {
     public void stopFramework() {
         try {
         	if (this.framework != null && this.systemBundleContext != null) {
-        		this.systemBundleContext.removeFrameworkListener(this.listener);
+        		this.systemBundleContext.removeFrameworkListener(this.frameworkListener);
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);

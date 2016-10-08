@@ -32,7 +32,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 
 /**
- * OSGi ServiceTracker for Felix DispatcherServlet.
+ * OSGi ServiceTracker for FELIX DispatcherServlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -42,17 +42,17 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
 	private final static String OSGI_FILTER_EXPR = "(http.felix.dispatcher=org.apache.felix.http.base.internal.DispatcherServlet)";
 
-	private final ServletConfig config;
+	private final ServletConfig servletConfig;
 
-    private HttpServlet dispatcher;
+    private HttpServlet dispatcherServlet;
 
     public DispatcherServletTracker(BundleContext context, ServletConfig config) throws InvalidSyntaxException {
         super(context, createFilter(context), null);
-        this.config = config;
+        this.servletConfig = config;
     }
 
-    public HttpServlet getDispatcher() {
-        return this.dispatcher;
+    public HttpServlet getDispatcherServlet() {
+        return this.dispatcherServlet;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         try {
             dispatcherServlet = super.addingService(reference);
 			LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-            this.handleDispatcher(dispatcherServlet);
+            this.handleDispatcherServlet(dispatcherServlet);
         } catch (Exception ex) {
             // This might be due to the OSGi framework restart from Felix WebConsole.
             LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
@@ -73,7 +73,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
         LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
         // Passing null so that DispatcherServlet.init() won't be called again.
-        this.handleDispatcher(null);
+        this.handleDispatcherServlet(null);
         super.removedService(reference, service);
         /*
          * Note: Since the DispatcherServlet has already been removed therefore close this ServiceTracker too.
@@ -92,29 +92,29 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         }
     }
 
-    private void handleDispatcher(HttpServlet dispatcher) {
-        this.destroyDispatcher();
-        this.dispatcher = dispatcher;
-        this.initDispatcher();
+    private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
+        this.destroyDispatcherServlet();
+        this.dispatcherServlet = dispatcherServlet;
+        this.initDispatcherServlet();
     }
 
-    private void destroyDispatcher() {
-        if (this.dispatcher == null) {
+    private void destroyDispatcherServlet() {
+        if (this.dispatcherServlet == null) {
             return;
         }
-        LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcher);
-        this.dispatcher.destroy();
-        this.dispatcher = null;
+        LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+        this.dispatcherServlet.destroy();
+        this.dispatcherServlet = null;
     }
 
-    private void initDispatcher() {
-        if (this.dispatcher == null) {
+    private void initDispatcherServlet() {
+        if (this.dispatcherServlet == null) {
             return;
         }
         try {
             LOGGER.info("Initializing Felix DispatcherServlet!!");
-            this.dispatcher.init(this.config);
-            LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcher);
+            this.dispatcherServlet.init(this.servletConfig);
+            LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcherServlet);
         } catch (Exception ex) {
             LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
         }

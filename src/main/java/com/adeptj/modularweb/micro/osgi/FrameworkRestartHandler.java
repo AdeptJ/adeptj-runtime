@@ -51,15 +51,18 @@ public class FrameworkRestartHandler implements FrameworkListener {
 		int type = event.getType();
 		switch (type) {
 		case FrameworkEvent.STARTED:
-			LOGGER.info("System Bundle Started!!");
+			LOGGER.info("Handling Framework Restart!!");
 			// Add the new BundleContext as a ServletContext attribute replacing the stale BundleContext.
 			ServletContext servletContext = ServletContextAware.INSTANCE.getServletContext();
             servletContext.removeAttribute(BundleContext.class.getName());
 			BundleContext bundleContext = event.getBundle().getBundleContext();
 			servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
+			// Sets the new BundleContext in FrameworkProvisioner so that whenever the Server shuts down
+			// and in turn OSGi Framework stops, it should not throw [java.lang.IllegalStateException]
+			// OSGi Framework should stop gracefully.
 			FrameworkProvisioner.INSTANCE.setSystemBundleContext(bundleContext);
 			try {
-				this.proxyDispatcherServlet.stopTracker();
+				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
 				this.proxyDispatcherServlet.init();
 			} catch (ServletException ex) {
 				// Note: What shall we do if ProxyDispatcherServlet initialization failed.
@@ -69,9 +72,10 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			}
 			break;
 		case FrameworkEvent.STOPPED_UPDATE:
-			LOGGER.info("Disposing DispatcherServletTracker!!");
-			this.proxyDispatcherServlet.stopTracker();
-			EventDispatcherTrackerSupport.INSTANCE.stopTracker();
+			LOGGER.info("Closing DispatcherServletTracker!!");
+			DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+			LOGGER.info("Closing EventDispatcherTracker!!");
+			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 			break;
 		default:
 			// log it and ignore.

@@ -57,7 +57,7 @@ public class Main {
 		try {
 			UndertowProvisioner provisioner = new UndertowProvisioner();
 			provisioner.provision(parseCommands(args));
-			logger.info("@@@@@ AdeptJ Modular Web Micro Initialized in [{}] ms @@@@@", (System.currentTimeMillis() - startTime));
+			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
 			if (ServletContextAware.INSTANCE.getBundleContext() != null) {

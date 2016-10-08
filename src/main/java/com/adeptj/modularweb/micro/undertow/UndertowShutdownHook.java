@@ -54,12 +54,12 @@ public class UndertowShutdownHook extends Thread {
 	@Override
 	public void run() {
 		long startTime = System.currentTimeMillis();
-		LOGGER.info("Stopping AdeptJ Modular Web Micro!!");
+		LOGGER.info("Stopping AdeptJ ModularWeb Micro!!");
 		try {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			LOGGER.info("@@@@@ AdeptJ Modular Web Micro stopped in [{}] ms @@@@@", (System.currentTimeMillis() - startTime));
+			LOGGER.info("AdeptJ ModularWeb Micro stopped in [{}] ms!!", (System.currentTimeMillis() - startTime));
 		} catch (ServletException ex) {
 			LOGGER.error("Exception while stopping Undertow, shutting down JVM!!", ex);
 			System.exit(-1);
