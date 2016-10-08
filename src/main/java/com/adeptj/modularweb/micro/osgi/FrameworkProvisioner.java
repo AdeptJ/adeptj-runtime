@@ -19,19 +19,6 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import com.adeptj.modularweb.micro.common.ServletContextAware;
-import com.adeptj.modularweb.micro.config.Configs;
-import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
-import com.typesafe.config.Config;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -39,8 +26,22 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration.Dynamic;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.launch.Framework;
+import org.osgi.framework.launch.FrameworkFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.config.Configs;
+import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
+import com.typesafe.config.Config;
+
 /**
- * FrameworkProvisioner that handles the OSGi Framework startup and shutdown.
+ * FrameworkProvisioner that handles the OSGi Framework(Apache FELIX) startup and shutdown.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -64,7 +65,7 @@ public enum FrameworkProvisioner {
 
     private BundleContext systemBundleContext;
 
-    public void startFramework() {
+    public void startFramework(ServletContext context) {
         try {
         	LOGGER.info("Starting the OSGi Framework!!");
     		long startTime = System.currentTimeMillis();
@@ -74,11 +75,10 @@ public enum FrameworkProvisioner {
             ProxyDispatcherServlet proxyDispatcherServlet = new ProxyDispatcherServlet();
             this.listener = new FrameworkRestartHandler(proxyDispatcherServlet);
             this.systemBundleContext.addFrameworkListener(this.listener);
-            // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
             LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
-            ServletContext context = ServletContextAware.INSTANCE.getServletContext();
             this.initBridgeListeners(context);
+            // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
             this.registerProxyDispatcherServlet(proxyDispatcherServlet, context);
         } catch (Exception ex) {
@@ -86,10 +86,6 @@ public enum FrameworkProvisioner {
             // Stop the Framework if the BundleProvisioner throws exception.
             this.stopFramework();
         }
-    }
-
-    protected void setSystemBundleContext(BundleContext bundleContext) {
-    	this.systemBundleContext = bundleContext;
     }
 
     public void stopFramework() {
@@ -106,6 +102,10 @@ public enum FrameworkProvisioner {
         } catch (Exception ex) {
             LOGGER.error("Error Stopping OSGi Framework!!", ex);
         }
+    }
+    
+    protected void setSystemBundleContext(BundleContext bundleContext) {
+    	this.systemBundleContext = bundleContext;
     }
     
 	private void initBridgeListeners(ServletContext servletContext) {
@@ -155,12 +155,7 @@ public enum FrameworkProvisioner {
     }
 
     private void handleFelixLog(Map<String, String> configs, Config felix) {
-        String felixLogLevel = System.getProperty("felix.log.level");
-        if (felixLogLevel == null || felixLogLevel.isEmpty()) {
-        	configs.put("felix.log.level", felix.getString("felix-config-log"));
-        } else {
-        	configs.put("felix.log.level", felixLogLevel);
-        }
+        	configs.put("felix.log.level", System.getProperty("felix.log.level", felix.getString("felix-config-log")));
     }
 
     private Map<String, String> loadFrameworkProps() throws IOException {

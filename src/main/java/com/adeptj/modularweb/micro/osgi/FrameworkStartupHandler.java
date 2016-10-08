@@ -43,6 +43,6 @@ public class FrameworkStartupHandler implements StartupHandler {
      */
     @Override
 	public void onStartup(ServletContext context) throws ServletException {
-		FrameworkProvisioner.INSTANCE.startFramework();
+		FrameworkProvisioner.INSTANCE.startFramework(context);
 	}
 }

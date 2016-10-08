@@ -21,10 +21,10 @@ package com.adeptj.modularweb.micro.osgi;
 
 import static com.adeptj.modularweb.micro.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -48,7 +48,7 @@ public enum BundleProvisioner {
 	
 	INSTANCE;
 	
-	private static final String BUNDLES_JAR_DIR = "bundles" + File.separator;
+	private static final String BUNDLES_JAR_DIR = "bundles/";
 	
 	private static final String HEADER_FRAGMENT_HOST = "Fragment-Host";
 
@@ -79,11 +79,11 @@ public enum BundleProvisioner {
 
 	private List<URL> collectBundles() throws IOException {
 		String rootPath = ServletContextAware.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-		JarURLConnection conn = (JarURLConnection) BundleProvisioner.class.getResource(rootPath).openConnection();
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
 		Predicate<JarEntry> bundlePredicate = (entry) -> entry.getName().startsWith(BUNDLES_JAR_DIR)
 				&& entry.getName().endsWith(EXTN_JAR);
-		List<URL> bundles = conn.getJarFile().stream().filter(bundlePredicate)
+		URLConnection conn = BundleProvisioner.class.getResource(rootPath).openConnection();
+		List<URL> bundles = JarURLConnection.class.cast(conn).getJarFile().stream().filter(bundlePredicate)
 				.map(entry -> classLoader.getResource(entry.getName())).collect(Collectors.toList());
 		LOGGER.debug("Total:[{}] Bundles(excluding system bundle) collected from location:[{}]", bundles.size(), conn);
 		return bundles;
