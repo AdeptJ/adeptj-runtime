@@ -1,16 +1,16 @@
-**AdeptJ Modular Web Architecture Micro**
+**AdeptJ Modular Web Micro Version**
 
-**Highly performant, dynamic, modular platform for developing web applications and µServices**
+**High performance, dynamic, modular platform for developing web applications and µServices.**
 
 **Runtime(s)**
 
 1. JAVA 8
-2. Highly performant [Undertow](http://undertow.io/) http server
+2. High performance [Undertow](http://undertow.io/) http server
 3. [OSGi](https://www.osgi.org) Framework R6(Apache Felix 5.6.0)
 
-**Lightweight ~15Mb footprint, low on memory, starts super fast (~2 sec.)**
+**Lightweight ~20Mb footprint, low on memory, starts instantly**
 
-**Pluggable Modules:**
+**Modules:**
 
 1. DI (OSGi Declarative Services)
 2. JAX-RS 2.0 (RESTEasy)
@@ -35,12 +35,19 @@ The platform embeds OSGi and Undertow with modules described above.
 4. Now cd target
 5. java -server -jar adeptj-modularweb-micro-1.0.0.RELEASE.jar
 6. Click to view [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
+7. Following directory structure is created once platform starts successfully.<br>
+ 
+	modularweb-micro
+          |
+    logs (platform logs - startup.log, error.log)
+    osgi-bundles (currently deployed bundles in OSGi)
+    osgi-configs (Configurations saved by ConfigurationAdmin in Web console)
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
 
 **LICENSE**
 
-   Copyright (c) 2016 AdeptJ
+   Copyright 2016, AdeptJ (http://adeptj.com)
    
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
