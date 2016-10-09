@@ -19,6 +19,9 @@
 */
 package com.adeptj.modularweb.micro.common;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.config.Configs;
@@ -29,15 +32,16 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 
 /**
- * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH.
- * But using that approach LOGBACK takes 5 seconds to initializes itself which is reduced drastically to under
- * 200 milliseconds using programmatic approach. This is a great improvement on total startup time.
+ * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH. 
+ * But using that approach LOGBACK takes few seconds to initializes itself which is reduced drastically to under 150 milliseconds
+ * using programmatic approach. This is a great improvement on total startup time.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -72,16 +76,15 @@ public class LogbackInitializer {
 	public static final String APPENDER_FILE = "FILE";
 
 	public static void init() {
-		Config commonConf = Configs.INSTANCE.main().getConfig(CONF_COMMON);
+		long startTime = System.currentTimeMillis();
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-		String logPattern = commonConf.getString(KEY_LOG_PATTERN);
+		Config commonConf = Configs.INSTANCE.main().getConfig(CONF_COMMON);
 		// Console Appender
-		ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, logPattern);
-		String logFile = commonConf.getString(KEY_STARTUP_LOG_FILE);
+		ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, commonConf);
 		// File Appender
-		RollingFileAppender<ILoggingEvent> fileAppender = fileAppender(context, logPattern, logFile);
+		RollingFileAppender<ILoggingEvent> fileAppender = fileAppender(context, commonConf);
 		// Rolling Policy
-		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = rollingPolicy(commonConf, context, logFile);
+		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = rollingPolicy(commonConf, context);
 		rollingPolicy.setParent(fileAppender);
 		// Triggering Policy
 		SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy = triggeringPolicy(commonConf);
@@ -92,48 +95,49 @@ public class LogbackInitializer {
 		fileAppender.setTriggeringPolicy(triggeringPolicy);
 		fileAppender.start();
 		// initialize all the required loggers.
-		rootLogger(context, consoleAppender);
-		adeptjLogger(context, consoleAppender, fileAppender);
-		undertowLogger(context, consoleAppender, fileAppender);
-		xnioLogger(context, consoleAppender, fileAppender);
-		undertowSecurityLogger(context, consoleAppender, fileAppender);
+		rootLogger(context, consoleAppender, commonConf);
+		List<Appender<ILoggingEvent>> appenders = Arrays.asList(consoleAppender, fileAppender);
+		adeptjLogger(context, appenders, commonConf);
+		undertowLogger(context, appenders, commonConf);
+		xnioLogger(context, appenders, commonConf);
+		undertowSecurityLogger(context, appenders, commonConf);
+		context.getLogger(LogbackInitializer.class).info("Logback initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
+	}
+	
+	private static void addAppenders(List<Appender<ILoggingEvent>> appenders, Logger logger) {
+		for (Appender<ILoggingEvent> appender : appenders) {
+			logger.addAppender(appender);
+		}
 	}
 
-	private static void undertowSecurityLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender,
-			RollingFileAppender<ILoggingEvent> fileAppender) {
-		Logger undertowSecurityLogger = logger(LOGGER_UNDERTOW_SECURITY, Level.ERROR, context);
-		undertowSecurityLogger.addAppender(consoleAppender);
-		undertowSecurityLogger.addAppender(fileAppender);
-		undertowSecurityLogger.setAdditive(false);
+	private static void undertowSecurityLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
+		Logger securityLogger = logger(LOGGER_UNDERTOW_SECURITY,
+				Level.valueOf(commonConf.getString("undertow-security-log-level")), context);
+		addAppenders(appenders, securityLogger);
+		securityLogger.setAdditive(false);
 	}
 
-	private static void xnioLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender,
-			RollingFileAppender<ILoggingEvent> fileAppender) {
-		Logger xnioLogger = logger(LOGGER_XNIO, Level.ERROR, context);
-		xnioLogger.addAppender(fileAppender);
-		xnioLogger.addAppender(consoleAppender);
+	private static void xnioLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
+		Logger xnioLogger = logger(LOGGER_XNIO, Level.valueOf(commonConf.getString("xnio-log-level")), context);
+		addAppenders(appenders, xnioLogger);
 		xnioLogger.setAdditive(false);
 	}
 
-	private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender) {
+	private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config commonConf) {
 		// initialize ROOT Logger at ERROR level.
-		Logger root = logger(Logger.ROOT_LOGGER_NAME, Level.ERROR, context);
+		Logger root = logger(Logger.ROOT_LOGGER_NAME, Level.valueOf(commonConf.getString("root-log-level")), context);
 		root.addAppender(consoleAppender);
 	}
 
-	private static void undertowLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender,
-			RollingFileAppender<ILoggingEvent> fileAppender) {
-		Logger undertowLogger = logger(LOGGER_UNDERTOW, Level.ERROR, context);
-		undertowLogger.addAppender(fileAppender);
-		undertowLogger.addAppender(consoleAppender);
+	private static void undertowLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
+		Logger undertowLogger = logger(LOGGER_UNDERTOW, Level.valueOf(commonConf.getString("undertow-log-level")), context);
+		addAppenders(appenders, undertowLogger);
 		undertowLogger.setAdditive(false);
 	}
 
-	private static void adeptjLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender,
-			RollingFileAppender<ILoggingEvent> fileAppender) {
-		Logger adeptjLogger = logger(LOGGER_ADEPTJ, Level.INFO, context);
-		adeptjLogger.addAppender(fileAppender);
-		adeptjLogger.addAppender(consoleAppender);
+	private static void adeptjLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
+		Logger adeptjLogger = logger(LOGGER_ADEPTJ, Level.valueOf(commonConf.getString("adeptj-log-level")), context);
+		addAppenders(appenders, adeptjLogger);
 		adeptjLogger.setAdditive(false);
 	}
 
@@ -149,40 +153,39 @@ public class LogbackInitializer {
 		return triggeringPolicy;
 	}
 
-	private static TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy(Config commonConf, LoggerContext context,
-			String logFile) {
+	private static TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy(Config commonConf, LoggerContext context) {
 		TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
 		rollingPolicy.setContext(context);
-		rollingPolicy.setFileNamePattern(logFile + HYPHEN + commonConf.getString(KEY_LOG_ROLLING_PATTERN));
+		rollingPolicy.setFileNamePattern(
+				commonConf.getString(KEY_STARTUP_LOG_FILE) + HYPHEN + commonConf.getString(KEY_LOG_ROLLING_PATTERN));
 		rollingPolicy.setMaxHistory(commonConf.getInt(KEY_LOG_MAX_HISTORY));
 		return rollingPolicy;
 	}
 
-	private static RollingFileAppender<ILoggingEvent> fileAppender(LoggerContext context, String logPattern,
-			String logFile) {
+	private static RollingFileAppender<ILoggingEvent> fileAppender(LoggerContext context, Config commonConf) {
 		RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
-		fileAppender.setFile(logFile + EXTN_LOG);
+		fileAppender.setFile(commonConf.getString(KEY_STARTUP_LOG_FILE) + EXTN_LOG);
 		fileAppender.setAppend(true);
-		fileAppender.setEncoder(layoutEncoder(context, logPattern));
+		fileAppender.setEncoder(layoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
 		fileAppender.setName(APPENDER_FILE);
 		fileAppender.setContext(context);
 		return fileAppender;
 	}
 
-	private static ConsoleAppender<ILoggingEvent> consoleAppender(LoggerContext context, String logPattern) {
+	private static ConsoleAppender<ILoggingEvent> consoleAppender(LoggerContext context, Config commonConf) {
 		ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
 		consoleAppender.setName(APPENDER_CONSOLE);
 		consoleAppender.setContext(context);
-		consoleAppender.setEncoder(layoutEncoder(context, logPattern));
+		consoleAppender.setEncoder(layoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
 		consoleAppender.start();
 		return consoleAppender;
 	}
 
 	private static PatternLayoutEncoder layoutEncoder(LoggerContext context, String logPattern) {
-		PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
-		consoleEncoder.setContext(context);
-		consoleEncoder.setPattern(logPattern);
-		consoleEncoder.start();
-		return consoleEncoder;
+		PatternLayoutEncoder layoutEncoder = new PatternLayoutEncoder();
+		layoutEncoder.setContext(context);
+		layoutEncoder.setPattern(logPattern);
+		layoutEncoder.start();
+		return layoutEncoder;
 	}
 }
