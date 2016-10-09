@@ -35,13 +35,6 @@ The platform embeds OSGi and Undertow with modules described above.
 4. Now cd target
 5. java -server -jar adeptj-modularweb-micro-1.0.0.RELEASE.jar
 6. Click to view [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
-7. Following directory structure is created once platform starts successfully.<br>
- 
-	modularweb-micro
-          |
-    logs (platform logs - startup.log, error.log)
-    osgi-bundles (currently deployed bundles in OSGi)
-    osgi-configs (Configurations saved by ConfigurationAdmin in Web console)
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
 
