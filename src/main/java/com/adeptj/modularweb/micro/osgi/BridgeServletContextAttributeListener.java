@@ -23,11 +23,6 @@ import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.modularweb.micro.common.ServletContextAware;
 
 /**
  * BridgeServletContextAttributeListener.
@@ -36,54 +31,26 @@ import com.adeptj.modularweb.micro.common.ServletContextAware;
  */
 public class BridgeServletContextAttributeListener implements ServletContextAttributeListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServletContextAttributeListener.class);
-
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent event) {
-		String attrName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isBundleContext(attrName)) {
-			this.openEventDispatcherTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
+		if (this.isBundleContext(event.getName())) {
+			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
 		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent event) {
-		String attrName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isBundleContext(attrName)) {
-			this.closeEventDispatcherTracker();
+		if (this.isBundleContext(event.getName())) {
+			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 		}
 	}
 
 	@Override
 	public void attributeReplaced(ServletContextAttributeEvent event) {
-		String attrName = event.getName();
-		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isBundleContext(attrName)) {
-			this.closeEventDispatcherTracker();
-			this.openEventDispatcherTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
-		}
+		// Does nothing as of now.
 	}
-	
+
 	private boolean isBundleContext(String attrName) {
 		return BundleContext.class.getName().equals(attrName);
 	}
-	
-	private void openEventDispatcherTracker(BundleContext bundleContext) {
-		try {
-			LOGGER.info("Opening EventDispatcherTracker!!");
-			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker(bundleContext);
-		} catch (InvalidSyntaxException ise) {
-			// not expected for our simple filter, just log it.
-			LOGGER.error("InvalidSyntaxException!!", ise);
-		}
-	}
-
-	private void closeEventDispatcherTracker() {
-		LOGGER.info(
-				"BundleContext attribute either removed or replaced from ServletContext, closing EventDispatcherTracker!!");
-		EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-	}
-
 }

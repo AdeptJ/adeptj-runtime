@@ -21,6 +21,8 @@ package com.adeptj.modularweb.micro.osgi;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Support for EventDispatcherTracker.
@@ -37,10 +39,17 @@ public enum EventDispatcherTrackerSupport {
 		return this.eventDispatcherTracker;
 	}
 
-	protected void openEventDispatcherTracker(BundleContext bundleContext) throws InvalidSyntaxException {
+	protected void openEventDispatcherTracker(BundleContext bundleContext) {
 		if (this.eventDispatcherTracker == null) {
-			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
-			this.eventDispatcherTracker.open();
+			Logger logger = LoggerFactory.getLogger(EventDispatcherTrackerSupport.class);
+			try {
+				logger.info("Opening EventDispatcherTracker!!");
+				this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+				this.eventDispatcherTracker.open();
+			} catch (InvalidSyntaxException ise) {
+				// Not possible for our simple filter but log it anyway and re-throw.
+				logger.error("InvalidSyntaxException!!", ise);
+			}
 		}
 	}
 
@@ -48,6 +57,7 @@ public enum EventDispatcherTrackerSupport {
 		if (this.eventDispatcherTracker != null) {
 			this.eventDispatcherTracker.close();
 			this.eventDispatcherTracker = null;
+			LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("EventDispatcherTracker Closed!!");
 		}
 	}
 }
