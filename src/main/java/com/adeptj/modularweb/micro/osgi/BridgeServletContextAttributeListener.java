@@ -38,14 +38,12 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServletContextAttributeListener.class);
 
-	private EventDispatcherTracker eventDispatcherTracker;
-
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent event) {
 		String attrName = event.getName();
 		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isAttrBundleContext(attrName)) {
-			this.startTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
+		if (this.isBundleContext(attrName)) {
+			this.openEventDispatcherTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
 		}
 	}
 
@@ -53,8 +51,8 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 	public void attributeRemoved(ServletContextAttributeEvent event) {
 		String attrName = event.getName();
 		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isAttrBundleContext(attrName)) {
-			this.stopTracker();
+		if (this.isBundleContext(attrName)) {
+			this.closeEventDispatcherTracker();
 		}
 	}
 
@@ -62,35 +60,30 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 	public void attributeReplaced(ServletContextAttributeEvent event) {
 		String attrName = event.getName();
 		LOGGER.debug("Adding context attribute: [{}]", attrName);
-		if (this.isAttrBundleContext(attrName)) {
-			this.stopTracker();
-			this.startTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
+		if (this.isBundleContext(attrName)) {
+			this.closeEventDispatcherTracker();
+			this.openEventDispatcherTracker(ServletContextAware.INSTANCE.getAttr(attrName, BundleContext.class));
 		}
 	}
 	
-	private boolean isAttrBundleContext(String attrName) {
+	private boolean isBundleContext(String attrName) {
 		return BundleContext.class.getName().equals(attrName);
 	}
 	
-	private void startTracker(BundleContext bundleContext) {
+	private void openEventDispatcherTracker(BundleContext bundleContext) {
 		try {
-			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
 			LOGGER.info("Opening EventDispatcherTracker!!");
-			this.eventDispatcherTracker.open();
-			EventDispatcherTrackerSupport.INSTANCE.setEventDispatcherTracker(this.eventDispatcherTracker);
+			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker(bundleContext);
 		} catch (InvalidSyntaxException ise) {
 			// not expected for our simple filter, just log it.
 			LOGGER.error("InvalidSyntaxException!!", ise);
 		}
 	}
 
-	private void stopTracker() {
-		if (this.eventDispatcherTracker != null) {
-			LOGGER.info("BundleContext attribute either removed or replaced from ServletContext, closing EventDispatcherTracker!!");
-			this.eventDispatcherTracker.close();
-			this.eventDispatcherTracker = null;
-			EventDispatcherTrackerSupport.INSTANCE.setEventDispatcherTracker(this.eventDispatcherTracker);
-		}
+	private void closeEventDispatcherTracker() {
+		LOGGER.info(
+				"BundleContext attribute either removed or replaced from ServletContext, closing EventDispatcherTracker!!");
+		EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 	}
 
 }

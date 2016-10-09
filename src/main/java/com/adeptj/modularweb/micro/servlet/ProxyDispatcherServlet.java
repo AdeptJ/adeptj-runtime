@@ -53,6 +53,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
     	long startTime = System.currentTimeMillis();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         try {
+        	LOGGER.info("Opening DispatcherServletTracker!!");
         	DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
 		} catch (InvalidSyntaxException ise) {
 			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
@@ -87,7 +88,8 @@ public class ProxyDispatcherServlet extends HttpServlet {
     @Override
     public void destroy() {
         LOGGER.info("Destroying ProxyDispatcherServlet!!");
-        DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
         super.destroy();
+        LOGGER.info("Closing DispatcherServletTracker!!");
+        DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
     }
 }

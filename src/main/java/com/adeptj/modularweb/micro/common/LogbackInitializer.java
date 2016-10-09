@@ -166,7 +166,7 @@ public class LogbackInitializer {
 		RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
 		fileAppender.setFile(commonConf.getString(KEY_STARTUP_LOG_FILE) + EXTN_LOG);
 		fileAppender.setAppend(true);
-		fileAppender.setEncoder(layoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
+		fileAppender.setEncoder(newLayoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
 		fileAppender.setName(APPENDER_FILE);
 		fileAppender.setContext(context);
 		return fileAppender;
@@ -176,12 +176,12 @@ public class LogbackInitializer {
 		ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
 		consoleAppender.setName(APPENDER_CONSOLE);
 		consoleAppender.setContext(context);
-		consoleAppender.setEncoder(layoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
+		consoleAppender.setEncoder(newLayoutEncoder(context, commonConf.getString(KEY_LOG_PATTERN)));
 		consoleAppender.start();
 		return consoleAppender;
 	}
 
-	private static PatternLayoutEncoder layoutEncoder(LoggerContext context, String logPattern) {
+	private static PatternLayoutEncoder newLayoutEncoder(LoggerContext context, String logPattern) {
 		PatternLayoutEncoder layoutEncoder = new PatternLayoutEncoder();
 		layoutEncoder.setContext(context);
 		layoutEncoder.setPattern(logPattern);

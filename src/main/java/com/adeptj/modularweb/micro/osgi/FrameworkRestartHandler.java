@@ -51,7 +51,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 		int type = event.getType();
 		switch (type) {
 		case FrameworkEvent.STARTED:
-			LOGGER.info("Handling Framework Restart!!");
+			LOGGER.info("Handling OSGi Framework Restart!!");
 			// Add the new BundleContext as a ServletContext attribute replacing the stale BundleContext.
 			ServletContext servletContext = ServletContextAware.INSTANCE.getServletContext();
             servletContext.removeAttribute(BundleContext.class.getName());

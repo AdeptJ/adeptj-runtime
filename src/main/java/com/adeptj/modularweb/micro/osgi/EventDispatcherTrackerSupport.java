@@ -19,8 +19,11 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+
 /**
- * EventDispatcherTrackerSupport.
+ * Support for EventDispatcherTracker.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -29,13 +32,16 @@ public enum EventDispatcherTrackerSupport {
 	INSTANCE;
 
 	private volatile EventDispatcherTracker eventDispatcherTracker;
-	
+
 	protected EventDispatcherTracker getEventDispatcherTracker() {
 		return this.eventDispatcherTracker;
 	}
-	
-	protected void setEventDispatcherTracker(EventDispatcherTracker eventDispatcherTracker) {
-		this.eventDispatcherTracker = eventDispatcherTracker;
+
+	protected void openEventDispatcherTracker(BundleContext bundleContext) throws InvalidSyntaxException {
+		if (this.eventDispatcherTracker == null) {
+			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+			this.eventDispatcherTracker.open();
+		}
 	}
 
 	protected void closeEventDispatcherTracker() {

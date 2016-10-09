@@ -45,13 +45,12 @@ import com.adeptj.modularweb.micro.osgi.FrameworkShutdownHandler;
 @HandlesTypes(StartupHandler.class)
 public class StartupHandlerInitializer implements ServletContainerInitializer {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartupHandlerInitializer.class);
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void onStartup(Set<Class<?>> handlers, ServletContext context) throws ServletException {
+		Logger LOGGER = LoggerFactory.getLogger(StartupHandlerInitializer.class);
 		if (handlers == null) {
 			// We can't go ahead if FrameworkStartupHandler is not passed by container.
 			LOGGER.error("No @HandlesTypes(StartupHandler) on classpath!!");
