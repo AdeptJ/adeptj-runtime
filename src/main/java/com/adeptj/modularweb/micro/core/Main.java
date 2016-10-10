@@ -25,9 +25,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.LogbackInitializer;
-import com.adeptj.modularweb.micro.common.ServletContextAware;
 import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
@@ -60,7 +60,7 @@ public class Main {
 			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
-			if (ServletContextAware.INSTANCE.getBundleContext() != null) {
+			if (BundleContextAware.INSTANCE.getBundleContext() != null) {
 				logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
 				FrameworkProvisioner.INSTANCE.stopFramework();
 			}

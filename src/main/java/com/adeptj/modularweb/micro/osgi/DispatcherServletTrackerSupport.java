@@ -22,9 +22,10 @@ package com.adeptj.modularweb.micro.osgi;
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 
-import com.adeptj.modularweb.micro.common.ServletContextAware;
+import com.adeptj.modularweb.micro.common.BundleContextAware;
 
 /**
  * Support for DispatcherServletTracker.
@@ -39,10 +40,13 @@ public enum DispatcherServletTrackerSupport {
 
 	private volatile DispatcherServletTracker dispatcherServletTracker;
 
+	private volatile ServletConfig servletConfig;
+
 	public void openDispatcherServletTracker(ServletConfig servletConfig) throws InvalidSyntaxException {
+		this.initServletConfig(servletConfig);
 		if (!this.isDispatcherServletInitialized && this.dispatcherServletTracker == null) {
-			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(
-					ServletContextAware.INSTANCE.getBundleContext(), servletConfig);
+			BundleContext ctx = BundleContextAware.INSTANCE.getBundleContext();
+			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
 			dispatcherServletTracker.open();
 			this.dispatcherServletTracker = dispatcherServletTracker;
 			this.isDispatcherServletInitialized = true;
@@ -59,5 +63,15 @@ public enum DispatcherServletTrackerSupport {
 			this.dispatcherServletTracker.close();
 		}
 		this.dispatcherServletTracker = null;
+	}
+
+	public ServletConfig getServletConfig() {
+		return servletConfig;
+	}
+
+	private void initServletConfig(ServletConfig servletConfig) {
+		if (this.servletConfig == null) {
+			this.servletConfig = servletConfig;
+		}
 	}
 }

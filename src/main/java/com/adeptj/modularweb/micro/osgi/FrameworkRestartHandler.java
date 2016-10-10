@@ -20,7 +20,6 @@
 package com.adeptj.modularweb.micro.osgi;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -28,8 +27,8 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.common.ServletContextAware;
-import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
 
 /**
  * OSGi FrameworkListener.
@@ -38,48 +37,56 @@ import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
  */
 public class FrameworkRestartHandler implements FrameworkListener {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkRestartHandler.class);
-
-	private ProxyDispatcherServlet proxyDispatcherServlet;
-
-	public FrameworkRestartHandler(ProxyDispatcherServlet proxyDispatcherServlet) {
-		this.proxyDispatcherServlet = proxyDispatcherServlet;
-	}
-
+	/**
+	 * Handles OSGi Framework restart, does following on System Bundle STARTED event.
+	 * 
+	 * 1. Removes the BundleContext from ServletContext attributes.
+	 * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext.
+	 * 3. Closes the DispatcherServletTracker and open again with new BundleContext.
+	 * 4. As the BundleContext is removed and added from ServletContext the corresponding
+	 *    BridgeServletContextAttributeListener is fired with events which in turn
+	 *    Closes the EventDispatcherTracker and open again with new BundleContext.
+	 */
 	@Override
 	public void frameworkEvent(FrameworkEvent event) {
+		Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
 		int type = event.getType();
 		switch (type) {
 		case FrameworkEvent.STARTED:
-			LOGGER.info("Handling OSGi Framework Restart!!");
-			// Add the new BundleContext as a ServletContext attribute replacing the stale BundleContext.
+			logger.info("Handling OSGi Framework Restart!!");
+			// Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
 			ServletContext servletContext = ServletContextAware.INSTANCE.getServletContext();
             servletContext.removeAttribute(BundleContext.class.getName());
 			BundleContext bundleContext = event.getBundle().getBundleContext();
 			servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
-			// Sets the new BundleContext in FrameworkProvisioner so that whenever the Server shuts down
-			// and in turn OSGi Framework stops, it should not throw [java.lang.IllegalStateException]
-			// OSGi Framework should stop gracefully.
-			FrameworkProvisioner.INSTANCE.setSystemBundleContext(bundleContext);
+			// Sets the new BundleContext in BundleContextAware so that whenever the Server shuts down
+			// after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
+			// while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
+			BundleContextAware.INSTANCE.setBundleContext(bundleContext);
 			try {
+				logger.info("Closing DispatcherServletTracker as OSGi Framework restarted!!");
 				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
-				this.proxyDispatcherServlet.init();
-			} catch (ServletException ex) {
-				// Note: What shall we do if ProxyDispatcherServlet initialization failed.
+				// DispatcherServletTrackerSupport already holds a ServletConfig reference
+				// from first time when ProxyDispatcherServlet was initialized.
+				// Pass a null, which is just fine.
+				logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
+				DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
+			} catch (Exception ex) {
+				// Note: What shall we do if DispatcherServlet initialization failed.
 				// Log it as of now, we may need to stop the OSGi Framework, will decide later.
 				// Have not seen this yet.
-				LOGGER.error("ServletException!!", ex);
+				logger.error("Exception!!", ex);
 			}
 			break;
 		case FrameworkEvent.STOPPED_UPDATE:
-			LOGGER.info("Closing DispatcherServletTracker!!");
+			logger.info("Closing DispatcherServletTracker!!");
 			DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
-			LOGGER.info("Closing EventDispatcherTracker!!");
+			logger.info("Closing EventDispatcherTracker!!");
 			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 			break;
 		default:
 			// log it and ignore.
-			LOGGER.debug("Ignoring the FrameworkEvent: [{}]", type);
+			logger.debug("Ignoring the FrameworkEvent: [{}]", type);
 			break;
 		}
 	}

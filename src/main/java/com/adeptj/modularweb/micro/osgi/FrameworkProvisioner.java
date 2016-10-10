@@ -36,6 +36,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
@@ -49,13 +50,15 @@ public enum FrameworkProvisioner {
 
     INSTANCE;
 
-    public static final String SHARED_SERVLET_CONTEXT_ATTRS = "org.apache.felix.http.shared_servlet_context_attributes";
+    private static final String FELIX_LOG_LEVEL = "felix.log.level";
 
-	private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
+    private static final String SHARED_SERVLET_CONTEXT_ATTRS = "org.apache.felix.http.shared_servlet_context_attributes";
 
-	public static final String PROXY_DISPATCHER_SERVLET = "ProxyDispatcherServlet";
+    private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
-	public static final String ROOT_MAPPING = "/*";
+    private static final String PROXY_DISPATCHER_SERVLET = "ProxyDispatcherServlet";
+
+    private static final String ROOT_MAPPING = "/*";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkProvisioner.class);
 
@@ -63,24 +66,22 @@ public enum FrameworkProvisioner {
 
     private FrameworkRestartHandler frameworkListener;
 
-    private BundleContext systemBundleContext;
-
     public void startFramework(ServletContext context) {
         try {
         	LOGGER.info("Starting the OSGi Framework!!");
     		long startTime = System.currentTimeMillis();
             this.framework = this.createFramework();
             this.framework.start();
-            this.systemBundleContext = this.framework.getBundleContext();
-            ProxyDispatcherServlet proxyDispatcherServlet = new ProxyDispatcherServlet();
-            this.frameworkListener = new FrameworkRestartHandler(proxyDispatcherServlet);
-            this.systemBundleContext.addFrameworkListener(this.frameworkListener);
-            BundleProvisioner.INSTANCE.provisionBundles(this.systemBundleContext);
+            this.frameworkListener = new FrameworkRestartHandler();
+            BundleContext systemBundleContext = this.framework.getBundleContext();
+            systemBundleContext.addFrameworkListener(this.frameworkListener);
+            BundleContextAware.INSTANCE.setBundleContext(systemBundleContext);
+            BundleProvisioner.INSTANCE.provisionBundles(systemBundleContext);
             LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
-            context.setAttribute(BundleContext.class.getName(), this.systemBundleContext);
-            this.registerProxyDispatcherServlet(proxyDispatcherServlet, context);
+            context.setAttribute(BundleContext.class.getName(), systemBundleContext);
+            this.registerProxyDispatcherServlet(context);
         } catch (Exception ex) {
             LOGGER.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the BundleProvisioner throws exception.
@@ -90,8 +91,8 @@ public enum FrameworkProvisioner {
 
     public void stopFramework() {
         try {
-        	if (this.framework != null && this.systemBundleContext != null) {
-        		this.systemBundleContext.removeFrameworkListener(this.frameworkListener);
+        	if (this.framework != null) {
+        		BundleContextAware.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
@@ -104,10 +105,6 @@ public enum FrameworkProvisioner {
         }
     }
     
-    protected void setSystemBundleContext(BundleContext bundleContext) {
-    	this.systemBundleContext = bundleContext;
-    }
-    
 	private void initBridgeListeners(ServletContext servletContext) {
 		// add all required listeners
 		servletContext.addListener(new BridgeServletContextAttributeListener());
@@ -116,14 +113,14 @@ public enum FrameworkProvisioner {
 		servletContext.addListener(new BridgeHttpSessionAttributeListener());
 	}
     
-    private void registerProxyDispatcherServlet(ProxyDispatcherServlet servlet, ServletContext context) {
+    private void registerProxyDispatcherServlet(ServletContext context) {
 		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
 		// This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
 		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
-		Dynamic registration = context.addServlet(PROXY_DISPATCHER_SERVLET, servlet);
+		Dynamic registration = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
 		registration.addMapping(ROOT_MAPPING);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
-		registration.setLoadOnStartup(1);
+		registration.setLoadOnStartup(0);
 		LOGGER.info("ProxyDispatcherServlet registered successfully!!");
 	}
 
@@ -154,9 +151,9 @@ public enum FrameworkProvisioner {
         return configs;
     }
 
-    private void handleFelixLog(Map<String, String> configs, Config felix) {
-        	configs.put("felix.log.level", System.getProperty("felix.log.level", felix.getString("felix-config-log")));
-    }
+	private void handleFelixLog(Map<String, String> configs, Config felix) {
+		configs.put(FELIX_LOG_LEVEL, System.getProperty(FELIX_LOG_LEVEL, felix.getString("felix-config-log")));
+	}
 
     private Map<String, String> loadFrameworkProps() throws IOException {
 		Properties props = new Properties();

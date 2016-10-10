@@ -19,6 +19,8 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
+import javax.servlet.http.HttpServlet;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -27,9 +29,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.
@@ -42,16 +41,13 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
 	private final static String OSGI_FILTER_EXPR = "(http.felix.dispatcher=org.apache.felix.http.base.internal.DispatcherServlet)";
 
-	private final ServletConfig servletConfig;
-
     private HttpServlet dispatcherServlet;
 
-    public DispatcherServletTracker(BundleContext context, ServletConfig config) throws InvalidSyntaxException {
+    public DispatcherServletTracker(BundleContext context) throws InvalidSyntaxException {
         super(context, createFilter(context), null);
-        this.servletConfig = config;
     }
 
-    public HttpServlet getDispatcherServlet() {
+    protected HttpServlet getDispatcherServlet() {
         return this.dispatcherServlet;
     }
 
@@ -113,7 +109,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         }
         try {
             LOGGER.info("Initializing Felix DispatcherServlet!!");
-            this.dispatcherServlet.init(this.servletConfig);
+            this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
             LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcherServlet);
         } catch (Exception ex) {
             LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);

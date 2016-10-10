@@ -53,7 +53,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
     	long startTime = System.currentTimeMillis();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         try {
-        	LOGGER.info("Opening DispatcherServletTracker!!");
+        	LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         	DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
 		} catch (InvalidSyntaxException ise) {
 			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
