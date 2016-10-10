@@ -50,25 +50,25 @@ public class StartupHandlerInitializer implements ServletContainerInitializer {
 	 */
 	@Override
 	public void onStartup(Set<Class<?>> handlers, ServletContext context) throws ServletException {
-		Logger LOGGER = LoggerFactory.getLogger(StartupHandlerInitializer.class);
+		Logger logger = LoggerFactory.getLogger(StartupHandlerInitializer.class);
 		if (handlers == null) {
 			// We can't go ahead if FrameworkStartupHandler is not passed by container.
-			LOGGER.error("No @HandlesTypes(StartupHandler) on classpath!!");
+			logger.error("No @HandlesTypes(StartupHandler) on classpath!!");
 			throw new IllegalStateException("No @HandlesTypes(StartupHandler) on classpath!!");
 		} else {
 			ServletContextAware.INSTANCE.setServletContext(context);
 			context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
 			handlers.forEach(handler -> {
-				LOGGER.debug("Handling @HandlesTypes: [{}]", handler);
+				logger.debug("Handling @HandlesTypes: [{}]", handler);
 				try {
 					if (StartupHandler.class.isAssignableFrom(handler)) {
 						StartupHandler.class.cast(handler.newInstance()).onStartup(context);
 					} else {
-						LOGGER.warn("Unknown @HandlesTypes: [{}]", handler);
+						logger.warn("Unknown @HandlesTypes: [{}]", handler);
 						throw new IllegalStateException("Only StartupHandler types are supported!!");
 					}
 				} catch (Exception ex) {
-					LOGGER.error("StartupHandler Exception!!", ex);
+					logger.error("StartupHandler Exception!!", ex);
 					throw new RuntimeException("StartupHandler Exception!!", ex);
 				}
 			});

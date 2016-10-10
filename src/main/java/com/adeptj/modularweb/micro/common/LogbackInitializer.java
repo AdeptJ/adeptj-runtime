@@ -40,14 +40,12 @@ import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 
 /**
  * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH. 
- * But using that approach LOGBACK takes few seconds to initializes itself which is reduced drastically to under 150 milliseconds
+ * But using that approach LOGBACK takes longer to initializes(5+ seconds) which is reduced drastically to under 150 milliseconds
  * using programmatic approach. This is a great improvement on total startup time.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
 public class LogbackInitializer {
-
-	public static final String LOGGER_UNDERTOW_SECURITY = "io.undertow.request.security";
 
 	public static final String LOGGER_XNIO = "org.xnio.nio";
 
@@ -100,8 +98,13 @@ public class LogbackInitializer {
 		adeptjLogger(context, appenders, commonConf);
 		undertowLogger(context, appenders, commonConf);
 		xnioLogger(context, appenders, commonConf);
-		undertowSecurityLogger(context, appenders, commonConf);
+		context.start();
 		context.getLogger(LogbackInitializer.class).info("Logback initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
+	}
+	
+	public static void destroy() {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+		context.stop();
 	}
 	
 	private static void addAppenders(List<Appender<ILoggingEvent>> appenders, Logger logger) {
@@ -110,23 +113,16 @@ public class LogbackInitializer {
 		}
 	}
 
-	private static void undertowSecurityLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
-		Logger securityLogger = logger(LOGGER_UNDERTOW_SECURITY,
-				Level.valueOf(commonConf.getString("undertow-security-log-level")), context);
-		addAppenders(appenders, securityLogger);
-		securityLogger.setAdditive(false);
-	}
-
-	private static void xnioLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
-		Logger xnioLogger = logger(LOGGER_XNIO, Level.valueOf(commonConf.getString("xnio-log-level")), context);
-		addAppenders(appenders, xnioLogger);
-		xnioLogger.setAdditive(false);
-	}
-
 	private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config commonConf) {
 		// initialize ROOT Logger at ERROR level.
 		Logger root = logger(Logger.ROOT_LOGGER_NAME, Level.valueOf(commonConf.getString("root-log-level")), context);
 		root.addAppender(consoleAppender);
+	}
+	
+	private static void xnioLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {
+		Logger xnioLogger = logger(LOGGER_XNIO, Level.valueOf(commonConf.getString("xnio-log-level")), context);
+		addAppenders(appenders, xnioLogger);
+		xnioLogger.setAdditive(false);
 	}
 
 	private static void undertowLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config commonConf) {

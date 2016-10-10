@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
+import com.adeptj.modularweb.micro.common.LogbackInitializer;
 import com.adeptj.modularweb.micro.common.Verb;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
@@ -79,18 +80,17 @@ public class UndertowProvisioner {
 
 	private static final String PROTOCOL_TLS = "TLS";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowProvisioner.class);
-
 	public void provision(Map<String, String> arguments) throws Exception {
 		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
-		int port = this.getPort(httpConf);
-		LOGGER.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
-		LOGGER.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
+		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
+		int port = this.getPort(httpConf, logger);
+		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
+		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
-		this.enableAJP(undertowConf, undertowBuilder);
-		this.enableHttp2(undertowConf, undertowBuilder);
+		this.enableAJP(undertowConf, undertowBuilder, logger);
+		this.enableHttp2(undertowConf, undertowBuilder, logger);
 		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
 		manager.deploy();
 		Undertow server = undertowBuilder
@@ -102,7 +102,7 @@ public class UndertowProvisioner {
 		}
 	}
 
-	private void enableHttp2(Config undertowConf, Builder undertowBuilder) throws Exception {
+	private void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
 		if (Boolean.getBoolean("enable.http2")) {
 			Config httpsConf = undertowConf.getConfig("https");
 			char[] keyStorePwd = httpsConf.getString("keyStorePwd").toCharArray();
@@ -110,29 +110,31 @@ public class UndertowProvisioner {
 			int httpsPort = httpsConf.getInt(KEY_PORT);
 			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
 					this.sslContext(this.keyStore(httpsConf.getString("keyStore"), keyStorePwd), keyPwd));
-			LOGGER.info("HTTP2 enabled on port: [{}]", httpsPort);
+			logger.info("HTTP2 enabled on port: [{}]", httpsPort);
 		}
 	}
 
-	private void enableAJP(Config undertowConf, Builder undertowBuilder) {
+	private void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
 		if (Boolean.getBoolean("enable.ajp")) {
 			Config ajpConf = undertowConf.getConfig("ajp");
 			int ajpPort = ajpConf.getInt(KEY_PORT);
 			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
-			LOGGER.info("AJP enabled on port: [{}]", ajpPort);
+			logger.info("AJP enabled on port: [{}]", ajpPort);
 		}
 	}
 
-	private int getPort(Config httpConf) {
+	private int getPort(Config httpConf, Logger logger) {
 		String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
 			port = httpConf.getInt(KEY_PORT);
-			LOGGER.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
+			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
 		if (!CommonUtils.isPortAvailable(port)) {
+			// Let the LOGBACK cleans up it's state.
+			LogbackInitializer.destroy();
 			System.exit(-1);
 		}
 		return port;

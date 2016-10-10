@@ -65,6 +65,8 @@ public class Main {
 				FrameworkProvisioner.INSTANCE.stopFramework();
 			}
 			logger.error("Fatal error, shutting down JVM!!", th);
+			// Let the LOGBACK cleans up it's state.
+			LogbackInitializer.destroy();
 			System.exit(-1);
 		}
 	}

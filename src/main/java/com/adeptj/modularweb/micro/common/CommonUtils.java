@@ -32,7 +32,6 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.config.Configs;
@@ -43,8 +42,6 @@ import com.adeptj.modularweb.micro.config.Configs;
  * @author Rakesh.Kumar, AdeptJ
  */
 public class CommonUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 
 	private static final int BUFFER_SIZE = 1024;
 
@@ -85,7 +82,7 @@ public class CommonUtils {
 			channel.socket().bind(new InetSocketAddress(port));
 			isAvailable = true;
 		} catch (IOException ex) {
-			LOGGER.error("Exception while aquiring port: [{}], cause:", port, ex);
+			LoggerFactory.getLogger(CommonUtils.class).error("Exception while aquiring port: [{}], cause:", port, ex);
 			isAvailable = !(ex instanceof BindException);
 		}
 		return isAvailable;

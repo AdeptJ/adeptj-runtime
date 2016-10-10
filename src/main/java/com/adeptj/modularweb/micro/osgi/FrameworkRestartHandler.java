@@ -50,8 +50,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 	@Override
 	public void frameworkEvent(FrameworkEvent event) {
 		Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
-		int type = event.getType();
-		switch (type) {
+		switch (event.getType()) {
 		case FrameworkEvent.STARTED:
 			logger.info("Handling OSGi Framework Restart!!");
 			// Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
@@ -64,7 +63,6 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			// while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
 			BundleContextAware.INSTANCE.setBundleContext(bundleContext);
 			try {
-				logger.info("Closing DispatcherServletTracker as OSGi Framework restarted!!");
 				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
 				// DispatcherServletTrackerSupport already holds a ServletConfig reference
 				// from first time when ProxyDispatcherServlet was initialized.
@@ -86,7 +84,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			break;
 		default:
 			// log it and ignore.
-			logger.debug("Ignoring the FrameworkEvent: [{}]", type);
+			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", event.getType());
 			break;
 		}
 	}

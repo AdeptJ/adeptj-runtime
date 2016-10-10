@@ -19,12 +19,11 @@
 */
 package com.adeptj.modularweb.micro.undertow;
 
-import javax.servlet.ServletException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.Constants;
+import com.adeptj.modularweb.micro.common.LogbackInitializer;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
@@ -35,8 +34,6 @@ import io.undertow.servlet.api.DeploymentManager;
  * Rakesh.Kumar, AdeptJ
  */
 public class UndertowShutdownHook extends Thread {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(UndertowShutdownHook.class);
 
 	private Undertow server;
 
@@ -54,16 +51,18 @@ public class UndertowShutdownHook extends Thread {
 	@Override
 	public void run() {
 		long startTime = System.currentTimeMillis();
-		LOGGER.info("Stopping AdeptJ ModularWeb Micro!!");
+		Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
+		logger.info("Stopping AdeptJ ModularWeb Micro!!");
 		try {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			LOGGER.info("AdeptJ ModularWeb Micro stopped in [{}] ms!!", (System.currentTimeMillis() - startTime));
-		} catch (ServletException ex) {
-			LOGGER.error("Exception while stopping Undertow, shutting down JVM!!", ex);
-			System.exit(-1);
+			logger.info("AdeptJ ModularWeb Micro stopped in [{}] ms!!", (System.currentTimeMillis() - startTime));
+		} catch (Exception ex) {
+			logger.error("Exception while stopping AdeptJ ModularWeb Micro!!", ex);
 		}
+		// Let the LOGBACK cleans up it's state.
+		LogbackInitializer.destroy();
 	}
 
 }
