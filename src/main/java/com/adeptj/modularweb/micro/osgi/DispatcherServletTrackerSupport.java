@@ -59,10 +59,10 @@ public enum DispatcherServletTrackerSupport {
 
 	public void closeDispatcherServletTracker() {
 		this.isDispatcherServletInitialized = false;
-		if (this.dispatcherServletTracker != null) {
+		if (this.dispatcherServletTracker != null && !this.dispatcherServletTracker.isEmpty()) {
 			this.dispatcherServletTracker.close();
+			this.dispatcherServletTracker = null;
 		}
-		this.dispatcherServletTracker = null;
 	}
 
 	public ServletConfig getServletConfig() {
