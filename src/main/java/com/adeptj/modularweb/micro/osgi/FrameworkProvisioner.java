@@ -19,7 +19,6 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,10 +48,6 @@ import com.typesafe.config.Config;
 public enum FrameworkProvisioner {
 
     INSTANCE;
-
-    private static final String FELIX_LOG_LEVEL = "felix.log.level";
-
-    private static final String SHARED_SERVLET_CONTEXT_ATTRS = "org.apache.felix.http.shared_servlet_context_attributes";
 
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
@@ -92,7 +87,10 @@ public enum FrameworkProvisioner {
     public void stopFramework() {
         try {
         	if (this.framework != null) {
-        		BundleContextAware.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
+        		BundleContext bundleContext = BundleContextAware.INSTANCE.getBundleContext();
+        		if (bundleContext != null) {
+        			bundleContext.removeFrameworkListener(this.frameworkListener);	
+        		}
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
@@ -137,23 +135,11 @@ public enum FrameworkProvisioner {
     private Map<String, String> createFrameworkConfigs() throws IOException {
         Map<String, String> configs = this.loadFrameworkProps();
         Config felixConf = Configs.INSTANCE.main().getConfig("felix");
-        configs.put(SHARED_SERVLET_CONTEXT_ATTRS, felixConf.getString("shared-servlet-context-attributes"));
-        String frameworkArtifactsDir = System.getProperty("user.dir") + File.separator + "modularweb-micro";
-        configs.put("org.osgi.framework.storage", frameworkArtifactsDir + File.separator + "osgi-bundles");
-        configs.put("felix.cm.dir", frameworkArtifactsDir + File.separator + "osgi-configs");
-        configs.put("felix.memoryusage.dump.location", frameworkArtifactsDir + File.separator + "heap-dumps");
-        configs.put("org.osgi.framework.bundle.parent", felixConf.getString("framework-bundle-parent"));
-        this.handleFelixLog(configs, felixConf);
-        // WARNING: This breaks OSGi Modularity, But EhCache and some other modules won't work without this.
-        configs.put("org.osgi.framework.bootdelegation", felixConf.getString("osgi-bootdelegation"));
-        configs.put("felix.webconsole.manager.root", "/system/console");
+        configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
+        configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
         LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
-
-	private void handleFelixLog(Map<String, String> configs, Config felix) {
-		configs.put(FELIX_LOG_LEVEL, System.getProperty(FELIX_LOG_LEVEL, felix.getString("felix-config-log")));
-	}
 
     private Map<String, String> loadFrameworkProps() throws IOException {
 		Properties props = new Properties();

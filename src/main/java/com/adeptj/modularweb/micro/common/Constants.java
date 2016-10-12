@@ -77,6 +77,8 @@ public final class Constants {
 	public static final String OS_NAME_PROP = "os.name";
 
 	public static final String OS = System.getProperty(OS_NAME_PROP);
+	
+	public static final String CURR_DIR = System.getProperty("user.dir");
 
 	// Configuration Keys constants start.
 
