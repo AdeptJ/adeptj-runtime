@@ -79,8 +79,7 @@ import io.undertow.util.HttpString;
 public final class UndertowProvisioner {
 	
 	// No instantiation.
-	private UndertowProvisioner() {
-	}
+	private UndertowProvisioner() {}
 
 	private static final String PROTOCOL_TLS = "TLS";
 
