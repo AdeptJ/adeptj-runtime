@@ -104,9 +104,9 @@ public final class Constants {
 
 	public static final String KEY_UT_INTERNALS = "internals";
 
-	public static final String HEADER_POWERED_BY_VALUE = "Undertow";
+	public static final String HEADER_POWERED_BY_VALUE = "Undertow/1";
 
-	public static final String HEADER_SERVER_VALUE = "AdeptJ Modular Web Micro";
+	public static final String HEADER_SERVER_VALUE = "AdeptJ ModularWeb Micro";
 
 	public static final String HEADER_POWERED_BY = "X-Powered-By";
 
