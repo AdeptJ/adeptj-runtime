@@ -25,8 +25,8 @@
 	<artifactId>adeptj-modularweb-micro</artifactId>
 	<version>1.0.0.RELEASE</version>
 	<packaging>jar</packaging>
-	<name>AdeptJ ModularWeb Micro:: Platform Provisioner</name>
-	<description>Provision AdeptJ ModularWeb Micro Platform</description>
+	<name>AdeptJ ModularWeb Micro Runtime</name>
+	<description>Provision AdeptJ ModularWeb Micro Runtime</description>
 	<url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
@@ -133,6 +133,7 @@
     </scm>
 
 	<build>
+	    <finalName>adeptj-runtime</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

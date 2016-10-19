@@ -130,9 +130,9 @@ public enum FrameworkProvisioner {
 
 	private Framework createFramework(Logger logger) throws Exception {
 		Framework framework = null;
-		for (FrameworkFactory factory : ServiceLoader.load(FrameworkFactory.class, this.getClass().getClassLoader())) {
+		for (FrameworkFactory factory : ServiceLoader.load(FrameworkFactory.class)) {
+			// There should only be a single FrameworkFactory.
 			framework = factory.newFramework(this.createFrameworkConfigs(logger));
-			// Ideally there will only be a single FrameworkFactory.
 			break;
 		}
 		return framework;
