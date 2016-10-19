@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
-import com.adeptj.modularweb.micro.common.LogbackInitializer;
+import com.adeptj.modularweb.micro.common.LogbackProvisioner;
 import com.adeptj.modularweb.micro.common.Verb;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
@@ -76,25 +76,29 @@ import io.undertow.util.HttpString;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class UndertowProvisioner {
+public final class UndertowProvisioner {
+	
+	// No instantiation.
+	private UndertowProvisioner() {
+	}
 
 	private static final String PROTOCOL_TLS = "TLS";
 
-	public void provision(Map<String, String> arguments) throws Exception {
+	public static void provision(Map<String, String> arguments) throws Exception {
 		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
-		int port = this.getPort(httpConf, logger);
+		int port = getPort(httpConf, logger);
 		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
-		this.enableAJP(undertowConf, undertowBuilder, logger);
-		this.enableHttp2(undertowConf, undertowBuilder, logger);
-		DeploymentManager manager = Servlets.newContainer().addDeployment(this.constructDeploymentInfo());
+		enableAJP(undertowConf, undertowBuilder, logger);
+		enableHttp2(undertowConf, undertowBuilder, logger);
+		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
 		manager.deploy();
 		Undertow server = undertowBuilder
-				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), this.buildHeaders())).build();
+				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -102,19 +106,19 @@ public class UndertowProvisioner {
 		}
 	}
 
-	private void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
+	private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
 		if (Boolean.getBoolean("enable.http2")) {
 			Config httpsConf = undertowConf.getConfig("https");
 			char[] keyStorePwd = httpsConf.getString("keyStorePwd").toCharArray();
 			char[] keyPwd = httpsConf.getString("keyPwd").toCharArray();
 			int httpsPort = httpsConf.getInt(KEY_PORT);
 			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-					this.sslContext(this.keyStore(httpsConf.getString("keyStore"), keyStorePwd), keyPwd));
+					sslContext(keyStore(httpsConf.getString("keyStore"), keyStorePwd), keyPwd));
 			logger.info("HTTP2 enabled on port: [{}]", httpsPort);
 		}
 	}
 
-	private void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
+	private static void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
 		if (Boolean.getBoolean("enable.ajp")) {
 			Config ajpConf = undertowConf.getConfig("ajp");
 			int ajpPort = ajpConf.getInt(KEY_PORT);
@@ -123,7 +127,7 @@ public class UndertowProvisioner {
 		}
 	}
 
-	private int getPort(Config httpConf, Logger logger) {
+	private static int getPort(Config httpConf, Logger logger) {
 		String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
@@ -134,27 +138,27 @@ public class UndertowProvisioner {
 		}
 		if (!CommonUtils.isPortAvailable(port)) {
 			// Let the LOGBACK cleans up it's state.
-			LogbackInitializer.destroy();
+			LogbackProvisioner.stop();
 			System.exit(-1);
 		}
 		return port;
 	}
 
-	private Map<HttpString, String> buildHeaders() {
+	private static Map<HttpString, String> buildHeaders() {
 		Map<HttpString, String> headers = new HashMap<>();
 		headers.put(HttpString.tryFromString(HEADER_SERVER), HEADER_SERVER_VALUE);
 		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), HEADER_POWERED_BY_VALUE);
 		return headers;
 	}
 
-	GracefulShutdownHandler gracefulShutdownHandler(PathHandler handler) {
+	static GracefulShutdownHandler gracefulShutdownHandler(PathHandler handler) {
 		return new GracefulShutdownHandler(new RequestLimitingHandler(new RequestLimit(MAX_REQ_WHEN_SHUTDOWN),
 				new AllowedMethodsHandler(new BlockingHandler(), Verb.GET.toHttpString(), Verb.POST.toHttpString(),
 						Verb.PUT.toHttpString(), Verb.DELETE.toHttpString(), Verb.OPTIONS.toHttpString(),
 						Verb.PATCH.toHttpString())));
 	}
 
-	private DeploymentInfo constructDeploymentInfo() {
+	private static DeploymentInfo constructDeploymentInfo() {
 		Set<Class<?>> handlesTypes = new HashSet<>();
 		handlesTypes.add(FrameworkStartupHandler.class);
 		return Servlets.deployment()
@@ -164,19 +168,19 @@ public class UndertowProvisioner {
 				.setIgnoreFlush(true).setDeploymentName(DEPLOYMENT_NAME);
 	}
 
-	private KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
+	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
 		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		keyStore.load(UndertowProvisioner.class.getResourceAsStream(keyStoreName), keyStorePwd);
 		return keyStore;
 	}
 
-	private SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
+	private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
 		SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-		sslContext.init(this.keyMgrs(keyStore, keyPwd), null, null);
+		sslContext.init(keyMgrs(keyStore, keyPwd), null, null);
 		return sslContext;
 	}
 
-	private KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
+	private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(keyStore, keyPwd);
 		return kmf.getKeyManagers();

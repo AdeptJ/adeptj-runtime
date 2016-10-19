@@ -19,6 +19,8 @@
 */
 package com.adeptj.modularweb.micro.servlet;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -50,7 +52,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-    	long startTime = System.currentTimeMillis();
+    	long startNanos = System.nanoTime();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         try {
         	LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
@@ -59,7 +61,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
 			throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
 		}
-        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", (System.currentTimeMillis() - startTime));
+        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
     }
 
     /**

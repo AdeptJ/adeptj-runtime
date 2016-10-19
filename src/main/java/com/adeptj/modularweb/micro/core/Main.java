@@ -19,6 +19,8 @@
 */
 package com.adeptj.modularweb.micro.core;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,16 +29,16 @@ import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.common.Constants;
-import com.adeptj.modularweb.micro.common.LogbackInitializer;
+import com.adeptj.modularweb.micro.common.LogbackProvisioner;
 import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
 /**
- * Main class bootstrapping the AdeptJ Runtime.
+ * Entry point for initializing the AdeptJ Runtime.
  * 
  * Rakesh.Kumar, AdeptJ
  */
-public class Main {
+public final class Main {
 
 	/**
 	 * Entry point for initializing the AdeptJ Runtime.
@@ -50,14 +52,13 @@ public class Main {
 	 * 5. Registers the runtime ShutdownHook. 
 	 */
 	public static void main(String[] args) {
-		final long startTime = System.currentTimeMillis();
+		long startNanos = System.nanoTime();
 		// First of all initialize LOGBACK.
-		LogbackInitializer.init();
-		final Logger logger = LoggerFactory.getLogger(Main.class);
+		LogbackProvisioner.start();
+		Logger logger = LoggerFactory.getLogger(Main.class);
 		try {
-			UndertowProvisioner provisioner = new UndertowProvisioner();
-			provisioner.provision(parseCommands(args));
-			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
+			UndertowProvisioner.provision(parseCommands(args));
+			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
 			if (BundleContextAware.INSTANCE.getBundleContext() != null) {
@@ -66,7 +67,7 @@ public class Main {
 			}
 			logger.error("Fatal error, shutting down JVM!!", th);
 			// Let the LOGBACK cleans up it's state.
-			LogbackInitializer.destroy();
+			LogbackProvisioner.stop();
 			System.exit(-1);
 		}
 	}
@@ -75,8 +76,8 @@ public class Main {
 		Map<String, String> arguments = new HashMap<>();
 		// Parse the command line.
 		for (String cmd : commands) {
-			int indexOf = cmd.indexOf(Constants.REGEX_EQ);
-			arguments.put(cmd.substring(0, indexOf), cmd.substring(indexOf + 1, cmd.length()));
+			int indexOfEq = cmd.indexOf(Constants.REGEX_EQ);
+			arguments.put(cmd.substring(0, indexOfEq), cmd.substring(indexOfEq + 1, cmd.length()));
 		}
 		return arguments;
 	}

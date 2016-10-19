@@ -19,6 +19,8 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +66,7 @@ public enum FrameworkProvisioner {
     public void startFramework(ServletContext context) {
         try {
         	LOGGER.info("Starting the OSGi Framework!!");
-    		long startTime = System.currentTimeMillis();
+    		long startTime = System.nanoTime();
             this.framework = this.createFramework();
             this.framework.start();
             this.frameworkListener = new FrameworkRestartHandler();
@@ -72,7 +74,7 @@ public enum FrameworkProvisioner {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextAware.INSTANCE.setBundleContext(systemBundleContext);
             BundleProvisioner.INSTANCE.provisionBundles(systemBundleContext);
-            LOGGER.info("OSGi Framework started in [{}] ms!!", (System.currentTimeMillis() - startTime));
+            LOGGER.info("OSGi Framework started in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startTime));
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);

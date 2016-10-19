@@ -19,6 +19,8 @@
 */
 package com.adeptj.modularweb.micro.common;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +47,7 @@ import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LogbackInitializer {
+public class LogbackProvisioner {
 
 	private static final String LOGGER_XNIO = "org.xnio.nio";
 
@@ -73,8 +75,8 @@ public class LogbackInitializer {
 
 	private static final String APPENDER_FILE = "FILE";
 
-	public static void init() {
-		long startTime = System.currentTimeMillis();
+	public static void start() {
+		long startNanos = System.nanoTime();
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 		Config commonConf = Configs.INSTANCE.main().getConfig(CONF_COMMON);
 		// Console Appender
@@ -99,10 +101,11 @@ public class LogbackInitializer {
 		undertowLogger(context, appenders, commonConf);
 		xnioLogger(context, appenders, commonConf);
 		context.start();
-		context.getLogger(LogbackInitializer.class).info("Logback initialized in [{}] ms!!", (System.currentTimeMillis() - startTime));
+		Logger logger = context.getLogger(LogbackProvisioner.class);
+		logger.info("Logback initialized in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
 	}
 	
-	public static void destroy() {
+	public static void stop() {
 		LoggerContext.class.cast(LoggerFactory.getILoggerFactory()).stop();
 	}
 	

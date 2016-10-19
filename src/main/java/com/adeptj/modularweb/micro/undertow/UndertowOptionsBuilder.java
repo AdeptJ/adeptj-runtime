@@ -34,7 +34,7 @@ import io.undertow.UndertowOptions;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class UndertowOptionsBuilder {
+public final class UndertowOptionsBuilder {
 
 	private static final Set<Option<Long>> OPTIONS_LONG;
 
