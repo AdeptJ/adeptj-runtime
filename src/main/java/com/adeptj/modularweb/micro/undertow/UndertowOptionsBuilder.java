@@ -19,15 +19,13 @@
 */
 package com.adeptj.modularweb.micro.undertow;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xnio.Option;
-
 import com.typesafe.config.Config;
-
 import io.undertow.Undertow.Builder;
 import io.undertow.UndertowOptions;
+import org.xnio.Option;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * UNDERTOW Server Options.
@@ -55,9 +53,9 @@ public final class UndertowOptionsBuilder {
 	}
 
 	public static void build(Builder builder, Config undertowConf) {
-		Config serverOptionsConf = undertowConf.getConfig("serverOptions");
-		OPTIONS_LONG.forEach(option -> builder.setServerOption(option, serverOptionsConf.getLong(option.getName())));
-		OPTIONS_INT.forEach(option -> builder.setServerOption(option, serverOptionsConf.getInt(option.getName())));
-		OPTIONS_BOOL.forEach(option -> builder.setServerOption(option, serverOptionsConf.getBoolean(option.getName())));
+		Config serverOptions = undertowConf.getConfig("serverOptions");
+		OPTIONS_LONG.forEach(option -> builder.setServerOption(option, serverOptions.getLong(option.getName())));
+		OPTIONS_INT.forEach(option -> builder.setServerOption(option, serverOptions.getInt(option.getName())));
+		OPTIONS_BOOL.forEach(option -> builder.setServerOption(option, serverOptions.getBoolean(option.getName())));
 	}
 }

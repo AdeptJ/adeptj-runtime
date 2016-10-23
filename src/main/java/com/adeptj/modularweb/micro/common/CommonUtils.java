@@ -27,12 +27,7 @@ import static com.adeptj.modularweb.micro.common.Constants.WIN_BROWSER_LAUNCH_CM
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.BindException;
-import java.net.InetSocketAddress;
 import java.net.URL;
-import java.nio.channels.ServerSocketChannel;
-
-import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.config.Configs;
 
@@ -43,49 +38,37 @@ import com.adeptj.modularweb.micro.config.Configs;
  */
 public class CommonUtils {
 
-	private static final int BUFFER_SIZE = 1024;
+	private static final int EOF = -1;
+	
+	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
-	public static final String REGEX_COMMA = ",";
+	private static final String REGEX_COMMA = ",";
 
-    public static final String EMPTY = "";
+	private static final String EMPTY = "";
 
-    public static final String SPACE = " ";
+	private static final String SPACE = " ";
 
-    public static final String PIPE = " || ";
+	private static final String PIPE = " || ";
 
-    public static final String CMD_SH = "sh";
+	private static final String CMD_SH = "sh";
 
-    public static final String CMD_OPT = "-c";
+	private static final String CMD_OPT = "-c";
 
-    public static final int INDEX_ZERO = 0;
+	private static final int OFFSET = 0;
 
     /**
 	 * Deny direct instantiation.
 	 */
-	private CommonUtils() {
-	}
+	private CommonUtils() {}
 
 	public static String toString(InputStream input) throws IOException {
-		byte[] buffer = new byte[BUFFER_SIZE];
-		int length;
+		byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		while ((length = input.read(buffer)) != -1) {
-			out.write(buffer, INDEX_ZERO, length);
+		int numberOfBytesRead;
+		while ((numberOfBytesRead = input.read(buffer)) != EOF) {
+			out.write(buffer, OFFSET, numberOfBytesRead);
 		}
 		return out.toString(Constants.UTF8);
-	}
-
-	public static boolean isPortAvailable(int port) {
-		boolean isAvailable = false;
-		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
-			channel.socket().setReuseAddress(true);
-			channel.socket().bind(new InetSocketAddress(port));
-			isAvailable = true;
-		} catch (IOException ex) {
-			LoggerFactory.getLogger(CommonUtils.class).error("Exception while aquiring port: [{}], cause:", port, ex);
-			isAvailable = !(ex instanceof BindException);
-		}
-		return isAvailable;
 	}
 
 	public static boolean isMac() {
@@ -109,9 +92,9 @@ public class CommonUtils {
 		} else if (isUnix()) {
 			String[] browsers = Configs.INSTANCE.main().getString(KEY_BROWSERS).split(REGEX_COMMA);
 			StringBuilder cmdBuilder = new StringBuilder();
-			int index = INDEX_ZERO;
+			int index = OFFSET;
 			for (String browser : browsers) {
-				if (index == INDEX_ZERO) {
+				if (index == OFFSET) {
 					cmdBuilder.append(EMPTY).append(browser).append(SPACE).append(url);
 				} else {
 					cmdBuilder.append(PIPE).append(browser).append(SPACE).append(url);

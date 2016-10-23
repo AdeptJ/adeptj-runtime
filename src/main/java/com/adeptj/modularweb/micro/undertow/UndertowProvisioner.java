@@ -34,7 +34,11 @@ import static com.adeptj.modularweb.micro.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.modularweb.micro.common.Constants.STARTUP_INFO;
 import static com.adeptj.modularweb.micro.common.Constants.SYS_PROP_SERVER_PORT;
 
+import java.io.IOException;
+import java.net.BindException;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.channels.ServerSocketChannel;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -135,12 +139,29 @@ public final class UndertowProvisioner {
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
-		if (!CommonUtils.isPortAvailable(port)) {
+		if (!isPortAvailable(port, logger)) {
 			// Let the LOGBACK cleans up it's state.
+			logger.error("JVM shutting down!!");
 			LogbackProvisioner.stop();
 			System.exit(-1);
 		}
 		return port;
+	}
+	
+	private static boolean isPortAvailable(int port, Logger logger) {
+		boolean isPortAvailable = false;
+		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
+			channel.socket().setReuseAddress(true);
+			channel.socket().bind(new InetSocketAddress(port));
+			isPortAvailable = true;
+		} catch (BindException ex) {
+			logger.error("BindException while aquiring port: [{}], cause:", port, ex);
+			isPortAvailable = false;
+		} catch (IOException ex) {
+			logger.error("IOException while aquiring port: [{}], cause:", port, ex);
+			isPortAvailable = false;
+		}
+		return isPortAvailable;
 	}
 
 	private static Map<HttpString, String> buildHeaders() {
