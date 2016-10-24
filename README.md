@@ -33,7 +33,7 @@ The platform embeds OSGi and Undertow with modules described above.
 3. mvn clean package
 4. Above step will create AdeptJ runtime uber jar.
 4. Now cd target
-5. java -server -jar adeptj-runtime.jar
+5. java -server -jar adeptj-runtime-LATEST_VERSION.jar
 6. Click to view [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
