@@ -33,6 +33,12 @@ public final class Constants {
 	public static final String PROVISIONING_FILE = "provisioning";
 
 	public static final String MAIN_CONF_SECTION = "main";
+	
+	public static final String UNDERTOW_CONF_SECTION = "undertow";
+	
+	public static final String FELIX_CONF_SECTION = "felix";
+	
+	public static final String COMMON_CONF_SECTION = "common";
 
 	public static final String CONTEXT_PATH = "/";
 
@@ -82,7 +88,7 @@ public final class Constants {
 
 	// Configuration Keys constants start.
 
-	public static final String KEY_BROWSERS = "common.browsers";
+	public static final String KEY_BROWSERS = "browsers";
 
 	public static final String KEY_HOST = "host";
 

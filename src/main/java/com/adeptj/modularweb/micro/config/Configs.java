@@ -19,7 +19,12 @@
 */
 package com.adeptj.modularweb.micro.config;
 
-import com.adeptj.modularweb.micro.common.Constants;
+import static com.adeptj.modularweb.micro.common.Constants.COMMON_CONF_SECTION;
+import static com.adeptj.modularweb.micro.common.Constants.FELIX_CONF_SECTION;
+import static com.adeptj.modularweb.micro.common.Constants.MAIN_CONF_SECTION;
+import static com.adeptj.modularweb.micro.common.Constants.PROVISIONING_FILE;
+import static com.adeptj.modularweb.micro.common.Constants.UNDERTOW_CONF_SECTION;
+
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -35,10 +40,18 @@ public enum Configs {
 	private final Config main;
 
 	Configs() {
-		this.main = ConfigFactory.load(Constants.PROVISIONING_FILE).getConfig(Constants.MAIN_CONF_SECTION);
+		this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
 	}
-
-	public Config main() {
-		return main;
+	
+	public Config undertow() {
+		return this.main.getConfig(UNDERTOW_CONF_SECTION);
+	}
+	
+	public Config felix() {
+		return this.main.getConfig(FELIX_CONF_SECTION);
+	}
+	
+	public Config common() {
+		return this.main.getConfig(COMMON_CONF_SECTION);
 	}
 }

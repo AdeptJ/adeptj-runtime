@@ -90,7 +90,7 @@ public class CommonUtils {
 		} else if (isWindows()) {
 			Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
 		} else if (isUnix()) {
-			String[] browsers = Configs.INSTANCE.main().getString(KEY_BROWSERS).split(REGEX_COMMA);
+			String[] browsers = Configs.INSTANCE.common().getString(KEY_BROWSERS).split(REGEX_COMMA);
 			StringBuilder cmdBuilder = new StringBuilder();
 			int index = OFFSET;
 			for (String browser : browsers) {

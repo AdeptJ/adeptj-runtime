@@ -65,8 +65,6 @@ public class LogbackProvisioner {
 
 	private static final String KEY_LOG_MAX_SIZE = "log-max-size";
 
-	private static final String CONF_COMMON = "common";
-
 	private static final String HYPHEN = "-";
 
 	private static final String EXTN_LOG = ".log";
@@ -78,7 +76,7 @@ public class LogbackProvisioner {
 	public static void start() {
 		long startNanos = System.nanoTime();
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-		Config commonConf = Configs.INSTANCE.main().getConfig(CONF_COMMON);
+		Config commonConf = Configs.INSTANCE.common();
 		// Console Appender
 		ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, commonConf);
 		// File Appender

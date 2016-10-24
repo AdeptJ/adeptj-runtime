@@ -140,7 +140,7 @@ public enum FrameworkProvisioner {
 
     private Map<String, String> createFrameworkConfigs(Logger logger) throws IOException {
         Map<String, String> configs = this.loadFrameworkProps();
-        Config felixConf = Configs.INSTANCE.main().getConfig("felix");
+        Config felixConf = Configs.INSTANCE.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
         configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
         logger.debug("OSGi Framework Configurations: {}", configs);

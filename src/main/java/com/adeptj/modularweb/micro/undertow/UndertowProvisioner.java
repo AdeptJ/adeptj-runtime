@@ -88,7 +88,7 @@ public final class UndertowProvisioner {
 	private static final String PROTOCOL_TLS = "TLS";
 
 	public static void provision(Map<String, String> arguments) throws Exception {
-		Config undertowConf = Configs.INSTANCE.main().getConfig("undertow");
+		Config undertowConf = Configs.INSTANCE.undertow();
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
 		int port = getPort(httpConf, logger);
