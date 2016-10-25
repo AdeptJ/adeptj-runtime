@@ -60,7 +60,7 @@ public enum FrameworkProvisioner {
     private Framework framework;
 
     private FrameworkRestartHandler frameworkListener;
-
+    
     public void startFramework(ServletContext context) {
     	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
@@ -105,7 +105,7 @@ public enum FrameworkProvisioner {
 	private void removeFrameworkListener() {
 		BundleContext bundleContext = BundleContextAware.INSTANCE.getBundleContext();
 		if (bundleContext != null) {
-			bundleContext.removeFrameworkListener(this.frameworkListener);	
+			bundleContext.removeFrameworkListener(this.frameworkListener);
 		}
 	}
     
@@ -123,6 +123,10 @@ public enum FrameworkProvisioner {
 		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
 		Dynamic registration = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
 		registration.addMapping(ROOT_MAPPING);
+		// Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
+		// Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026: 
+		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
+		registration.setAsyncSupported(true);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
 		registration.setLoadOnStartup(0);
 		logger.info("ProxyDispatcherServlet registered successfully!!");

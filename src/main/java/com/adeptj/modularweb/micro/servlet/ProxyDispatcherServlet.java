@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -77,6 +78,11 @@ public class ProxyDispatcherServlet extends HttpServlet {
             	res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
             	dispatcherServlet.service(req, res);
+            	// Check if [javax.servlet.error.exception] set by org.apache.felix.http.base.internal.dispatch.Dispatcher
+            	Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+            	if (exception != null) {
+            		LOGGER.error("Exception while handling request!!", exception);
+            	}
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);
