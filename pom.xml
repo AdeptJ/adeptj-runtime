@@ -23,7 +23,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adeptj</groupId>
 	<artifactId>adeptj-modularweb-micro</artifactId>
-	<version>1.0.0.Final</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>AdeptJ ModularWeb Micro Runtime</name>
 	<description>Provision AdeptJ ModularWeb Micro Runtime</description>
