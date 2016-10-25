@@ -19,13 +19,12 @@
 */
 package com.adeptj.modularweb.micro.undertow;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.LogbackProvisioner;
+import com.adeptj.modularweb.micro.common.TimeUnits;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
@@ -42,7 +41,7 @@ public final class UndertowShutdownHook extends Thread {
 	private DeploymentManager manager;
 
 	public UndertowShutdownHook(Undertow server, DeploymentManager manager) {
-		super(Constants.SHUTDOWN_HOOK);
+		super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
 		this.server = server;
 		this.manager = manager;
 	}
@@ -52,14 +51,14 @@ public final class UndertowShutdownHook extends Thread {
 	 */
 	@Override
 	public void run() {
-		long startNanos = System.nanoTime();
+		long startTime = System.nanoTime();
 		Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
 		logger.info("Stopping AdeptJ ModularWeb Micro!!");
 		try {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			logger.info("AdeptJ ModularWeb Micro stopped in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+			logger.info("AdeptJ ModularWeb Micro stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Exception ex) {
 			logger.error("Exception while stopping AdeptJ ModularWeb Micro!!", ex);
 		}

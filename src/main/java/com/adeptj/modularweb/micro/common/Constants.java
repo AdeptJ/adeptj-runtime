@@ -41,6 +41,8 @@ public final class Constants {
 	public static final String COMMON_CONF_SECTION = "common";
 
 	public static final String CONTEXT_PATH = "/";
+	
+	public static final String OSGI_WEBCONSOLE_PATH = "/system/console";
 
 	public static final String STARTUP_INFO = "/startup-info.txt";
 
@@ -70,7 +72,7 @@ public final class Constants {
 
 	public static final String DATE_FORMAT_LOGGING = "dd.MM.yyyy HH:mm:ss.SSS ";
 
-	public static final String SHUTDOWN_HOOK = "AdeptJ ModularWeb Micro Terminator";
+	public static final String SHUTDOWN_HOOK_THREAD_NAME = "AdeptJ Terminator";
 
 	public static final String DEPLOYMENT_NAME = "AdeptJ ModularWeb Micro Deployment";
 

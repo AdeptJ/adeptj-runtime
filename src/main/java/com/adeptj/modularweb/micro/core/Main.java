@@ -19,8 +19,6 @@
 */
 package com.adeptj.modularweb.micro.core;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.LogbackProvisioner;
+import com.adeptj.modularweb.micro.common.TimeUnits;
 import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 
@@ -52,13 +51,14 @@ public final class Main {
 	 * 5. Registers the runtime ShutdownHook. 
 	 */
 	public static void main(String[] args) {
-		long startNanos = System.nanoTime();
+		Thread.currentThread().setName("AdeptJ Provisioner");
+		long startTime = System.nanoTime();
 		// First of all initialize LOGBACK.
 		LogbackProvisioner.start();
 		Logger logger = LoggerFactory.getLogger(Main.class);
 		try {
 			UndertowProvisioner.provision(parseCommands(args));
-			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+			logger.info("AdeptJ ModularWeb Micro Initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
 			if (BundleContextAware.INSTANCE.getBundleContext() != null) {

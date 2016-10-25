@@ -19,8 +19,6 @@
 */
 package com.adeptj.modularweb.micro.servlet;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -33,6 +31,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.Constants;
+import com.adeptj.modularweb.micro.common.TimeUnits;
 import com.adeptj.modularweb.micro.osgi.DispatcherServletTrackerSupport;
 
 /**
@@ -53,7 +53,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-    	long startNanos = System.nanoTime();
+    	long startTime = System.nanoTime();
         LOGGER.info("Initializing ProxyDispatcherServlet!!");
         try {
         	LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
@@ -62,42 +62,59 @@ public class ProxyDispatcherServlet extends HttpServlet {
 			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
 			throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
 		}
-        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", TimeUnits.nanosToMillis(startTime));
     }
 
     /**
      * Proxy for FELIX DispatcherServlet, delegates all the calls to the underlying DispatcherServlet.
      */
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        LOGGER.debug("Handling request: {}", req.getRequestURI());
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		LOGGER.debug("Handling request: {}", req.getRequestURI());
         HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
-            	LOGGER.warn("Felix DispatcherServlet is unavailable!!");
-            	res.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            	LOGGER.warn("Can't serve request as Felix DispatcherServlet is unavailable!!");
+            	resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
-            	dispatcherServlet.service(req, res);
-            	// Check if [javax.servlet.error.exception] set by org.apache.felix.http.base.internal.dispatch.Dispatcher
-            	Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-            	if (exception != null) {
-            		LOGGER.error("Exception while handling request!!", exception);
-            	}
+            	this.doService(req, resp, dispatcherServlet);
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);
-            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
+	private void doService(HttpServletRequest req, HttpServletResponse resp, HttpServlet dispatcherServlet) throws Exception {
+		if (!this.handleContextRoot(req, resp)) {
+			dispatcherServlet.service(req, resp);
+			this.logDispatcherException(req);
+		}
+	}
+	
+	private boolean handleContextRoot(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		boolean isReqForCtxRoot = Constants.CONTEXT_PATH.equals(req.getRequestURI());
+		if (isReqForCtxRoot) {
+			// if this is a request for context root then redirect to OSGi Web Console.
+			resp.sendRedirect(resp.encodeRedirectURL(Constants.OSGI_WEBCONSOLE_PATH));
+		}
+		return isReqForCtxRoot;
+	}
+
+	private void logDispatcherException(HttpServletRequest req) {
+		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
+		Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		if (exception != null) {
+			LOGGER.error("Exception while handling request!!", exception);
+		}
+	}
 
     /**
      * Close the DispatcherServletTracker.
      */
     @Override
     public void destroy() {
-        LOGGER.info("Destroying ProxyDispatcherServlet!!");
-        super.destroy();
-        LOGGER.info("Closing DispatcherServletTracker!!");
+        LOGGER.info("Destroying ProxyDispatcherServlet which in turn closes DispatcherServletTracker!!");
         DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
     }
 }

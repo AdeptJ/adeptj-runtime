@@ -19,8 +19,6 @@
 */
 package com.adeptj.modularweb.micro.common;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,7 +72,7 @@ public class LogbackProvisioner {
 	private static final String APPENDER_FILE = "FILE";
 
 	public static void start() {
-		long startNanos = System.nanoTime();
+		long startTime = System.nanoTime();
 		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 		Config commonConf = Configs.INSTANCE.common();
 		// Console Appender
@@ -100,7 +98,7 @@ public class LogbackProvisioner {
 		xnioLogger(context, appenders, commonConf);
 		context.start();
 		Logger logger = context.getLogger(LogbackProvisioner.class);
-		logger.info("Logback initialized in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+		logger.info("Logback initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 	
 	public static void stop() {

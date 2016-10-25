@@ -56,7 +56,7 @@ public enum EventDispatcherTrackerSupport {
 	protected void closeEventDispatcherTracker() {
 		if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
 			this.eventDispatcherTracker.close();
-			LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("EventDispatcherTracker Closed!!");
+			LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
 		}
 		this.eventDispatcherTracker = null;
 	}

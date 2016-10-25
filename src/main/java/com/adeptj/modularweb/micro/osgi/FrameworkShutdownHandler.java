@@ -19,8 +19,6 @@
 */
 package com.adeptj.modularweb.micro.osgi;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -29,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.ServletContextAware;
+import com.adeptj.modularweb.micro.common.TimeUnits;
 
 /**
  * ContextListener that handles the OSGi Framework shutdown.
@@ -45,14 +44,14 @@ public class FrameworkShutdownHandler implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-		long startNanos = System.nanoTime();
+		long startTime = System.nanoTime();
 		Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
 		logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
 		logger.info("Closing EventDispatcherTracker!!");
 		EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 		FrameworkProvisioner.INSTANCE.stopFramework();
 		ServletContextAware.INSTANCE.setServletContext(null);
-		logger.info("OSGi Framework stopped in [{}] ms!!", NANOSECONDS.toMillis(System.nanoTime() - startNanos));
+		logger.info("OSGi Framework stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 
 }
