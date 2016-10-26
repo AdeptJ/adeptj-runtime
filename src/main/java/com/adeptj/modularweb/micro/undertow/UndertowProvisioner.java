@@ -53,10 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
-import com.adeptj.modularweb.micro.common.LogbackProvisioner;
 import com.adeptj.modularweb.micro.common.Verb;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
+import com.adeptj.modularweb.micro.logging.LogbackProvisioner;
 import com.adeptj.modularweb.micro.osgi.FrameworkStartupHandler;
 import com.typesafe.config.Config;
 

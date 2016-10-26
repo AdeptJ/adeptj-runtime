@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.BundleContextAware;
 import com.adeptj.modularweb.micro.common.Constants;
-import com.adeptj.modularweb.micro.common.LogbackProvisioner;
 import com.adeptj.modularweb.micro.common.TimeUnits;
+import com.adeptj.modularweb.micro.logging.LogbackProvisioner;
 import com.adeptj.modularweb.micro.osgi.FrameworkProvisioner;
 import com.adeptj.modularweb.micro.undertow.UndertowProvisioner;
 

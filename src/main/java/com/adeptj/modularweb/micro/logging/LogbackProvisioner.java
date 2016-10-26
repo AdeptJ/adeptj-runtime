@@ -17,13 +17,14 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.modularweb.micro.common;
+package com.adeptj.modularweb.micro.logging;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.micro.common.TimeUnits;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.typesafe.config.Config;
 
@@ -41,7 +42,7 @@ import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 /**
  * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH. 
  * But using that approach LOGBACK takes longer to initializes(5+ seconds) which is reduced drastically to under 150 milliseconds
- * using programmatic approach. This is a great improvement on total startup time.
+ * using programmatic approach. This is huge improvement on total startup time.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */

@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.micro.common.Constants;
-import com.adeptj.modularweb.micro.common.LogbackProvisioner;
 import com.adeptj.modularweb.micro.common.TimeUnits;
+import com.adeptj.modularweb.micro.logging.LogbackProvisioner;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
