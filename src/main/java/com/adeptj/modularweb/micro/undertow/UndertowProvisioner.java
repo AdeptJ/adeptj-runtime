@@ -51,8 +51,10 @@ import javax.net.ssl.SSLContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.Options;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
+import com.adeptj.modularweb.micro.common.ServerMode;
 import com.adeptj.modularweb.micro.common.Verb;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
@@ -94,18 +96,42 @@ public final class UndertowProvisioner {
 		int port = getPort(httpConf, logger);
 		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
-		Builder undertowBuilder = Undertow.builder().addHttpListener(port, httpConf.getString(KEY_HOST));
+		Builder undertowBuilder = Undertow.builder();
+		handleProdMode(undertowBuilder, undertowConf);
+		undertowBuilder.addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
 		enableAJP(undertowConf, undertowBuilder, logger);
 		enableHttp2(undertowConf, undertowBuilder, logger);
 		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
 		manager.deploy();
-		Undertow server = undertowBuilder
-				.setHandler(new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders())).build();
+		DelegatingSetHeadersHttpHandler rootHandler = new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders());
+		Undertow server = undertowBuilder.setHandler(rootHandler).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
 			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
+		}
+	}
+	
+	private static void handleProdMode(Builder undertowBuilder, Config undertowConf) {
+		if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty("adeptj.server.mode"))) {
+			Config workerOptions = undertowConf.getConfig("workerOptions");
+			// defaults to 64
+			int coreTaskThreadsConfig = workerOptions.getInt("worker-task-core-threads");
+			// defaults to double of [worker-task-core-threads] i.e 128
+			int maxTaskThreadsConfig = workerOptions.getInt("worker-task-max-threads");
+			int sysTaskThreads = Runtime.getRuntime().availableProcessors() * 8;
+			if (sysTaskThreads > coreTaskThreadsConfig) {
+				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads);
+			} else {
+				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, coreTaskThreadsConfig);
+			}
+			int calcMaxTaskThreadsConfig = sysTaskThreads * 2;
+			if (calcMaxTaskThreadsConfig > maxTaskThreadsConfig) {
+				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreadsConfig);
+			} else {
+				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
+			}
 		}
 	}
 
