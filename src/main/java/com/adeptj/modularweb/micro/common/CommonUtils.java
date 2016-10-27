@@ -19,6 +19,7 @@
 */
 package com.adeptj.modularweb.micro.common;
 
+import static com.adeptj.modularweb.micro.common.Constants.EMPTY;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_BROWSERS;
 import static com.adeptj.modularweb.micro.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.modularweb.micro.common.Constants.OS;
@@ -41,10 +42,6 @@ public class CommonUtils {
 	private static final int EOF = -1;
 	
 	private static final int DEFAULT_BUFFER_SIZE = 1024;
-
-	private static final String REGEX_COMMA = ",";
-
-	private static final String EMPTY = "";
 
 	private static final String SPACE = " ";
 
@@ -90,10 +87,9 @@ public class CommonUtils {
 		} else if (isWindows()) {
 			Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
 		} else if (isUnix()) {
-			String[] browsers = Configs.INSTANCE.common().getString(KEY_BROWSERS).split(REGEX_COMMA);
 			StringBuilder cmdBuilder = new StringBuilder();
 			int index = OFFSET;
-			for (String browser : browsers) {
+			for (String browser : Configs.INSTANCE.common().getStringList(KEY_BROWSERS)) {
 				if (index == OFFSET) {
 					cmdBuilder.append(EMPTY).append(browser).append(SPACE).append(url);
 				} else {

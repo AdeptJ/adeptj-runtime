@@ -31,7 +31,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.TimeUnits;
 import com.adeptj.modularweb.micro.osgi.DispatcherServletTrackerSupport;
 
@@ -77,29 +76,14 @@ public class ProxyDispatcherServlet extends HttpServlet {
             	LOGGER.warn("Can't serve request as Felix DispatcherServlet is unavailable!!");
             	resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
-            	this.doService(req, resp, dispatcherServlet);
+            	dispatcherServlet.service(req, resp);
+    			this.logDispatcherException(req);
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-
-	private void doService(HttpServletRequest req, HttpServletResponse resp, HttpServlet dispatcherServlet) throws Exception {
-		if (!this.handleContextRoot(req, resp)) {
-			dispatcherServlet.service(req, resp);
-			this.logDispatcherException(req);
-		}
-	}
-	
-	private boolean handleContextRoot(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		boolean isReqForCtxRoot = Constants.CONTEXT_PATH.equals(req.getRequestURI());
-		if (isReqForCtxRoot) {
-			// if this is a request for context root then redirect to OSGi Web Console.
-			resp.sendRedirect(resp.encodeRedirectURL(Constants.OSGI_WEBCONSOLE_PATH));
-		}
-		return isReqForCtxRoot;
-	}
 
 	private void logDispatcherException(HttpServletRequest req) {
 		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]

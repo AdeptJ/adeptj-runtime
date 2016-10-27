@@ -51,6 +51,8 @@ public final class Constants {
 	public static final String REGEX_EQ = "=";
 	
 	public static final String COMMA = ",";
+	
+	public static final String EMPTY = "";
 
 	public static final String UTF8 = "UTF-8";
 

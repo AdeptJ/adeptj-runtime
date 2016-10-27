@@ -23,7 +23,6 @@ import java.util.Map;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
 /**
@@ -32,23 +31,20 @@ import io.undertow.util.HttpString;
  * @author Rakesh.Kumar, AdeptJ
  */
 public class SetHeadersHandler implements HttpHandler {
-	
-	private final HttpHandler delegatee;
-	
+
+	private final HttpHandler servletHandler;
+
 	private Map<HttpString, String> headers;
-	
-	public SetHeadersHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
-		this.delegatee = delegatee;
+
+	public SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
+		this.servletHandler = servletHandler;
 		this.headers = headers;
 	}
 
 	@Override
 	public void handleRequest(HttpServerExchange exchange) throws Exception {
-		HeaderMap responseHeaders = exchange.getResponseHeaders();
-		this.headers.forEach((headerName, headerValue) -> {
-			responseHeaders.put(headerName, headerValue);
-		});
-		this.delegatee.handleRequest(exchange);
+		this.headers.forEach((headerName, headerValue) -> exchange.getResponseHeaders().put(headerName, headerValue));
+		this.servletHandler.handleRequest(exchange);
 	}
 
 }

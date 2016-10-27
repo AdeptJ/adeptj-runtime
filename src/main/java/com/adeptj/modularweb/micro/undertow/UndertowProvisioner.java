@@ -26,11 +26,13 @@ import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY_VALUE;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER_VALUE;
+import static com.adeptj.modularweb.micro.common.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HOST;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HTTP;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_PORT;
 import static com.adeptj.modularweb.micro.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.modularweb.micro.common.Constants.OSGI_WEBCONSOLE_PATH;
 import static com.adeptj.modularweb.micro.common.Constants.STARTUP_INFO;
 import static com.adeptj.modularweb.micro.common.Constants.SYS_PROP_SERVER_PORT;
 
@@ -42,9 +44,10 @@ import java.nio.channels.ServerSocketChannel;
 import java.security.KeyStore;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -55,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
-import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.ServerMode;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
@@ -69,6 +71,7 @@ import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
+import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -83,9 +86,10 @@ import io.undertow.util.HttpString;
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class UndertowProvisioner {
-	
+
 	// No instantiation.
-	private UndertowProvisioner() {}
+	private UndertowProvisioner() {
+	}
 
 	private static final String PROTOCOL_TLS = "TLS";
 
@@ -102,10 +106,9 @@ public final class UndertowProvisioner {
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
 		enableAJP(undertowConf, undertowBuilder, logger);
 		enableHttp2(undertowConf, undertowBuilder, logger);
-		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
+		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo());
 		manager.deploy();
-		HttpHandler servletHandler = manager.start();
-		SetHeadersHandler headersHandler = new SetHeadersHandler(servletHandler, buildHeaders());
+		SetHeadersHandler headersHandler = new SetHeadersHandler(manager.start(), serverHeaders());
 		Undertow server = undertowBuilder.setHandler(rootHandler(headersHandler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
@@ -113,10 +116,11 @@ public final class UndertowProvisioner {
 			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
 		}
 	}
-	
+
 	private static void handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
+		boolean isProdMode = false;
 		if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty("adeptj.server.mode"))) {
-			logger.info("Provisioning AdeptJ ModularWeb for [PROD] mode.");
+			isProdMode = true;
 			Config workerOptions = undertowConf.getConfig("workerOptions");
 			// defaults to 64
 			int coreTaskThreadsConfig = workerOptions.getInt("worker-task-core-threads");
@@ -134,9 +138,8 @@ public final class UndertowProvisioner {
 			} else {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
 			}
-		} else {
-			logger.info("Provisioning AdeptJ ModularWeb for [DEV] mode.");
 		}
+		logger.info("Provisioning AdeptJ ModularWeb for [{}] mode.", isProdMode ? "PROD" : "DEV");
 	}
 
 	private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
@@ -165,7 +168,8 @@ public final class UndertowProvisioner {
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
 			port = httpConf.getInt(KEY_PORT);
-			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
+			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
+					port);
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
@@ -177,7 +181,7 @@ public final class UndertowProvisioner {
 		}
 		return port;
 	}
-	
+
 	private static boolean isPortAvailable(int port, Logger logger) {
 		boolean isPortAvailable = false;
 		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
@@ -194,27 +198,28 @@ public final class UndertowProvisioner {
 		return isPortAvailable;
 	}
 
-	private static Map<HttpString, String> buildHeaders() {
+	private static Map<HttpString, String> serverHeaders() {
 		Map<HttpString, String> headers = new HashMap<>();
 		headers.put(HttpString.tryFromString(HEADER_SERVER), HEADER_SERVER_VALUE);
 		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), HEADER_POWERED_BY_VALUE);
 		return headers;
 	}
 	
+	private static PredicateHandler predicateHandler(HttpHandler headersHandler) {
+		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_PATH), headersHandler);
+	}
+
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
-		Set<HttpString> allowedMethods = new HashSet<>();
-		for (String verb : undertowConfig.getString(Constants.KEY_ALLOWED_METHODS).split(Constants.COMMA)) {
-			allowedMethods.add(HttpString.tryFromString(verb));
-		}
-		return allowedMethods;
+		Function<String, HttpString> verbFunc = (verb) -> { return HttpString.tryFromString(verb); };
+		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunc).collect(Collectors.toSet());
 	}
 
 	private static GracefulShutdownHandler rootHandler(HttpHandler handler, Config undertowConfig) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(handler, allowedMethods(undertowConfig))));
+				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
 	}
-
-	private static DeploymentInfo constructDeploymentInfo() {
+	
+	private static DeploymentInfo deploymentInfo() {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setIgnoreFlush(true)
 				.addServletContainerInitalizer(new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
