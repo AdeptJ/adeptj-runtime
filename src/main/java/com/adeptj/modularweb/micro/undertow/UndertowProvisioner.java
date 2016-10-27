@@ -62,12 +62,12 @@ import com.adeptj.modularweb.micro.logging.LogbackProvisioner;
 import com.adeptj.modularweb.micro.osgi.FrameworkStartupHandler;
 import com.typesafe.config.Config;
 
+import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
-import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
-import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
@@ -97,7 +97,7 @@ public final class UndertowProvisioner {
 		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder();
-		handleProdMode(undertowBuilder, undertowConf);
+		handleProdMode(undertowBuilder, undertowConf, logger);
 		undertowBuilder.addHttpListener(port, httpConf.getString(KEY_HOST));
 		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
 		enableAJP(undertowConf, undertowBuilder, logger);
@@ -105,7 +105,7 @@ public final class UndertowProvisioner {
 		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
 		manager.deploy();
 		DelegatingSetHeadersHttpHandler rootHandler = new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders());
-		Undertow server = undertowBuilder.setHandler(rootHandler).build();
+		Undertow server = undertowBuilder.setHandler(gracefulShutdownHandler(rootHandler)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -113,8 +113,9 @@ public final class UndertowProvisioner {
 		}
 	}
 	
-	private static void handleProdMode(Builder undertowBuilder, Config undertowConf) {
+	private static void handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
 		if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty("adeptj.server.mode"))) {
+			logger.info("Provisioning AdeptJ ModularWeb for [PROD] mode.");
 			Config workerOptions = undertowConf.getConfig("workerOptions");
 			// defaults to 64
 			int coreTaskThreadsConfig = workerOptions.getInt("worker-task-core-threads");
@@ -132,6 +133,8 @@ public final class UndertowProvisioner {
 			} else {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
 			}
+		} else {
+			logger.info("Provisioning AdeptJ ModularWeb for [DEV] mode.");
 		}
 	}
 
@@ -197,11 +200,9 @@ public final class UndertowProvisioner {
 		return headers;
 	}
 
-	static GracefulShutdownHandler gracefulShutdownHandler(PathHandler handler) {
-		return new GracefulShutdownHandler(new RequestLimitingHandler(new RequestLimit(MAX_REQ_WHEN_SHUTDOWN),
-				new AllowedMethodsHandler(new BlockingHandler(), Verb.GET.toHttpString(), Verb.POST.toHttpString(),
-						Verb.PUT.toHttpString(), Verb.DELETE.toHttpString(), Verb.OPTIONS.toHttpString(),
-						Verb.PATCH.toHttpString())));
+	private static GracefulShutdownHandler gracefulShutdownHandler(HttpHandler rootHandler) {
+		return Handlers.gracefulShutdown(new RequestLimitingHandler(new RequestLimit(MAX_REQ_WHEN_SHUTDOWN),
+				new AllowedMethodsHandler(rootHandler, Verb.allowedMethods())));
 	}
 
 	private static DeploymentInfo constructDeploymentInfo() {

@@ -72,7 +72,7 @@ public final class BundleProvisioner {
 		try {
 			bundle.start();
 		} catch (BundleException | IllegalStateException | SecurityException ex) {
-			logger.error("Exception while installing bundle: [{}]. Exception: {}", bundle, ex);
+			logger.error("Exception while starting bundle: [{}]. Exception: {}", bundle, ex);
 		}
 	}
 

@@ -19,6 +19,9 @@
 */
 package com.adeptj.modularweb.micro.common;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import io.undertow.util.HttpString;
 
 /**
@@ -28,19 +31,27 @@ import io.undertow.util.HttpString;
  */
 public enum Verb {
 
-	GET, 
-	
-	POST, 
-	
-	PUT, 
-	
-	DELETE, 
-	
-	OPTIONS, 
-	
+	GET,
+
+	POST,
+
+	PUT,
+
+	DELETE,
+
+	OPTIONS,
+
 	PATCH;
-	
+
 	public HttpString toHttpString() {
 		return HttpString.tryFromString(this.toString());
+	}
+
+	public static Set<HttpString> allowedMethods() {
+		Set<HttpString> allowedMethods = new HashSet<>();
+		for (Verb verb : Verb.values()) {
+			allowedMethods.add(HttpString.tryFromString(verb.toString()));
+		}
+		return allowedMethods;
 	}
 }
