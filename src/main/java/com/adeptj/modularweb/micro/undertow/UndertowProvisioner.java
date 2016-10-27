@@ -23,9 +23,9 @@ import static com.adeptj.modularweb.micro.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.modularweb.micro.common.Constants.CONTEXT_PATH;
 import static com.adeptj.modularweb.micro.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY;
-import static com.adeptj.modularweb.micro.common.Constants.HEADER_POWERED_BY_VALUE;
+import static com.adeptj.modularweb.micro.common.Constants.KEY_HEADER_POWERED_BY;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER;
-import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER_VALUE;
+import static com.adeptj.modularweb.micro.common.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HOST;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HTTP;
@@ -108,7 +108,7 @@ public final class UndertowProvisioner {
 		enableHttp2(undertowConf, undertowBuilder, logger);
 		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo());
 		manager.deploy();
-		SetHeadersHandler headersHandler = new SetHeadersHandler(manager.start(), serverHeaders());
+		SetHeadersHandler headersHandler = new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
 		Undertow server = undertowBuilder.setHandler(rootHandler(headersHandler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
@@ -198,10 +198,10 @@ public final class UndertowProvisioner {
 		return isPortAvailable;
 	}
 
-	private static Map<HttpString, String> serverHeaders() {
+	private static Map<HttpString, String> serverHeaders(Config undertowConfig) {
 		Map<HttpString, String> headers = new HashMap<>();
-		headers.put(HttpString.tryFromString(HEADER_SERVER), HEADER_SERVER_VALUE);
-		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), HEADER_POWERED_BY_VALUE);
+		headers.put(HttpString.tryFromString(HEADER_SERVER), undertowConfig.getString(KEY_HEADER_SERVER));
+		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), undertowConfig.getString(KEY_HEADER_POWERED_BY));
 		return headers;
 	}
 	
