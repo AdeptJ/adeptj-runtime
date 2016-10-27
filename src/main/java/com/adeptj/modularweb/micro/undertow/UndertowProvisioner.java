@@ -28,8 +28,8 @@ import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER;
 import static com.adeptj.modularweb.micro.common.Constants.HEADER_SERVER_VALUE;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HOST;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_HTTP;
+import static com.adeptj.modularweb.micro.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.modularweb.micro.common.Constants.KEY_PORT;
-import static com.adeptj.modularweb.micro.common.Constants.MAX_REQ_WHEN_SHUTDOWN;
 import static com.adeptj.modularweb.micro.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.modularweb.micro.common.Constants.STARTUP_INFO;
 import static com.adeptj.modularweb.micro.common.Constants.SYS_PROP_SERVER_PORT;
@@ -54,8 +54,8 @@ import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 
 import com.adeptj.modularweb.micro.common.CommonUtils;
+import com.adeptj.modularweb.micro.common.Constants;
 import com.adeptj.modularweb.micro.common.ServerMode;
-import com.adeptj.modularweb.micro.common.Verb;
 import com.adeptj.modularweb.micro.config.Configs;
 import com.adeptj.modularweb.micro.initializer.StartupHandlerInitializer;
 import com.adeptj.modularweb.micro.logging.LogbackProvisioner;
@@ -68,7 +68,6 @@ import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
-import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -105,7 +104,7 @@ public final class UndertowProvisioner {
 		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
 		manager.deploy();
 		DelegatingSetHeadersHttpHandler rootHandler = new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders());
-		Undertow server = undertowBuilder.setHandler(gracefulShutdownHandler(rootHandler)).build();
+		Undertow server = undertowBuilder.setHandler(gracefulShutdownHandler(rootHandler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -199,10 +198,18 @@ public final class UndertowProvisioner {
 		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), HEADER_POWERED_BY_VALUE);
 		return headers;
 	}
+	
+	private static Set<HttpString> allowedMethods(Config undertowConfig) {
+		Set<HttpString> allowedMethods = new HashSet<>();
+		for (String verb : undertowConfig.getString(Constants.KEY_ALLOWED_METHODS).split(Constants.COMMA)) {
+			allowedMethods.add(HttpString.tryFromString(verb));
+		}
+		return allowedMethods;
+	}
 
-	private static GracefulShutdownHandler gracefulShutdownHandler(HttpHandler rootHandler) {
-		return Handlers.gracefulShutdown(new RequestLimitingHandler(new RequestLimit(MAX_REQ_WHEN_SHUTDOWN),
-				new AllowedMethodsHandler(rootHandler, Verb.allowedMethods())));
+	private static GracefulShutdownHandler gracefulShutdownHandler(HttpHandler rootHandler, Config undertowConfig) {
+		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
+				new AllowedMethodsHandler(rootHandler, allowedMethods(undertowConfig))));
 	}
 
 	private static DeploymentInfo constructDeploymentInfo() {

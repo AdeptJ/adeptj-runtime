@@ -49,6 +49,8 @@ public final class Constants {
 	public static final String SHUTDOWN_INFO = "/shutdown-info.txt";
 	
 	public static final String REGEX_EQ = "=";
+	
+	public static final String COMMA = ",";
 
 	public static final String UTF8 = "UTF-8";
 
@@ -56,7 +58,9 @@ public final class Constants {
 
 	public static final String FALSE = "false";
 
-	public static final int MAX_REQ_WHEN_SHUTDOWN = 1000;
+	public static final String KEY_MAX_CONCURRENT_REQS = "common.max-concurrent-requests";
+	
+	public static final String KEY_ALLOWED_METHODS = "common.allowed-methods";
 
 	public static final int MIN_PROCESSORS = 2;
 
