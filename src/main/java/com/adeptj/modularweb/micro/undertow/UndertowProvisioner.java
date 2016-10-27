@@ -40,6 +40,7 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.security.KeyStore;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -103,8 +104,9 @@ public final class UndertowProvisioner {
 		enableHttp2(undertowConf, undertowBuilder, logger);
 		DeploymentManager manager = Servlets.newContainer().addDeployment(constructDeploymentInfo());
 		manager.deploy();
-		DelegatingSetHeadersHttpHandler rootHandler = new DelegatingSetHeadersHttpHandler(manager.start(), buildHeaders());
-		Undertow server = undertowBuilder.setHandler(gracefulShutdownHandler(rootHandler, undertowConf)).build();
+		HttpHandler servletHandler = manager.start();
+		SetHeadersHandler headersHandler = new SetHeadersHandler(servletHandler, buildHeaders());
+		Undertow server = undertowBuilder.setHandler(rootHandler(headersHandler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -207,19 +209,17 @@ public final class UndertowProvisioner {
 		return allowedMethods;
 	}
 
-	private static GracefulShutdownHandler gracefulShutdownHandler(HttpHandler rootHandler, Config undertowConfig) {
+	private static GracefulShutdownHandler rootHandler(HttpHandler handler, Config undertowConfig) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(rootHandler, allowedMethods(undertowConfig))));
+				new AllowedMethodsHandler(handler, allowedMethods(undertowConfig))));
 	}
 
 	private static DeploymentInfo constructDeploymentInfo() {
-		Set<Class<?>> handlesTypes = new HashSet<>();
-		handlesTypes.add(FrameworkStartupHandler.class);
-		return Servlets.deployment()
+		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
+				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setIgnoreFlush(true)
 				.addServletContainerInitalizer(new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
-						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), handlesTypes))
-				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setContextPath(CONTEXT_PATH)
-				.setIgnoreFlush(true).setDeploymentName(DEPLOYMENT_NAME);
+						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()),
+						Collections.singleton(FrameworkStartupHandler.class)));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

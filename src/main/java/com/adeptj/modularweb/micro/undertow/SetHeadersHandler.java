@@ -27,17 +27,17 @@ import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 
 /**
- * DelegatingSetHeadersHttpHandler
+ * SetHeadersHandler
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class DelegatingSetHeadersHttpHandler implements HttpHandler {
+public class SetHeadersHandler implements HttpHandler {
 	
 	private final HttpHandler delegatee;
 	
 	private Map<HttpString, String> headers;
 	
-	public DelegatingSetHeadersHttpHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
+	public SetHeadersHandler(HttpHandler delegatee, Map<HttpString, String> headers) {
 		this.delegatee = delegatee;
 		this.headers = headers;
 	}
@@ -48,7 +48,7 @@ public class DelegatingSetHeadersHttpHandler implements HttpHandler {
 		this.headers.forEach((headerName, headerValue) -> {
 			responseHeaders.put(headerName, headerValue);
 		});
-		delegatee.handleRequest(exchange);
+		this.delegatee.handleRequest(exchange);
 	}
 
 }
