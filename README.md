@@ -1,14 +1,15 @@
-**AdeptJ ModularWeb Micro**
+**AdeptJ ModularWeb Runtime**
 
-**High performance, dynamic, modular platform for developing web applications and µServices.**
+**High performance, dynamic, modular(OSGi based) platform for developing web applications and µServices.**
 
 **Runtime(s)**
 
-1. JAVA 8
-2. High performance [Undertow](http://undertow.io/) http server
-3. [OSGi](https://www.osgi.org) Framework R6(Apache Felix 5.6.0)
+1. High performance [Undertow](http://undertow.io/) http server
+2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix 5.6.0)
 
-**Lightweight ~20Mb footprint, low on memory, starts instantly**
+**Lightweight ~25MB footprint(with below mentioned modules), low on memory, starts instantly**
+
+**Minimal runtime(OSGi, Undertow and some supporting bundles) is ~8MB, starts in ~800ms**
 
 **Modules:**
 
@@ -28,8 +29,8 @@ The platform embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Clone adeptj-modularweb-micro
-2. cd adeptj-modularweb-micro
+1. Clone adeptj-modularweb-runtime
+2. cd adeptj-modularweb-runtime
 3. mvn clean package
 4. Above step will create AdeptJ runtime uber jar.
 4. Now cd target
