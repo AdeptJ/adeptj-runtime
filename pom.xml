@@ -22,11 +22,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adeptj</groupId>
-	<artifactId>adeptj-modularweb-micro</artifactId>
+	<artifactId>adeptj-modularweb-runtime</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>AdeptJ ModularWeb Micro Runtime</name>
-	<description>Provision AdeptJ ModularWeb Micro Runtime</description>
+	<name>AdeptJ ModularWeb Runtime</name>
+	<description>Provision AdeptJ ModularWeb Runtime</description>
 	<url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
@@ -165,7 +165,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.adeptj.modularweb.micro.core.Main</mainClass>
+									<mainClass>com.adeptj.modularweb.runtime.core.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
