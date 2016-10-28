@@ -33,7 +33,7 @@ public enum EventDispatcherTrackerSupport {
 
 	INSTANCE;
 
-	private volatile EventDispatcherTracker eventDispatcherTracker;
+	private EventDispatcherTracker eventDispatcherTracker;
 
 	protected EventDispatcherTracker getEventDispatcherTracker() {
 		return this.eventDispatcherTracker;
@@ -47,7 +47,7 @@ public enum EventDispatcherTrackerSupport {
 				this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
 				this.eventDispatcherTracker.open();
 			} catch (InvalidSyntaxException ise) {
-				// Not possible for our simple filter but log it anyway and re-throw.
+				// Not possible for our simple filter but log it anyway.
 				logger.error("InvalidSyntaxException!!", ise);
 			}
 		}

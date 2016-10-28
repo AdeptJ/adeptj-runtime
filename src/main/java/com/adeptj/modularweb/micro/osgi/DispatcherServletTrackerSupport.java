@@ -36,11 +36,11 @@ public enum DispatcherServletTrackerSupport {
 
 	INSTANCE;
 
-	private volatile boolean dispatcherServletInitialized;
+	private boolean dispatcherServletInitialized;
 
-	private volatile DispatcherServletTracker dispatcherServletTracker;
+	private DispatcherServletTracker dispatcherServletTracker;
 
-	private volatile ServletConfig servletConfig;
+	private ServletConfig servletConfig;
 
 	public void openDispatcherServletTracker(ServletConfig servletConfig) throws InvalidSyntaxException {
 		this.initServletConfig(servletConfig);
