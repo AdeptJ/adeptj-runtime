@@ -40,7 +40,7 @@ import com.adeptj.modularweb.micro.config.Configs;
 public class CommonUtils {
 
 	private static final int EOF = -1;
-	
+
 	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	private static final String SPACE = " ";
@@ -53,19 +53,28 @@ public class CommonUtils {
 
 	private static final int OFFSET = 0;
 
-    /**
+	/**
 	 * Deny direct instantiation.
 	 */
-	private CommonUtils() {}
+	private CommonUtils() {
+	}
 
 	public static String toString(InputStream input) throws IOException {
+		return toByteArrayOutputStream(input).toString(Constants.UTF8);
+	}
+
+	public static byte[] toBytes(InputStream input) throws IOException {
+		return toByteArrayOutputStream(input).toByteArray();
+	}
+
+	public static ByteArrayOutputStream toByteArrayOutputStream(InputStream input) throws IOException {
 		byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		int numberOfBytesRead;
 		while ((numberOfBytesRead = input.read(buffer)) != EOF) {
 			out.write(buffer, OFFSET, numberOfBytesRead);
 		}
-		return out.toString(Constants.UTF8);
+		return out;
 	}
 
 	public static boolean isMac() {
