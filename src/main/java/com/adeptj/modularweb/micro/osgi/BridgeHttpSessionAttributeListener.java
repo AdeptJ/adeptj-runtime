@@ -31,7 +31,7 @@ public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeL
 
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent event) {
-		final HttpSessionAttributeListener attributeDispatcher = getHttpSessionAttributeListener();
+		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
 		if (attributeDispatcher != null) {
 			attributeDispatcher.attributeAdded(event);
 		}
@@ -39,7 +39,7 @@ public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeL
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent event) {
-		final HttpSessionAttributeListener attributeDispatcher = getHttpSessionAttributeListener();
+		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
 		if (attributeDispatcher != null) {
 			attributeDispatcher.attributeRemoved(event);
 		}
@@ -47,17 +47,18 @@ public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeL
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent event) {
-		final HttpSessionAttributeListener attributeDispatcher = getHttpSessionAttributeListener();
+		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
 		if (attributeDispatcher != null) {
 			attributeDispatcher.attributeReplaced(event);
 		}
 	}
 
 	private HttpSessionAttributeListener getHttpSessionAttributeListener() {
-		final EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+		HttpSessionAttributeListener listener = null;
+		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
 		if (tracker != null) {
-			return tracker.getHttpSessionAttributeListener();
+			listener = tracker.getHttpSessionAttributeListener();
 		}
-		return null;
+		return listener;
 	}
 }

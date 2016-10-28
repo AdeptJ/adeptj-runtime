@@ -23,12 +23,13 @@ import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.common.OSGiFilters;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.
@@ -44,7 +45,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
     private HttpServlet dispatcherServlet;
 
     public DispatcherServletTracker(BundleContext context) throws InvalidSyntaxException {
-        super(context, createFilter(context), null);
+        super(context, OSGiFilters.filter(context, HttpServlet.class, OSGI_FILTER_EXPR), null);
     }
 
     protected HttpServlet getDispatcherServlet() {
@@ -81,12 +82,16 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * Since a Framework restart creates a new BundleContext and this tracker will again be opened with
          * the new BundleContext therefore closing it here make sense.
         */
-        try {
-            this.close();
-        } catch (Exception ex) {
-            // ignore, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
-        }
+        this.closeTracker();
     }
+    
+    private void closeTracker() {
+		try {
+			this.close();
+		} catch (Exception ex) {
+			// ignore, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
+		}
+	}
 
     private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
         this.destroyDispatcherServlet();
@@ -114,15 +119,5 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         } catch (Exception ex) {
             LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
         }
-    }
-
-    private static Filter createFilter(BundleContext context) throws InvalidSyntaxException {
-        StringBuilder filterExpr = new StringBuilder();
-        filterExpr.append("(&(").append(Constants.OBJECTCLASS).append("=");
-        filterExpr.append(HttpServlet.class.getName()).append(")");
-        filterExpr.append(OSGI_FILTER_EXPR).append(")");
-        String filter = filterExpr.toString();
-        LOGGER.debug("Felix DispatcherServlet ServiceTracker Filter: [{}]", filter);
-        return context.createFilter(filter);
     }
 }

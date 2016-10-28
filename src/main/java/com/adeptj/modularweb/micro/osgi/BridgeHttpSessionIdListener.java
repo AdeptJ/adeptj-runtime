@@ -31,17 +31,18 @@ public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
 
 	@Override
 	public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
-		final HttpSessionIdListener sessionIdDispatcher = getHttpSessionIdListener();
+		HttpSessionIdListener sessionIdDispatcher = this.getHttpSessionIdListener();
 		if (sessionIdDispatcher != null) {
 			sessionIdDispatcher.sessionIdChanged(event, oldSessionId);
 		}
 	}
 
 	private HttpSessionIdListener getHttpSessionIdListener() {
-		final EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+		HttpSessionIdListener listener = null;
+		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
 		if (tracker != null) {
-			return tracker.getHttpSessionIdListener();
+			listener = tracker.getHttpSessionIdListener();
 		}
-		return null;
+		return listener;
 	}
 }

@@ -27,12 +27,13 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.modularweb.micro.common.OSGiFilters;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.
@@ -61,7 +62,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	private HttpSessionAttributeListener sessionAttributeListener;
 
 	public EventDispatcherTracker(BundleContext context) throws InvalidSyntaxException {
-		super(context, createFilter(context, EventListener.class), null);
+		super(context, OSGiFilters.filter(context, EventListener.class, OSGI_FILTER_EXPR), null);
 	}
 
 	@Override
@@ -82,8 +83,12 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	public void removedService(ServiceReference<EventListener> reference, EventListener service) {
 		LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
 		super.removedService(reference, service);
+		// NOTE: See class header why ServiceTracker is closed here.
+		this.closeTracker();
+	}
+
+	private void closeTracker() {
 		try {
-			// NOTE: See class header why ServiceTracker is closed here.
 			this.close();
 		} catch (Exception ex) {
 			// ignore, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
@@ -101,16 +106,4 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	public HttpSessionAttributeListener getHttpSessionAttributeListener() {
 		return this.sessionAttributeListener;
 	}
-
-	private static Filter createFilter(final BundleContext context, final Class<EventListener> evtListenerKlass)
-			throws InvalidSyntaxException {
-		StringBuilder filterExpr = new StringBuilder();
-		filterExpr.append("(&(").append(Constants.OBJECTCLASS).append("=");
-		filterExpr.append(evtListenerKlass.getName()).append(")");
-		filterExpr.append(OSGI_FILTER_EXPR).append(")");
-		String filter = filterExpr.toString();
-		LOGGER.debug("Felix EventDispatcher ServiceTracker Filter: [{}]", filter);
-		return context.createFilter(filter);
-	}
-
 }

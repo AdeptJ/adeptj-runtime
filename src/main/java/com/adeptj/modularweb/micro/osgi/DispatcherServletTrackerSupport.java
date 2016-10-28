@@ -36,7 +36,7 @@ public enum DispatcherServletTrackerSupport {
 
 	INSTANCE;
 
-	private volatile boolean isDispatcherServletInitialized;
+	private volatile boolean dispatcherServletInitialized;
 
 	private volatile DispatcherServletTracker dispatcherServletTracker;
 
@@ -44,12 +44,12 @@ public enum DispatcherServletTrackerSupport {
 
 	public void openDispatcherServletTracker(ServletConfig servletConfig) throws InvalidSyntaxException {
 		this.initServletConfig(servletConfig);
-		if (!this.isDispatcherServletInitialized && this.dispatcherServletTracker == null) {
+		if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
 			BundleContext ctx = BundleContextAware.INSTANCE.getBundleContext();
 			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
 			dispatcherServletTracker.open();
 			this.dispatcherServletTracker = dispatcherServletTracker;
-			this.isDispatcherServletInitialized = true;
+			this.dispatcherServletInitialized = true;
 		}
 	}
 
@@ -58,7 +58,7 @@ public enum DispatcherServletTrackerSupport {
 	}
 
 	public void closeDispatcherServletTracker() {
-		this.isDispatcherServletInitialized = false;
+		this.dispatcherServletInitialized = false;
 		if (this.dispatcherServletTracker != null && !this.dispatcherServletTracker.isEmpty()) {
 			this.dispatcherServletTracker.close();
 		}

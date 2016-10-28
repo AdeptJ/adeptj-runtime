@@ -97,31 +97,32 @@ public final class UndertowProvisioner {
 		Config undertowConf = Configs.INSTANCE.undertow();
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
-		int port = getPort(httpConf, logger);
-		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", port);
+		int httpPort = handlePortAvailability(httpConf, logger);
+		logger.info("Starting AdeptJ ModularWeb Micro on port: [{}]", httpPort);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder();
-		handleProdMode(undertowBuilder, undertowConf, logger);
-		undertowBuilder.addHttpListener(port, httpConf.getString(KEY_HOST));
-		UndertowOptionsBuilder.build(undertowBuilder, undertowConf);
+		boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
+		undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
+		ServerOptions.setOptions(undertowBuilder, undertowConf);
 		enableAJP(undertowConf, undertowBuilder, logger);
 		enableHttp2(undertowConf, undertowBuilder, logger);
-		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo());
+		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
 		manager.deploy();
-		SetHeadersHandler headersHandler = new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
-		Undertow server = undertowBuilder.setHandler(rootHandler(headersHandler, undertowConf)).build();
+		HttpHandler handler = prodMode ? manager.start()
+				: new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
+		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
-			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, port)));
+			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
 		}
 	}
 
-	private static void handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-		boolean isProdMode = false;
+	private static boolean handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
+		boolean prodMode = false;
 		if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty("adeptj.server.mode"))) {
-			isProdMode = true;
-			Config workerOptions = undertowConf.getConfig("workerOptions");
+			prodMode = true;
+			Config workerOptions = undertowConf.getConfig("worker-options");
 			// defaults to 64
 			int coreTaskThreadsConfig = workerOptions.getInt("worker-task-core-threads");
 			// defaults to double of [worker-task-core-threads] i.e 128
@@ -139,7 +140,8 @@ public final class UndertowProvisioner {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
 			}
 		}
-		logger.info("Provisioning AdeptJ ModularWeb for [{}] mode.", isProdMode ? "PROD" : "DEV");
+		logger.info("Provisioning AdeptJ ModularWeb for [{}] mode.", prodMode ? "PROD" : "DEV");
+		return prodMode;
 	}
 
 	private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
@@ -163,7 +165,7 @@ public final class UndertowProvisioner {
 		}
 	}
 
-	private static int getPort(Config httpConf, Logger logger) {
+	private static int handlePortAvailability(Config httpConf, Logger logger) {
 		String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
@@ -173,7 +175,11 @@ public final class UndertowProvisioner {
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
-		if (!isPortAvailable(port, logger)) {
+		// Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
+		// started already and another server start(from same location) will again start new OSGi Framework which may interfere
+		// with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
+		// this is unknown at this moment but just to be on safer side doing this.
+		if (Boolean.getBoolean("check.server.port") && !isPortAvailable(port, logger)) {
 			// Let the LOGBACK cleans up it's state.
 			logger.error("JVM shutting down!!");
 			LogbackProvisioner.stop();
@@ -183,19 +189,19 @@ public final class UndertowProvisioner {
 	}
 
 	private static boolean isPortAvailable(int port, Logger logger) {
-		boolean isPortAvailable = false;
+		boolean portAvailable = false;
 		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
 			channel.socket().setReuseAddress(true);
 			channel.socket().bind(new InetSocketAddress(port));
-			isPortAvailable = true;
+			portAvailable = true;
 		} catch (BindException ex) {
 			logger.error("BindException while aquiring port: [{}], cause:", port, ex);
-			isPortAvailable = false;
+			portAvailable = false;
 		} catch (IOException ex) {
 			logger.error("IOException while aquiring port: [{}], cause:", port, ex);
-			isPortAvailable = false;
+			portAvailable = false;
 		}
-		return isPortAvailable;
+		return portAvailable;
 	}
 
 	private static Map<HttpString, String> serverHeaders(Config undertowConfig) {
@@ -205,13 +211,13 @@ public final class UndertowProvisioner {
 		return headers;
 	}
 	
-	private static PredicateHandler predicateHandler(HttpHandler headersHandler) {
-		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_PATH), headersHandler);
+	private static PredicateHandler predicateHandler(HttpHandler handler) {
+		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_PATH), handler);
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
-		Function<String, HttpString> verbFunc = (verb) -> { return HttpString.tryFromString(verb); };
-		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunc).collect(Collectors.toSet());
+		Function<String, HttpString> verbFunction = (verb) -> { return HttpString.tryFromString(verb); };
+		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunction).collect(Collectors.toSet());
 	}
 
 	private static GracefulShutdownHandler rootHandler(HttpHandler handler, Config undertowConfig) {
@@ -219,12 +225,13 @@ public final class UndertowProvisioner {
 				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
 	}
 	
-	private static DeploymentInfo deploymentInfo() {
+	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setIgnoreFlush(true)
 				.addServletContainerInitalizer(new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
 						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()),
-						Collections.singleton(FrameworkStartupHandler.class)));
+						Collections.singleton(FrameworkStartupHandler.class)))
+				.setDefaultEncoding(undertowConfig.getString("common.default-encoding"));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
