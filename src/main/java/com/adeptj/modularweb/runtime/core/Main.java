@@ -61,7 +61,7 @@ public final class Main {
 			logger.info("AdeptJ ModularWeb Runtime Initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Throwable th) {
 			// Check if OSGi Framework was already started, try to stop the framework gracefully.
-			if (BundleContextAware.INSTANCE.getBundleContext() != null) {
+			if (BundleContextAware.INSTANCE.isBundleContextSet()) {
 				logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
 				FrameworkProvisioner.INSTANCE.stopFramework();
 			}

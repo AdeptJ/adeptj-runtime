@@ -102,9 +102,8 @@ public enum FrameworkProvisioner {
     }
 
 	private void removeFrameworkListener() {
-		BundleContext bundleContext = BundleContextAware.INSTANCE.getBundleContext();
-		if (bundleContext != null) {
-			bundleContext.removeFrameworkListener(this.frameworkListener);
+		if (BundleContextAware.INSTANCE.isBundleContextSet()) {
+			BundleContextAware.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
 		}
 	}
     
@@ -127,7 +126,7 @@ public enum FrameworkProvisioner {
 		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
 		registration.setAsyncSupported(true);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
-		registration.setLoadOnStartup(0);
+		// registration.setLoadOnStartup(0);
 		logger.info("ProxyDispatcherServlet registered successfully!!");
 	}
 

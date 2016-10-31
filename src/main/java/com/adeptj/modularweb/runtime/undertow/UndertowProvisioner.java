@@ -87,11 +87,45 @@ import io.undertow.util.HttpString;
  */
 public final class UndertowProvisioner {
 
+	private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
+	
+	private static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
+	
+	private static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
+	
+	private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
+	
+	private static final String KEY_WORKER_OPTIONS = "worker-options";
+	
+	private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
+	
+	private static final String MODE_DEV = "DEV";
+	
+	private static final String MODE_PROD = "PROD";
+	
+	private static final String KEY_KEYSTORE = "keyStore";
+	
+	private static final String KEY_KEYPWD = "keyPwd";
+	
+	private static final String KEY_KEYSTORE_PWD = "keyStorePwd";
+	
+	private static final String KEY_HTTPS = "https";
+	
+	private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
+	
+	private static final String KEY_AJP = "ajp";
+	
+	private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
+	
+	private static final String SYS_PROP_CHECK_PORT = "check.server.port";
+	
+	private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
+	
+	private static final String PROTOCOL_TLS = "TLS";
+
 	// No instantiation.
 	private UndertowProvisioner() {
 	}
-
-	private static final String PROTOCOL_TLS = "TLS";
 
 	public static void provision(Map<String, String> arguments) throws Exception {
 		Config undertowConf = Configs.INSTANCE.undertow();
@@ -119,46 +153,45 @@ public final class UndertowProvisioner {
 	}
 
 	private static boolean handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-		boolean prodMode = false;
-		if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty("adeptj.server.mode"))) {
-			prodMode = true;
-			Config workerOptions = undertowConf.getConfig("worker-options");
+		boolean prodMode = ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
+		if (prodMode) {
+			Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
 			// defaults to 64
-			int coreTaskThreadsConfig = workerOptions.getInt("worker-task-core-threads");
+			int coreTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
 			// defaults to double of [worker-task-core-threads] i.e 128
-			int maxTaskThreadsConfig = workerOptions.getInt("worker-task-max-threads");
-			int sysTaskThreads = Runtime.getRuntime().availableProcessors() * 8;
+			int maxTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+			int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
 			if (sysTaskThreads > coreTaskThreadsConfig) {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads);
 			} else {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, coreTaskThreadsConfig);
 			}
-			int calcMaxTaskThreadsConfig = sysTaskThreads * 2;
+			int calcMaxTaskThreadsConfig = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
 			if (calcMaxTaskThreadsConfig > maxTaskThreadsConfig) {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreadsConfig);
 			} else {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
 			}
 		}
-		logger.info("Provisioning AdeptJ ModularWeb Runtime for [{}] mode.", prodMode ? "PROD" : "DEV");
+		logger.info("Provisioning AdeptJ ModularWeb Runtime for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
 		return prodMode;
 	}
 
 	private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
-		if (Boolean.getBoolean("enable.http2")) {
-			Config httpsConf = undertowConf.getConfig("https");
-			char[] keyStorePwd = httpsConf.getString("keyStorePwd").toCharArray();
-			char[] keyPwd = httpsConf.getString("keyPwd").toCharArray();
+		if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
+			Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
+			char[] keyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
+			char[] keyPwd = httpsConf.getString(KEY_KEYPWD).toCharArray();
 			int httpsPort = httpsConf.getInt(KEY_PORT);
 			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-					sslContext(keyStore(httpsConf.getString("keyStore"), keyStorePwd), keyPwd));
+					sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd), keyPwd));
 			logger.info("HTTP2 enabled on port: [{}]", httpsPort);
 		}
 	}
 
 	private static void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
-		if (Boolean.getBoolean("enable.ajp")) {
-			Config ajpConf = undertowConf.getConfig("ajp");
+		if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
+			Config ajpConf = undertowConf.getConfig(KEY_AJP);
 			int ajpPort = ajpConf.getInt(KEY_PORT);
 			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
 			logger.info("AJP enabled on port: [{}]", ajpPort);
@@ -179,7 +212,7 @@ public final class UndertowProvisioner {
 		// started already and another server start(from same location) will again start new OSGi Framework which may interfere
 		// with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
 		// this is unknown at this moment but just to be on safer side doing this.
-		if (Boolean.getBoolean("check.server.port") && !isPortAvailable(port, logger)) {
+		if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
 			// Let the LOGBACK cleans up it's state.
 			logger.error("JVM shutting down!!");
 			LogbackProvisioner.stop();
@@ -231,7 +264,7 @@ public final class UndertowProvisioner {
 				.addServletContainerInitalizer(new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
 						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()),
 						Collections.singleton(FrameworkStartupHandler.class)))
-				.setDefaultEncoding(undertowConfig.getString("common.default-encoding"));
+				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

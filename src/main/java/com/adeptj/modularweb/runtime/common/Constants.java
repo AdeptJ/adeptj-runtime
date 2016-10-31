@@ -125,6 +125,8 @@ public final class Constants {
 	public static final String HEADER_POWERED_BY = "X-Powered-By";
 
 	public static final String HEADER_SERVER = "Server";
+	
+	public static final String PREFIX_ADMIN = "/admin";
 
 	// Configuration Keys constants ends.
 }

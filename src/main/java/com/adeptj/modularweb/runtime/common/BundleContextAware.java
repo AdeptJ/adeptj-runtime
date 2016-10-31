@@ -36,6 +36,10 @@ public enum BundleContextAware {
 		return this.bundleContext;
 	}
 	
+	public boolean isBundleContextSet() {
+		return this.bundleContext != null;
+	}
+	
 	public void setBundleContext(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 	}
