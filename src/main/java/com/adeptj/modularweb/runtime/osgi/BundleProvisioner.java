@@ -104,7 +104,7 @@ public final class BundleProvisioner {
 		URLConnection conn = BundleProvisioner.class.getResource(rootPath).openConnection();
 		List<URL> bundles = JarURLConnection.class.cast(conn).getJarFile().stream().filter(bundlePredicate)
 				.map(entry -> classLoader.getResource(entry.getName())).collect(Collectors.toList());
-		logger.info("Total:[{}] Bundles(excluding system bundle) collected!!", bundles.size());
+		logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
 		return bundles;
 	}
 }

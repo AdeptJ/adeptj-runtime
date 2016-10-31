@@ -70,7 +70,6 @@ import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
-import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
@@ -81,11 +80,13 @@ import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 
 /**
- * UndertowProvisioner: Provision the UNDERTOW server and OSGi Framework.
+ * UndertowProvisioner: Provision the Undertow Http Server.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class UndertowProvisioner {
+
+	private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
 	private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
 	
@@ -213,8 +214,8 @@ public final class UndertowProvisioner {
 		// with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
 		// this is unknown at this moment but just to be on safer side doing this.
 		if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-			// Let the LOGBACK cleans up it's state.
 			logger.error("JVM shutting down!!");
+			// Let the LOGBACK cleans up it's state.
 			LogbackProvisioner.stop();
 			System.exit(-1);
 		}
@@ -253,18 +254,22 @@ public final class UndertowProvisioner {
 		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunction).collect(Collectors.toSet());
 	}
 
-	private static GracefulShutdownHandler rootHandler(HttpHandler handler, Config undertowConfig) {
+	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
 				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
 	}
 	
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
-				.setClassLoader(UndertowProvisioner.class.getClassLoader()).setIgnoreFlush(true)
-				.addServletContainerInitalizer(new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
-						new ImmediateInstanceFactory<>(new StartupHandlerInitializer()),
-						Collections.singleton(FrameworkStartupHandler.class)))
-				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING));
+				.setClassLoader(UndertowProvisioner.class.getClassLoader())
+				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
+				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
+				.addServletContainerInitalizer(sciInfo());
+	}
+
+	private static ServletContainerInitializerInfo sciInfo() {
+		return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
+				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

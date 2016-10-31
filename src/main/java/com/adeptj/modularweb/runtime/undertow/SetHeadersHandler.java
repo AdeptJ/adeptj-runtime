@@ -26,7 +26,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
 
 /**
- * SetHeadersHandler
+ * Sets the given headers in the response header map on each request, then call the next handler.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */

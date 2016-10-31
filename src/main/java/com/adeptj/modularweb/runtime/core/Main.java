@@ -65,7 +65,7 @@ public final class Main {
 				logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
 				FrameworkProvisioner.INSTANCE.stopFramework();
 			}
-			logger.error("Fatal error, shutting down JVM!!", th);
+			logger.error("Shutting down JVM!!", th);
 			// Let the LOGBACK cleans up it's state.
 			LogbackProvisioner.stop();
 			System.exit(-1);
