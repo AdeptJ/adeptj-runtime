@@ -7,6 +7,9 @@
 <title>Login</title>
 <style type="text/css">
 
+body {
+	background-color: #F5F5F5
+}
 .login-page {
 	width: 360px;
 	padding: 8% 0 0;
@@ -26,7 +29,7 @@
 }
 
 .form input {
-	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+	font-family: 'Lato', sans-serif;
 	outline: 0;
 	background: #f2f2f2;
 	width: 100%;
@@ -34,26 +37,41 @@
 	margin: 0 0 15px;
 	padding: 15px;
 	box-sizing: border-box;
-	font-size: 14px;
+	font-size: 15px;
 }
 
 .form button {
-	font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+	font-family: 'Lato', sans-serif;
+	font-weight:bold;
 	text-transform: uppercase;
 	outline: 0;
-	background: #4789af;
+	background: #00a0e4;
 	width: 100%;
 	border: 0;
 	padding: 15px;
 	color: #FFFFFF;
-	font-size: 14px;
+	font-size: 12px;
 	-webkit-transition: all 0.3 ease;
 	transition: all 0.3 ease;
 	cursor: pointer;
+	
+}
+
+.form div {
+	font-family: 'Lato', sans-serif;
+	font-weight:bold;
+	outline: 0;
+	text-align: left;
+	width: 100%;
+	border: 0;
+	padding: 15px;
+	font-size: 14px;
+	-webkit-transition: all 0.3 ease;
+	transition: all 0.3 ease;
 }
 
 .form button:hover, .form button:active, .form button:focus {
-	background: #4582af;
+	background: #11a4e4;
 }
 
 .form .message {
@@ -72,10 +90,13 @@
 }
 
 .container {
-	position: relative;
-	z-index: 1;
-	max-width: 300px;
-	margin: 0 auto;
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  z-index: 1;
+  top: 30%;
+  left: 47%;
+  margin: -100px 0 0 -150px;
 }
 
 .container:before, .container:after {
@@ -120,9 +141,10 @@
 				<div class="error-template">
 					<div class="login-page">
 						<div class="form">
+						    <div>AdeptJ OSGi Web Console Login</div>
 							<form class="login-form" action="/j_security_check" method="post">
-								<input type="text" name="j_username" placeholder="username" /> 
-								<input type="password" name="j_password" placeholder="password" />
+								<input type="text" name="j_username" placeholder="username" required /> 
+								<input type="password" name="j_password" placeholder="password" required />
 								<button>login</button>
 							</form>
 						</div>
