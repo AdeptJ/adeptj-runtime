@@ -19,6 +19,9 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(OSGiConsoleIdentityManager.class);
 
+	/**
+	 * This is queried on each request afterward.
+	 */
 	@Override
 	public Account verify(Account account) {
 		LOGGER.info("OSGiConsoleIdentityManager.verify(Account account)");

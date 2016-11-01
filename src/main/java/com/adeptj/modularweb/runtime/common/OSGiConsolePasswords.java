@@ -39,8 +39,7 @@ public enum OSGiConsolePasswords {
 			String storedPwdLine = Files.readAllLines(Paths.get(pathBuilder.toString())).stream()
 					.filter((String line) -> {
 						return line.startsWith("password=");
-					}).collect(Collectors.joining());
-			storedPwdLine = storedPwdLine.replace("\\", "");
+					}).collect(Collectors.joining()).replace("\\", "");
 			String hashedPwd = storedPwdLine.substring(storedPwdLine.indexOf('"') + 1, storedPwdLine.length() - 1);
 			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)), this.getPasswordBytes(hashedPwd));
 		} catch (IOException ex) {
@@ -122,8 +121,9 @@ public enum OSGiConsolePasswords {
 		try {
 			final MessageDigest md = MessageDigest.getInstance(hashAlg);
 			return md.digest(pwd);
-		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalStateException("Cannot hash the password: " + e);
+		} catch (NoSuchAlgorithmException ex) {
+			LoggerFactory.getLogger(getClass()).error("NoSuchAlgorithmException!!", ex);
+			throw new IllegalStateException("Cannot hash the password: " + ex);
 		}
 	}
 }
