@@ -35,7 +35,21 @@ The platform embeds OSGi and Undertow with modules described above.
 4. Above step will create AdeptJ runtime uber jar.
 4. Now cd target
 5. java -server -jar adeptj-runtime-LATEST_VERSION.jar
-6. Click to view [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
+6. Go to [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
+7. System will ask for username/password, provide the default ones [admin/admin]
+
+Debug options:
+
+java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -jar adeptj-runtime-LATEST_VERSION.jar
+
+Start Parameters and VM arguments
+
+1. For specifying port: -Dadeptj.server.port=9007
+2. For port check eagerly: -Dcheck.server.port=true
+3. Enable AJP: -Denable.ajp=true
+4. Enable HTTP2: -Denable.http2=true
+5. For providing server mode: -Dadeptj.server.mode=MODE or mode [DEV] is default
+6. Command line argument for launching browser: launchBrowser=true
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
 
