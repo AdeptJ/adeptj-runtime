@@ -23,7 +23,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.adeptj</groupId>
 	<artifactId>adeptj-modularweb-runtime</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1.Final</version>
 	<packaging>jar</packaging>
 	<name>AdeptJ ModularWeb Runtime</name>
 	<description>Provision AdeptJ ModularWeb Runtime</description>
