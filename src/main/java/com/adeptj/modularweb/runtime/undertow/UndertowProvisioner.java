@@ -32,7 +32,6 @@ import static com.adeptj.modularweb.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.modularweb.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.modularweb.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.modularweb.runtime.common.Constants.OSGI_CONSOLE_URL;
-import static com.adeptj.modularweb.runtime.common.Constants.OSGI_WEBCONSOLE_PATH;
 import static com.adeptj.modularweb.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.modularweb.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 
@@ -44,6 +43,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.security.KeyStore;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 
 import com.adeptj.modularweb.runtime.common.CommonUtils;
+import com.adeptj.modularweb.runtime.common.Constants;
 import com.adeptj.modularweb.runtime.common.ServerMode;
 import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.initializer.StartupHandlerInitializer;
@@ -73,8 +74,10 @@ import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ErrorPage;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
@@ -145,7 +148,7 @@ public final class UndertowProvisioner {
 		manager.deploy();
 		HttpHandler handler = prodMode ? manager.start()
 				: new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
-		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
+		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf, manager.getDeployment())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -245,8 +248,9 @@ public final class UndertowProvisioner {
 		return headers;
 	}
 	
-	private static PredicateHandler predicateHandler(HttpHandler handler) {
-		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_PATH), handler);
+	private static PredicateHandler predicateHandler(HttpHandler handler, Deployment deployment) {
+		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_PATH),
+				handler);
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
@@ -254,9 +258,20 @@ public final class UndertowProvisioner {
 		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunction).collect(Collectors.toSet());
 	}
 
-	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig) {
+	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig, Deployment deployment) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
+				new AllowedMethodsHandler(predicateHandler(handler, deployment), allowedMethods(undertowConfig))));
+	}
+	
+	private static List<ErrorPage> errorPages(Config undertowConfig) {
+		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream().map((entry) -> {
+			return new ErrorPage((String) entry.getValue(), Integer.parseInt(entry.getKey()));
+		}).collect(Collectors.toList());
+	}
+
+	private static ServletContainerInitializerInfo sciInfo() {
+		return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
+				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
 	}
 	
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
@@ -264,12 +279,7 @@ public final class UndertowProvisioner {
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())
 				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
-				.addServletContainerInitalizer(sciInfo());
-	}
-
-	private static ServletContainerInitializerInfo sciInfo() {
-		return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
-				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
+				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

@@ -33,8 +33,8 @@
 	<properties>
 		<!-- Common Dependencies -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<undertow.version>1.4.3.Final</undertow.version>
-		<undertow.websockets.version>1.4.3.Final</undertow.websockets.version>
+		<undertow.version>1.4.4.Final</undertow.version>
+		<undertow.websockets.version>1.4.4.Final</undertow.websockets.version>
 		<xnio.version>3.3.6.Final</xnio.version>
 		<slf4j-api.version>1.7.21</slf4j-api.version>
 		<logback-core.version>1.1.7</logback-core.version>

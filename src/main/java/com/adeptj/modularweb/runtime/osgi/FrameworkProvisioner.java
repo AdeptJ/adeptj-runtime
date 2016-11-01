@@ -20,18 +20,23 @@
 package com.adeptj.modularweb.runtime.osgi;
 
 import java.io.IOException;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration.Dynamic;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
+import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +65,8 @@ public enum FrameworkProvisioner {
 
     private FrameworkRestartHandler frameworkListener;
     
+    private ServiceRegistration<Servlet> svcReg;
+    
     public void startFramework(ServletContext context) {
     	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
@@ -76,6 +83,10 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
+            Dictionary<String, Object> properties = new Hashtable<>();
+            properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorHandlerServlet");
+            properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/error/*");
+            this.svcReg = systemBundleContext.registerService(Servlet.class, new ErrorHandlerServlet(), properties);
             this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
@@ -87,13 +98,16 @@ public enum FrameworkProvisioner {
     public void stopFramework() {
     	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
-        	if (this.framework != null) {
-        		this.removeFrameworkListener();
-                this.framework.stop();
-                // A value of zero will wait indefinitely.
-                FrameworkEvent event = this.framework.waitForStop(0);
-                logger.info("OSGi Framework Stopped, Event Code: [{}]", event.getType());
-        	} else {
+			if (this.framework != null) {
+				this.removeFrameworkListener();
+				if (this.svcReg != null) {
+					this.svcReg.unregister();
+				}
+				this.framework.stop();
+				// A value of zero will wait indefinitely.
+				FrameworkEvent event = this.framework.waitForStop(0);
+				logger.info("OSGi Framework Stopped, Event Code: [{}]", event.getType());
+			} else {
         		logger.info("OSGi Framework not started yet, nothing to stop!!");
         	}
         } catch (Exception ex) {
