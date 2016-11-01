@@ -18,8 +18,8 @@ import com.adeptj.modularweb.runtime.config.Configs;
 /**
  * OSGiConsolePasswords, Logic copied from org.apache.felix.webconsole.internal.servlet.Password.
  * 
- * Because, we want to match the same hashing mechanism OSGi Web Console configuration management,
- * but classes there are package private and therefore can't be accessible outside world.
+ * Because, we want to match the same hashing mechanism used by OSGi Web Console configuration management,
+ * but classes there are package private and therefore can't be accessible to outside world.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -43,35 +43,43 @@ public enum OSGiConsolePasswords {
 		// This happens when OsgiManager.config file is non-existent as configuration was never saved
 		// from OSGi console.
 		if (Files.exists(Paths.get(this.cfgFile))) {
-			try {
-				String storedPwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream().filter(line -> {
-					return line.startsWith("password=");
-				}).collect(Collectors.joining()).replace("\\", "");
-				return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)), this.getPasswordBytes(
-						storedPwdLine.substring(storedPwdLine.indexOf('"') + 1, storedPwdLine.length() - 1)));
-			} catch (Exception ex) {
-				LoggerFactory.getLogger(getClass()).error("IOException!!", ex);
-			}
-			return false;
+			return this.matchFromOsgiManagerConfigFile(formPwd);
 		} else {
 			// When system starts up very first time, the OsgiManager.config file is non-existent.
 			// Meanwhile make use of default password maintained in provisioning file.
-			Map<String, Object> users = Configs.INSTANCE.undertow().getObject("common.osgi-console-users").unwrapped();
-			if (users.containsKey(id)) {
-				return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)),
-						this.getPasswordBytes((String) users.get(id)));
-			}
-			return false;
+			return this.matchFromProvisioningConfig(id, formPwd);
 		}
+	}
+
+	private boolean matchFromProvisioningConfig(String id, String formPwd) {
+		Map<String, Object> users = Configs.INSTANCE.undertow().getObject("common.osgi-console-users").unwrapped();
+		if (users.containsKey(id)) {
+			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)),
+					this.getPasswordBytes((String) users.get(id)));
+		}
+		return false;
+	}
+
+	private boolean matchFromOsgiManagerConfigFile(String formPwd) {
+		try {
+			String storedPwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream().filter(line -> {
+				return line.startsWith("password=");
+			}).collect(Collectors.joining()).replace("\\", "");
+			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)), this.getPasswordBytes(
+					storedPwdLine.substring(storedPwdLine.indexOf('"') + 1, storedPwdLine.length() - 1)));
+		} catch (Exception ex) {
+			LoggerFactory.getLogger(getClass()).error("IOException!!", ex);
+		}
+		return false;
 	}
 
 	public String hashPassword(final String hashAlgorithm, final byte[] password) {
 		final String actualHashAlgo = (hashAlgorithm == null) ? DEFAULT_HASH_ALGO : hashAlgorithm;
 		final byte[] hashedPassword = hashPassword(password, actualHashAlgo);
-		final StringBuffer buf = new StringBuffer(2 + actualHashAlgo.length() + hashedPassword.length * 3);
-		buf.append('{').append(actualHashAlgo.toLowerCase()).append('}');
-		buf.append(newStringUtf8(Base64.getEncoder().encode((hashedPassword))));
-		return buf.toString();
+		final StringBuilder pwdBuilder = new StringBuilder(2 + actualHashAlgo.length() + hashedPassword.length * 3);
+		pwdBuilder.append('{').append(actualHashAlgo.toLowerCase()).append('}');
+		pwdBuilder.append(newStringUtf8(Base64.getEncoder().encode((hashedPassword))));
+		return pwdBuilder.toString();
 	}
 
 	private String newStringUtf8(byte[] bytes) {
@@ -112,8 +120,7 @@ public enum OSGiConsolePasswords {
 	public byte[] getPasswordBytes(final String textPassword) {
 		final int endHash = getEndOfHashAlgorithm(textPassword);
 		if (endHash >= 0) {
-			final String encodedPassword = textPassword.substring(endHash + 1);
-			return Base64.getDecoder().decode(encodedPassword);
+			return Base64.getDecoder().decode(textPassword.substring(endHash + 1));
 		}
 		return getBytesUtf8(textPassword);
 	}
@@ -134,8 +141,7 @@ public enum OSGiConsolePasswords {
 			return pwd;
 		}
 		try {
-			final MessageDigest md = MessageDigest.getInstance(hashAlg);
-			return md.digest(pwd);
+			return MessageDigest.getInstance(hashAlg).digest(pwd);
 		} catch (NoSuchAlgorithmException ex) {
 			LoggerFactory.getLogger(getClass()).error("NoSuchAlgorithmException!!", ex);
 			throw new IllegalStateException("Cannot hash the password: " + ex);
