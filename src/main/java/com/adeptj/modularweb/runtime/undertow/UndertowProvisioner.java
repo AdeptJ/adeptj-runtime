@@ -82,7 +82,6 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
 import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
-import io.undertow.servlet.api.WebResourceCollection;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 
@@ -278,6 +277,13 @@ public final class UndertowProvisioner {
 				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
 	}
 	
+	private static SecurityConstraint securityConstraint(Config undertowConfig) {
+		return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.osgi-console-roles"))
+				.addWebResourceCollection(Servlets.webResourceCollection()
+						.addHttpMethods(undertowConfig.getStringList("common.osgi-console-methods")).addUrlPatterns(
+								undertowConfig.getStringList("common.osgi-console-patterns")));
+	}
+	
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())
@@ -288,8 +294,7 @@ public final class UndertowProvisioner {
 				.setIdentityManager(new OSGiConsoleIdentityManager())
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/login", "/error"))
-				.addSecurityConstraint(new SecurityConstraint().addRoleAllowed("OSGiAdmin").addWebResourceCollection(
-						new WebResourceCollection().addHttpMethods("GET", "POST").addUrlPattern("/system/console/*")));
+				.addSecurityConstraint(securityConstraint(undertowConfig));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

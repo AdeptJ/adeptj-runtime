@@ -9,9 +9,15 @@ import java.security.Principal;
  */
 public class OSGiConsolePrincipal implements Principal {
 
+	private String name;
+
+	public OSGiConsolePrincipal(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String getName() {
-		return "OSGiConsolePrincipal";
+		return name;
 	}
 
 }

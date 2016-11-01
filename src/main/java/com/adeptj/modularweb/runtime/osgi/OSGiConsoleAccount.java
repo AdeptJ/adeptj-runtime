@@ -14,10 +14,19 @@ import io.undertow.security.idm.Account;
 public class OSGiConsoleAccount implements Account {
 
 	private static final long serialVersionUID = -2090504892837494810L;
+	
+	private String loginId;
+	
+	char[] credential;
+
+	public OSGiConsoleAccount(String loginId, char[] credential) {
+		this.loginId = loginId;
+		this.credential = credential;
+	}
 
 	@Override
 	public Principal getPrincipal() {
-		return new OSGiConsolePrincipal();
+		return new OSGiConsolePrincipal(loginId);
 	}
 
 	@Override

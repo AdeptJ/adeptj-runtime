@@ -3,9 +3,12 @@ package com.adeptj.modularweb.runtime.osgi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.runtime.common.OSGiConsolePasswords;
+
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
+import io.undertow.security.idm.PasswordCredential;
 
 /**
  * OSGiConsoleIdentityManager.
@@ -19,13 +22,21 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	@Override
 	public Account verify(Account account) {
 		LOGGER.info("OSGiConsoleIdentityManager.verify(Account account)");
-		return new OSGiConsoleAccount();
+		return new OSGiConsoleAccount(account.getPrincipal().getName(), null);
 	}
 
+	/**
+	 * Called by FormAuthenticationMechanism.
+	 */
 	@Override
 	public Account verify(String id, Credential credential) {
 		LOGGER.info("OSGiConsoleIdentityManager.verify(String id, Credential credential)");
-		return new OSGiConsoleAccount();
+		PasswordCredential passwordCredential = (PasswordCredential) credential;
+		char[] password = passwordCredential.getPassword();
+		if (OSGiConsolePasswords.INSTANCE.matches(new String(password))) {
+			return new OSGiConsoleAccount(id, password);
+		}
+		return null;
 	}
 
 	@Override

@@ -420,6 +420,13 @@
 			<scope>provided</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>com.adeptj</groupId>
+			<artifactId>adeptj-modularweb-webconsole-security-provider</artifactId>
+			<version>1.0.0.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
+		
 		<!-- AdeptJ Modular Web Bundles Ends-->
 
 	</dependencies>
