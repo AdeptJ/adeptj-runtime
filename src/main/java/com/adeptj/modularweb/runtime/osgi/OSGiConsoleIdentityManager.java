@@ -1,9 +1,11 @@
 package com.adeptj.modularweb.runtime.osgi;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.adeptj.modularweb.runtime.common.OSGiConsolePasswords;
+import com.typesafe.config.Config;
 
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
@@ -16,35 +18,55 @@ import io.undertow.security.idm.PasswordCredential;
  * @author Rakesh.Kumar, AdeptJ
  */
 public class OSGiConsoleIdentityManager implements IdentityManager {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(OSGiConsoleIdentityManager.class);
 
-	/**
-	 * This is queried on each request afterward.
-	 */
-	@Override
-	public Account verify(Account account) {
-		LOGGER.info("OSGiConsoleIdentityManager.verify(Account account)");
-		return new OSGiConsoleAccount(account.getPrincipal().getName(), null);
+	private Map<String, List<String>> principalRoleMapping;
+
+	@SuppressWarnings("unchecked")
+	public OSGiConsoleIdentityManager(Config undertowConfig) {
+		this.principalRoleMapping = new HashMap<>();
+		undertowConfig.getObject("common.osgi-console-user-role-mapping").unwrapped().forEach((principal, roles) -> {
+			this.principalRoleMapping.put(principal, (List<String>) roles);
+		});
 	}
 
 	/**
-	 * Called by FormAuthenticationMechanism.
+	 * In our case, this method is called by CachedAuthenticatedSessionMechanism.
+	 * 
+	 * This is queried on each request after user is successfully logged in.
 	 */
 	@Override
-	public Account verify(String id, Credential credential) {
-		LOGGER.info("OSGiConsoleIdentityManager.verify(String id, Credential credential)");
-		PasswordCredential passwordCredential = (PasswordCredential) credential;
-		char[] password = passwordCredential.getPassword();
-		if (OSGiConsolePasswords.INSTANCE.matches(new String(password))) {
-			return new OSGiConsoleAccount(id, password);
+	public Account verify(Account account) {
+		if (account != null) {
+			String id = account.getPrincipal().getName();
+			if (this.principalRoleMapping.containsKey(id)) {
+				if (this.principalRoleMapping.get(id).containsAll(account.getRoles())) {
+					return account;
+				}
+			}
 		}
 		return null;
 	}
 
+	/**
+	 * Called by FormAuthenticationMechanism when user submits the login form.
+	 */
+	@Override
+	public Account verify(String id, Credential credential) {
+		PasswordCredential pwdCredential = (PasswordCredential) credential;
+		return OSGiConsolePasswords.INSTANCE.matches(id, new String(pwdCredential.getPassword()))
+				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential)) : null;
+	}
+
+	/**
+	 * Used here:
+	 * 
+	 * 1. ClientCertAuthenticationMechanism.
+	 * 2. GSSAPIAuthenticationMechanism
+	 * 
+	 * We are not covering both the use cases therefore returning a null.
+	 */
 	@Override
 	public Account verify(Credential credential) {
-		LOGGER.info("OSGiConsoleIdentityManager.verify(Credential credential)");
 		return null;
 	}
 

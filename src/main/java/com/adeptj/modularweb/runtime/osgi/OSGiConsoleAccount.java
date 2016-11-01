@@ -15,18 +15,15 @@ public class OSGiConsoleAccount implements Account {
 
 	private static final long serialVersionUID = -2090504892837494810L;
 	
-	private String loginId;
+	private OSGiConsolePrincipal principal;
 	
-	char[] credential;
-
-	public OSGiConsoleAccount(String loginId, char[] credential) {
-		this.loginId = loginId;
-		this.credential = credential;
+	public OSGiConsoleAccount(OSGiConsolePrincipal principal) {
+		this.principal = principal;
 	}
 
 	@Override
 	public Principal getPrincipal() {
-		return new OSGiConsolePrincipal(loginId);
+		return principal;
 	}
 
 	@Override

@@ -291,7 +291,7 @@ public final class UndertowProvisioner {
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
 				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
 				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig))
-				.setIdentityManager(new OSGiConsoleIdentityManager())
+				.setIdentityManager(new OSGiConsoleIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/login", "/login"))
 				.addSecurityConstraint(securityConstraint(undertowConfig));
