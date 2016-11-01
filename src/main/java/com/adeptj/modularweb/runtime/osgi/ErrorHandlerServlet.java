@@ -21,9 +21,9 @@ public class ErrorHandlerServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		InputStream resource = getClass().getResourceAsStream(String.format("/error/views/%s.html", this.getStatusCode(req)));
+		InputStream resource = getClass().getResourceAsStream(String.format("/views/error/%s.html", this.getStatusCode(req)));
 		if (resource == null) {
-			resp.getWriter().write(CommonUtils.toString(getClass().getResourceAsStream("/error/views/404.html")));
+			resp.getWriter().write(CommonUtils.toString(getClass().getResourceAsStream("/views/error/404.html")));
 		} else {
 			resp.getWriter().write(CommonUtils.toString(resource));
 		}
