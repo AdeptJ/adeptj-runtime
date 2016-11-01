@@ -28,15 +28,14 @@ public enum OSGiConsolePasswords {
 	INSTANCE;
 
 	private static final String DEFAULT_HASH_ALGO = "SHA-256";
+	
+	private static final String OSGI_MGR_CFG_LOC = "/org/apache/felix/webconsole/internal/servlet/OsgiManager.config";
 
 	private final String cfgFile;
 
 	OSGiConsolePasswords() {
-		this.cfgFile = new StringBuilder(Configs.INSTANCE.felix().getString("felix-cm-dir")).append(File.separator)
-				.append("org").append(File.separator).append("apache").append(File.separator).append("felix")
-				.append(File.separator).append("webconsole").append(File.separator).append("internal")
-				.append(File.separator).append("servlet").append(File.separator).append("OsgiManager.config")
-				.toString();
+		this.cfgFile = new StringBuilder(Configs.INSTANCE.felix().getString("felix-cm-dir"))
+				.append(OSGI_MGR_CFG_LOC.replace('/', File.separatorChar)).toString();
 	}
 
 	public boolean matches(String id, String formPwd) {
