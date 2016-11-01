@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.initializer.StartupHandlerInitializer;
 import com.adeptj.modularweb.runtime.logging.LogbackProvisioner;
 import com.adeptj.modularweb.runtime.osgi.FrameworkStartupHandler;
+import com.adeptj.modularweb.runtime.osgi.OSGiConsoleIdentityManager;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;
@@ -78,7 +80,9 @@ import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
+import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
+import io.undertow.servlet.api.WebResourceCollection;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 
@@ -265,7 +269,7 @@ public final class UndertowProvisioner {
 	
 	private static List<ErrorPage> errorPages(Config undertowConfig) {
 		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream().map((entry) -> {
-			return new ErrorPage((String) entry.getValue(), Integer.parseInt(entry.getKey()));
+			return Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey()));
 		}).collect(Collectors.toList());
 	}
 
@@ -279,7 +283,13 @@ public final class UndertowProvisioner {
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())
 				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
-				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig));
+				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
+				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig))
+				.setIdentityManager(new OSGiConsoleIdentityManager())
+				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
+				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/login", "/error"))
+				.addSecurityConstraint(new SecurityConstraint().addRoleAllowed("OSGiAdmin").addWebResourceCollection(
+						new WebResourceCollection().addHttpMethods("GET", "POST").addUrlPattern("/system/console/*")));
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

@@ -65,7 +65,9 @@ public enum FrameworkProvisioner {
 
     private FrameworkRestartHandler frameworkListener;
     
-    private ServiceRegistration<Servlet> svcReg;
+    private ServiceRegistration<Servlet> svcRegErrorPageServlet;
+    
+    private ServiceRegistration<Servlet> svcRegLoginPageServlet;
     
     public void startFramework(ServletContext context) {
     	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
@@ -83,10 +85,8 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-            Dictionary<String, Object> properties = new Hashtable<>();
-            properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorHandlerServlet");
-            properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/error/*");
-            this.svcReg = systemBundleContext.registerService(Servlet.class, new ErrorHandlerServlet(), properties);
+			this.registerErrorPageServlet(systemBundleContext);
+			this.registerLoginPageServlet(systemBundleContext);
             this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
@@ -100,8 +100,11 @@ public enum FrameworkProvisioner {
         try {
 			if (this.framework != null) {
 				this.removeFrameworkListener();
-				if (this.svcReg != null) {
-					this.svcReg.unregister();
+				if (this.svcRegErrorPageServlet != null) {
+					this.svcRegErrorPageServlet.unregister();
+				}
+				if (this.svcRegLoginPageServlet != null) {
+					this.svcRegLoginPageServlet.unregister();
 				}
 				this.framework.stop();
 				// A value of zero will wait indefinitely.
@@ -127,6 +130,20 @@ public enum FrameworkProvisioner {
 		servletContext.addListener(new BridgeHttpSessionListener());
 		servletContext.addListener(new BridgeHttpSessionIdListener());
 		servletContext.addListener(new BridgeHttpSessionAttributeListener());
+	}
+	
+	private void registerLoginPageServlet(BundleContext systemBundleContext) {
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "LoginPageServlet");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/login");
+		this.svcRegLoginPageServlet = systemBundleContext.registerService(Servlet.class, new LoginPageServlet(), properties);
+	}
+
+	private void registerErrorPageServlet(BundleContext systemBundleContext) {
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorPageServlet");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/error/*");
+		this.svcRegErrorPageServlet = systemBundleContext.registerService(Servlet.class, new ErrorPageServlet(), properties);
 	}
     
     private void registerProxyDispatcherServlet(ServletContext context, Logger logger) {
