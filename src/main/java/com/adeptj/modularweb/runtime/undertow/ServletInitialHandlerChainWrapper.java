@@ -1,11 +1,11 @@
 package com.adeptj.modularweb.runtime.undertow;
 
+import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
 
 /**
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
@@ -17,9 +17,9 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 public class ServletInitialHandlerChainWrapper implements HandlerWrapper {
 
 	@Override
-	public HttpHandler wrap(HttpHandler initial) {
+	public HttpHandler wrap(HttpHandler intialHandler) {
 		return new PredicateHandler(
 				Predicates.and(Predicates.prefix("/static"), Predicates.suffixes("css", "js", "jpg", "png", "jpeg")),
-				new ResourceHandler(new ClassPathResourceManager(getClass().getClassLoader())), initial);
+				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader())), intialHandler);
 	}
 }
