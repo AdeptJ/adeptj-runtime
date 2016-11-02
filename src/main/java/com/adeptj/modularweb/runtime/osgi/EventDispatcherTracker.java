@@ -53,7 +53,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTracker.class);
 
-	private final static String OSGI_FILTER_EXPR = "(http.felix.dispatcher=*)";
+	private final static String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
 
 	private HttpSessionListener sessionListener;
 
@@ -62,7 +62,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	private HttpSessionAttributeListener sessionAttributeListener;
 
 	public EventDispatcherTracker(BundleContext context) throws InvalidSyntaxException {
-		super(context, OSGiUtils.filter(context, EventListener.class, OSGI_FILTER_EXPR), null);
+		super(context, OSGiUtils.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
 	}
 
 	@Override

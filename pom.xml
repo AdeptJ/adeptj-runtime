@@ -61,7 +61,7 @@
 		<ehcache.version>3.1.1</ehcache.version>
 		
 		<!-- Apache Felix and OSGi Dependencies Version -->
-		<felix.framework.version>5.6.0</felix.framework.version>
+		<felix.framework.version>5.6.1</felix.framework.version>
 		<felix.scr.version>2.0.6</felix.scr.version>
 		<felix.configadmin.version>1.8.10</felix.configadmin.version>
 		<felix.eventadmin.version>1.4.8</felix.eventadmin.version>
@@ -71,7 +71,8 @@
 		<felix.webconsole.plugins.memoryusage.version>1.0.6</felix.webconsole.plugins.memoryusage.version>
 		<felix.inventory.version>1.0.4</felix.inventory.version>
 		<felix.webconsole.version>4.2.16</felix.webconsole.version>
-		<felix.http.bridge.version>3.0.12</felix.http.bridge.version>
+		<felix.http.bridge.version>3.0.16</felix.http.bridge.version>
+		<felix.http.base.version>3.0.16</felix.http.base.version>
 		<felix.http.servlet-api.version>1.1.2</felix.http.servlet-api.version>
 		<felix.log.version>1.0.1</felix.log.version>
 		<felix.metatype.version>1.1.2</felix.metatype.version>

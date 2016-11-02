@@ -40,12 +40,12 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
-	private final static String OSGI_FILTER_EXPR = "(http.felix.dispatcher=org.apache.felix.http.base.internal.DispatcherServlet)";
+	private final static String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
 
     private HttpServlet dispatcherServlet;
 
     public DispatcherServletTracker(BundleContext context) throws InvalidSyntaxException {
-        super(context, OSGiUtils.filter(context, HttpServlet.class, OSGI_FILTER_EXPR), null);
+        super(context, OSGiUtils.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
     }
 
     protected HttpServlet getDispatcherServlet() {
