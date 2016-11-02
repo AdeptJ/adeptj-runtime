@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.runtime.osgi;
+package com.adeptj.modularweb.runtime.servlet;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.adeptj.modularweb.runtime.common.CommonUtils;
 
 /**
- * LoginPageServlet renders the login page.
+ * OSGi LoginPageServlet renders the login page.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

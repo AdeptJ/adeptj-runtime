@@ -32,13 +32,14 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.modularweb.runtime.common.Constants;
 import com.adeptj.modularweb.runtime.common.TimeUnits;
 import com.adeptj.modularweb.runtime.osgi.DispatcherServletTrackerSupport;
 
 /**
- * HttpServlet acting as a front controller for all of the incoming requests and
- * delegates the actual service request to FELIX DispatcherServlet, so in other
- * words it is acting as a Proxy for FELIX DispatcherServlet.
+ * ProxyDispatcherServlet acting as a front controller for all of the incoming requests and
+ * delegates the actual service request to FELIX DispatcherServlet.
+ * So in other words it is acting as a Proxy for FELIX DispatcherServlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -94,7 +95,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 			HttpSession session = req.getSession(false);
 			if (session != null) {
 				session.invalidate();
-				resp.sendRedirect("/system/console");
+				resp.sendRedirect(Constants.OSGI_WEBCONSOLE_PATH);
 				return true;
 			}
 		}

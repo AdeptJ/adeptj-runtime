@@ -10,10 +10,10 @@ import org.osgi.framework.InvalidSyntaxException;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class OSGiFilters {
+public final class OSGiUtils {
 	
 	// No instantiation. Utility methods only.
-	private OSGiFilters() {}
+	private OSGiUtils() {}
 
 	public static Filter filter(BundleContext context, Class<?> objClass, String filterExpr) throws InvalidSyntaxException {
 		StringBuilder filterExprBuilder = new StringBuilder();

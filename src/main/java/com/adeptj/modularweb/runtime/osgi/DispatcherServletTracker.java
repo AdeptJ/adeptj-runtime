@@ -29,7 +29,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.runtime.common.OSGiFilters;
+import com.adeptj.modularweb.runtime.common.OSGiUtils;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.
@@ -45,7 +45,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
     private HttpServlet dispatcherServlet;
 
     public DispatcherServletTracker(BundleContext context) throws InvalidSyntaxException {
-        super(context, OSGiFilters.filter(context, HttpServlet.class, OSGI_FILTER_EXPR), null);
+        super(context, OSGiUtils.filter(context, HttpServlet.class, OSGI_FILTER_EXPR), null);
     }
 
     protected HttpServlet getDispatcherServlet() {

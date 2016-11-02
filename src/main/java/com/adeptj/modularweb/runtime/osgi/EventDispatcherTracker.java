@@ -33,7 +33,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.modularweb.runtime.common.OSGiFilters;
+import com.adeptj.modularweb.runtime.common.OSGiUtils;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.
@@ -62,7 +62,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 	private HttpSessionAttributeListener sessionAttributeListener;
 
 	public EventDispatcherTracker(BundleContext context) throws InvalidSyntaxException {
-		super(context, OSGiFilters.filter(context, EventListener.class, OSGI_FILTER_EXPR), null);
+		super(context, OSGiUtils.filter(context, EventListener.class, OSGI_FILTER_EXPR), null);
 	}
 
 	@Override

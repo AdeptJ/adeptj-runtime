@@ -1,4 +1,4 @@
-package com.adeptj.modularweb.runtime.osgi;
+package com.adeptj.modularweb.runtime.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.adeptj.modularweb.runtime.common.CommonUtils;
 
 /**
- * ErrorPageServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.).
+ * OSGi ErrorPageServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.).
  *
  * @author Rakesh.Kumar, AdeptJ
  */

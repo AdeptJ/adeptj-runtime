@@ -16,10 +16,11 @@ import org.slf4j.LoggerFactory;
 import com.adeptj.modularweb.runtime.config.Configs;
 
 /**
- * OSGiConsolePasswords, Logic copied from org.apache.felix.webconsole.internal.servlet.Password.
+ * OSGiConsolePasswords, Logic for creating password hash and comparing submitted credential is same as implemented
+ * in [org.apache.felix.webconsole.internal.servlet.Password]
  * 
- * Because, we want to match the same hashing mechanism used by OSGi Web Console configuration management,
- * but classes there are package private and therefore can't be accessible to outside world.
+ * Because, we want to be consistent with the hashing mechanism used by OSGi Web Console configuration management,
+ * but supporting classes available there are package private and therefore can't be accessible to outside world.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -29,13 +30,13 @@ public enum OSGiConsolePasswords {
 
 	private static final String DEFAULT_HASH_ALGO = "SHA-256";
 	
-	private static final String OSGI_MGR_CFG_LOC = "/org/apache/felix/webconsole/internal/servlet/OsgiManager.config";
+	private static final String OSGI_MGR_CFG_FILE = "/org/apache/felix/webconsole/internal/servlet/OsgiManager.config";
 
 	private final String cfgFile;
 
 	OSGiConsolePasswords() {
 		this.cfgFile = new StringBuilder(Configs.INSTANCE.felix().getString("felix-cm-dir"))
-				.append(OSGI_MGR_CFG_LOC.replace('/', File.separatorChar)).toString();
+				.append(OSGI_MGR_CFG_FILE.replace('/', File.separatorChar)).toString();
 	}
 
 	public boolean matches(String id, String formPwd) {
@@ -46,11 +47,11 @@ public enum OSGiConsolePasswords {
 		} else {
 			// When system starts up very first time, the OsgiManager.config file is non-existent.
 			// Meanwhile make use of default password maintained in provisioning file.
-			return this.matchFromProvisioningConfig(id, formPwd);
+			return this.matchFromProvisioningConfigFile(id, formPwd);
 		}
 	}
 
-	private boolean matchFromProvisioningConfig(String id, String formPwd) {
+	private boolean matchFromProvisioningConfigFile(String id, String formPwd) {
 		Map<String, Object> users = Configs.INSTANCE.undertow().getObject("common.osgi-console-users").unwrapped();
 		if (users.containsKey(id)) {
 			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)),

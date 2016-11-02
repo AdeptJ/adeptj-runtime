@@ -1,8 +1,10 @@
-package com.adeptj.modularweb.runtime.osgi;
+package com.adeptj.modularweb.runtime.undertow;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.adeptj.modularweb.runtime.common.OSGiConsolePasswords;
 import com.typesafe.config.Config;
@@ -54,7 +56,9 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	public Account verify(String id, Credential credential) {
 		PasswordCredential pwdCredential = (PasswordCredential) credential;
 		return OSGiConsolePasswords.INSTANCE.matches(id, new String(pwdCredential.getPassword()))
-				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential)) : null;
+				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential), this.principalRoleMapping
+						.getOrDefault(id, Collections.emptyList()).stream().collect(Collectors.toSet()))
+				: null;
 	}
 
 	/**

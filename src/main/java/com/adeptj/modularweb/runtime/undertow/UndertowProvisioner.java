@@ -65,7 +65,6 @@ import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.initializer.StartupHandlerInitializer;
 import com.adeptj.modularweb.runtime.logging.LogbackProvisioner;
 import com.adeptj.modularweb.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.modularweb.runtime.osgi.OSGiConsoleIdentityManager;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;

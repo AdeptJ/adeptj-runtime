@@ -1,7 +1,6 @@
-package com.adeptj.modularweb.runtime.osgi;
+package com.adeptj.modularweb.runtime.undertow;
 
 import java.security.Principal;
-import java.util.Collections;
 import java.util.Set;
 
 import io.undertow.security.idm.Account;
@@ -17,8 +16,11 @@ public class OSGiConsoleAccount implements Account {
 	
 	private OSGiConsolePrincipal principal;
 	
-	public OSGiConsoleAccount(OSGiConsolePrincipal principal) {
+	private Set<String> roles;
+	
+	public OSGiConsoleAccount(OSGiConsolePrincipal principal, Set<String> roles) {
 		this.principal = principal;
+		this.roles = roles;
 	}
 
 	@Override
@@ -28,7 +30,7 @@ public class OSGiConsoleAccount implements Account {
 
 	@Override
 	public Set<String> getRoles() {
-		return Collections.singleton("OSGiAdmin");
+		return roles;
 	}
 
 }
