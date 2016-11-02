@@ -165,6 +165,11 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<artifactSet>
+								<excludes>
+									<exclude>org.apache.felix:org.apache.felix.http.base:*:jar</exclude>
+								</excludes>
+							</artifactSet>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>com.adeptj.modularweb.runtime.core.Main</mainClass>
@@ -191,6 +196,7 @@
 							<excludeScope>compile</excludeScope>
 							<includeScope>provided</includeScope>
 							<excludeTransitive>true</excludeTransitive>
+							<excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
@@ -341,6 +347,14 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.http.servlet-api</artifactId>
 			<version>${felix.http.servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- Here for debugging purpose in eclipse, excluded from being bundled, shaded -->
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.base</artifactId>
+			<version>${felix.http.base.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
