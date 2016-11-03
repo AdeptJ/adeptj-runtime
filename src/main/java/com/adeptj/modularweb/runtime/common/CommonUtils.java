@@ -56,8 +56,7 @@ public class CommonUtils {
 	/**
 	 * Deny direct instantiation.
 	 */
-	private CommonUtils() {
-	}
+	private CommonUtils() {}
 
 	public static String toString(InputStream input) throws IOException {
 		return toByteArrayOutputStream(input).toString(Constants.UTF8);

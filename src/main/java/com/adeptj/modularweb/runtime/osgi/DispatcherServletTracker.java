@@ -80,17 +80,11 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * from which this ServiceTracker was created and causes the [java.lang.IllegalStateException: Invalid BundleContext].
          * Since a Framework restart creates a new BundleContext and this tracker will again be opened with
          * the new BundleContext therefore closing it here make sense.
+         * 
+         * Ignore exceptions, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
         */
-        this.closeTracker();
+        ServiceTrackers.closeQuietly(this);
     }
-    
-    private void closeTracker() {
-		try {
-			this.close();
-		} catch (Exception ex) {
-			// ignore, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
-		}
-	}
 
     private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
         this.destroyDispatcherServlet();
@@ -98,25 +92,24 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         this.initDispatcherServlet();
     }
 
-    private void destroyDispatcherServlet() {
-        if (this.dispatcherServlet == null) {
-            return;
-        }
-        LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
-        this.dispatcherServlet.destroy();
-        this.dispatcherServlet = null;
-    }
+	private void destroyDispatcherServlet() {
+		if (this.dispatcherServlet != null) {
+			LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+			this.dispatcherServlet.destroy();
+			// Set dispatcherServlet as null, don't want to call dispatcherServlet.init with this reference.
+			this.dispatcherServlet = null;
+		}
+	}
 
-    private void initDispatcherServlet() {
-        if (this.dispatcherServlet == null) {
-            return;
-        }
-        try {
-            LOGGER.info("Initializing Felix DispatcherServlet!!");
-            this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
-            LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcherServlet);
-        } catch (Exception ex) {
-            LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
-        }
-    }
+	private void initDispatcherServlet() {
+		if (this.dispatcherServlet != null) {
+			try {
+				LOGGER.info("Initializing Felix DispatcherServlet!!");
+				this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
+				LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcherServlet);
+			} catch (Exception ex) {
+				LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
+			}
+		}
+	}
 }

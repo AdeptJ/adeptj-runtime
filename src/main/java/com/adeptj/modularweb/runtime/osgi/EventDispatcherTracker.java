@@ -83,15 +83,8 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 		LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
 		super.removedService(reference, service);
 		// NOTE: See class header why ServiceTracker is closed here.
-		this.closeTracker();
-	}
-
-	private void closeTracker() {
-		try {
-			this.close();
-		} catch (Exception ex) {
-			// ignore, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
-		}
+		// ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
+		ServiceTrackers.closeQuietly(this);
 	}
 
 	public HttpSessionListener getHttpSessionListener() {
