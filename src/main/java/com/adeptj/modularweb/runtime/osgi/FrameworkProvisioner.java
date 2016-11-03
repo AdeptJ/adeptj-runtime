@@ -102,12 +102,7 @@ public enum FrameworkProvisioner {
         try {
 			if (this.framework != null) {
 				this.removeFrameworkListener();
-				if (this.svcRegErrorPageServlet != null) {
-					this.svcRegErrorPageServlet.unregister();
-				}
-				if (this.svcRegLoginPageServlet != null) {
-					this.svcRegLoginPageServlet.unregister();
-				}
+				this.unregisterServices();
 				this.framework.stop();
 				// A value of zero will wait indefinitely.
 				FrameworkEvent event = this.framework.waitForStop(0);
@@ -119,6 +114,15 @@ public enum FrameworkProvisioner {
         	logger.error("Error Stopping OSGi Framework!!", ex);
         }
     }
+
+	private void unregisterServices() {
+		if (this.svcRegErrorPageServlet != null) {
+			this.svcRegErrorPageServlet.unregister();
+		}
+		if (this.svcRegLoginPageServlet != null) {
+			this.svcRegLoginPageServlet.unregister();
+		}
+	}
 
 	private void removeFrameworkListener() {
 		if (BundleContextAware.INSTANCE.isBundleContextSet()) {
@@ -134,46 +138,40 @@ public enum FrameworkProvisioner {
 		servletContext.addListener(new BridgeHttpSessionAttributeListener());
 	}
 	
-	private void registerLoginPageServlet(BundleContext systemBundleContext) {
+	private void registerLoginPageServlet(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "LoginPageServlet");
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/login");
-		this.svcRegLoginPageServlet = systemBundleContext.registerService(Servlet.class, new LoginPageServlet(), properties);
+		this.svcRegLoginPageServlet = bundleContext.registerService(Servlet.class, new LoginPageServlet(), properties);
 	}
 
-	private void registerErrorPageServlet(BundleContext systemBundleContext) {
+	private void registerErrorPageServlet(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorPageServlet");
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/error/*");
-		this.svcRegErrorPageServlet = systemBundleContext.registerService(Servlet.class, new ErrorPageServlet(), properties);
+		this.svcRegErrorPageServlet = bundleContext.registerService(Servlet.class, new ErrorPageServlet(), properties);
 	}
     
     private void registerProxyDispatcherServlet(ServletContext context, Logger logger) {
 		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
 		// This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
 		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
-		Dynamic registration = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
-		registration.addMapping(ROOT_MAPPING);
+		Dynamic servletRegistration = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
+		servletRegistration.addMapping(ROOT_MAPPING);
 		// Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
 		// Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026: 
 		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-		registration.setAsyncSupported(true);
+		servletRegistration.setAsyncSupported(true);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
-		// registration.setLoadOnStartup(0);
+		servletRegistration.setLoadOnStartup(0);
 		logger.info("ProxyDispatcherServlet registered successfully!!");
 	}
 
 	private Framework createFramework(Logger logger) throws Exception {
-		Framework framework = null;
-		for (FrameworkFactory factory : ServiceLoader.load(FrameworkFactory.class)) {
-			// There should only be a single FrameworkFactory.
-			framework = factory.newFramework(this.createFrameworkConfigs(logger));
-			break;
-		}
-		return framework;
+		return ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
 	}
 
-    private Map<String, String> createFrameworkConfigs(Logger logger) throws IOException {
+    private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
         Map<String, String> configs = this.loadFrameworkProps();
         Config felixConf = Configs.INSTANCE.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
