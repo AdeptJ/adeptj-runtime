@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,18 +52,13 @@ public class ProxyDispatcherServlet extends HttpServlet {
      * Open the DispatcherServletTracker.
      */
     @Override
-    public void init() throws ServletException {
-    	long startTime = System.nanoTime();
-        LOGGER.info("Initializing ProxyDispatcherServlet!!");
-        try {
-        	LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
-        	DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
-		} catch (InvalidSyntaxException ise) {
-			LOGGER.error("Could not register the DispatcherServletTracker!!", ise);
-			throw new ServletException("Could not register the DispatcherServletTracker!!", ise);
-		}
-        LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", TimeUnits.nanosToMillis(startTime));
-    }
+	public void init() throws ServletException {
+		long startTime = System.nanoTime();
+		LOGGER.info("Initializing ProxyDispatcherServlet!!");
+		LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
+		DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
+		LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", TimeUnits.nanosToMillis(startTime));
+	}
 
     /**
      * Proxy for FELIX DispatcherServlet, delegates all the calls to the underlying DispatcherServlet.

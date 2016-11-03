@@ -27,7 +27,6 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -61,7 +60,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
 	private HttpSessionAttributeListener sessionAttributeListener;
 
-	public EventDispatcherTracker(BundleContext context) throws InvalidSyntaxException {
+	public EventDispatcherTracker(BundleContext context) {
 		super(context, OSGiUtils.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
 	}
 

@@ -23,7 +23,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
 
 import com.adeptj.modularweb.runtime.common.BundleContextAware;
 
@@ -42,7 +41,7 @@ public enum DispatcherServletTrackerSupport {
 
 	private ServletConfig servletConfig;
 
-	public void openDispatcherServletTracker(ServletConfig servletConfig) throws InvalidSyntaxException {
+	public void openDispatcherServletTracker(ServletConfig servletConfig) {
 		this.initServletConfig(servletConfig);
 		if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
 			BundleContext ctx = BundleContextAware.INSTANCE.getBundleContext();

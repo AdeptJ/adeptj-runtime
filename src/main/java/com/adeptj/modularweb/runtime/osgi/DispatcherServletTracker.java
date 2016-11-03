@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private HttpServlet dispatcherServlet;
 
-    public DispatcherServletTracker(BundleContext context) throws InvalidSyntaxException {
+    public DispatcherServletTracker(BundleContext context) {
         super(context, OSGiUtils.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
     }
 

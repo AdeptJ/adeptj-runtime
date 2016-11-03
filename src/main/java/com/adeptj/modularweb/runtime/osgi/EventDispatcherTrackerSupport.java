@@ -20,8 +20,6 @@
 package com.adeptj.modularweb.runtime.osgi;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -41,15 +39,9 @@ public enum EventDispatcherTrackerSupport {
 
 	protected void openEventDispatcherTracker(BundleContext bundleContext) {
 		if (this.eventDispatcherTracker == null) {
-			Logger logger = LoggerFactory.getLogger(EventDispatcherTrackerSupport.class);
-			try {
-				logger.info("Opening EventDispatcherTracker!!");
-				this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
-				this.eventDispatcherTracker.open();
-			} catch (InvalidSyntaxException ise) {
-				// Not possible for our simple filter but log it anyway.
-				logger.error("InvalidSyntaxException!!", ise);
-			}
+			LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("Opening EventDispatcherTracker!!");
+			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+			this.eventDispatcherTracker.open();
 		}
 	}
 
