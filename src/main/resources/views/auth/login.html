@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="UTF-8">
 		<title>Login</title>
-		<link rel="stylesheet" type="text/css" href="/static/style.css">
+		<link rel="stylesheet" type="text/css" href="/static/styles/login.css">
 	</head>
 		<body>
-			<div class="container">
-				<div class="row">
-					<div class="twelve columns">
-						<div class="error-template">
-							<div class="login-page">
-								<div class="form">
-								    <div>AdeptJ OSGi Web Console Login</div>
-									<form class="login-form" action="/j_security_check" method="post">
-										<input type="text" name="j_username" placeholder="username" required /> 
-										<input type="password" name="j_password" placeholder="password" required />
-										<button>login</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
+			<div class="login-bg">
+				<div class="login-card">
+				    <h1>Welcome!</h1>
+				    <div class="sep-top"></div>
+				    <form method="post" name="loginForm" action="/j_security_check">
+				        <input type="hidden" name="site" value="">
+				            <div class="group">
+				                <input type="text" placeholder="Username" maxlength="10" name="j_username" autofocus="autofocus" required ><span class="bar"></span>
+				            </div>
+				            <div class="group">
+				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required ><span class="bar"></span>
+				            </div>
+				        
+				        <button type="submit" class="button buttonBlue">Login
+				            <div class="ripples buttonRipples">
+				                <span class="ripplesCircle"></span>
+				            </div>
+				        </button>
+				    
+				    </form>
+				
 				</div>
 			</div>
 		</body>
