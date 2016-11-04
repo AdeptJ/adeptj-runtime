@@ -20,17 +20,19 @@
 package com.adeptj.modularweb.runtime.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.modularweb.runtime.common.CommonUtils;
+import org.thymeleaf.exceptions.TemplateInputException;
+
+import com.adeptj.modularweb.runtime.viewengine.Models;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
 
 /**
  * OSGi AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.).
@@ -45,28 +47,29 @@ public class AdminErrorServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String requestURI = req.getRequestURI();
-		ServletOutputStream outputStream = resp.getOutputStream();
+		Models models = new Models();
 		if ("/admin/error".equals(requestURI)) {
-			outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/generic.html")));
+			ViewEngine.THYMELEAF
+					.processView(new ViewEngineContext("error/generic", models, req, resp, req.getLocale()));
 		} else {
 			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			String statusCode = this.getStatusCode(requestURI);
 			if (exception != null && "500".equals(statusCode)) {
-				outputStream.write(CommonUtils.toString(getClass().getResourceAsStream("/admin/views/error/500.html"))
-						.replace("#{error}", exception.toString()).getBytes("UTF-8"));
+				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+				ViewEngine.THYMELEAF
+						.processView(new ViewEngineContext("error/500", models, req, resp, req.getLocale()));
 			} else {
-				InputStream resource = getClass()
-						.getResourceAsStream(String.format("/admin/views/error/%s.html", statusCode));
-				if (resource == null) {
-					outputStream
-							.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/404.html")));
-				} else {
-					outputStream.write(CommonUtils.toBytes(resource));
+				try {
+					ViewEngine.THYMELEAF.processView(new ViewEngineContext(String.format("error/%s", statusCode),
+							models, req, resp, req.getLocale()));
+				} catch (TemplateInputException ex) {
+					ViewEngine.THYMELEAF.processView(new ViewEngineContext(String.format("error/404", statusCode),
+							models, req, resp, req.getLocale()));
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		this.doGet(req, resp);

@@ -23,13 +23,14 @@ import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.modularweb.runtime.common.CommonUtils;
+import com.adeptj.modularweb.runtime.viewengine.Models;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
 
 /**
  * OSGiGenericErrorSevlet handles the system wide error codes and exceptions.
@@ -50,23 +51,23 @@ public class OSGiGenericErrorSevlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		this.doGet(req, resp);
 	}
-	
+
 	private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-		// String errorMsg = (String) req.getAttribute(RequestDispatcher.ERROR_MESSAGE);
-		// String reqURI = (String) req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
-		// String servletName = (String) req.getAttribute(RequestDispatcher.ERROR_SERVLET_NAME);
-		Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-		ServletOutputStream outputStream = resp.getOutputStream();
-		if (exception != null && Integer.valueOf(500).equals(statusCode)) {
-			outputStream.write(CommonUtils.toString(getClass().getResourceAsStream("/admin/views/error/500.html"))
-					.replace("#{error}", exception.toString()).getBytes("UTF-8"));
+		Models models = new Models();
+		models.put("statusCode", statusCode);
+		models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+		models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
+		models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+		if (Integer.valueOf(500).equals(statusCode)) {
+			ViewEngine.THYMELEAF.processView(new ViewEngineContext("error/500", models, req, resp, req.getLocale()));
 		} else if (Integer.valueOf(401).equals(statusCode) || Integer.valueOf(403).equals(statusCode)
-				|| Integer.valueOf(500).equals(statusCode)) {
-			outputStream.write(CommonUtils
-					.toBytes(getClass().getResourceAsStream(String.format("/admin/views/error/%s.html", statusCode))));
+				|| Integer.valueOf(404).equals(statusCode)) {
+			ViewEngine.THYMELEAF.processView(
+					new ViewEngineContext(String.format("error/%s", statusCode), models, req, resp, req.getLocale()));
 		} else {
-			outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/generic.html")));
+			ViewEngine.THYMELEAF
+					.processView(new ViewEngineContext("error/generic", models, req, resp, req.getLocale()));
 		}
 	}
 }

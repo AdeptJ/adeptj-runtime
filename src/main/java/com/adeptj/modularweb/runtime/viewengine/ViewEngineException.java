@@ -17,40 +17,26 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.modularweb.runtime.servlet;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
+package com.adeptj.modularweb.runtime.viewengine;
 
 /**
- * OSGi AdminDashboardServlet renders the admin dashboard page.
- *
- * @author Rakesh.Kumar, AdeptJ
+ * ViewEngineException.
+ * 
+ * @author Rakesh.Kumar, AdeptJ.
  */
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/dashboard/*" })
-public class AdminDashboardServlet extends HttpServlet {
+public class ViewEngineException extends RuntimeException {
 
-	private static final long serialVersionUID = -3339904764769823449L;
+	private static final long serialVersionUID = -3491650743232718940L;
 
-	/**
-	 * Render dashboard page.
-	 */
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ViewEngine.THYMELEAF.processView(new ViewEngineContext("auth/dashboard", new Models(), req, resp, req.getLocale()));
+	public ViewEngineException(String message) {
+		super(message);
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("/admin/dashboard");
+	public ViewEngineException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ViewEngineException(Throwable cause) {
+		super(cause);
 	}
 }

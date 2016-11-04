@@ -27,7 +27,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.modularweb.runtime.common.CommonUtils;
+import com.adeptj.modularweb.runtime.viewengine.Models;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
 
 /**
  * OSGi AdminLoginServlet serves the login page.
@@ -44,7 +46,7 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.getOutputStream().write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/auth/login.html")));
+		ViewEngine.THYMELEAF.processView(new ViewEngineContext("auth/login", new Models(), req, resp, req.getLocale()));
 	}
 
 	/**
@@ -52,6 +54,6 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("/admin/login");
+		resp.sendRedirect("/admin/login?j_reason=invalid credentials");
 	}
 }

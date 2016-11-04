@@ -17,40 +17,55 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.modularweb.runtime.servlet;
+package com.adeptj.modularweb.runtime.viewengine;
 
-import java.io.IOException;
+import java.util.Locale;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
-
 /**
- * OSGi AdminDashboardServlet renders the admin dashboard page.
- *
- * @author Rakesh.Kumar, AdeptJ
+ * ViewEngineContext.
+ * 
+ * @author Rakesh.Kumar, AdeptJ.
  */
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/dashboard/*" })
-public class AdminDashboardServlet extends HttpServlet {
+public class ViewEngineContext {
 
-	private static final long serialVersionUID = -3339904764769823449L;
+	private final String view;
 
-	/**
-	 * Render dashboard page.
-	 */
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ViewEngine.THYMELEAF.processView(new ViewEngineContext("auth/dashboard", new Models(), req, resp, req.getLocale()));
+	private final Models models;
+
+	private final HttpServletRequest request;
+
+	private final HttpServletResponse response;
+
+	private final Locale locale;
+
+	public ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
+		this.view = view;
+		this.models = models;
+		this.request = req;
+		this.response = resp;
+		this.locale = locale;
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("/admin/dashboard");
+	public String getView() {
+		return view;
+	}
+
+	public Models getModels() {
+		return models;
+	}
+
+	public HttpServletRequest getRequest() {
+		return request;
+	}
+
+	public HttpServletResponse getResponse() {
+		return response;
+	}
+
+	public Locale getLocale() {
+		return locale;
 	}
 }
