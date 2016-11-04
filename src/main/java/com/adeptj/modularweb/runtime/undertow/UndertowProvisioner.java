@@ -65,6 +65,7 @@ import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.initializer.StartupHandlerInitializer;
 import com.adeptj.modularweb.runtime.logging.LogbackProvisioner;
 import com.adeptj.modularweb.runtime.osgi.FrameworkStartupHandler;
+import com.adeptj.modularweb.runtime.servlet.AdminErrorServlet;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;
@@ -294,6 +295,7 @@ public final class UndertowProvisioner {
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/admin/login", "/admin/login"))
 				.addSecurityConstraint(securityConstraint(undertowConfig))
+				.addServlet(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"))
 				.addInitialHandlerChainWrapper(new ServletInitialHandlerChainWrapper());
 	}
 

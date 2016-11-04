@@ -22,6 +22,7 @@ package com.adeptj.modularweb.runtime.osgi;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Servlet;
@@ -75,6 +76,27 @@ public enum OSGiServlets {
 		String name = klazz.getName();
 		LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi Servlet: [{}]", name);
 		this.servlets.put(name, ctx.registerService(Servlet.class, httpServlet, properties));
+	}
+	
+	public void registerErrorServlet(BundleContext ctx, HttpServlet errorServlet, List<String> errors) {
+		Class<? extends HttpServlet> klazz = errorServlet.getClass();
+		WebServlet webServlet = klazz.getAnnotation(WebServlet.class);
+		if (webServlet == null) {
+			throw new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!");
+		}
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, webServlet.name());
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
+		// Apply this ErrorServlet to all the Servlets registered with "default" contextId.
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(osgi.http.whiteboard.context.name=*)");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
+		WebInitParam[] initParams = webServlet.initParams();
+		for (WebInitParam initParam : initParams) {
+			properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value());
+		}
+		String name = klazz.getName();
+		LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi ErrorServlet: [{}]", name);
+		this.servlets.put(name, ctx.registerService(Servlet.class, errorServlet, properties));
 	}
 
 	public void unregister(Class<HttpServlet> klazz) {

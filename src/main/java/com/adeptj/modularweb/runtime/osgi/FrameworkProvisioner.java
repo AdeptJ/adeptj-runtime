@@ -20,7 +20,9 @@
 package com.adeptj.modularweb.runtime.osgi;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -40,8 +42,8 @@ import com.adeptj.modularweb.runtime.common.BundleContextAware;
 import com.adeptj.modularweb.runtime.common.TimeUnits;
 import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.servlet.AdminDashboardServlet;
-import com.adeptj.modularweb.runtime.servlet.AdminErrorServlet;
 import com.adeptj.modularweb.runtime.servlet.AdminLoginServlet;
+import com.adeptj.modularweb.runtime.servlet.OSGiGenericErrorSevlet;
 import com.adeptj.modularweb.runtime.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
 
@@ -80,7 +82,9 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-			HttpServlet[] servlets = { new AdminDashboardServlet(), new AdminLoginServlet(), new AdminErrorServlet(), };
+			HttpServlet[] servlets = { new AdminDashboardServlet(), new AdminLoginServlet(), };
+			List<String> errorPages = Arrays.asList("401", "403", "404", "500", IOException.class.getName());
+			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiGenericErrorSevlet(), errorPages);
             OSGiServlets.INSTANCE.register(systemBundleContext, servlets);
             this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
