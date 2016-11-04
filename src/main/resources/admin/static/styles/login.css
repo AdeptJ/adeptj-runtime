@@ -7,7 +7,7 @@ body {
 .login-bg {
 	font-family: 'Lato', sans-serif;
 	background-color: #231D1D ;
-	background-image: url('/static/images/login.jpg');
+	background-image: url('/admin/static/images/login.jpg');
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center center;

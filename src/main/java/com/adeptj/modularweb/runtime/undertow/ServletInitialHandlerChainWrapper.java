@@ -38,7 +38,7 @@ public class ServletInitialHandlerChainWrapper implements HandlerWrapper {
 	@Override
 	public HttpHandler wrap(HttpHandler intialHandler) {
 		return new PredicateHandler(
-				Predicates.and(Predicates.prefix("/static"), Predicates.suffixes("css", "js", "jpg", "png", "jpeg")),
+				Predicates.and(Predicates.prefix("/admin"), Predicates.suffixes("css", "js", "jpg", "png", "jpeg")),
 				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader())), intialHandler);
 	}
 }

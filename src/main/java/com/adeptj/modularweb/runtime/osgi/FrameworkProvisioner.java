@@ -141,14 +141,14 @@ public enum FrameworkProvisioner {
 	private void registerLoginPageServlet(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "LoginPageServlet");
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/login");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/admin/login");
 		this.svcRegLoginPageServlet = bundleContext.registerService(Servlet.class, new LoginPageServlet(), properties);
 	}
 
 	private void registerErrorPageServlet(BundleContext bundleContext) {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorPageServlet");
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/error/*");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/admin/error/*");
 		this.svcRegErrorPageServlet = bundleContext.registerService(Servlet.class, new ErrorPageServlet(), properties);
 	}
     

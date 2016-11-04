@@ -85,7 +85,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 
 	private boolean handleLogout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		// if this is a logout call, invalidate the session and redirect back to /system/console page. 
-		if (req.getRequestURI().equals("/logout")) {
+		if (req.getRequestURI().equals("/admin/logout")) {
 			HttpSession session = req.getSession(false);
 			if (session != null) {
 				session.invalidate();

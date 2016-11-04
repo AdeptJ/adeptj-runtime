@@ -42,7 +42,7 @@ public class LoginPageServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.getOutputStream().write(CommonUtils.toBytes(getClass().getResourceAsStream("/views/auth/login.html")));
+		resp.getOutputStream().write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/auth/login.html")));
 	}
 
 	/**
@@ -50,6 +50,6 @@ public class LoginPageServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("/login");
+		resp.sendRedirect("/admin/login");
 	}
 }

@@ -22,6 +22,7 @@ package com.adeptj.modularweb.runtime.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -43,17 +44,30 @@ public class ErrorPageServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String requestURI = req.getRequestURI();
 		ServletOutputStream outputStream = resp.getOutputStream();
-		if ("/error".equals(requestURI)) {
-			outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/views/error/generic.html")));
+		if ("/admin/error".equals(requestURI)) {
+			outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/generic.html")));
 		} else {
-			InputStream resource = getClass()
-					.getResourceAsStream(String.format("/views/error/%s.html", this.getStatusCode(requestURI)));
-			if (resource == null) {
-				outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/views/error/404.html")));
+			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+			String statusCode = this.getStatusCode(requestURI);
+			if (exception != null && "500".equals(statusCode)) {
+				outputStream.write(CommonUtils.toString(getClass().getResourceAsStream("/admin/views/error/500.html"))
+						.replace("#{error}", exception.toString()).getBytes("UTF-8"));
 			} else {
-				outputStream.write(CommonUtils.toBytes(resource));
+				InputStream resource = getClass()
+						.getResourceAsStream(String.format("/admin/views/error/%s.html", statusCode));
+				if (resource == null) {
+					outputStream
+							.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/404.html")));
+				} else {
+					outputStream.write(CommonUtils.toBytes(resource));
+				}
 			}
 		}
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		this.doGet(req, resp);
 	}
 
 	private String getStatusCode(String requestURI) {

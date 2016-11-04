@@ -292,7 +292,7 @@ public final class UndertowProvisioner {
 				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig))
 				.setIdentityManager(new OSGiConsoleIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
-				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/login", "/login"))
+				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/admin/login", "/admin/login"))
 				.addSecurityConstraint(securityConstraint(undertowConfig))
 				.addInitialHandlerChainWrapper(new ServletInitialHandlerChainWrapper());
 	}
