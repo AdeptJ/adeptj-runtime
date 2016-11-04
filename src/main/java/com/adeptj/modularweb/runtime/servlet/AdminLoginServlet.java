@@ -17,42 +17,41 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.modularweb.runtime.common;
+package com.adeptj.modularweb.runtime.servlet;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceRegistration;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.adeptj.modularweb.runtime.common.CommonUtils;
 
 /**
- * Utility for creating OSGi Filter for tracking/finding Services etc.
- * 
+ * OSGi AdminLoginServlet serves the login page.
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class OSGiUtils {
+@WebServlet(name = "AdminLoginServlet", urlPatterns = { "/admin/login" })
+public class AdminLoginServlet extends HttpServlet {
 
-	// No instantiation. Utility methods only.
-	private OSGiUtils() {}
+	private static final long serialVersionUID = -3339904764769823449L;
 
-	public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
-		try {
-			StringBuilder filterExprBuilder = new StringBuilder();
-			filterExprBuilder.append("(&(").append(Constants.OBJECTCLASS).append("=");
-			filterExprBuilder.append(objectClass.getName()).append(")");
-			filterExprBuilder.append(filterExpr).append(")");
-			return context.createFilter(filterExprBuilder.toString());
-		} catch (InvalidSyntaxException ex) {
-			// Probable causes.
-			// 1. objectClass is malformed.
-			// 2. Filter expression is malformed, not RFC 1960-based Filter.
-			throw new IllegalArgumentException("Unexpected InvalidSyntaxException!!", ex);
-		}
+	/**
+	 * Render login page.
+	 */
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.getOutputStream().write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/auth/login.html")));
 	}
-	
-	public static void unregisterServiceRegistration(ServiceRegistration<?> registration) {
-		if (registration != null) {
-			registration.unregister();
-		}
+
+	/**
+	 * Post comes here when login to "/j_security_check" fails.
+	 */
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.sendRedirect("/admin/login");
 	}
 }

@@ -20,31 +20,28 @@
 package com.adeptj.modularweb.runtime.osgi;
 
 import java.io.IOException;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration.Dynamic;
+import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.modularweb.runtime.common.BundleContextAware;
 import com.adeptj.modularweb.runtime.common.TimeUnits;
 import com.adeptj.modularweb.runtime.config.Configs;
-import com.adeptj.modularweb.runtime.servlet.ErrorPageServlet;
-import com.adeptj.modularweb.runtime.servlet.LoginPageServlet;
+import com.adeptj.modularweb.runtime.servlet.AdminDashboardServlet;
+import com.adeptj.modularweb.runtime.servlet.AdminErrorServlet;
+import com.adeptj.modularweb.runtime.servlet.AdminLoginServlet;
 import com.adeptj.modularweb.runtime.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
 
@@ -67,10 +64,6 @@ public enum FrameworkProvisioner {
 
     private FrameworkRestartHandler frameworkListener;
     
-    private ServiceRegistration<Servlet> svcRegErrorPageServlet;
-    
-    private ServiceRegistration<Servlet> svcRegLoginPageServlet;
-    
     public void startFramework(ServletContext context) {
     	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
@@ -87,8 +80,8 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-			this.registerErrorPageServlet(systemBundleContext);
-			this.registerLoginPageServlet(systemBundleContext);
+			HttpServlet[] servlets = { new AdminDashboardServlet(), new AdminLoginServlet(), new AdminErrorServlet(), };
+            OSGiServlets.INSTANCE.register(systemBundleContext, servlets);
             this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
@@ -102,7 +95,7 @@ public enum FrameworkProvisioner {
         try {
 			if (this.framework != null) {
 				this.removeFrameworkListener();
-				this.unregisterServices();
+				OSGiServlets.INSTANCE.unregisterAll();
 				this.framework.stop();
 				// A value of zero will wait indefinitely.
 				FrameworkEvent event = this.framework.waitForStop(0);
@@ -114,15 +107,6 @@ public enum FrameworkProvisioner {
         	logger.error("Error Stopping OSGi Framework!!", ex);
         }
     }
-
-	private void unregisterServices() {
-		if (this.svcRegErrorPageServlet != null) {
-			this.svcRegErrorPageServlet.unregister();
-		}
-		if (this.svcRegLoginPageServlet != null) {
-			this.svcRegLoginPageServlet.unregister();
-		}
-	}
 
 	private void removeFrameworkListener() {
 		if (BundleContextAware.INSTANCE.isBundleContextSet()) {
@@ -136,20 +120,6 @@ public enum FrameworkProvisioner {
 		servletContext.addListener(new BridgeHttpSessionListener());
 		servletContext.addListener(new BridgeHttpSessionIdListener());
 		servletContext.addListener(new BridgeHttpSessionAttributeListener());
-	}
-	
-	private void registerLoginPageServlet(BundleContext bundleContext) {
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "LoginPageServlet");
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/admin/login");
-		this.svcRegLoginPageServlet = bundleContext.registerService(Servlet.class, new LoginPageServlet(), properties);
-	}
-
-	private void registerErrorPageServlet(BundleContext bundleContext) {
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "ErrorPageServlet");
-		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/admin/error/*");
-		this.svcRegErrorPageServlet = bundleContext.registerService(Servlet.class, new ErrorPageServlet(), properties);
 	}
     
     private void registerProxyDispatcherServlet(ServletContext context, Logger logger) {

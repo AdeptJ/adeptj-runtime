@@ -20,11 +20,9 @@
 package com.adeptj.modularweb.runtime.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,45 +30,26 @@ import javax.servlet.http.HttpServletResponse;
 import com.adeptj.modularweb.runtime.common.CommonUtils;
 
 /**
- * OSGi ErrorPageServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.).
+ * OSGi AdminDashboardServlet renders the admin dashboard page.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ErrorPageServlet extends HttpServlet {
+@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/dashboard/*" })
+public class AdminDashboardServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -3339904764769823449L;
 
+	/**
+	 * Render dashboard page.
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String requestURI = req.getRequestURI();
-		ServletOutputStream outputStream = resp.getOutputStream();
-		if ("/admin/error".equals(requestURI)) {
-			outputStream.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/generic.html")));
-		} else {
-			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-			String statusCode = this.getStatusCode(requestURI);
-			if (exception != null && "500".equals(statusCode)) {
-				outputStream.write(CommonUtils.toString(getClass().getResourceAsStream("/admin/views/error/500.html"))
-						.replace("#{error}", exception.toString()).getBytes("UTF-8"));
-			} else {
-				InputStream resource = getClass()
-						.getResourceAsStream(String.format("/admin/views/error/%s.html", statusCode));
-				if (resource == null) {
-					outputStream
-							.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/error/404.html")));
-				} else {
-					outputStream.write(CommonUtils.toBytes(resource));
-				}
-			}
-		}
-	}
-	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		this.doGet(req, resp);
+		resp.getOutputStream()
+				.write(CommonUtils.toBytes(getClass().getResourceAsStream("/admin/views/auth/dashboard.html")));
 	}
 
-	private String getStatusCode(String requestURI) {
-		return requestURI.substring(requestURI.lastIndexOf('/') + 1);
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.sendRedirect("/admin/dashboard");
 	}
 }
