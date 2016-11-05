@@ -4,8 +4,8 @@
 
 **Runtime(s)**
 
-1. High performance [Undertow](http://undertow.io/) http server
-2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix 5.6.0)
+1. High performance [Undertow](http://undertow.io/) web server.
+2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix as implementation).
 
 **Lightweight ~25MB footprint(with below mentioned modules), low on memory, starts instantly**
 
