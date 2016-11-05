@@ -21,9 +21,6 @@ package com.adeptj.modularweb.runtime.viewengine;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
@@ -40,37 +37,44 @@ public enum ViewEngine {
 
 	THYMELEAF {
 
+		private TemplateEngine templateEngine = this.initTemplateEngine();
+
+		/**
+		 * Renders the view using Thymeleaf TemplateEngine.
+		 */
+		public void processView(ViewEngineContext ctx) throws ViewEngineException {
+			String view = ctx.getView();
+			LOGGER.debug("Processing view:[{}]", view);
+			try {
+				this.templateEngine.process(view, this.webContext(ctx), ctx.getResponse().getWriter());
+			} catch (IOException ex) {
+				LOGGER.error("IOException while processing view: [{}]", view, ex);
+				throw new ViewEngineException(ex.getMessage(), ex);
+			}
+		}
+
 		private TemplateEngine initTemplateEngine() {
 			ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 			templateResolver.setPrefix("admin/views/");
 			templateResolver.setSuffix(".html");
 			templateResolver.setCharacterEncoding("UTF-8");
 			templateResolver.setTemplateMode(TemplateMode.HTML);
+			templateResolver.setCacheable(true);
+			// Template cache TTL=1h
+			templateResolver.setCacheTTLMs(Long.valueOf(3600000L));
 			templateResolver.setOrder(1);
 			TemplateEngine engine = new TemplateEngine();
 			engine.addTemplateResolver(templateResolver);
 			return engine;
 		}
-		
-		// Initialize eagerly.
-		private TemplateEngine templateEngine = this.initTemplateEngine();
 
-		public void processView(ViewEngineContext engineContext) throws ViewEngineException {
-			String view = engineContext.getView();
-			LOGGER.info("Processing view:[{}]", view);
-			try {
-				HttpServletRequest request = engineContext.getRequest();
-				HttpServletResponse response = engineContext.getResponse();
-				this.templateEngine.process(view, new WebContext(request, response, request.getServletContext(),
-						engineContext.getLocale(), engineContext.getModels()), response.getWriter());
-			} catch (IOException ex) {
-				LOGGER.error("IOException while processing view: [{}]", view, ex);
-				throw new ViewEngineException(ex.getMessage(), ex);
-			}
+		private WebContext webContext(ViewEngineContext ctx) {
+			return new WebContext(ctx.getRequest(), ctx.getResponse(), ctx.getRequest().getServletContext(),
+					ctx.getLocale(), ctx.getModels());
 		}
 	};
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
-	
+
 	public abstract void processView(ViewEngineContext engineContext) throws ViewEngineException;
 }

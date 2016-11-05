@@ -41,7 +41,7 @@ public class ViewEngineContext {
 
 	private final Locale locale;
 
-	public ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
+	private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
 		this.view = view;
 		this.models = models;
 		this.request = req;
@@ -67,5 +67,52 @@ public class ViewEngineContext {
 
 	public Locale getLocale() {
 		return locale;
+	}
+	
+	/**
+	 * Builder for ViewEngineContext.
+	 * 
+	 * @author Rakesh.Kumar, AdeptJ.
+	 */
+	public static class Builder {
+		
+		private String view;
+
+		private Models models;
+
+		private HttpServletRequest request;
+
+		private HttpServletResponse response;
+
+		private Locale locale;
+		
+		public Builder view(String view) {
+			this.view = view;
+			return this;
+		}
+		
+		public Builder models(Models models) {
+			this.models = models;
+			return this;
+		}
+		
+		public Builder request(HttpServletRequest request) {
+			this.request = request;
+			return this;
+		}
+		
+		public Builder response(HttpServletResponse response) {
+			this.response = response;
+			return this;
+		}
+		
+		public Builder locale(Locale locale) {
+			this.locale = locale;
+			return this;
+		}
+		
+		public ViewEngineContext build() {
+			return new ViewEngineContext(view, models, request, response, locale);
+		}
 	}
 }

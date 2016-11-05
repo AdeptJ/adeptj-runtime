@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.viewengine.Models;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
@@ -54,20 +55,23 @@ public class OSGiGenericErrorSevlet extends HttpServlet {
 
 	private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		builder.models(this.models(req, statusCode)).request(req).response(resp).locale(req.getLocale());
+		if (Integer.valueOf(500).equals(statusCode)) {
+			ViewEngine.THYMELEAF.processView(builder.view("error/500").build());
+		} else if (Configs.INSTANCE.undertow().getIntList("common-status-codes").contains(statusCode)) {
+			ViewEngine.THYMELEAF.processView(builder.view("error/%s").build());
+		} else {
+			ViewEngine.THYMELEAF.processView(builder.view("error/generic").build());
+		}
+	}
+
+	private Models models(HttpServletRequest req, Integer statusCode) {
 		Models models = new Models();
 		models.put("statusCode", statusCode);
 		models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
 		models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
 		models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-		if (Integer.valueOf(500).equals(statusCode)) {
-			ViewEngine.THYMELEAF.processView(new ViewEngineContext("error/500", models, req, resp, req.getLocale()));
-		} else if (Integer.valueOf(401).equals(statusCode) || Integer.valueOf(403).equals(statusCode)
-				|| Integer.valueOf(404).equals(statusCode)) {
-			ViewEngine.THYMELEAF.processView(
-					new ViewEngineContext(String.format("error/%s", statusCode), models, req, resp, req.getLocale()));
-		} else {
-			ViewEngine.THYMELEAF
-					.processView(new ViewEngineContext("error/generic", models, req, resp, req.getLocale()));
-		}
+		return models;
 	}
 }

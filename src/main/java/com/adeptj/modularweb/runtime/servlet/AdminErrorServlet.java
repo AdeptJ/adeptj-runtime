@@ -47,24 +47,22 @@ public class AdminErrorServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String requestURI = req.getRequestURI();
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		Models models = new Models();
+		builder.models(models).request(req).response(resp).locale(req.getLocale());
 		if ("/admin/error".equals(requestURI)) {
-			ViewEngine.THYMELEAF
-					.processView(new ViewEngineContext("error/generic", models, req, resp, req.getLocale()));
+			ViewEngine.THYMELEAF.processView(builder.view("error/generic").build());
 		} else {
 			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			String statusCode = this.getStatusCode(requestURI);
 			if (exception != null && "500".equals(statusCode)) {
 				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-				ViewEngine.THYMELEAF
-						.processView(new ViewEngineContext("error/500", models, req, resp, req.getLocale()));
+				ViewEngine.THYMELEAF.processView(builder.view("error/500").build());
 			} else {
 				try {
-					ViewEngine.THYMELEAF.processView(new ViewEngineContext(String.format("error/%s", statusCode),
-							models, req, resp, req.getLocale()));
+					ViewEngine.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
 				} catch (TemplateInputException ex) {
-					ViewEngine.THYMELEAF.processView(new ViewEngineContext(String.format("error/404", statusCode),
-							models, req, resp, req.getLocale()));
+					ViewEngine.THYMELEAF.processView(builder.view("error/404").build());
 				}
 			}
 		}

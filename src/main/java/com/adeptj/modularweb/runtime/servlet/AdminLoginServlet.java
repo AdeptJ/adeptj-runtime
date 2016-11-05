@@ -46,7 +46,9 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ViewEngine.THYMELEAF.processView(new ViewEngineContext("auth/login", new Models(), req, resp, req.getLocale()));
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		builder.view("auth/login").models(new Models()).request(req).response(resp).locale(req.getLocale());
+		ViewEngine.THYMELEAF.processView(builder.build());
 	}
 
 	/**
