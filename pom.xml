@@ -79,6 +79,7 @@
 		
 		<!-- AdeptJ Modular Web Dependencies Version -->
 		<adeptj.modularweb-webconsole-branding.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-branding.version>
+		<adeptj.modularweb-webconsole-security-provider.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-security-provider.version>
 	</properties>
 	
 	<prerequisites>
@@ -494,7 +495,7 @@
 		<dependency>
 			<groupId>com.adeptj</groupId>
 			<artifactId>adeptj-modularweb-webconsole-security-provider</artifactId>
-			<version>1.0.0.RELEASE</version>
+			<version>${adeptj.modularweb-webconsole-security-provider.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
