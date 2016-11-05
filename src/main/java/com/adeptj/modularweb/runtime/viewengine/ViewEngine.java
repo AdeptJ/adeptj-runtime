@@ -25,8 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import com.adeptj.modularweb.runtime.config.Configs;
+import com.typesafe.config.Config;
 
 /**
  * ViewEngine.
@@ -37,6 +39,27 @@ public enum ViewEngine {
 
 	THYMELEAF {
 
+		private TemplateEngine initTemplateEngine() {
+			ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+			Config config = Configs.INSTANCE.common();
+			templateResolver.setPrefix(config.getString("thymeleaf-template-prefix"));
+			templateResolver.setSuffix(config.getString("thymeleaf-template-suffix"));
+			templateResolver.setCharacterEncoding(config.getString("thymeleaf-template-encoding"));
+			templateResolver.setTemplateMode(config.getString("thymeleaf-template-mode"));
+			templateResolver.setCacheable(config.getBoolean("thymeleaf-template-cacheable"));
+			// Template cache TTL=1h
+			templateResolver.setCacheTTLMs(config.getLong("thymeleaf-template-cacheTTLMs"));
+			templateResolver.setOrder(config.getInt("thymeleaf-templateresolver-order"));
+			TemplateEngine engine = new TemplateEngine();
+			engine.addTemplateResolver(templateResolver);
+			return engine;
+		}
+
+		private WebContext webContext(ViewEngineContext ctx) {
+			return new WebContext(ctx.getRequest(), ctx.getResponse(), ctx.getRequest().getServletContext(),
+					ctx.getLocale(), ctx.getModels());
+		}
+		
 		private TemplateEngine templateEngine = this.initTemplateEngine();
 
 		/**
@@ -51,26 +74,6 @@ public enum ViewEngine {
 				LOGGER.error("IOException while processing view: [{}]", view, ex);
 				throw new ViewEngineException(ex.getMessage(), ex);
 			}
-		}
-
-		private TemplateEngine initTemplateEngine() {
-			ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-			templateResolver.setPrefix("admin/views/");
-			templateResolver.setSuffix(".html");
-			templateResolver.setCharacterEncoding("UTF-8");
-			templateResolver.setTemplateMode(TemplateMode.HTML);
-			templateResolver.setCacheable(true);
-			// Template cache TTL=1h
-			templateResolver.setCacheTTLMs(Long.valueOf(3600000L));
-			templateResolver.setOrder(1);
-			TemplateEngine engine = new TemplateEngine();
-			engine.addTemplateResolver(templateResolver);
-			return engine;
-		}
-
-		private WebContext webContext(ViewEngineContext ctx) {
-			return new WebContext(ctx.getRequest(), ctx.getResponse(), ctx.getRequest().getServletContext(),
-					ctx.getLocale(), ctx.getModels());
 		}
 	};
 

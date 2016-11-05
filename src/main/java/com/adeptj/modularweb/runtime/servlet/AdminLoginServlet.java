@@ -56,6 +56,10 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.sendRedirect("/admin/login?j_reason=invalid credentials");
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		Models models = new Models();
+		models.put("validation", "Invalid credentials!!");
+		builder.view("auth/login").models(models).request(req).response(resp).locale(req.getLocale());
+		ViewEngine.THYMELEAF.processView(builder.build());
 	}
 }
