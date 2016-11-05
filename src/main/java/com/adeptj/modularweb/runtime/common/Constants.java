@@ -36,6 +36,8 @@ public final class Constants {
 	
 	public static final String UNDERTOW_CONF_SECTION = "undertow";
 	
+	public static final String THYMELEAF_CONF_SECTION = "thymeleaf";
+	
 	public static final String FELIX_CONF_SECTION = "felix";
 	
 	public static final String COMMON_CONF_SECTION = "common";

@@ -20,11 +20,13 @@
 package com.adeptj.modularweb.runtime.viewengine;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.messageresolver.StandardMessageResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import com.adeptj.modularweb.runtime.config.Configs;
@@ -41,7 +43,7 @@ public enum ViewEngines {
 
 		private TemplateEngine initTemplateEngine() {
 			ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-			Config config = Configs.INSTANCE.common();
+			Config config = Configs.INSTANCE.thymeleaf();
 			templateResolver.setPrefix(config.getString("thymeleaf-template-prefix"));
 			templateResolver.setSuffix(config.getString("thymeleaf-template-suffix"));
 			templateResolver.setCharacterEncoding(config.getString("thymeleaf-template-encoding"));
@@ -50,8 +52,15 @@ public enum ViewEngines {
 			// Template cache TTL=1h
 			templateResolver.setCacheTTLMs(config.getLong("thymeleaf-template-cacheTTLMs"));
 			templateResolver.setOrder(config.getInt("thymeleaf-templateresolver-order"));
+			Properties properties = new Properties();
+			config.getObject("messages").unwrapped().forEach((key, message) -> {
+				properties.setProperty(key, (String) message);
+			});
+			StandardMessageResolver messageResolver = new StandardMessageResolver();
+			messageResolver.setDefaultMessages(properties);
 			TemplateEngine engine = new TemplateEngine();
 			engine.addTemplateResolver(templateResolver);
+			engine.setMessageResolver(messageResolver);
 			return engine;
 		}
 
@@ -59,7 +68,7 @@ public enum ViewEngines {
 			return new WebContext(ctx.getRequest(), ctx.getResponse(), ctx.getRequest().getServletContext(),
 					ctx.getLocale(), ctx.getModels());
 		}
-		
+
 		private TemplateEngine templateEngine = this.initTemplateEngine();
 
 		/**

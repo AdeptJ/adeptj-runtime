@@ -23,6 +23,7 @@ import static com.adeptj.modularweb.runtime.common.Constants.COMMON_CONF_SECTION
 import static com.adeptj.modularweb.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.modularweb.runtime.common.Constants.MAIN_CONF_SECTION;
 import static com.adeptj.modularweb.runtime.common.Constants.PROVISIONING_FILE;
+import static com.adeptj.modularweb.runtime.common.Constants.THYMELEAF_CONF_SECTION;
 import static com.adeptj.modularweb.runtime.common.Constants.UNDERTOW_CONF_SECTION;
 
 import com.typesafe.config.Config;
@@ -53,5 +54,9 @@ public enum Configs {
 	
 	public Config common() {
 		return this.main.getConfig(COMMON_CONF_SECTION);
+	}
+	
+	public Config thymeleaf() {
+		return this.main.getConfig(THYMELEAF_CONF_SECTION);
 	}
 }
