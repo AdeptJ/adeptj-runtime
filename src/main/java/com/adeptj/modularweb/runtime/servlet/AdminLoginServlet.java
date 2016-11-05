@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngines;
 
 /**
  * OSGi AdminLoginServlet serves the login page.
@@ -48,7 +48,7 @@ public class AdminLoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		builder.view("auth/login").models(new Models()).request(req).response(resp).locale(req.getLocale());
-		ViewEngine.THYMELEAF.processView(builder.build());
+		ViewEngines.THYMELEAF.processView(builder.build());
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class AdminLoginServlet extends HttpServlet {
 		Models models = new Models();
 		models.put("validation", "Invalid credentials!!");
 		builder.view("auth/login").models(models).request(req).response(resp).locale(req.getLocale());
-		ViewEngine.THYMELEAF.processView(builder.build());
+		ViewEngines.THYMELEAF.processView(builder.build());
 	}
 }

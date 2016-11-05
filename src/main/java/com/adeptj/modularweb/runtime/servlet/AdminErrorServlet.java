@@ -31,11 +31,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.thymeleaf.exceptions.TemplateInputException;
 
 import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngines;
 
 /**
- * OSGi AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.).
+ * AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
+ * 
+ * Note: This is independent of OSGi and directly managed by Undertow. 
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -51,18 +53,18 @@ public class AdminErrorServlet extends HttpServlet {
 		Models models = new Models();
 		builder.models(models).request(req).response(resp).locale(req.getLocale());
 		if ("/admin/error".equals(requestURI)) {
-			ViewEngine.THYMELEAF.processView(builder.view("error/generic").build());
+			ViewEngines.THYMELEAF.processView(builder.view("error/generic").build());
 		} else {
 			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			String statusCode = this.getStatusCode(requestURI);
 			if (exception != null && "500".equals(statusCode)) {
 				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-				ViewEngine.THYMELEAF.processView(builder.view("error/500").build());
+				ViewEngines.THYMELEAF.processView(builder.view("error/500").build());
 			} else {
 				try {
-					ViewEngine.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
+					ViewEngines.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
 				} catch (TemplateInputException ex) {
-					ViewEngine.THYMELEAF.processView(builder.view("error/404").build());
+					ViewEngines.THYMELEAF.processView(builder.view("error/404").build());
 				}
 			}
 		}

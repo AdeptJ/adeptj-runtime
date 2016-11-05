@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.adeptj.modularweb.runtime.config.Configs;
 import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngines;
 
 /**
  * OSGiGenericErrorSevlet handles the system wide error codes and exceptions.
@@ -58,11 +58,11 @@ public class OSGiGenericErrorSevlet extends HttpServlet {
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		builder.models(this.models(req, statusCode)).request(req).response(resp).locale(req.getLocale());
 		if (Integer.valueOf(500).equals(statusCode)) {
-			ViewEngine.THYMELEAF.processView(builder.view("error/500").build());
+			ViewEngines.THYMELEAF.processView(builder.view("error/500").build());
 		} else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
-			ViewEngine.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
+			ViewEngines.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
 		} else {
-			ViewEngine.THYMELEAF.processView(builder.view("error/generic").build());
+			ViewEngines.THYMELEAF.processView(builder.view("error/generic").build());
 		}
 	}
 

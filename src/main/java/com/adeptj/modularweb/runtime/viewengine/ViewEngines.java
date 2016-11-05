@@ -31,11 +31,11 @@ import com.adeptj.modularweb.runtime.config.Configs;
 import com.typesafe.config.Config;
 
 /**
- * ViewEngine.
+ * ViewEngines.
  * 
  * @author Rakesh.Kumar, AdeptJ.
  */
-public enum ViewEngine {
+public enum ViewEngines {
 
 	THYMELEAF {
 
@@ -77,7 +77,7 @@ public enum ViewEngine {
 		}
 	};
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngines.class);
 
 	public abstract void processView(ViewEngineContext engineContext) throws ViewEngineException;
 }

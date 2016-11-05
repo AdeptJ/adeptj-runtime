@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.adeptj.modularweb.runtime.viewengine.Models;
-import com.adeptj.modularweb.runtime.viewengine.ViewEngine;
 import com.adeptj.modularweb.runtime.viewengine.ViewEngineContext;
+import com.adeptj.modularweb.runtime.viewengine.ViewEngines;
 
 /**
  * OSGi AdminDashboardServlet renders the admin dashboard page.
@@ -48,7 +48,7 @@ public class AdminDashboardServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		builder.view("auth/dashboard").models(new Models()).request(req).response(resp).locale(req.getLocale());
-		ViewEngine.THYMELEAF.processView(builder.build());
+		ViewEngines.THYMELEAF.processView(builder.build());
 	}
 
 	@Override
