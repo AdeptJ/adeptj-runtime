@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>500</title>
-</head>
-<body>
-	<div class="error-trace">#{error}</div>
-</body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>500</title>
+	</head>
+		<body>
+			<div class="login-bg">
+				<div class="login-card">
+				    <h1>No, it's not you, it's definitely us!!</h1>
+				    <div>
+				    	<p th:text="${exception}"></p>
+				    </div>
+				    <div>
+				    	<a href="/system/console" th:href="${reqURI}">go back!</a>
+				    </div>
+				</div>
+			</div>
+		</body>
 </html>

@@ -59,8 +59,8 @@ public class OSGiGenericErrorSevlet extends HttpServlet {
 		builder.models(this.models(req, statusCode)).request(req).response(resp).locale(req.getLocale());
 		if (Integer.valueOf(500).equals(statusCode)) {
 			ViewEngine.THYMELEAF.processView(builder.view("error/500").build());
-		} else if (Configs.INSTANCE.undertow().getIntList("common-status-codes").contains(statusCode)) {
-			ViewEngine.THYMELEAF.processView(builder.view("error/%s").build());
+		} else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
+			ViewEngine.THYMELEAF.processView(builder.view(String.format("error/%s", statusCode)).build());
 		} else {
 			ViewEngine.THYMELEAF.processView(builder.view("error/generic").build());
 		}

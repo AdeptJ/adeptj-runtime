@@ -82,11 +82,11 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-			HttpServlet[] servlets = { new AdminDashboardServlet(), new AdminLoginServlet(), };
-			List<String> errorPages = Arrays.asList("401", "403", "404", "500", IOException.class.getName());
+			List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
 			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiGenericErrorSevlet(), errorPages);
-            OSGiServlets.INSTANCE.register(systemBundleContext, servlets);
-            this.registerProxyDispatcherServlet(context, logger);
+			List<HttpServlet> servlets = Arrays.asList(new AdminLoginServlet(), new AdminDashboardServlet());
+			OSGiServlets.INSTANCE.registerAll(systemBundleContext, servlets);
+			this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the BundleProvisioner throws exception.

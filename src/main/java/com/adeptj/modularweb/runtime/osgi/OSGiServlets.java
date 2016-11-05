@@ -48,10 +48,8 @@ public enum OSGiServlets {
 
 	private Map<String, ServiceRegistration<? extends Servlet>> servlets = new HashMap<>();
 
-	public void register(BundleContext ctx, HttpServlet... servlets) {
-		for (HttpServlet httpServlet : servlets) {
-			this.register(ctx, httpServlet);
-		}
+	public void registerAll(BundleContext ctx, List<HttpServlet> servlets) {
+		servlets.forEach(servlet -> this.register(ctx, servlet));
 	}
 
 	public void register(BundleContext ctx, HttpServlet httpServlet) {
