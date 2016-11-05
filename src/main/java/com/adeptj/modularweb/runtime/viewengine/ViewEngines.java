@@ -26,8 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
+import org.thymeleaf.messageresolver.IMessageResolver;
 import org.thymeleaf.messageresolver.StandardMessageResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import com.adeptj.modularweb.runtime.config.Configs;
 import com.typesafe.config.Config;
@@ -40,27 +42,34 @@ import com.typesafe.config.Config;
 public enum ViewEngines {
 
 	THYMELEAF {
-
-		private TemplateEngine initTemplateEngine() {
+		
+		private ITemplateResolver templateResolver(Config config) {
 			ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-			Config config = Configs.INSTANCE.thymeleaf();
 			templateResolver.setPrefix(config.getString("thymeleaf-template-prefix"));
 			templateResolver.setSuffix(config.getString("thymeleaf-template-suffix"));
 			templateResolver.setCharacterEncoding(config.getString("thymeleaf-template-encoding"));
 			templateResolver.setTemplateMode(config.getString("thymeleaf-template-mode"));
 			templateResolver.setCacheable(config.getBoolean("thymeleaf-template-cacheable"));
-			// Template cache TTL=1h
 			templateResolver.setCacheTTLMs(config.getLong("thymeleaf-template-cacheTTLMs"));
 			templateResolver.setOrder(config.getInt("thymeleaf-templateresolver-order"));
+			return templateResolver;
+		}
+
+		private IMessageResolver messageResolver(Config config) {
 			Properties properties = new Properties();
-			config.getObject("messages").unwrapped().forEach((key, message) -> {
+			config.getObject("thymeleaf-template-messages").unwrapped().forEach((key, message) -> {
 				properties.setProperty(key, (String) message);
 			});
 			StandardMessageResolver messageResolver = new StandardMessageResolver();
 			messageResolver.setDefaultMessages(properties);
+			return messageResolver;
+		}
+
+		private TemplateEngine initTemplateEngine() {
+			Config config = Configs.INSTANCE.thymeleaf();
 			TemplateEngine engine = new TemplateEngine();
-			engine.addTemplateResolver(templateResolver);
-			engine.setMessageResolver(messageResolver);
+			engine.addTemplateResolver(this.templateResolver(config));
+			engine.setMessageResolver(this.messageResolver(config));
 			return engine;
 		}
 
