@@ -25,6 +25,9 @@ import java.util.Base64;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import com.adeptj.modularweb.runtime.config.Configs;
+import com.typesafe.config.Config;
+
 /**
  * Passwords, utility for password generation and matching.
  * 
@@ -34,35 +37,40 @@ public enum Passwords {
 
 	INSTANCE;
 
-	public static final int RANDOM_BYTES = 16;
-
-	public static final int KEY_LENGTH = 32 * 8;
-
-	public static final String ALGO_SHA1PRNG = "SHA1PRNG";
-
-	public static final String ALGO_PBKD = "PBKDF2WithHmacSHA1";
-
-	public static final int ITERATIONS = 1000;
-
 	public static final String UTF8 = "UTF-8";
 
+	/**
+	 * Generates the salt for hashing.
+	 * 
+	 * @return UTF-8 Base64 encoded hash.
+	 */
 	public String generateSalt() {
 		try {
-			byte[] salt = new byte[RANDOM_BYTES];
-			SecureRandom.getInstance(ALGO_SHA1PRNG).nextBytes(salt);
-			return new String(salt, UTF8);
+			Config config = Configs.INSTANCE.common();
+			byte[] salt = new byte[config.getInt("salt-size")];
+			SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
+			return new String(Base64.getEncoder().encode(salt), UTF8);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
+	/**
+	 * Generates UTF-8 Base64 encoded hashed password
+	 * 
+	 * @param pwd
+	 * @param salt
+	 * @return Hashed password
+	 */
 	public String hashPwd(String pwd, String salt) {
 		try {
-			return Base64.getEncoder()
-					.encodeToString(SecretKeyFactory.getInstance(ALGO_PBKD)
-							.generateSecret(
-									new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8), ITERATIONS, KEY_LENGTH))
-							.getEncoded());
+			Config config = Configs.INSTANCE.common();
+			return new String(
+					Base64.getEncoder()
+							.encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
+									.generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8),
+											config.getInt("iteration-count"), config.getInt("derived-key-size")))
+									.getEncoded()), UTF8);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
