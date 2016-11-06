@@ -44,6 +44,10 @@ public enum Configs {
 		this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
 	}
 	
+	public Config main() {
+		return this.main;
+	}
+	
 	public Config undertow() {
 		return this.main.getConfig(UNDERTOW_CONF_SECTION);
 	}
