@@ -52,14 +52,16 @@ public class AdminLoginServlet extends HttpServlet {
 	}
 
 	/**
-	 * Post comes here when login to "/j_security_check" fails.
+	 * Control comes here when login to "/auth/j_security_check" fails due to invalid credentials.
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		Models models = new Models();
 		models.put("validation", "Invalid credentials!!");
+		models.put("j_username", req.getParameter("j_username"));
 		builder.view("auth/login").models(models).request(req).response(resp).locale(req.getLocale());
+		// Render login page again with validation message.
 		ViewEngines.THYMELEAF.processView(builder.build());
 	}
 }

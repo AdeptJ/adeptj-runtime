@@ -22,8 +22,8 @@ body {
 
 .login-card {
 	width: 100%;
-	max-width: 360px;
-	height: 380px;
+	max-width: 300px;
+	height: 280px;
 	background-color: #fff;
 	position: absolute;
 	top: 0;
@@ -35,18 +35,18 @@ body {
 	box-shadow: 0 0px 5px 0 rgba(0, 0, 0, 0.1), 0 16px 20px -8px rgba(0, 0, 0, 0.3);
 	box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.1), 0 24px 38px -16px rgba(0, 0, 0, 0.2);
 	border: none;
-	padding: 14px;
-	padding-top: 40px;
+	padding: 15px;
+	padding-top: 30px;
 	border-radius: 2px;
 }
 
 body form {
-	margin: 10px 40px;
+	margin: 10px 45px;
 }
 
 body h1 {
 	font-weight: 400;
-	font-size: 24px;
+	font-size: 16px;
 	padding: 0;
 	margin-top: 20px;
 	margin-bottom: 10px;
@@ -56,7 +56,7 @@ body h1 {
 
 .sep-top {
 	width: 100%;
-	height: 30px;
+	height: 17px;
 	background: transparent;
 }
 
@@ -65,13 +65,13 @@ body h1 {
 
 .login-card .group {
 	position: relative;
-	margin-bottom: 45px;
+	margin-bottom: 15px;
 	line-height: normal;
 }
 
 .login-card .group input {
-	font-size: 18px;
-	padding: 10px 10px 10px 5px;
+	font-size: 13px;
+	padding: 10px 8px 10px 0px;
 	-webkit-appearance: none;
 	display: block;
 	background: transparent;
@@ -97,7 +97,7 @@ body h1 {
 
 .login-card .group label {
 	color: #ddd;
-	font-size: 18px;
+	font-size: 10px;
 	font-weight: normal;
 	position: absolute;
 	pointer-events: none;
@@ -129,7 +129,7 @@ body h1 {
 .login-card .bar:before,
 .login-card .bar:after {
 	content: '';
-	height: 2px;
+	height: 1px;
 	width: 0;
 	bottom: 1px;
 	position: absolute;
@@ -163,13 +163,14 @@ body h1 {
 .button {
 	position: relative;
 	display: inline-block;
-	padding: 0 24px;
-	height: 42px;
+	padding: 0 12px;
+	height: 28px;
 	color: #fff;
 	text-transform: uppercase;
-	font-size: 14px;
-	font-weight: 700;
-	line-height: 42px;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 22px;
+	margin-top: 10px;
 	-webkit-font-smoothing: antialiased;
 	text-align: center;
 	letter-spacing: 1px;
@@ -205,61 +206,4 @@ body h1 {
 
 .buttonBlue:hover {
 	background: #0092D0;
-}
-
-
-/* Ripples container */
-
-.ripples {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
-	background: transparent;
-}
-
-
-/* Ripples circle */
-
-.ripplesCircle {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	-moz-transform: translate(-50%, -50%);
-	-webkit-transform: translate(-50%, -50%);
-	-o-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	opacity: 0;
-	width: 0;
-	height: 0;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.25);
-}
-
-.ripples.is-active .ripplesCircle {
-	animation: ripples .4s ease-in;
-}
-
-
-/* Ripples animation */
-
-@keyframes ripples {
-
-	0% {
-		opacity: 0;
-	}
-
-	25% {
-		opacity: 1;
-	}
-
-	100% {
-		width: 200%;
-		padding-bottom: 200%;
-		opacity: 0;
-	}
-
 }

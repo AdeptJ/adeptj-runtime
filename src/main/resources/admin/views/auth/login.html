@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Login</title>
+		<title>AdeptJ Login</title>
 		<link rel="stylesheet" type="text/css" href="/admin/static/styles/login.css">
 	</head>
 		<body>
@@ -10,20 +10,15 @@
 				<div class="login-card">
 				    <h1>Welcome!</h1>
 				    <div class="sep-top"></div>
-				    <form method="post" name="loginForm" action="/login/j_security_check">
-				        <input type="hidden" name="site" value="">
+				    <form method="post" name="loginForm" action="/auth/j_security_check">
 				            <div class="group">
-				                <input type="text" placeholder="Username" maxlength="10" name="j_username" autofocus="autofocus" required ><span class="bar"></span>
+				                <input type="text" placeholder="Username" maxlength="10" name="j_username" th:value="${j_username}" autofocus="autofocus" required ><span class="bar"></span>
 				            </div>
 				            <div class="group">
 				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required ><span class="bar"></span>
 				            </div>
 				           	<span class="validation-error" th:text="${validation}"></span>
-				        <button type="submit" class="button buttonBlue">Login
-				            <div class="ripples buttonRipples">
-				                <span class="ripplesCircle"></span>
-				            </div>
-				        </button>
+				        	<button type="submit" class="button buttonBlue">Login</button>
 				    </form>
 				
 				</div>
