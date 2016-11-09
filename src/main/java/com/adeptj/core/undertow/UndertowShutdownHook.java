@@ -53,14 +53,14 @@ public final class UndertowShutdownHook extends Thread {
 	public void run() {
 		long startTime = System.nanoTime();
 		Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
-		logger.info("Stopping AdeptJ ModularWeb Runtime!!");
+		logger.info("Stopping AdeptJ Core!!");
 		try {
 			this.manager.stop();
 			this.manager.undeploy();
 			this.server.stop();
-			logger.info("AdeptJ ModularWeb Runtime stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+			logger.info("AdeptJ Core stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Exception ex) {
-			logger.error("Exception while stopping AdeptJ ModularWeb Runtime!!", ex);
+			logger.error("Exception while stopping AdeptJ Core!!", ex);
 		}
 		// Let the LOGBACK cleans up it's state.
 		LogbackProvisioner.stop();

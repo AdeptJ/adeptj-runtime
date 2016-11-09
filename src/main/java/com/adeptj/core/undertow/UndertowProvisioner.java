@@ -139,7 +139,7 @@ public final class UndertowProvisioner {
 		Config httpConf = undertowConf.getConfig(KEY_HTTP);
 		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
 		int httpPort = handlePortAvailability(httpConf, logger);
-		logger.info("Starting AdeptJ ModularWeb Runtime on port: [{}]", httpPort);
+		logger.info("Starting AdeptJ Core on port: [{}]", httpPort);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder();
 		boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
@@ -180,7 +180,7 @@ public final class UndertowProvisioner {
 				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
 			}
 		}
-		logger.info("Provisioning AdeptJ ModularWeb Runtime for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
+		logger.info("Provisioning AdeptJ Core for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
 		return prodMode;
 	}
 

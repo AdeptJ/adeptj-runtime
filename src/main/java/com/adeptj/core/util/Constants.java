@@ -82,7 +82,7 @@ public final class Constants {
 
 	public static final String SHUTDOWN_HOOK_THREAD_NAME = "AdeptJ Terminator";
 
-	public static final String DEPLOYMENT_NAME = "AdeptJ ModularWeb Runtime Deployment";
+	public static final String DEPLOYMENT_NAME = "AdeptJ Core Deployment";
 
 	public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
 
