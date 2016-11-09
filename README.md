@@ -1,6 +1,6 @@
-**AdeptJ ModularWeb Runtime**
+**AdeptJ Callisto**
 
-**High performance, dynamic, modular(OSGi based) platform for developing web applications and µServices.**
+**High performance, dynamic, modular(OSGi based) platform for developing web applications and MicroServices.**
 
 **Runtime(s)**
 
