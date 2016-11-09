@@ -36,50 +36,14 @@
 
 	<properties>
 		<!-- Common Dependencies -->
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<undertow.version>1.4.4.Final</undertow.version>
 		<undertow.websockets.version>1.4.4.Final</undertow.websockets.version>
 		<xnio.version>3.3.6.Final</xnio.version>
-		<slf4j-api.version>1.7.21</slf4j-api.version>
-		<logback-core.version>1.1.7</logback-core.version>
-		<logback-classic.version>1.1.7</logback-classic.version>
 		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
 		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
-		<jdk.version>1.8</jdk.version>
-		<compiler.plugin.version>3.5.1</compiler.plugin.version>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<mvn.skipITs>true</mvn.skipITs>
-		<github.global.server>github</github.global.server>
-		<org.json.version>20160212</org.json.version>
-		<commons-fileupload.version>1.3.1</commons-fileupload.version>
-		<commons-io.version>2.5</commons-io.version>
-		<typesafe.config.version>1.3.1</typesafe.config.version>
-		<boon-json.version>0.34</boon-json.version>
-		<jpa.version>2.1.1</jpa.version>
-		<eclipselink.version>2.6.3</eclipselink.version>
-		<mongo.version>3.3.0</mongo.version>
-		<shiro.version>1.3.2</shiro.version>
-		<resteasy.version>3.1.0.CR2</resteasy.version>
-		<ehcache.version>3.1.1</ehcache.version>
 		
 		<!-- Apache Felix and OSGi Dependencies Version -->
 		<felix.framework.version>5.6.1</felix.framework.version>
-		<felix.scr.version>2.0.6</felix.scr.version>
-		<felix.configadmin.version>1.8.12</felix.configadmin.version>
-		<felix.eventadmin.version>1.4.8</felix.eventadmin.version>
-		<felix.webconsole.plugins.packageadmin.version>1.0.2</felix.webconsole.plugins.packageadmin.version>
-		<felix.webconsole.plugins.ds.version>2.0.2</felix.webconsole.plugins.ds.version>
-		<felix.webconsole.plugins.event.version>1.1.4</felix.webconsole.plugins.event.version>
-		<felix.webconsole.plugins.memoryusage.version>1.0.6</felix.webconsole.plugins.memoryusage.version>
-		<felix.inventory.version>1.0.4</felix.inventory.version>
-		<felix.webconsole.version>4.2.16</felix.webconsole.version>
-		<felix.http.bridge.version>3.0.16</felix.http.bridge.version>
-		<felix.http.base.version>3.0.16</felix.http.base.version>
-		<felix.http.servlet-api.version>1.1.2</felix.http.servlet-api.version>
-		<felix.log.version>1.0.1</felix.log.version>
-		<felix.metatype.version>1.1.2</felix.metatype.version>
 		
 		<!-- AdeptJ Modular Web Dependencies Version -->
 		<adeptj.modularweb-webconsole-branding.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-branding.version>
@@ -148,6 +112,7 @@
 	<build>
 	    
 		<plugins>
+		    
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
