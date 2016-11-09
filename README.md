@@ -1,8 +1,8 @@
-**AdeptJ Callisto**
+**AdeptJ Core**
 
-**High performance, dynamic, modular(OSGi based) platform for developing web applications and MicroServices.**
+**Highly performant, dynamic, modular(OSGi based) platform for developing WebApps and MicroServices.**
 
-**Runtime(s)**
+**Built upon**
 
 1. High performance [Undertow](http://undertow.io/) web server.
 2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix as implementation).
@@ -16,8 +16,8 @@
 1. DI (OSGi Declarative Services)
 2. JAX-RS 2.0 (RESTEasy)
 3. Web Security Framework
-   - Apache Shiro 
-   - ESAPI - (Only if template engine is opted)
+   - Apache Shiro
+   - ESAPI and related modules - (Only if template engine is opted)
 4. Persistence(SQL/NOSQL)
    - JPA or MongoDB
 5. Hikari Datasource/JDBC Connection Pool Provider(Only if JPA is opted)
@@ -29,18 +29,18 @@ The platform embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Clone adeptj-modularweb-runtime
-2. cd adeptj-modularweb-runtime
+1. Clone adeptj-core
+2. cd adeptj-core
 3. mvn clean package
-4. Above step will create AdeptJ runtime uber jar.
+4. Above step will create AdeptJ Core uber jar.
 4. Now cd target
-5. java -server -jar adeptj-runtime-LATEST_VERSION.jar
-6. Go to [AdeptJ OSGi Web Console](http://localhost:9007/system/console)
+5. java -server -jar adeptj-core-LATEST_VERSION.jar
+6. Go to [AdeptJ Admin Dashboard](http://localhost:9007/admin/dashboard)
 7. System will ask for username/password, provide the default ones [admin/admin]
 
 Debug options:
 
-java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -jar adeptj-runtime-LATEST_VERSION.jar
+java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -jar adeptj-core-LATEST_VERSION.jar
 
 Start Parameters and VM arguments
 
