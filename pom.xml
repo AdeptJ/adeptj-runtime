@@ -21,12 +21,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.adeptj</groupId>
-	<artifactId>adeptj-modularweb-runtime</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<parent>
+		<groupId>com.adeptj</groupId>
+		<artifactId>adeptj-parent</artifactId>
+		<version>1.0.0.Final</version>
+	</parent>
+	<artifactId>adeptj-core</artifactId>
+	<version>1.0.3.Final</version>
 	<packaging>jar</packaging>
-	<name>AdeptJ ModularWeb Runtime</name>
-	<description>Provision AdeptJ ModularWeb Runtime</description>
+	<name>AdeptJ Core</name>
+	<description>Provision AdeptJ Core</description>
 	<url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
@@ -142,12 +146,11 @@
     </scm>
 
 	<build>
-	    <finalName>adeptj-runtime-${project.version}</finalName>
+	    
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${compiler.plugin.version}</version>
 				<configuration>
 					<compilerArgument>-parameters</compilerArgument>
 					<source>${jdk.version}</source>
@@ -173,7 +176,7 @@
 							</artifactSet>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.adeptj.modularweb.runtime.core.Main</mainClass>
+									<mainClass>com.adeptj.core.initializer.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
@@ -211,6 +214,7 @@
 			</plugin>
 
 		</plugins>
+		
 	</build>
 
 	<dependencies>
@@ -252,19 +256,16 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j-api.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-core</artifactId>
-			<version>${logback-core.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>${logback-classic.version}</version>
 		</dependency>
 		
 		<dependency>
@@ -276,7 +277,6 @@
 		<dependency>
 		    <groupId>com.typesafe</groupId>
 		    <artifactId>config</artifactId>
-		    <version>${typesafe.config.version}</version>
 		</dependency>
 		
 		<!-- Thymeleaf Dependencies -->
@@ -284,25 +284,21 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.21.0-GA</version>
 		</dependency>
 	
 		<dependency>
 			<groupId>org.attoparser</groupId>
 			<artifactId>attoparser</artifactId>
-			<version>2.0.1.RELEASE</version>
 		</dependency>
 	
 		<dependency>
 			<groupId>org.unbescape</groupId>
 			<artifactId>unbescape</artifactId>
-			<version>1.1.4.RELEASE</version>
 		</dependency>
 	
 		<dependency>
 			<groupId>ognl</groupId>
 			<artifactId>ognl</artifactId>
-			<version>3.1.12</version>
 			<exclusions>
 				<exclusion>
 					<groupId>javassist</groupId>
@@ -314,7 +310,6 @@
 		<dependency>
 			<groupId>org.thymeleaf</groupId>
 			<artifactId>thymeleaf</artifactId>
-			<version>3.0.2.RELEASE</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -340,28 +335,24 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>${org.json.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 		    <groupId>io.fastjson</groupId>
 		    <artifactId>boon</artifactId>
-		    <version>${boon-json.version}</version>
 		    <scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>${commons-fileupload.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>${commons-io.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
