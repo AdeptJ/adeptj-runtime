@@ -46,8 +46,8 @@
 		<felix.framework.version>5.6.1</felix.framework.version>
 		
 		<!-- AdeptJ Modular Web Dependencies Version -->
-		<adeptj.modularweb-webconsole-branding.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-branding.version>
-		<adeptj.modularweb-webconsole-security-provider.version>1.0.0.RELEASE</adeptj.modularweb-webconsole-security-provider.version>
+		<adeptj-modules-webconsole-branding.version>1.0.0.RELEASE</adeptj-modules-webconsole-branding.version>
+		<adeptj-modules-webconsole-security-provider.version>1.0.0.RELEASE</adeptj-modules-webconsole-security-provider.version>
 	</properties>
 	
 	<prerequisites>
@@ -443,15 +443,15 @@
 
 		<dependency>
 			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modularweb-webconsole-branding</artifactId>
-			<version>${adeptj.modularweb-webconsole-branding.version}</version>
+			<artifactId>adeptj-modules-common-webconsole-branding</artifactId>
+			<version>${adeptj-modules-webconsole-branding.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modularweb-webconsole-security-provider</artifactId>
-			<version>${adeptj.modularweb-webconsole-security-provider.version}</version>
+			<artifactId>adeptj-modules-common-webconsole-security-provider</artifactId>
+			<version>${adeptj-modules-webconsole-security-provider.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
