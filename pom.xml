@@ -462,13 +462,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<dependency>
-			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modules-cache-api</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		
 		<!-- AdeptJ Modular Web Bundles Ends-->
 
 	</dependencies>
@@ -498,6 +491,13 @@
 							<artifactId>slf4j-api</artifactId>
 						</exclusion>
 					</exclusions>
+				</dependency>
+				
+				<dependency>
+					<groupId>com.adeptj</groupId>
+					<artifactId>adeptj-modules-cache-api</artifactId>
+					<version>1.0.0-SNAPSHOT</version>
+					<scope>provided</scope>
 				</dependency>
 			
 				<dependency>
