@@ -540,6 +540,43 @@
 	        </dependencies>
 	   
 	   </profile>
+	   
+	   <profile>
+	       <id>Infispan</id>
+	       
+	        <dependencies>
+		
+				<dependency>
+		    		<groupId>org.infinispan</groupId>
+				    <artifactId>infinispan-commons</artifactId>
+				    <version>8.2.4.Final</version>
+				    <scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+				    <groupId>org.infinispan</groupId>
+				    <artifactId>infinispan-core</artifactId>
+				    <version>8.2.4.Final</version>
+				    <scope>provided</scope>
+				</dependency>
+				
+				<dependency>
+					<groupId>com.adeptj</groupId>
+					<artifactId>adeptj-modules-cache-api</artifactId>
+					<version>1.0.0-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+			
+				<dependency>
+					<groupId>com.adeptj</groupId>
+					<artifactId>adeptj-modules-cache-infispan</artifactId>
+					<version>1.0.0-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
+	       
+	        </dependencies>
+	   
+	   </profile>
 	
 		<profile>
 			<id>Shiro</id>
@@ -664,11 +701,11 @@
 		</profile>
 	
 		<profile>
-			<id>JPA</id>
+			<id>JPA-EclipseLink</id>
 			
 			<dependencies>
 			
-				<!-- Eclipselink 2.6.3 Dependencies -->
+				<!-- EclipseLink 2.6.3 Dependencies -->
 
 				<dependency>
 					<groupId>org.eclipse.persistence</groupId>
@@ -843,7 +880,7 @@
 		</profile>
 		
 		<profile>
-			<id>REST</id>
+			<id>RESTEasy</id>
 			
 			<dependencies>
 			
