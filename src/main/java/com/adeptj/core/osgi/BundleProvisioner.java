@@ -72,7 +72,7 @@ public final class BundleProvisioner {
 		try {
 			bundle.start();
 		} catch (BundleException | IllegalStateException | SecurityException ex) {
-			logger.error("Exception while starting bundle: [{}]. Exception: {}", bundle, ex);
+			logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
 		}
 	}
 
@@ -91,7 +91,7 @@ public final class BundleProvisioner {
 		try {
 			bundle = systemBundleContext.installBundle(url.toExternalForm());
 		} catch (BundleException | IllegalStateException | SecurityException ex) {
-			logger.error("Exception while installing bundle: [{}]. Exception: {}", url, ex);
+			logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
 		}
 		return bundle;
 	}
