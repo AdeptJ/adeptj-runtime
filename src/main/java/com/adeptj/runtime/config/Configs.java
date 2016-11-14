@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,51 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.config;
 
+import static com.adeptj.runtime.util.Constants.COMMON_CONF_SECTION;
+import static com.adeptj.runtime.util.Constants.FELIX_CONF_SECTION;
+import static com.adeptj.runtime.util.Constants.MAIN_CONF_SECTION;
+import static com.adeptj.runtime.util.Constants.PROVISIONING_FILE;
+import static com.adeptj.runtime.util.Constants.THYMELEAF_CONF_SECTION;
+import static com.adeptj.runtime.util.Constants.UNDERTOW_CONF_SECTION;
+
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+
+/**
+ * Initializes the application configurations.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum Configs {
+
+	INSTANCE;
+
+	private final Config main;
+
+	Configs() {
+		this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
+	}
+	
+	public Config main() {
+		return this.main;
+	}
+	
+	public Config undertow() {
+		return this.main.getConfig(UNDERTOW_CONF_SECTION);
+	}
+	
+	public Config felix() {
+		return this.main.getConfig(FELIX_CONF_SECTION);
+	}
+	
+	public Config common() {
+		return this.main.getConfig(COMMON_CONF_SECTION);
+	}
+	
+	public Config thymeleaf() {
+		return this.main.getConfig(THYMELEAF_CONF_SECTION);
+	}
+}

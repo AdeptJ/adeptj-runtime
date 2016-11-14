@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,31 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.util;
 
+import javax.servlet.ServletContext;
+
+/**
+ * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum ServletContextAware {
+
+	INSTANCE;
+
+	private ServletContext context;
+
+	public void setServletContext(ServletContext context) {
+		this.context = context;
+	}
+
+	public ServletContext getServletContext() {
+		return this.context;
+	}
+
+	public <T> T getAttr(String name, Class<T> type) {
+		return type.cast(this.context.getAttribute(name));
+	}
+}

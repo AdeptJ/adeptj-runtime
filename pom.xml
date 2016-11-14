@@ -26,11 +26,11 @@
 		<artifactId>adeptj-parent</artifactId>
 		<version>1.0.0.Final</version>
 	</parent>
-	<artifactId>adeptj-core</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<artifactId>adeptj-runtime</artifactId>
+	<version>1.0.4.Final</version>
 	<packaging>jar</packaging>
-	<name>AdeptJ Core</name>
-	<description>Provision AdeptJ Core</description>
+	<name>AdeptJ Runtime</name>
+	<description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
 	<url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
@@ -88,7 +88,7 @@
     </developers>
     
      <issueManagement>
-        <url>https://github.com/AdeptJ/adeptj-modularweb-micro/issues</url>
+        <url>https://github.com/AdeptJ/adeptj-runtime/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -104,12 +104,15 @@
     </distributionManagement>
 
     <scm>
-        <url>https://github.com/AdeptJ/adeptj-modularweb-micro</url>
-        <connection>scm:git:git@github.com:AdeptJ/adeptj-modularweb-micro.git</connection>
-        <developerConnection>scm:git:git@github.com:AdeptJ/adeptj-modularweb-micro.git</developerConnection>
+        <url>https://github.com/AdeptJ/adeptj-runtime</url>
+        <connection>scm:git:git@github.com:AdeptJ/adeptj-runtime.git</connection>
+        <developerConnection>scm:git:git@github.com:AdeptJ/adeptj-runtime.git</developerConnection>
     </scm>
 
 	<build>
+	
+		<!-- Strip off the version information from final artifact -->
+		<finalName>${project.artifactId}</finalName>
 	    
 		<plugins>
 		    
@@ -141,7 +144,7 @@
 							</artifactSet>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.adeptj.core.initializer.Main</mainClass>
+									<mainClass>com.adeptj.runtime.initializer.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

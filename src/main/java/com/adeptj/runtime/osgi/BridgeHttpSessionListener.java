@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,41 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.osgi;
 
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
+/**
+ * BridgeHttpSessionListener.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+public class BridgeHttpSessionListener implements HttpSessionListener {
+
+	@Override
+	public void sessionCreated(HttpSessionEvent se) {
+		HttpSessionListener sessionDispatcher = this.getHttpSessionListener();
+		if (sessionDispatcher != null) {
+			sessionDispatcher.sessionCreated(se);
+		}
+	}
+
+	@Override
+	public void sessionDestroyed(HttpSessionEvent se) {
+		HttpSessionListener sessionDispatcher = this.getHttpSessionListener();
+		if (sessionDispatcher != null) {
+			sessionDispatcher.sessionDestroyed(se);
+		}
+	}
+
+	private HttpSessionListener getHttpSessionListener() {
+		HttpSessionListener listener = null;
+		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+		if (tracker != null) {
+			listener = tracker.getHttpSessionListener();
+		}
+		return listener;
+	}
+}

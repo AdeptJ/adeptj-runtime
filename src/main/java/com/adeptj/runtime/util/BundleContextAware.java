@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,31 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.util;
 
+import org.osgi.framework.BundleContext;
+
+/**
+ * This Enum provides the access to the OSGi System Bundle {@link BundleContext}.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum BundleContextAware {
+
+	INSTANCE;
+
+	private BundleContext bundleContext;
+	
+	public BundleContext getBundleContext() {
+		return this.bundleContext;
+	}
+	
+	public boolean isBundleContextSet() {
+		return this.bundleContext != null;
+	}
+	
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
+	}
+}

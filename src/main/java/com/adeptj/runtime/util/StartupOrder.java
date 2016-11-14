@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,29 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.util;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import com.adeptj.runtime.initializer.StartupHandler;
+
+/**
+ * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
+ * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
+ * are called in an unspecified order.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+@Target(TYPE)
+@Retention(RUNTIME)
+@Documented
+public @interface StartupOrder {
+
+	public int value() default 0;
+}

@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,41 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.osgi;
 
+import javax.servlet.ServletContextAttributeEvent;
+import javax.servlet.ServletContextAttributeListener;
+
+import org.osgi.framework.BundleContext;
+
+/**
+ * BridgeServletContextAttributeListener.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+public class BridgeServletContextAttributeListener implements ServletContextAttributeListener {
+
+	@Override
+	public void attributeAdded(ServletContextAttributeEvent event) {
+		if (this.isBundleContext(event.getName())) {
+			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
+		}
+	}
+
+	@Override
+	public void attributeRemoved(ServletContextAttributeEvent event) {
+		if (this.isBundleContext(event.getName())) {
+			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
+		}
+	}
+
+	@Override
+	public void attributeReplaced(ServletContextAttributeEvent event) {
+		// Does nothing as of now.
+	}
+
+	private boolean isBundleContext(String attrName) {
+		return BundleContext.class.getName().equals(attrName);
+	}
+}

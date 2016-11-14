@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,33 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.osgi;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
+import com.adeptj.runtime.initializer.StartupHandler;
+import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.util.StartupOrder;
+
+/**
+ * StartupHandler is a {@link javax.servlet.annotation.HandlesTypes} that handles the OSGi Framework startup.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+@StartupOrder(0)
+public class FrameworkStartupHandler implements StartupHandler {
+	
+    /**
+     * This method will be called by the {@link StartupHandlerInitializer} while application startup is in
+     * progress.
+     *
+     * @param context
+     * @throws ServletException
+     */
+    @Override
+	public void onStartup(ServletContext context) throws ServletException {
+		FrameworkProvisioner.INSTANCE.startFramework(context);
+	}
+}

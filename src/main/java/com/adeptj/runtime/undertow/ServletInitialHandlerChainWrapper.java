@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,29 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.undertow;
 
+import io.undertow.Handlers;
+import io.undertow.predicate.Predicates;
+import io.undertow.server.HandlerWrapper;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.PredicateHandler;
+import io.undertow.server.handlers.resource.ClassPathResourceManager;
+
+/**
+ * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
+ * 
+ * Here it registers Undertow ClassPath based ResourceHandler for serving static content.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class ServletInitialHandlerChainWrapper implements HandlerWrapper {
+
+	@Override
+	public HttpHandler wrap(HttpHandler intialHandler) {
+		return new PredicateHandler(
+				Predicates.and(Predicates.prefix("/admin"), Predicates.suffixes("css", "js", "jpg", "png", "jpeg")),
+				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader())), intialHandler);
+	}
+}

@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,25 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.initializer;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
+/**
+ * StartupHandler that will be called by the ServletContainerInitializer while startup is in progress.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public interface StartupHandler {
+
+	/**
+	 * This method will be called by the StartupHandlerInitializer while startup is in
+	 * progress.
+	 * 
+	 * @param context
+	 * @throws ServletException
+	 */
+	void onStartup(ServletContext context) throws ServletException;
+}

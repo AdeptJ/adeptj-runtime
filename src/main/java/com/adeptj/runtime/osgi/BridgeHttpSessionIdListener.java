@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,33 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.osgi;
 
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionIdListener;
+
+/**
+ * BridgeHttpSessionIdListener.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
+
+	@Override
+	public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
+		HttpSessionIdListener sessionIdDispatcher = this.getHttpSessionIdListener();
+		if (sessionIdDispatcher != null) {
+			sessionIdDispatcher.sessionIdChanged(event, oldSessionId);
+		}
+	}
+
+	private HttpSessionIdListener getHttpSessionIdListener() {
+		HttpSessionIdListener listener = null;
+		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+		if (tracker != null) {
+			listener = tracker.getHttpSessionIdListener();
+		}
+		return listener;
+	}
+}

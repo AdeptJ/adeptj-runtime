@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,40 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.osgi;
 
+import org.osgi.framework.BundleContext;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Support for EventDispatcherTracker.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum EventDispatcherTrackerSupport {
+
+	INSTANCE;
+
+	private EventDispatcherTracker eventDispatcherTracker;
+
+	protected EventDispatcherTracker getEventDispatcherTracker() {
+		return this.eventDispatcherTracker;
+	}
+
+	protected void openEventDispatcherTracker(BundleContext bundleContext) {
+		if (this.eventDispatcherTracker == null) {
+			LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("Opening EventDispatcherTracker!!");
+			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+			this.eventDispatcherTracker.open();
+		}
+	}
+
+	protected void closeEventDispatcherTracker() {
+		if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
+			this.eventDispatcherTracker.close();
+			LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
+		}
+		this.eventDispatcherTracker = null;
+	}
+}

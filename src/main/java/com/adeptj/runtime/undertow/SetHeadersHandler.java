@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,35 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.undertow;
 
+import java.util.Map;
+
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HttpString;
+
+/**
+ * Sets the given headers in the response header map on each request, then call the next handler.
+ * 
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class SetHeadersHandler implements HttpHandler {
+
+	private final HttpHandler servletHandler;
+
+	private Map<HttpString, String> headers;
+
+	public SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
+		this.servletHandler = servletHandler;
+		this.headers = headers;
+	}
+
+	@Override
+	public void handleRequest(HttpServerExchange exchange) throws Exception {
+		this.headers.forEach((headerName, headerValue) -> exchange.getResponseHeaders().put(headerName, headerValue));
+		this.servletHandler.handleRequest(exchange);
+	}
+
+}

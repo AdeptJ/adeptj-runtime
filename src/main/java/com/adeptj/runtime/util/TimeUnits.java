@@ -1,14 +1,6 @@
-
-
-   ___     __         __     __  ___            __  _          
-  / _ |___/ /__ ___  / /___ / / / _ \__ _____  / /_(_)_ _  ___ 
- / __ / _  / -_) _ \/ __/ // / /   _/ // / _ \/ __/ /    \/ -_)
-/_/ |_\___/\__/ ___/\__/\___/ /_/|_|\___/_//_/\__/_/_/_/_/\__/ 
-             /_/                                                                        
-
-                           
+/** 
 ###############################################################################
-#                                                                             #
+#                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -24,4 +16,28 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
+*/
+package com.adeptj.runtime.util;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
+/**
+ * Utility for providing time in multiple ranges.
+ * 
+ * Rakesh.Kumar, AdeptJ
+ */
+public final class TimeUnits {
+	
+	// No instances, just utility methods.
+	private TimeUnits() {}
+
+	/**
+	 * Converts the nanoseconds time to milliseconds.
+	 * 
+	 * @param startTime
+	 * @return time in milliseconds
+	 */
+	public static final long nanosToMillis(final long startTime) {
+		return NANOSECONDS.toMillis(System.nanoTime() - startTime);
+	}
+}
