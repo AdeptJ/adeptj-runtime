@@ -27,7 +27,7 @@
 		<version>1.0.0.Final</version>
 	</parent>
 	<artifactId>adeptj-runtime</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.4.Final</version>
 	<packaging>jar</packaging>
 	<name>AdeptJ Runtime</name>
 	<description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
