@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.admin.render;
 
 import java.util.Locale;
 
@@ -25,15 +25,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * ViewEngineContext.
+ * RenderContext.
  * 
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ViewEngineContext {
+public class RenderContext {
 
 	private final String view;
 
-	private final Models models;
+	private final ContextObjects contextObjects;
 
 	private final HttpServletRequest request;
 
@@ -41,9 +41,9 @@ public class ViewEngineContext {
 
 	private final Locale locale;
 
-	private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
+	private RenderContext(String view, ContextObjects contextObjects, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
 		this.view = view;
-		this.models = models;
+		this.contextObjects = contextObjects;
 		this.request = req;
 		this.response = resp;
 		this.locale = locale;
@@ -53,8 +53,8 @@ public class ViewEngineContext {
 		return view;
 	}
 
-	public Models getModels() {
-		return models;
+	public ContextObjects getContextObjects() {
+		return contextObjects;
 	}
 
 	public HttpServletRequest getRequest() {
@@ -70,7 +70,7 @@ public class ViewEngineContext {
 	}
 	
 	/**
-	 * Builder for ViewEngineContext.
+	 * Builder for RenderContext.
 	 * 
 	 * @author Rakesh.Kumar, AdeptJ.
 	 */
@@ -78,7 +78,7 @@ public class ViewEngineContext {
 		
 		private String view;
 
-		private Models models;
+		private ContextObjects contextObjects;
 
 		private HttpServletRequest request;
 
@@ -91,8 +91,8 @@ public class ViewEngineContext {
 			return this;
 		}
 		
-		public Builder models(Models models) {
-			this.models = models;
+		public Builder contextObjects(ContextObjects contextObjects) {
+			this.contextObjects = contextObjects;
 			return this;
 		}
 		
@@ -111,8 +111,8 @@ public class ViewEngineContext {
 			return this;
 		}
 		
-		public ViewEngineContext build() {
-			return new ViewEngineContext(view, models, request, response, locale);
+		public RenderContext build() {
+			return new RenderContext(view, contextObjects, request, response, locale);
 		}
 	}
 }

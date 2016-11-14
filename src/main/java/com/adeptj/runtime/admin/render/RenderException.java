@@ -17,26 +17,26 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.admin.render;
 
 /**
- * ViewEngineException.
+ * RenderException.
  * 
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ViewEngineException extends RuntimeException {
+public class RenderException extends RuntimeException {
 
-	private static final long serialVersionUID = -3491650743232718940L;
+	private static final long serialVersionUID = -8077495079692215520L;
 
-	public ViewEngineException(String message) {
+	public RenderException(String message) {
 		super(message);
 	}
 
-	public ViewEngineException(String message, Throwable cause) {
+	public RenderException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ViewEngineException(Throwable cause) {
+	public RenderException(Throwable cause) {
 		super(cause);
 	}
 }

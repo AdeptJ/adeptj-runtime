@@ -27,9 +27,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
-import com.adeptj.runtime.viewengine.ViewEngines;
+import com.adeptj.runtime.admin.render.ContextObjects;
+import com.adeptj.runtime.admin.render.RenderContext;
+import com.adeptj.runtime.admin.render.RenderEngine;
 
 /**
  * OSGi AdminDashboardServlet renders the admin dashboard page.
@@ -46,9 +46,9 @@ public class AdminDashboardServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
-		builder.view("auth/dashboard").models(new Models()).request(req).response(resp).locale(req.getLocale());
-		ViewEngines.THYMELEAF.processView(builder.build());
+		RenderContext.Builder builder = new RenderContext.Builder();
+		builder.view("auth/dashboard").contextObjects(new ContextObjects()).request(req).response(resp).locale(req.getLocale());
+		RenderEngine.INSTANCE.render(builder.build());
 	}
 
 	@Override
