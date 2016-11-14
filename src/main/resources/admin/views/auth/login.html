@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>AdeptJ Login</title>
@@ -12,12 +12,12 @@
 				    <div class="sep-top"></div>
 				    <form method="post" name="loginForm" action="/auth/j_security_check">
 				            <div class="group">
-				                <input type="text" placeholder="Username" maxlength="10" name="j_username" th:value="${j_username}" autofocus="autofocus" required ><span class="bar"></span>
+				                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}" autofocus="autofocus" required ><span class="bar"></span>
 				            </div>
 				            <div class="group">
 				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required ><span class="bar"></span>
 				            </div>
-				           	<span class="validation-error" th:text="${validation}"></span>
+				           	<span class="validation-error">{{validation}}</span>
 				        	<button type="submit" class="button buttonBlue">Login</button>
 				    </form>
 				

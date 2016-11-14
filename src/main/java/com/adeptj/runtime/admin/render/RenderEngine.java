@@ -21,9 +21,14 @@ package com.adeptj.runtime.admin.render;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
+import org.trimou.engine.locator.TemplateLocator;
+import org.trimou.handlebars.Helper;
+import org.trimou.handlebars.i18n.ResourceBundleHelper;
+import org.trimou.handlebars.i18n.ResourceBundleHelper.Format;
 
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.config.Configs;
@@ -39,34 +44,50 @@ public enum RenderEngine {
 	INSTANCE;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RenderEngine.class);
+	
+	private static final String RB_HELPER_NAME = "msg";
 
-	private MustacheEngine engine;
-
-	private void initMustacheEngine() {
-		if (this.engine == null) {
-			long startTime = System.nanoTime();
-			Config config = Configs.INSTANCE.common();
-			this.engine = MustacheEngineBuilder.newBuilder()
-					.addTemplateLocator(new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"),
-							config.getString("admin-view-root"), config.getString("admin-view-suffix"),
-							RenderEngine.class.getClassLoader(), false)).build();
-			LoggerFactory.getLogger(RenderEngine.class).info("MustacheEngine initialization took: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-		}
+	private final MustacheEngine engine;
+	
+	private TemplateLocator templateLocator(Config config) {
+		return new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"),
+				config.getString("admin-view-root"), config.getString("admin-view-suffix"),
+				RenderEngine.class.getClassLoader(), false);
 	}
 
+	private Helper resourceBundleHelper() {
+		return new ResourceBundleHelper("messages", Format.MESSAGE);
+	}
+
+	private MustacheEngine mustacheEngine() {
+		long startTime = System.nanoTime();
+		Config config = Configs.INSTANCE.common();
+		MustacheEngine engine = MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
+				.addTemplateLocator(templateLocator(config)).build();
+		LoggerFactory.getLogger(RenderEngine.class).info("MustacheEngine initialization took: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+		return engine;
+	}
+	
 	RenderEngine() {
-		this.initMustacheEngine();
+		this.engine = this.mustacheEngine();
 	}
 
-	public void render(RenderContext context) throws RenderException {
+	public boolean render(RenderContext context) throws RenderException {
+		boolean rendered = false;
 		String view = context.getView();
-		LOGGER.debug("Rendering view:[{}]", view);
+		LOGGER.debug("Rendering view: [{}]", view);
 		try {
-			context.getResponse().getWriter()
-					.write(this.engine.getMustache(view).render(context.getContextObjects()));
+			Mustache mustache = this.engine.getMustache(view);
+			if (mustache == null) {
+				LOGGER.info("View: [{}] not found!!", view);
+			} else {
+				context.getResponse().getWriter().write(mustache.render(context.getContextObjects()));
+				rendered = true;
+			}
 		} catch (Exception ex) {
 			LOGGER.error("Exception while processing view: [{}]", view, ex);
 			throw new RenderException(ex.getMessage(), ex);
 		}
+		return rendered;
 	}
 }

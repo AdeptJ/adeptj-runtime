@@ -58,12 +58,9 @@ public class AdminErrorServlet extends HttpServlet {
 			if (exception != null && "500".equals(statusCode)) {
 				contextObjects.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
 				RenderEngine.INSTANCE.render(builder.view("error/500").build());
-			} else {
-				try {
-					RenderEngine.INSTANCE.render(builder.view(String.format("error/%s", statusCode)).build());
-				} catch (Exception ex) {
-					RenderEngine.INSTANCE.render(builder.view("error/404").build());
-				}
+			} else if (!RenderEngine.INSTANCE.render(builder.view(String.format("error/%s", statusCode)).build())) {
+				// if the requested view not found, render 404.
+				RenderEngine.INSTANCE.render(builder.view("error/404").build());
 			}
 		}
 	}
