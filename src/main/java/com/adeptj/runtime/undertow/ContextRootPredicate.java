@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.undertow;
 
-import com.adeptj.runtime.util.Constants;
+import com.adeptj.runtime.common.Constants;
 
 import io.undertow.predicate.Predicate;
 import io.undertow.server.HttpServerExchange;

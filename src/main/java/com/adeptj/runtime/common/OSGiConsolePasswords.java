@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

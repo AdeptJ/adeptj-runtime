@@ -19,8 +19,8 @@
 */
 package com.adeptj.runtime.sci;
 
-import static com.adeptj.runtime.util.Constants.BUNDLES_ROOT_DIR_KEY;
-import static com.adeptj.runtime.util.Constants.BUNDLES_ROOT_DIR_VALUE;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 
 import java.util.Set;
 
@@ -32,9 +32,9 @@ import javax.servlet.annotation.HandlesTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.runtime.common.ServletContextAware;
 import com.adeptj.runtime.initializer.StartupHandler;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
-import com.adeptj.runtime.util.ServletContextAware;
 
 /**
  * An ServletContainerInitializer that is called by the Container while initialization is in progress.

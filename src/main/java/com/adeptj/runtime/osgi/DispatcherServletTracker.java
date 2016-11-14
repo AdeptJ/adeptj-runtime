@@ -28,7 +28,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.util.OSGiUtils;
+import com.adeptj.runtime.common.OSGiUtils;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.

@@ -26,8 +26,8 @@ import javax.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.util.ServletContextAware;
-import com.adeptj.runtime.util.TimeUnits;
+import com.adeptj.runtime.common.ServletContextAware;
+import com.adeptj.runtime.common.TimeUnits;
 
 /**
  * ContextListener that handles the OSGi Framework shutdown.

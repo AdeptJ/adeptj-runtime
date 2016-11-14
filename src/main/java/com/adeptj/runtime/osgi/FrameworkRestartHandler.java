@@ -27,8 +27,8 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.util.BundleContextAware;
-import com.adeptj.runtime.util.ServletContextAware;
+import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.ServletContextAware;
 
 /**
  * OSGi FrameworkListener.

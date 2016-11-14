@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
 /**
  * Constants.

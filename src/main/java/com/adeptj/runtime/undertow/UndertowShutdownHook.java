@@ -22,9 +22,9 @@ package com.adeptj.runtime.undertow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.logging.LogbackProvisioner;
-import com.adeptj.runtime.util.Constants;
-import com.adeptj.runtime.util.TimeUnits;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;

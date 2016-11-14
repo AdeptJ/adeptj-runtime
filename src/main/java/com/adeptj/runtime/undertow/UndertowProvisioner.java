@@ -19,21 +19,21 @@
 */
 package com.adeptj.runtime.undertow;
 
-import static com.adeptj.runtime.util.Constants.CMD_LAUNCH_BROWSER;
-import static com.adeptj.runtime.util.Constants.CONTEXT_PATH;
-import static com.adeptj.runtime.util.Constants.DEPLOYMENT_NAME;
-import static com.adeptj.runtime.util.Constants.HEADER_POWERED_BY;
-import static com.adeptj.runtime.util.Constants.HEADER_SERVER;
-import static com.adeptj.runtime.util.Constants.KEY_ALLOWED_METHODS;
-import static com.adeptj.runtime.util.Constants.KEY_HEADER_POWERED_BY;
-import static com.adeptj.runtime.util.Constants.KEY_HEADER_SERVER;
-import static com.adeptj.runtime.util.Constants.KEY_HOST;
-import static com.adeptj.runtime.util.Constants.KEY_HTTP;
-import static com.adeptj.runtime.util.Constants.KEY_MAX_CONCURRENT_REQS;
-import static com.adeptj.runtime.util.Constants.KEY_PORT;
-import static com.adeptj.runtime.util.Constants.OSGI_CONSOLE_URL;
-import static com.adeptj.runtime.util.Constants.STARTUP_INFO;
-import static com.adeptj.runtime.util.Constants.SYS_PROP_SERVER_PORT;
+import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
+import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
+import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
+import static com.adeptj.runtime.common.Constants.HEADER_POWERED_BY;
+import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
+import static com.adeptj.runtime.common.Constants.KEY_HEADER_POWERED_BY;
+import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.KEY_HOST;
+import static com.adeptj.runtime.common.Constants.KEY_HTTP;
+import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
+import static com.adeptj.runtime.common.Constants.KEY_PORT;
+import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -58,14 +58,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 
+import com.adeptj.runtime.common.CommonUtils;
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.sci.StartupHandlerInitializer;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
-import com.adeptj.runtime.util.CommonUtils;
-import com.adeptj.runtime.util.Constants;
-import com.adeptj.runtime.util.ServerMode;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;

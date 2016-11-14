@@ -17,27 +17,42 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Filter;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceRegistration;
 
 /**
- * Utility for providing time in multiple ranges.
+ * Utility for creating OSGi Filter for tracking/finding Services etc.
  * 
- * Rakesh.Kumar, AdeptJ
+ * @author Rakesh.Kumar, AdeptJ
  */
-public final class TimeUnits {
-	
-	// No instances, just utility methods.
-	private TimeUnits() {}
+public final class OSGiUtils {
 
-	/**
-	 * Converts the nanoseconds time to milliseconds.
-	 * 
-	 * @param startTime
-	 * @return time in milliseconds
-	 */
-	public static final long nanosToMillis(final long startTime) {
-		return NANOSECONDS.toMillis(System.nanoTime() - startTime);
+	// No instantiation. Utility methods only.
+	private OSGiUtils() {}
+
+	public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
+		try {
+			StringBuilder filterExprBuilder = new StringBuilder();
+			filterExprBuilder.append("(&(").append(Constants.OBJECTCLASS).append("=");
+			filterExprBuilder.append(objectClass.getName()).append(")");
+			filterExprBuilder.append(filterExpr).append(")");
+			return context.createFilter(filterExprBuilder.toString());
+		} catch (InvalidSyntaxException ex) {
+			// Probable causes.
+			// 1. objectClass is malformed.
+			// 2. Filter expression is malformed, not RFC 1960-based Filter.
+			throw new IllegalArgumentException("Unexpected InvalidSyntaxException!!", ex);
+		}
+	}
+	
+	public static void unregisterServiceRegistration(ServiceRegistration<?> registration) {
+		if (registration != null) {
+			registration.unregister();
+		}
 	}
 }

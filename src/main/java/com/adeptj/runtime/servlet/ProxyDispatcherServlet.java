@@ -31,9 +31,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
-import com.adeptj.runtime.util.Constants;
-import com.adeptj.runtime.util.TimeUnits;
 
 /**
  * ProxyDispatcherServlet acting as a front controller for all of the incoming requests and

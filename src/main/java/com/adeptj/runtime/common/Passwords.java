@@ -17,30 +17,62 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
-import javax.servlet.ServletContext;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
+import com.adeptj.runtime.config.Configs;
+import com.typesafe.config.Config;
 
 /**
- * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
+ * Passwords, utility for password generation and matching.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServletContextAware {
+public enum Passwords {
 
 	INSTANCE;
 
-	private ServletContext context;
+	public static final String UTF8 = "UTF-8";
 
-	public void setServletContext(ServletContext context) {
-		this.context = context;
+	/**
+	 * Generates the salt for hashing.
+	 * 
+	 * @return UTF-8 Base64 encoded hash.
+	 */
+	public String generateSalt() {
+		try {
+			Config config = Configs.INSTANCE.common();
+			byte[] salt = new byte[config.getInt("salt-size")];
+			SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
+			return new String(Base64.getEncoder().encode(salt), UTF8);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
-	public ServletContext getServletContext() {
-		return this.context;
-	}
-
-	public <T> T getAttr(String name, Class<T> type) {
-		return type.cast(this.context.getAttribute(name));
+	/**
+	 * Generates UTF-8 Base64 encoded hashed password
+	 * 
+	 * @param pwd
+	 * @param salt
+	 * @return Hashed password
+	 */
+	public String hashPwd(String pwd, String salt) {
+		try {
+			Config config = Configs.INSTANCE.common();
+			return new String(
+					Base64.getEncoder()
+							.encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
+									.generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8),
+											config.getInt("iteration-count"), config.getInt("derived-key-size")))
+									.getEncoded()), UTF8);
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 }

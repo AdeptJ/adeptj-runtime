@@ -25,12 +25,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkProvisioner;
 import com.adeptj.runtime.undertow.UndertowProvisioner;
-import com.adeptj.runtime.util.BundleContextAware;
-import com.adeptj.runtime.util.Constants;
-import com.adeptj.runtime.util.TimeUnits;
 
 /**
  * Entry point for initializing the AdeptJ Runtime.

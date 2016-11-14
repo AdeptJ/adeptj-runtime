@@ -17,18 +17,30 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
+
+import org.osgi.framework.BundleContext;
 
 /**
- * Execution mode for optimizing server settings according to the mode provided.
+ * This Enum provides the access to the OSGi System Bundle {@link BundleContext}.
  * 
- * Note: Defaults to DEV mode.
- *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServerMode {
+public enum BundleContextAware {
 
-	DEV,
+	INSTANCE;
+
+	private BundleContext bundleContext;
 	
-	PROD
+	public BundleContext getBundleContext() {
+		return this.bundleContext;
+	}
+	
+	public boolean isBundleContextSet() {
+		return this.bundleContext != null;
+	}
+	
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
+	}
 }

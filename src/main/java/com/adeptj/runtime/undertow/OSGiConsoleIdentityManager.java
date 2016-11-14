@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.adeptj.runtime.util.OSGiConsolePasswords;
+import com.adeptj.runtime.common.OSGiConsolePasswords;
 import com.typesafe.config.Config;
 
 import io.undertow.security.idm.Account;

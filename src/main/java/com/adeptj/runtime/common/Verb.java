@@ -17,30 +17,30 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
-import org.osgi.framework.BundleContext;
+import io.undertow.util.HttpString;
 
 /**
- * This Enum provides the access to the OSGi System Bundle {@link BundleContext}.
+ * ENUM for denoting HTTP methods.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum BundleContextAware {
+public enum Verb {
 
-	INSTANCE;
+	GET,
 
-	private BundleContext bundleContext;
-	
-	public BundleContext getBundleContext() {
-		return this.bundleContext;
-	}
-	
-	public boolean isBundleContextSet() {
-		return this.bundleContext != null;
-	}
-	
-	public void setBundleContext(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
+	POST,
+
+	PUT,
+
+	DELETE,
+
+	OPTIONS,
+
+	PATCH;
+
+	public HttpString toHttpString() {
+		return HttpString.tryFromString(this.toString());
 	}
 }

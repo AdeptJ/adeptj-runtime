@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 
-import com.adeptj.runtime.util.BundleContextAware;
+import com.adeptj.runtime.common.BundleContextAware;
 
 /**
  * Support for DispatcherServletTracker.

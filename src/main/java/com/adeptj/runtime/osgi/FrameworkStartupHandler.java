@@ -22,9 +22,9 @@ package com.adeptj.runtime.osgi;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.initializer.StartupHandler;
 import com.adeptj.runtime.sci.StartupHandlerInitializer;
-import com.adeptj.runtime.util.StartupOrder;
 
 /**
  * StartupHandler is a {@link javax.servlet.annotation.HandlesTypes} that handles the OSGi Framework startup.

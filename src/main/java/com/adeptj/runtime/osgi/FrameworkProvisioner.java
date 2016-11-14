@@ -38,13 +38,13 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminLoginServlet;
 import com.adeptj.runtime.servlet.OSGiGenericErrorSevlet;
 import com.adeptj.runtime.servlet.ProxyDispatcherServlet;
-import com.adeptj.runtime.util.BundleContextAware;
-import com.adeptj.runtime.util.TimeUnits;
 import com.typesafe.config.Config;
 
 /**

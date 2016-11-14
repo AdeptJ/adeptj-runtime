@@ -17,13 +17,13 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
-import static com.adeptj.runtime.util.Constants.EMPTY;
-import static com.adeptj.runtime.util.Constants.KEY_BROWSERS;
-import static com.adeptj.runtime.util.Constants.MAC_BROWSER_LAUNCH_CMD;
-import static com.adeptj.runtime.util.Constants.OS;
-import static com.adeptj.runtime.util.Constants.WIN_BROWSER_LAUNCH_CMD;
+import static com.adeptj.runtime.common.Constants.EMPTY;
+import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
+import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
+import static com.adeptj.runtime.common.Constants.OS;
+import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

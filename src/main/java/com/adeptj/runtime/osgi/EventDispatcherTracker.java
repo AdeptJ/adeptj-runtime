@@ -32,7 +32,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.util.OSGiUtils;
+import com.adeptj.runtime.common.OSGiUtils;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.

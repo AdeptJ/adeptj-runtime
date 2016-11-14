@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.osgi;
 
-import static com.adeptj.runtime.util.Constants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -37,7 +37,7 @@ import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.util.ServletContextAware;
+import com.adeptj.runtime.common.ServletContextAware;
 
 /**
  * BundleProvisioner that handles the installation/activation of required bundles after the system bundle is up and running.

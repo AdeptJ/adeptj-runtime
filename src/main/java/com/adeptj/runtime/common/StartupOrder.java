@@ -17,30 +17,28 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.util;
+package com.adeptj.runtime.common;
 
-import io.undertow.util.HttpString;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import com.adeptj.runtime.initializer.StartupHandler;
 
 /**
- * ENUM for denoting HTTP methods.
- * 
- * @author Rakesh.Kumar, AdeptJ
+ * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
+ * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
+ * are called in an unspecified order.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
  */
-public enum Verb {
+@Target(TYPE)
+@Retention(RUNTIME)
+@Documented
+public @interface StartupOrder {
 
-	GET,
-
-	POST,
-
-	PUT,
-
-	DELETE,
-
-	OPTIONS,
-
-	PATCH;
-
-	public HttpString toHttpString() {
-		return HttpString.tryFromString(this.toString());
-	}
+	public int value() default 0;
 }
