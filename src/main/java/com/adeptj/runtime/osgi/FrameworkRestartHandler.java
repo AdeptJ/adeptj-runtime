@@ -73,7 +73,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 				// Note: What shall we do if DispatcherServlet initialization failed.
 				// Log it as of now, we may need to stop the OSGi Framework, will decide later.
 				// Have not seen this yet.
-				logger.error("Exception!!", ex);
+				logger.error("Exception while restarting OSGi Framework!!", ex);
 			}
 			break;
 		case FrameworkEvent.STOPPED_UPDATE:
@@ -84,7 +84,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			break;
 		default:
 			// log it and ignore.
-			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", event.getType());
+			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.value(event.getType()));
 			break;
 		}
 	}
