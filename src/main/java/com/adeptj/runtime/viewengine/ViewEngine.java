@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.admin.render;
+package com.adeptj.runtime.viewengine;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,24 +35,23 @@ import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 
 /**
- * RenderEngine.
+ * ViewEngine.
  * 
  * @author Rakesh.Kumar, AdeptJ.
  */
-public enum RenderEngine {
+public enum ViewEngine {
 
 	INSTANCE;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RenderEngine.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
 	
 	private static final String RB_HELPER_NAME = "msg";
 
 	private final MustacheEngine engine;
 	
 	private TemplateLocator templateLocator(Config config) {
-		return new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"),
-				config.getString("admin-view-root"), config.getString("admin-view-suffix"),
-				RenderEngine.class.getClassLoader(), false);
+		return new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"), config.getString("admin-view-root"),
+				config.getString("admin-view-suffix"), ViewEngine.class.getClassLoader(), false);
 	}
 
 	private Helper resourceBundleHelper() {
@@ -60,33 +59,36 @@ public enum RenderEngine {
 	}
 
 	private MustacheEngine mustacheEngine() {
-		long startTime = System.nanoTime();
 		Config config = Configs.INSTANCE.common();
-		MustacheEngine engine = MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
+		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
 				.addTemplateLocator(templateLocator(config)).build();
-		LoggerFactory.getLogger(RenderEngine.class).info("MustacheEngine initialization took: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-		return engine;
 	}
 	
-	RenderEngine() {
+	ViewEngine() {
+		long startTime = System.nanoTime();
 		this.engine = this.mustacheEngine();
+		LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 
-	public boolean render(RenderContext context) throws RenderException {
+	public boolean processView(ViewEngineContext context) throws ViewEngineException {
+		long startTime = System.nanoTime();
 		boolean rendered = false;
 		String view = context.getView();
-		LOGGER.debug("Rendering view: [{}]", view);
+		LOGGER.debug("Processing view: [{}]", view);
 		try {
 			Mustache mustache = this.engine.getMustache(view);
 			if (mustache == null) {
 				LOGGER.info("View: [{}] not found!!", view);
 			} else {
-				context.getResponse().getWriter().write(mustache.render(context.getContextObjects()));
+				context.getResponse().getWriter().write(mustache.render(context.getModels()));
 				rendered = true;
 			}
 		} catch (Exception ex) {
-			LOGGER.error("Exception while processing view: [{}]", view, ex);
-			throw new RenderException(ex.getMessage(), ex);
+			LOGGER.error("Exception while rendering view: [{}]", view, ex);
+			throw new ViewEngineException(ex.getMessage(), ex);
+		}
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.info("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
 		}
 		return rendered;
 	}

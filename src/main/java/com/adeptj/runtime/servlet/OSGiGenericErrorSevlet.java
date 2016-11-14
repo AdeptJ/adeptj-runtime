@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.runtime.admin.render.ContextObjects;
-import com.adeptj.runtime.admin.render.RenderContext;
-import com.adeptj.runtime.admin.render.RenderEngine;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
  * OSGiGenericErrorSevlet handles the system wide error codes and exceptions.
@@ -55,23 +55,23 @@ public class OSGiGenericErrorSevlet extends HttpServlet {
 
 	private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-		RenderContext.Builder builder = new RenderContext.Builder();
-		builder.contextObjects(this.contextObjects(req, statusCode)).request(req).response(resp).locale(req.getLocale());
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		builder.models(this.models(req, statusCode)).request(req).response(resp).locale(req.getLocale());
 		if (Integer.valueOf(500).equals(statusCode)) {
-			RenderEngine.INSTANCE.render(builder.view("error/500").build());
+			ViewEngine.INSTANCE.processView(builder.view("error/500").build());
 		} else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
-			RenderEngine.INSTANCE.render(builder.view(String.format("error/%s", statusCode)).build());
+			ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
 		} else {
-			RenderEngine.INSTANCE.render(builder.view("error/generic").build());
+			ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
 		}
 	}
 
-	private ContextObjects contextObjects(HttpServletRequest req, Integer statusCode) {
-		ContextObjects contextObjects = new ContextObjects();
-		contextObjects.put("statusCode", statusCode);
-		contextObjects.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
-		contextObjects.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
-		contextObjects.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-		return contextObjects;
+	private Models models(HttpServletRequest req, Integer statusCode) {
+		Models models = new Models();
+		models.put("statusCode", statusCode);
+		models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+		models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
+		models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+		return models;
 	}
 }

@@ -27,9 +27,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.runtime.admin.render.ContextObjects;
-import com.adeptj.runtime.admin.render.RenderContext;
-import com.adeptj.runtime.admin.render.RenderEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
  * OSGi AdminLoginServlet serves the login page.
@@ -46,9 +46,9 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RenderContext.Builder builder = new RenderContext.Builder();
-		builder.view("auth/login").contextObjects(new ContextObjects()).request(req).response(resp).locale(req.getLocale());
-		RenderEngine.INSTANCE.render(builder.build());
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		builder.view("auth/login").models(new Models()).request(req).response(resp).locale(req.getLocale());
+		ViewEngine.INSTANCE.processView(builder.build());
 	}
 
 	/**
@@ -56,12 +56,12 @@ public class AdminLoginServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RenderContext.Builder builder = new RenderContext.Builder();
-		ContextObjects contextObjects = new ContextObjects();
-		contextObjects.put("validation", "Invalid credentials!!");
-		contextObjects.put("j_username", req.getParameter("j_username"));
-		builder.view("auth/login").contextObjects(contextObjects).request(req).response(resp).locale(req.getLocale());
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		Models models = new Models();
+		models.put("validation", "Invalid credentials!!");
+		models.put("j_username", req.getParameter("j_username"));
+		builder.view("auth/login").models(models).request(req).response(resp).locale(req.getLocale());
 		// Render login page again with validation message.
-		RenderEngine.INSTANCE.render(builder.build());
+		ViewEngine.INSTANCE.processView(builder.build());
 	}
 }

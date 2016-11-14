@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.admin.render;
+package com.adeptj.runtime.viewengine;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -27,11 +27,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * ContextObjects.
+ * Models.
  * 
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ContextObjects extends AbstractMap<String, Object> implements Iterable<Entry<String, Object>> {
+public class Models extends AbstractMap<String, Object> implements Iterable<Entry<String, Object>> {
 
 	private Map<String, Object> delegate = new HashMap<>();
 

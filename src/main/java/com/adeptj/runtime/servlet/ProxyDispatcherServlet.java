@@ -88,6 +88,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 		if (req.getRequestURI().equals("/admin/logout")) {
 			HttpSession session = req.getSession(false);
 			if (session != null) {
+				LOGGER.info("Invalidating session with id: [{}]", session.getId());
 				session.invalidate();
 				resp.sendRedirect(Constants.OSGI_WEBCONSOLE_PATH);
 				return true;

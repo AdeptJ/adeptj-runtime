@@ -28,9 +28,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.runtime.admin.render.ContextObjects;
-import com.adeptj.runtime.admin.render.RenderContext;
-import com.adeptj.runtime.admin.render.RenderEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
  * AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
@@ -47,20 +47,20 @@ public class AdminErrorServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String requestURI = req.getRequestURI();
-		RenderContext.Builder builder = new RenderContext.Builder();
-		ContextObjects contextObjects = new ContextObjects();
-		builder.contextObjects(contextObjects).request(req).response(resp).locale(req.getLocale());
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		Models models = new Models();
+		builder.models(models).request(req).response(resp).locale(req.getLocale());
 		if ("/admin/error".equals(requestURI)) {
-			RenderEngine.INSTANCE.render(builder.view("error/generic").build());
+			ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
 		} else {
 			Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 			String statusCode = this.getStatusCode(requestURI);
 			if (exception != null && "500".equals(statusCode)) {
-				contextObjects.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-				RenderEngine.INSTANCE.render(builder.view("error/500").build());
-			} else if (!RenderEngine.INSTANCE.render(builder.view(String.format("error/%s", statusCode)).build())) {
+				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+				ViewEngine.INSTANCE.processView(builder.view("error/500").build());
+			} else if (!ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build())) {
 				// if the requested view not found, render 404.
-				RenderEngine.INSTANCE.render(builder.view("error/404").build());
+				ViewEngine.INSTANCE.processView(builder.view("error/404").build());
 			}
 		}
 	}
