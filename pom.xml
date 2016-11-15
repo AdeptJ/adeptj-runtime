@@ -47,7 +47,7 @@
 		
 		<!-- AdeptJ Modular Web Dependencies Version -->
 		<adeptj-modules-webconsole-branding.version>1.0.0.RELEASE</adeptj-modules-webconsole-branding.version>
-		<adeptj-modules-webconsole-security-provider.version>1.0.0.RELEASE</adeptj-modules-webconsole-security-provider.version>
+		<adeptj-modules-webconsole-security.version>1.0.0.RELEASE</adeptj-modules-webconsole-security.version>
 	</properties>
 	
 	<prerequisites>
@@ -415,15 +415,15 @@
 
 		<dependency>
 			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modules-common-webconsole-branding</artifactId>
+			<artifactId>adeptj-modules-commons-webconsole-branding</artifactId>
 			<version>${adeptj-modules-webconsole-branding.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modules-common-webconsole-security-provider</artifactId>
-			<version>${adeptj-modules-webconsole-security-provider.version}</version>
+			<artifactId>adeptj-modules-commons-webconsole-security</artifactId>
+			<version>${adeptj-modules-webconsole-security.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
@@ -568,34 +568,6 @@
 			<id>Shiro</id>
 			
 			<dependencies>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modularweb-common</artifactId>
-					<version>1.0.0.RELEASE</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modularweb-cache</artifactId>
-					<version>1.0.0.RELEASE</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modularweb-shiro</artifactId>
-					<version>1.0.0.RELEASE</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modularweb-webconsole-security-provider</artifactId>
-					<version>1.0.0.RELEASE</version>
-					<scope>provided</scope>
-				</dependency>
 				
 				<dependency>
 					<groupId>commons-collections</groupId>
