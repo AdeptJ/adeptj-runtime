@@ -62,9 +62,9 @@ public class AdminAuthServlet extends HttpServlet {
 		String requestURI = req.getRequestURI();
 		if (ADMIN_LOGIN_URI.equals(requestURI)) {
 			this.renderLoginPage(req, resp);
-		} else if (ADMIN_LOGOUT_URI.equals(requestURI)) {
+		} else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole("OSGiAdmin")) {
 			this.logout(req, resp);
-		} 
+		}
 	}
 
 	/**
