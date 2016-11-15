@@ -55,7 +55,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 		LOGGER.info("Initializing ProxyDispatcherServlet!!");
 		LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
 		DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
-		LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms", TimeUnits.nanosToMillis(startTime));
+		LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 
     /**
