@@ -97,7 +97,7 @@ public enum FrameworkProvisioner {
 				this.framework.stop();
 				// A value of zero will wait indefinitely.
 				FrameworkEvent event = this.framework.waitForStop(0);
-				logger.info("OSGi Framework Stopped, Event: [{}]", FrameworkEvents.value(event.getType()));
+				logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.value(event.getType()));
 			} else {
         		logger.info("OSGi Framework not started yet, nothing to stop!!");
         	}
