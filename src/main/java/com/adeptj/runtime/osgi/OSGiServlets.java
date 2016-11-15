@@ -85,7 +85,7 @@ public enum OSGiServlets {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, webServlet.name());
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
-		// Apply this ErrorServlet to all the Servlets registered with "default" contextId.
+		// Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(osgi.http.whiteboard.context.name=*)");
 		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
 		WebInitParam[] initParams = webServlet.initParams();

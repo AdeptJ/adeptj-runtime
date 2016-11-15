@@ -20,7 +20,6 @@
 package com.adeptj.runtime.osgi;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import java.util.ServiceLoader;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -41,9 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.adeptj.runtime.common.BundleContextAware;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.servlet.AdminDashboardServlet;
-import com.adeptj.runtime.servlet.AdminLoginServlet;
-import com.adeptj.runtime.servlet.OSGiGenericErrorSevlet;
+import com.adeptj.runtime.servlet.OSGiServletContextsErrorSevlet;
 import com.adeptj.runtime.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
 
@@ -83,9 +79,7 @@ public enum FrameworkProvisioner {
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
 			List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
-			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiGenericErrorSevlet(), errorPages);
-			List<HttpServlet> servlets = Arrays.asList(new AdminLoginServlet(), new AdminDashboardServlet());
-			OSGiServlets.INSTANCE.registerAll(systemBundleContext, servlets);
+			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiServletContextsErrorSevlet(), errorPages);
 			this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);

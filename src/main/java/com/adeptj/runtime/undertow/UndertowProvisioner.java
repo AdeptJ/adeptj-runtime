@@ -41,6 +41,7 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +66,9 @@ import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
+import com.adeptj.runtime.servlet.AdminLoginServlet;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;
@@ -82,6 +85,7 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
 import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
+import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 
@@ -284,6 +288,14 @@ public final class UndertowProvisioner {
 								undertowConfig.getStringList("common.osgi-console-patterns")));
 	}
 	
+	private static List<ServletInfo> servlets() {
+		List<ServletInfo> servlets = new ArrayList<>();
+		servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
+		servlets.add(Servlets.servlet(AdminDashboardServlet.class).addMapping("/admin/dashboard/*"));
+		servlets.add(Servlets.servlet(AdminLoginServlet.class).addMapping("/admin/login"));
+		return servlets;
+	}
+	
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())
@@ -295,7 +307,7 @@ public final class UndertowProvisioner {
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/admin/login", "/admin/login"))
 				.addSecurityConstraint(securityConstraint(undertowConfig))
-				.addServlet(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"))
+				.addServlets(servlets())
 				.addInitialHandlerChainWrapper(new ServletInitialHandlerChainWrapper());
 	}
 

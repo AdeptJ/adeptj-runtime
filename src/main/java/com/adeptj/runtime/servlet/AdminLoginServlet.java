@@ -32,7 +32,9 @@ import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
- * OSGi AdminLoginServlet serves the login page.
+ * AdminLoginServlet serves the login page and handles the validation failure on wrong credentials submission.
+ * 
+ * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

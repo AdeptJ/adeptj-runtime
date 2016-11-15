@@ -32,7 +32,9 @@ import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
- * OSGi AdminDashboardServlet renders the admin dashboard page.
+ * AdminDashboardServlet renders the admin dashboard page.
+ * 
+ * Note: This is independent of OSGi and directly managed by UndertowServer.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

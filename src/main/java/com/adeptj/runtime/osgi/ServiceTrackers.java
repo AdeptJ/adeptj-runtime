@@ -39,7 +39,7 @@ public final class ServiceTrackers {
 		try {
 			tracker.close();
 		} catch (Exception ex) {
-			// ignore, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
+			// ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
 		}
 	}
 }
