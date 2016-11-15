@@ -84,11 +84,11 @@ public enum ViewEngine {
 				rendered = true;
 			}
 		} catch (Exception ex) {
-			LOGGER.error("Exception while rendering view: [{}]", view, ex);
+			LOGGER.error("Exception while processing view: [{}]", view, ex);
 			throw new ViewEngineException(ex.getMessage(), ex);
 		}
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.info("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
+			LOGGER.debug("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
 		}
 		return rendered;
 	}

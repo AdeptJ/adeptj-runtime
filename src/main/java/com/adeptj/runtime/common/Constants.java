@@ -44,7 +44,11 @@ public final class Constants {
 
 	public static final String CONTEXT_PATH = "/";
 	
-	public static final String OSGI_WEBCONSOLE_PATH = "/system/console";
+	public static final String OSGI_WEBCONSOLE_URI = "/system/console";
+	
+	public static final String ADMIN_LOGIN_URI = "/admin/login";
+	
+	public static final String ADMIN_LOGOUT_URI = "/admin/logout";
 
 	public static final String STARTUP_INFO = "/startup-info.txt";
 

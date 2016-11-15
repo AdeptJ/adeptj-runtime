@@ -19,6 +19,8 @@
 */
 package com.adeptj.runtime.undertow;
 
+import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
@@ -68,7 +70,7 @@ import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.sci.StartupHandlerInitializer;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
-import com.adeptj.runtime.servlet.AdminLoginServlet;
+import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;
@@ -255,9 +257,8 @@ public final class UndertowProvisioner {
 		return headers;
 	}
 	
-	private static PredicateHandler predicateHandler(HttpHandler handler, Deployment deployment) {
-		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_PATH),
-				handler);
+	private static PredicateHandler predicateHandler(HttpHandler handler) {
+		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), handler);
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
@@ -267,7 +268,7 @@ public final class UndertowProvisioner {
 
 	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig, Deployment deployment) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(predicateHandler(handler, deployment), allowedMethods(undertowConfig))));
+				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
 	}
 	
 	private static List<ErrorPage> errorPages(Config undertowConfig) {
@@ -292,7 +293,7 @@ public final class UndertowProvisioner {
 		List<ServletInfo> servlets = new ArrayList<>();
 		servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
 		servlets.add(Servlets.servlet(AdminDashboardServlet.class).addMapping("/admin/dashboard/*"));
-		servlets.add(Servlets.servlet(AdminLoginServlet.class).addMapping("/admin/login"));
+		servlets.add(Servlets.servlet(AdminAuthServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
 		return servlets;
 	}
 	
@@ -305,7 +306,7 @@ public final class UndertowProvisioner {
 				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig))
 				.setIdentityManager(new OSGiConsoleIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
-				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", "/admin/login", "/admin/login"))
+				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
 				.addSecurityConstraint(securityConstraint(undertowConfig))
 				.addServlets(servlets())
 				.addInitialHandlerChainWrapper(new ServletInitialHandlerChainWrapper());

@@ -26,12 +26,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
 
@@ -69,12 +67,10 @@ public class ProxyDispatcherServlet extends HttpServlet {
         HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
 		try {
 			if (dispatcherServlet == null) {
-				LOGGER.warn("Can't serve request as Felix DispatcherServlet is unavailable!!");
+				LOGGER.error("Can't serve request: [{}], DispatcherServlet is unavailable!!", req.getRequestURI());
 				resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 			} else {
-				if (!this.handleLogout(req, resp)) {
-					dispatcherServlet.service(req, resp);
-				}
+				dispatcherServlet.service(req, resp);
 				this.logDispatcherException(req);
 			}
 		} catch (Exception ex) {
@@ -82,20 +78,6 @@ public class ProxyDispatcherServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
-
-	private boolean handleLogout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		// if this is a logout call, invalidate the session and redirect back to /system/console page. 
-		if (req.getRequestURI().equals("/admin/logout")) {
-			HttpSession session = req.getSession(false);
-			if (session != null) {
-				LOGGER.info("Invalidating session with id: [{}]", session.getId());
-				session.invalidate();
-				resp.sendRedirect(Constants.OSGI_WEBCONSOLE_PATH);
-				return true;
-			}
-		}
-		return false;
-	}
 
 	private void logDispatcherException(HttpServletRequest req) {
 		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
