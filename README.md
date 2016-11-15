@@ -1,6 +1,6 @@
 **AdeptJ Runtime**
 
-**Highly performant, dynamic, modular(OSGi based) platform for developing WebApps and MicroServices.**
+**Highly performant, dynamic, modular(OSGi based) runtime for developing/deploying WebApps and MicroServices.**
 
 **Built upon**
 
