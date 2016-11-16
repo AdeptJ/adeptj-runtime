@@ -68,3 +68,6 @@ Start Parameters and VM arguments
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+[![Join the chat at https://gitter.im/AdeptJ/adeptj-runtime](https://badges.gitter.im/AdeptJ/adeptj-runtime.svg)](https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
