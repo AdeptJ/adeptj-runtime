@@ -19,10 +19,14 @@
 */
 package com.adeptj.runtime.undertow;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnio.Option;
 
+import com.adeptj.runtime.common.TimeUnits;
 import com.typesafe.config.Config;
 
 import io.undertow.Undertow.Builder;
@@ -41,35 +45,54 @@ public final class ServerOptions {
 	 * @param builder
 	 * @param undertowConfig
 	 */
-	public static void setOptions(Builder builder, Config undertowConfig) {
+	public static void build(Builder builder, Config undertowConfig) {
+		long startTime = System.nanoTime();
+		Logger logger = LoggerFactory.getLogger(ServerOptions.class);
 		Config serverOptions = undertowConfig.getConfig("server-options");
-		setStringOptions(builder, serverOptions.getObject("options-type-string").unwrapped());
-		setIntOptions(builder, serverOptions.getObject("options-type-integer").unwrapped());
-		setLongOptions(builder, serverOptions.getObject("options-type-long").unwrapped());
-		setBooleanOptions(builder, serverOptions.getObject("options-type-boolean").unwrapped());
+		setStringOptions(builder, serverOptions.getObject("options-type-string").unwrapped(), logger);
+		setIntOptions(builder, serverOptions.getObject("options-type-integer").unwrapped(), logger);
+		setLongOptions(builder, serverOptions.getObject("options-type-long").unwrapped(), logger);
+		setBooleanOptions(builder, serverOptions.getObject("options-type-boolean").unwrapped(), logger);
+		logger.info("ServerOptions populated in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
-	
-	private static void setStringOptions(Builder builder, Map<String, Object> options) {
+
+	private static void setStringOptions(Builder builder, Map<String, Object> options, Logger logger) {
 		options.forEach((key, val) -> {
-			builder.setServerOption(Option.simple(UndertowOptions.class, key, String.class), (String) val);
-		});
-	}
-	
-	private static void setIntOptions(Builder builder, Map<String, Object> options) {
-		options.forEach((key, val) -> {
-			builder.setServerOption(Option.simple(UndertowOptions.class, key, Integer.class), Integer.valueOf((String) val));
+			builder.setServerOption(toOption(key, logger), (String) val);
 		});
 	}
 
-	private static void setLongOptions(Builder builder, Map<String, Object> options) {
+	private static void setIntOptions(Builder builder, Map<String, Object> options, Logger logger) {
 		options.forEach((key, val) -> {
-			builder.setServerOption(Option.simple(UndertowOptions.class, key, Long.class), Long.valueOf((String) val));
+			builder.setServerOption(toOption(key, logger), Integer.valueOf((String) val));
 		});
 	}
 
-	private static void setBooleanOptions(Builder builder, Map<String, Object> options) {
+	private static void setLongOptions(Builder builder, Map<String, Object> options, Logger logger) {
 		options.forEach((key, val) -> {
-			builder.setServerOption(Option.simple(UndertowOptions.class, key, Boolean.class), Boolean.valueOf((Boolean) val));
+			builder.setServerOption(toOption(key, logger), Long.valueOf((String) val));
 		});
+	}
+
+	private static void setBooleanOptions(Builder builder, Map<String, Object> options, Logger logger) {
+		options.forEach((key, val) -> {
+			builder.setServerOption(toOption(key, logger), Boolean.valueOf((Boolean) val));
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> Option<T> toOption(String name, Logger logger) {
+		Option<T> option = null;
+		try {
+			Field field = UndertowOptions.class.getField(name);
+			if (field == null || !field.getName().equals(name)) {
+				logger.warn("No such field: [{}] in class: [{}]", name, UndertowOptions.class.getName());
+			} else {
+				option = (Option<T>) field.get(null);
+			}
+		} catch (Exception ex) {
+			logger.error("Exception!!", ex);
+		}
+		return option;
 	}
 }

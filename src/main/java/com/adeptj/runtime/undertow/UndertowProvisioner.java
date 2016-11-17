@@ -68,9 +68,9 @@ import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
-import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.typesafe.config.Config;
 
 import io.undertow.Handlers;
@@ -148,15 +148,14 @@ public final class UndertowProvisioner {
 		logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
 		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder();
-		boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
-		undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-		ServerOptions.setOptions(undertowBuilder, undertowConf);
-		enableAJP(undertowConf, undertowBuilder, logger);
-		enableHttp2(undertowConf, undertowBuilder, logger);
 		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
 		manager.deploy();
-		HttpHandler handler = prodMode ? manager.start()
-				: new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
+		boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
+		HttpHandler handler = prodMode ? manager.start() : new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
+		ServerOptions.build(undertowBuilder, undertowConf);
+		undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
+		enableHttp2(undertowConf, undertowBuilder, logger);
+		enableAJP(undertowConf, undertowBuilder, logger);
 		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf, manager.getDeployment())).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));

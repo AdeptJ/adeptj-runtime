@@ -58,7 +58,7 @@ public final class Main {
 		Logger logger = LoggerFactory.getLogger(Main.class);
 		try {
 			UndertowProvisioner.provision(parseCommands(args));
-			logger.info("AdeptJ Runtime Initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+			logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Throwable th) {
 			stopOSGiFramework(logger);
 			logger.error("Shutting down JVM!!", th);

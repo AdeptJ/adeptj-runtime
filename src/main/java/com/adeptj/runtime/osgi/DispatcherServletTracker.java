@@ -106,7 +106,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 			try {
 				LOGGER.info("Initializing Felix DispatcherServlet!!");
 				this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
-				LOGGER.info("Felix DispatcherServlet Initialized: [{}]", this.dispatcherServlet);
+				LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
 			} catch (Exception ex) {
 				LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
 			}
