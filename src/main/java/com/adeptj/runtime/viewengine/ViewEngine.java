@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
+import org.trimou.engine.config.EngineConfigurationKey;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.engine.locator.TemplateLocator;
 import org.trimou.handlebars.Helper;
@@ -61,7 +62,9 @@ public enum ViewEngine {
 	private MustacheEngine mustacheEngine() {
 		Config config = Configs.INSTANCE.common();
 		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
-				.addTemplateLocator(templateLocator(config)).build();
+				.addTemplateLocator(templateLocator(config))
+				.setProperty(EngineConfigurationKey.TEMPLATE_CACHE_ENABLED, Boolean.TRUE)
+				.setProperty(EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT, 1800).build();
 	}
 	
 	ViewEngine() {

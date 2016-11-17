@@ -57,16 +57,20 @@ public class LogbackProvisioner {
 	private static final String XNIO_LOG_LEVEL = "xnio-log-level";
 	
 	private static final String THYMELEAF_LOG_LEVEL = "thymeleaf-log-level";
+	
+	private static final String TRIMOU_LOG_LEVEL = "trimou-log-level";
 
 	private static final String ROOT_LOG_LEVEL = "root-log-level";
 
-	private static final String LOGGER_XNIO = "org.xnio.nio";
+	private static final String LOGGER_XNIO = "org.xnio";
 
 	private static final String LOGGER_UNDERTOW = "io.undertow";
 
 	private static final String LOGGER_ADEPTJ = "com.adeptj";
 	
 	private static final String LOGGER_THYMELEAF = "org.thymeleaf";
+	
+	private static final String LOGGER_TRIMOU = "org.trimou";
 
 	private static final String KEY_SERVER_LOG_FILE = "server-log-file";
 	
@@ -108,6 +112,7 @@ public class LogbackProvisioner {
 		undertowLogger(context, appenders, config);
 		xnioLogger(context, appenders, config);
 		thymeleafLogger(context, appenders, config);
+		trimouLogger(context, appenders, config);
 		context.start();
 		Logger logger = context.getLogger(LogbackProvisioner.class);
 		logger.info("Logback initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
@@ -149,6 +154,12 @@ public class LogbackProvisioner {
 	
 	private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
 		Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
+		addAppenders(appenders, thymeleafLogger);
+		thymeleafLogger.setAdditive(false);
+	}
+	
+	private static void trimouLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
+		Logger thymeleafLogger = logger(LOGGER_TRIMOU, toLevel(config.getString(TRIMOU_LOG_LEVEL)), context);
 		addAppenders(appenders, thymeleafLogger);
 		thymeleafLogger.setAdditive(false);
 	}
