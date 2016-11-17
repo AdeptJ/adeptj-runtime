@@ -63,6 +63,8 @@ public enum ViewEngine {
 		Config config = Configs.INSTANCE.common();
 		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
 				.addTemplateLocator(templateLocator(config))
+				.setProperty(EngineConfigurationKey.START_DELIMITER, "#{")
+				.setProperty(EngineConfigurationKey.END_DELIMITER, "}")
 				.setProperty(EngineConfigurationKey.TEMPLATE_CACHE_ENABLED, Boolean.TRUE)
 				.setProperty(EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT, 1800).build();
 	}
