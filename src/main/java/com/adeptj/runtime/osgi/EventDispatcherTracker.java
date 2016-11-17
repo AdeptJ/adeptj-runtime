@@ -87,15 +87,15 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 		ServiceTrackers.closeQuietly(this);
 	}
 
-	public HttpSessionListener getHttpSessionListener() {
+	HttpSessionListener getHttpSessionListener() {
 		return this.sessionListener;
 	}
 
-	public HttpSessionIdListener getHttpSessionIdListener() {
+	HttpSessionIdListener getHttpSessionIdListener() {
 		return this.sessionIdListener;
 	}
 
-	public HttpSessionAttributeListener getHttpSessionAttributeListener() {
+	HttpSessionAttributeListener getHttpSessionAttributeListener() {
 		return this.sessionAttributeListener;
 	}
 }

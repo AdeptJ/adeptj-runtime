@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,20 +51,18 @@ public final class BundleProvisioner {
 	private BundleProvisioner() {}
 	
 	private static final String BUNDLES_JAR_DIR = "bundles/";
-	
-	private static final String HEADER_FRAGMENT_HOST = "Fragment-Host";
 
 	private static final String EXTN_JAR = ".jar";
 
 	public static void provisionBundles(BundleContext systemBundleContext) throws Exception {
 		Logger logger = LoggerFactory.getLogger(BundleProvisioner.class);
-		// Now start all the installed Bundles.
+		// Start all the Bundles after collection and installation phase.
 		startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
 	}
 
 	private static void startBundles(List<Bundle> bundles, Logger logger) {
 		// Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-		bundles.stream().filter(bundle -> bundle.getHeaders().get(HEADER_FRAGMENT_HOST) == null)
+		bundles.stream().filter(bundle -> bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null)
 				.forEach(bundle -> startBundle(bundle, logger));
 	}
 
@@ -76,11 +75,11 @@ public final class BundleProvisioner {
 		}
 	}
 
-	private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) throws Exception {
+	private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger)
+			throws Exception {
 		// First install all the Bundles.
-		List<Bundle> installedBundles = bundles.stream().map(url -> {
-			return installBundle(context, logger, url);
-		}).filter(Objects::nonNull).collect(Collectors.toList());
+		List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(context, logger, url))
+				.filter(Objects::nonNull).collect(Collectors.toList());
 		logger.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
 		return installedBundles;
 	}
@@ -99,11 +98,11 @@ public final class BundleProvisioner {
 	private static List<URL> collectBundles(Logger logger) throws IOException {
 		String rootPath = ServletContextAware.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
-		Predicate<JarEntry> bundlePredicate = (entry) -> entry.getName().startsWith(BUNDLES_JAR_DIR)
-				&& entry.getName().endsWith(EXTN_JAR);
+		Predicate<JarEntry> bundlePredicate = (jarEentry) -> jarEentry.getName().startsWith(BUNDLES_JAR_DIR)
+				&& jarEentry.getName().endsWith(EXTN_JAR);
 		URLConnection conn = BundleProvisioner.class.getResource(rootPath).openConnection();
 		List<URL> bundles = JarURLConnection.class.cast(conn).getJarFile().stream().filter(bundlePredicate)
-				.map(entry -> classLoader.getResource(entry.getName())).collect(Collectors.toList());
+				.map(jarEentry -> classLoader.getResource(jarEentry.getName())).collect(Collectors.toList());
 		logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
 		return bundles;
 	}

@@ -38,20 +38,20 @@ public enum FrameworkEvents {
 
 	WAIT_TIMEDOUT(512);
 
-	private int evtType;
+	private int code;
 
-	FrameworkEvents(int evtType) {
-		this.evtType = evtType;
+	FrameworkEvents(int code) {
+		this.code = code;
 	}
 
-	public int getEvtType() {
-		return evtType;
+	public int getCode() {
+		return code;
 	}
 
-	public static String value(int evtType) {
+	public static String asString(int code) {
 		String event = "UNKNOWN";
 		for (FrameworkEvents events : values()) {
-			if (evtType == events.getEvtType()) {
+			if (code == events.getCode()) {
 				event = events.toString();
 				break;
 			}

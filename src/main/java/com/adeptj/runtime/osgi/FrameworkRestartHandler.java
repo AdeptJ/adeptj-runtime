@@ -84,7 +84,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			break;
 		default:
 			// log it and ignore.
-			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.value(event.getType()));
+			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
 			break;
 		}
 	}

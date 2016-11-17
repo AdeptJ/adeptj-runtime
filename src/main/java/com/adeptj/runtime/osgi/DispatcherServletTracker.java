@@ -47,10 +47,6 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         super(context, OSGiUtils.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
     }
 
-    protected HttpServlet getDispatcherServlet() {
-        return this.dispatcherServlet;
-    }
-
     @Override
     public HttpServlet addingService(ServiceReference<HttpServlet> reference) {
         HttpServlet dispatcherServlet = null;
@@ -84,6 +80,10 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * Ignore exceptions, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
         */
         ServiceTrackers.closeQuietly(this);
+    }
+    
+    HttpServlet getDispatcherServlet() {
+        return this.dispatcherServlet;
     }
 
     private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
