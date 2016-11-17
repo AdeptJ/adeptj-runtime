@@ -48,36 +48,32 @@ public final class ServerOptions {
 	public static void build(Builder builder, Config undertowConfig) {
 		long startTime = System.nanoTime();
 		Logger logger = LoggerFactory.getLogger(ServerOptions.class);
-		Config serverOptions = undertowConfig.getConfig("server-options");
-		setStringOptions(builder, serverOptions.getObject("options-type-string").unwrapped(), logger);
-		setIntOptions(builder, serverOptions.getObject("options-type-integer").unwrapped(), logger);
-		setLongOptions(builder, serverOptions.getObject("options-type-long").unwrapped(), logger);
-		setBooleanOptions(builder, serverOptions.getObject("options-type-boolean").unwrapped(), logger);
+		Config serverOptionsCfg = undertowConfig.getConfig("server-options");
+		stringOptions(builder, serverOptionsCfg.getObject("options-type-string").unwrapped(), logger);
+		integerOptions(builder, serverOptionsCfg.getObject("options-type-integer").unwrapped(), logger);
+		longOptions(builder, serverOptionsCfg.getObject("options-type-long").unwrapped(), logger);
+		booleanOptions(builder, serverOptionsCfg.getObject("options-type-boolean").unwrapped(), logger);
 		logger.info("ServerOptions populated in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
-
-	private static void setStringOptions(Builder builder, Map<String, Object> options, Logger logger) {
-		options.forEach((key, val) -> {
-			builder.setServerOption(toOption(key, logger), (String) val);
-		});
+	
+	private static void buildServerOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), optVal));
 	}
 
-	private static void setIntOptions(Builder builder, Map<String, Object> options, Logger logger) {
-		options.forEach((key, val) -> {
-			builder.setServerOption(toOption(key, logger), Integer.valueOf((String) val));
-		});
+	private static void stringOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		buildServerOptions(builder, options, logger);
 	}
 
-	private static void setLongOptions(Builder builder, Map<String, Object> options, Logger logger) {
-		options.forEach((key, val) -> {
-			builder.setServerOption(toOption(key, logger), Long.valueOf((String) val));
-		});
+	private static void integerOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		buildServerOptions(builder, options, logger);
 	}
 
-	private static void setBooleanOptions(Builder builder, Map<String, Object> options, Logger logger) {
-		options.forEach((key, val) -> {
-			builder.setServerOption(toOption(key, logger), Boolean.valueOf((Boolean) val));
-		});
+	private static void longOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), Long.valueOf((String) optVal)));
+	}
+
+	private static void booleanOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		buildServerOptions(builder, options, logger);
 	}
 
 	@SuppressWarnings("unchecked")
