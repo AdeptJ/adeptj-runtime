@@ -111,7 +111,7 @@ public class LogbackProvisioner {
 		adeptjLogger(context, appenders, config);
 		undertowLogger(context, appenders, config);
 		xnioLogger(context, appenders, config);
-		thymeleafLogger(context, appenders, config);
+		// thymeleafLogger(context, appenders, config);
 		trimouLogger(context, appenders, config);
 		context.start();
 		Logger logger = context.getLogger(LogbackProvisioner.class);
@@ -152,7 +152,7 @@ public class LogbackProvisioner {
 		adeptjLogger.setAdditive(false);
 	}
 	
-	private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
+	static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
 		Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
 		addAppenders(appenders, thymeleafLogger);
 		thymeleafLogger.setAdditive(false);

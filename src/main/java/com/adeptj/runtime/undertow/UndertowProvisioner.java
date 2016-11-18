@@ -49,7 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.KeyManager;
@@ -81,7 +80,6 @@ import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
-import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
@@ -156,7 +154,7 @@ public final class UndertowProvisioner {
 		undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
 		enableHttp2(undertowConf, undertowBuilder, logger);
 		enableAJP(undertowConf, undertowBuilder, logger);
-		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf, manager.getDeployment())).build();
+		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
@@ -215,8 +213,7 @@ public final class UndertowProvisioner {
 		int port;
 		if (propertyPort == null || propertyPort.isEmpty()) {
 			port = httpConf.getInt(KEY_PORT);
-			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
-					port);
+			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
 		} else {
 			port = Integer.parseInt(propertyPort);
 		}
@@ -261,19 +258,19 @@ public final class UndertowProvisioner {
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
-		Function<String, HttpString> verbFunction = (verb) -> { return HttpString.tryFromString(verb); };
-		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verbFunction).collect(Collectors.toSet());
+		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verb -> HttpString.tryFromString(verb))
+				.collect(Collectors.toSet());
 	}
 
-	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig, Deployment deployment) {
+	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
 				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
 	}
 	
 	private static List<ErrorPage> errorPages(Config undertowConfig) {
-		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream().map((entry) -> {
-			return Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey()));
-		}).collect(Collectors.toList());
+		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
+				.map(entry -> Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey())))
+				.collect(Collectors.toList());
 	}
 
 	private static ServletContainerInitializerInfo sciInfo() {
@@ -302,13 +299,12 @@ public final class UndertowProvisioner {
 				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
 				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
-				.addServletContainerInitalizer(sciInfo()).addErrorPages(errorPages(undertowConfig))
 				.setIdentityManager(new OSGiConsoleIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
-				.addSecurityConstraint(securityConstraint(undertowConfig))
-				.addServlets(servlets())
-				.addInitialHandlerChainWrapper(new ServletInitialHandlerChainWrapper());
+				.addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
+				.addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
+				.addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
 	}
 
 	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

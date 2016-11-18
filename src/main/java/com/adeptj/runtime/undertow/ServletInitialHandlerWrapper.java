@@ -19,6 +19,11 @@
 */
 package com.adeptj.runtime.undertow;
 
+import java.util.List;
+
+import com.adeptj.runtime.config.Configs;
+import com.typesafe.config.Config;
+
 import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HandlerWrapper;
@@ -30,15 +35,21 @@ import io.undertow.server.handlers.resource.ClassPathResourceManager;
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
  * 
  * Here it registers Undertow ClassPath based ResourceHandler for serving static content.
+ * If the Predicate grouping is true then it invokes the non blocking ResourceHandler
+ * completely bypassing security handler chain, which is desirable as we don't need security
+ * and blocking I/O to kick in while serving static content.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ServletInitialHandlerChainWrapper implements HandlerWrapper {
+public class ServletInitialHandlerWrapper implements HandlerWrapper {
 
 	@Override
 	public HttpHandler wrap(HttpHandler intialHandler) {
+		Config undertowCfg = Configs.INSTANCE.undertow();
+		List<String> extns = undertowCfg.getStringList("common.static-resource-extns");
 		return new PredicateHandler(
-				Predicates.and(Predicates.prefix("/admin"), Predicates.suffixes("css", "js", "jpg", "png", "jpeg")),
+				Predicates.and(Predicates.prefix(undertowCfg.getString("common.static-resource-prefix")),
+						Predicates.suffixes(extns.toArray(new String[extns.size()]))),
 				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader())), intialHandler);
 	}
 }
