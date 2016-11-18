@@ -68,7 +68,7 @@ public final class Constants {
 
 	public static final String KEY_MAX_CONCURRENT_REQS = "common.max-concurrent-requests";
 	
-	public static final String KEY_ALLOWED_METHODS = "common.allowed-methods";
+	public static final String KEY_ALLOWED_METHODS = "common.server-allowed-methods";
 
 	public static final int MIN_PROCESSORS = 2;
 

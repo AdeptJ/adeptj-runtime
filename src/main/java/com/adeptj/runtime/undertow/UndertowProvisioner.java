@@ -282,10 +282,10 @@ public final class UndertowProvisioner {
 	}
 	
 	private static SecurityConstraint securityConstraint(Config undertowConfig) {
-		return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.osgi-console-roles"))
+		return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.auth-roles"))
 				.addWebResourceCollection(Servlets.webResourceCollection()
-						.addHttpMethods(undertowConfig.getStringList("common.osgi-console-methods")).addUrlPatterns(
-								undertowConfig.getStringList("common.osgi-console-patterns")));
+						.addHttpMethods(undertowConfig.getStringList("common.secured-urls-allowed-methods"))
+						.addUrlPatterns(undertowConfig.getStringList("common.secured-urls")));
 	}
 	
 	private static List<ServletInfo> servlets() {
