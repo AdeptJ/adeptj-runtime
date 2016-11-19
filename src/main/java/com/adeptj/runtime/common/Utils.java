@@ -37,7 +37,7 @@ import com.adeptj.runtime.config.Configs;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public class CommonUtils {
+public class Utils {
 
 	private static final int EOF = -1;
 
@@ -56,8 +56,8 @@ public class CommonUtils {
 	/**
 	 * Deny direct instantiation.
 	 */
-	private CommonUtils() {}
-
+	private Utils() {}
+	
 	public static String toString(InputStream input) throws IOException {
 		return toByteArrayOutputStream(input).toString(Constants.UTF8);
 	}

@@ -38,6 +38,8 @@ public final class Constants {
 	
 	public static final String THYMELEAF_CONF_SECTION = "thymeleaf";
 	
+	public static final String TRIMOU_CONF_SECTION = "trimou";
+	
 	public static final String FELIX_CONF_SECTION = "felix";
 	
 	public static final String COMMON_CONF_SECTION = "common";
@@ -98,7 +100,13 @@ public final class Constants {
 
 	public static final String OS = System.getProperty(OS_NAME_PROP);
 	
-	public static final String CURR_DIR = System.getProperty("user.dir");
+	public static final String CURRENT_DIR = System.getProperty("user.dir");
+	
+	public static final String HEADER_POWERED_BY = "X-Powered-By";
+
+	public static final String HEADER_SERVER = "Server";
+	
+	public static final String PREFIX_ADMIN = "/admin";
 
 	// Configuration Keys constants start.
 
@@ -127,12 +135,6 @@ public final class Constants {
 	public static final String KEY_HEADER_POWERED_BY = "common.header-x-powered-by";
 
 	public static final String KEY_HEADER_SERVER = "common.header-server";
-
-	public static final String HEADER_POWERED_BY = "X-Powered-By";
-
-	public static final String HEADER_SERVER = "Server";
-	
-	public static final String PREFIX_ADMIN = "/admin";
 
 	// Configuration Keys constants ends.
 }

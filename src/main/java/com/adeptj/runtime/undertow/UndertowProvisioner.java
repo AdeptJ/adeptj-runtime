@@ -60,7 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 
-import com.adeptj.runtime.common.CommonUtils;
+import com.adeptj.runtime.common.Utils;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.Verb;
@@ -145,7 +145,7 @@ public final class UndertowProvisioner {
 		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
 		int httpPort = handlePortAvailability(httpConf, logger);
 		logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
-		logger.info(CommonUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
+		logger.info(Utils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
 		Builder undertowBuilder = Undertow.builder();
 		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
 		manager.deploy();
@@ -159,7 +159,7 @@ public final class UndertowProvisioner {
 		server.start();
 		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
 		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
-			CommonUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+			Utils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
 		}
 	}
 

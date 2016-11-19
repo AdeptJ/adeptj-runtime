@@ -24,6 +24,7 @@ import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.PROVISIONING_FILE;
 import static com.adeptj.runtime.common.Constants.THYMELEAF_CONF_SECTION;
+import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
 
 import com.typesafe.config.Config;
@@ -62,5 +63,9 @@ public enum Configs {
 	
 	public Config thymeleaf() {
 		return this.main.getConfig(THYMELEAF_CONF_SECTION);
+	}
+	
+	public Config trimou() {
+		return this.main.getConfig(TRIMOU_CONF_SECTION);
 	}
 }
