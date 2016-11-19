@@ -34,11 +34,12 @@ import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 
 /**
- * OSGiConsoleIdentityManager.
+ * Simple IdentityManager implementation that does the authentication from provisioning file or from the OsgiManager.config
+ * file if it is created when password is updated from OSGi Web Console.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class OSGiConsoleIdentityManager implements IdentityManager {
+public class FileIdentityManager implements IdentityManager {
 
 	private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
 	
@@ -48,7 +49,7 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	private Map<String, List<String>> userRolesMapping;
 
 	@SuppressWarnings("unchecked")
-	public OSGiConsoleIdentityManager(Config undertowCfg) {
+	public FileIdentityManager(Config undertowCfg) {
 		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
 	}
 
@@ -68,10 +69,9 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(String id, Credential credential) {
-		PasswordCredential cred = (PasswordCredential) credential;
 		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(id))
-				.map(entry -> CredentialMatcher.INSTANCE.matches(id, new String(cred.getPassword()))
-						? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, cred), new HashSet<>(this.userRolesMapping.get(id)))
+				.map(entry -> CredentialMatcher.INSTANCE.matches(id, new String(((PasswordCredential) credential).getPassword()))
+						? new SimpleAccount(new SimplePrincipal(id), new HashSet<>(this.userRolesMapping.get(id)))
 						: null).filter(Objects::nonNull).findFirst().get();
 	}
 

@@ -299,7 +299,7 @@ public final class UndertowProvisioner {
 				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
 				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
-				.setIdentityManager(new OSGiConsoleIdentityManager(undertowConfig))
+				.setIdentityManager(new FileIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
 				.addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))

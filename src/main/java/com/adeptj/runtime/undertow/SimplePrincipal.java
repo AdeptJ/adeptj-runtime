@@ -21,26 +21,17 @@ package com.adeptj.runtime.undertow;
 
 import java.security.Principal;
 
-import io.undertow.security.idm.PasswordCredential;
-
 /**
- * OSGiConsolePrincipal.
+ * SimplePrincipal.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class OSGiConsolePrincipal implements Principal {
+public class SimplePrincipal implements Principal {
 
 	private String name;
 
-	private PasswordCredential credential;
-
-	public OSGiConsolePrincipal(String name, PasswordCredential credential) {
+	public SimplePrincipal(String name) {
 		this.name = name;
-		this.credential = credential;
-	}
-	
-	public PasswordCredential getCredential() {
-		return credential;
 	}
 
 	@Override
@@ -64,7 +55,7 @@ public class OSGiConsolePrincipal implements Principal {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		OSGiConsolePrincipal other = (OSGiConsolePrincipal) obj;
+		SimplePrincipal other = (SimplePrincipal) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -75,6 +66,6 @@ public class OSGiConsolePrincipal implements Principal {
 
 	@Override
 	public String toString() {
-		return "OSGiConsolePrincipal [name=" + name + "]";
+		return "SimplePrincipal [name=" + name + "]";
 	}
 }

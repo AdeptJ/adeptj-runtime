@@ -25,19 +25,19 @@ import java.util.Set;
 import io.undertow.security.idm.Account;
 
 /**
- * OSGiConsoleAccount.
+ * SimpleAccount.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class OSGiConsoleAccount implements Account {
+public class SimpleAccount implements Account {
 
 	private static final long serialVersionUID = -2090504892837494810L;
 	
-	private OSGiConsolePrincipal principal;
+	private SimplePrincipal principal;
 	
 	private Set<String> roles;
 	
-	public OSGiConsoleAccount(OSGiConsolePrincipal principal, Set<String> roles) {
+	public SimpleAccount(SimplePrincipal principal, Set<String> roles) {
 		this.principal = principal;
 		this.roles = roles;
 	}
