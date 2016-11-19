@@ -27,8 +27,8 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.BundleContextAware;
-import com.adeptj.runtime.common.ServletContextAware;
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.ServletContextHolder;
 
 /**
  * OSGi FrameworkListener.
@@ -54,14 +54,14 @@ public class FrameworkRestartHandler implements FrameworkListener {
 		case FrameworkEvent.STARTED:
 			logger.info("Handling OSGi Framework Restart!!");
 			// Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
-			ServletContext servletContext = ServletContextAware.INSTANCE.getServletContext();
+			ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
             servletContext.removeAttribute(BundleContext.class.getName());
 			BundleContext bundleContext = event.getBundle().getBundleContext();
 			servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
-			// Sets the new BundleContext in BundleContextAware so that whenever the Server shuts down
+			// Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
 			// after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
 			// while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
-			BundleContextAware.INSTANCE.setBundleContext(bundleContext);
+			BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
 			try {
 				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
 				// DispatcherServletTrackerSupport already holds a ServletConfig reference

@@ -19,28 +19,28 @@
 */
 package com.adeptj.runtime.common;
 
-import javax.servlet.ServletContext;
+import org.osgi.framework.BundleContext;
 
 /**
- * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
+ * This Enum provides the access to the OSGi System Bundle {@link BundleContext}.
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServletContextAware {
+public enum BundleContextHolder {
 
 	INSTANCE;
 
-	private ServletContext context;
-
-	public void setServletContext(ServletContext context) {
-		this.context = context;
+	private BundleContext bundleContext;
+	
+	public BundleContext getBundleContext() {
+		return this.bundleContext;
 	}
-
-	public ServletContext getServletContext() {
-		return this.context;
+	
+	public boolean isBundleContextSet() {
+		return this.bundleContext != null;
 	}
-
-	public <T> T getAttr(String name, Class<T> type) {
-		return type.cast(this.context.getAttribute(name));
+	
+	public void setBundleContext(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
 	}
 }

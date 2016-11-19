@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.adeptj.runtime.common.OSGiConsolePasswords;
+import com.adeptj.runtime.common.CredentialMatcher;
 import com.typesafe.config.Config;
 
 import io.undertow.security.idm.Account;
@@ -40,11 +40,16 @@ import io.undertow.security.idm.PasswordCredential;
  */
 public class OSGiConsoleIdentityManager implements IdentityManager {
 
+	private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
+	
+	/**
+	 * User to Roles mapping.
+	 */
 	private Map<String, List<String>> userRolesMapping;
 
 	@SuppressWarnings("unchecked")
 	public OSGiConsoleIdentityManager(Config undertowCfg) {
-		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject("common.user-roles-mapping").unwrapped()));
+		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
 	}
 
 	/**
@@ -63,8 +68,11 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(String id, Credential credential) {
+		PasswordCredential cred = (PasswordCredential) credential;
 		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(id))
-				.map(entry -> this.account(id, (PasswordCredential) credential)).filter(Objects::nonNull).findFirst().get();
+				.map(entry -> CredentialMatcher.INSTANCE.matches(id, new String(cred.getPassword()))
+						? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, cred), new HashSet<>(this.userRolesMapping.get(id)))
+						: null).filter(Objects::nonNull).findFirst().get();
 	}
 
 	/**
@@ -78,11 +86,5 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	@Override
 	public Account verify(Credential credential) {
 		return null;
-	}
-
-	private OSGiConsoleAccount account(String id, PasswordCredential pwdCredential) {
-		return OSGiConsolePasswords.INSTANCE.matches(id, new String(pwdCredential.getPassword()))
-				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential), new HashSet<>(this.userRolesMapping.get(id)))
-				: null;
 	}
 }

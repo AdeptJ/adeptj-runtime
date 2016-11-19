@@ -43,4 +43,8 @@ public enum Verb {
 	public HttpString toHttpString() {
 		return HttpString.tryFromString(this.toString());
 	}
+	
+	public static HttpString from(String verb) {
+		return HttpString.tryFromString(verb);
+	}
 }

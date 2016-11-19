@@ -38,7 +38,7 @@ import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.ServletContextAware;
+import com.adeptj.runtime.common.ServletContextHolder;
 
 /**
  * BundleProvisioner that handles the installation/activation of required bundles after the system bundle is up and running.
@@ -75,20 +75,19 @@ public final class BundleProvisioner {
 		}
 	}
 
-	private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger)
-			throws Exception {
+	private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
 		// First install all the Bundles.
-		List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(context, logger, url))
+		List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
 				.filter(Objects::nonNull).collect(Collectors.toList());
 		logger.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
 		return installedBundles;
 	}
 
-	private static Bundle installBundle(BundleContext systemBundleContext, Logger logger, URL url) {
+	private static Bundle installBundle(URL url, BundleContext context, Logger logger) {
 		logger.debug("Installing Bundle from location: [{}]", url);
 		Bundle bundle = null;
 		try {
-			bundle = systemBundleContext.installBundle(url.toExternalForm());
+			bundle = context.installBundle(url.toExternalForm());
 		} catch (BundleException | IllegalStateException | SecurityException ex) {
 			logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
 		}
@@ -96,7 +95,7 @@ public final class BundleProvisioner {
 	}
 
 	private static List<URL> collectBundles(Logger logger) throws IOException {
-		String rootPath = ServletContextAware.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+		String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
 		Predicate<JarEntry> bundlePredicate = (jarEentry) -> jarEentry.getName().startsWith(BUNDLES_JAR_DIR)
 				&& jarEentry.getName().endsWith(EXTN_JAR);

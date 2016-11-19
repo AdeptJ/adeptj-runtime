@@ -32,7 +32,7 @@ import javax.servlet.annotation.HandlesTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.ServletContextAware;
+import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.initializer.StartupHandler;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 
@@ -56,7 +56,7 @@ public class StartupHandlerInitializer implements ServletContainerInitializer {
 			logger.error("No @HandlesTypes(StartupHandler) on classpath!!");
 			throw new IllegalStateException("No @HandlesTypes(StartupHandler) on classpath!!");
 		} else {
-			ServletContextAware.INSTANCE.setServletContext(context);
+			ServletContextHolder.INSTANCE.setServletContext(context);
 			context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
 			handlers.forEach(handler -> this.handleStartupHandler(context, logger, handler));
 			// If we are here means startup went well above, register FrameworkShutdownHandler now.

@@ -25,7 +25,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.logging.LogbackProvisioner;
@@ -70,7 +70,7 @@ public final class Main {
 
 	private static void stopOSGiFramework(Logger logger) {
 		// Check if OSGi Framework was already started, try to stop the framework gracefully.
-		if (BundleContextAware.INSTANCE.isBundleContextSet()) {
+		if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
 			logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
 			FrameworkProvisioner.INSTANCE.stopFramework();
 		}

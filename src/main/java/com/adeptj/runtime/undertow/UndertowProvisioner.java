@@ -63,6 +63,7 @@ import org.xnio.Options;
 import com.adeptj.runtime.common.CommonUtils;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.ServerMode;
+import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
@@ -258,8 +259,7 @@ public final class UndertowProvisioner {
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
-		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(verb -> HttpString.tryFromString(verb))
-				.collect(Collectors.toSet());
+		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
 	}
 
 	private static HttpHandler rootHandler(HttpHandler initialHandler, Config undertowConfig) {

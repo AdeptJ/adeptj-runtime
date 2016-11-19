@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.osgi.framework.BundleContext;
 
-import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.BundleContextHolder;
 
 /**
  * Support for DispatcherServletTracker.
@@ -44,7 +44,7 @@ public enum DispatcherServletTrackerSupport {
 	public void openDispatcherServletTracker(ServletConfig servletConfig) {
 		this.initServletConfig(servletConfig);
 		if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
-			BundleContext ctx = BundleContextAware.INSTANCE.getBundleContext();
+			BundleContext ctx = BundleContextHolder.INSTANCE.getBundleContext();
 			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
 			dispatcherServletTracker.open();
 			this.dispatcherServletTracker = dispatcherServletTracker;

@@ -36,10 +36,10 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.BundleContextAware;
+import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.servlet.OSGiServletContextsErrorSevlet;
+import com.adeptj.runtime.servlet.OSGiServletContextsErrorServlet;
 import com.adeptj.runtime.servlet.ProxyDispatcherServlet;
 import com.typesafe.config.Config;
 
@@ -72,14 +72,14 @@ public enum FrameworkProvisioner {
             this.frameworkListener = new FrameworkRestartHandler();
             BundleContext systemBundleContext = this.framework.getBundleContext();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
-            BundleContextAware.INSTANCE.setBundleContext(systemBundleContext);
+            BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             BundleProvisioner.provisionBundles(systemBundleContext);
             logger.info("OSGi Framework started in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
 			List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
-			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiServletContextsErrorSevlet(), errorPages);
+			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiServletContextsErrorServlet(), errorPages);
 			this.registerProxyDispatcherServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
@@ -107,8 +107,8 @@ public enum FrameworkProvisioner {
     }
 
 	private void removeFrameworkListener() {
-		if (BundleContextAware.INSTANCE.isBundleContextSet()) {
-			BundleContextAware.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
+		if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
+			BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
 		}
 	}
     
@@ -124,14 +124,14 @@ public enum FrameworkProvisioner {
 		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
 		// This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
 		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
-		Dynamic servletRegistration = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
-		servletRegistration.addMapping(ROOT_MAPPING);
+		Dynamic proxyDispatcherServlet = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
+		proxyDispatcherServlet.addMapping(ROOT_MAPPING);
 		// Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
 		// Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026: 
 		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-		servletRegistration.setAsyncSupported(true);
+		proxyDispatcherServlet.setAsyncSupported(true);
 		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
-		servletRegistration.setLoadOnStartup(0);
+		proxyDispatcherServlet.setLoadOnStartup(0);
 		logger.info("ProxyDispatcherServlet registered successfully!!");
 	}
 
@@ -152,9 +152,7 @@ public enum FrameworkProvisioner {
 		Properties props = new Properties();
         props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
-        props.forEach((key, val) -> {
-        	configs.put((String) key, (String) val);
-        });
+        props.forEach((key, val) -> configs.put((String) key, (String) val));
 		return configs;
 	}
 }

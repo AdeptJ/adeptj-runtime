@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.adeptj.runtime.config.Configs;
 
 /**
- * OSGiConsolePasswords, Logic for creating password hash and comparing submitted credential is same as implemented
+ * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
  * in [org.apache.felix.webconsole.internal.servlet.Password]
  * 
  * Because, we want to be consistent with the hashing mechanism used by OSGi Web Console configuration management,
@@ -42,7 +42,7 @@ import com.adeptj.runtime.config.Configs;
  * 
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum OSGiConsolePasswords {
+public enum CredentialMatcher {
 
 	INSTANCE;
 
@@ -52,14 +52,13 @@ public enum OSGiConsolePasswords {
 
 	private final String cfgFile;
 
-	OSGiConsolePasswords() {
+	CredentialMatcher() {
 		this.cfgFile = new StringBuilder(Configs.INSTANCE.felix().getString("felix-cm-dir"))
 				.append(OSGI_MGR_CFG_FILE.replace('/', File.separatorChar)).toString();
 	}
 
 	public boolean matches(String id, String formPwd) {
-		// This happens when OsgiManager.config file is non-existent as configuration was never saved
-		// from OSGi console.
+		// This happens when OsgiManager.config file is non-existent as configuration was never saved from OSGi console.
 		if (Files.exists(Paths.get(this.cfgFile))) {
 			return this.matchFromOsgiManagerConfigFile(formPwd);
 		} else {
