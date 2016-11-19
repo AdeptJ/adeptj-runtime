@@ -19,11 +19,11 @@
 */
 package com.adeptj.runtime.undertow;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import com.adeptj.runtime.common.OSGiConsolePasswords;
 import com.typesafe.config.Config;
@@ -40,14 +40,11 @@ import io.undertow.security.idm.PasswordCredential;
  */
 public class OSGiConsoleIdentityManager implements IdentityManager {
 
-	private Map<String, List<String>> principalRoleMapping;
+	private Map<String, List<String>> userRolesMapping;
 
 	@SuppressWarnings("unchecked")
-	public OSGiConsoleIdentityManager(Config undertowConfig) {
-		this.principalRoleMapping = new HashMap<>();
-		undertowConfig.getObject("common.osgi-console-user-role-mapping").unwrapped().forEach((principal, roles) -> {
-			this.principalRoleMapping.put(principal, (List<String>) roles);
-		});
+	public OSGiConsoleIdentityManager(Config undertowCfg) {
+		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject("common.user-roles-mapping").unwrapped()));
 	}
 
 	/**
@@ -57,15 +54,8 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(Account account) {
-		if (account != null) {
-			String id = account.getPrincipal().getName();
-			if (this.principalRoleMapping.containsKey(id)) {
-				if (this.principalRoleMapping.get(id).containsAll(account.getRoles())) {
-					return account;
-				}
-			}
-		}
-		return null;
+		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(account.getPrincipal().getName()))
+				.anyMatch(entry -> entry.getValue().containsAll(account.getRoles())) ? account : null;
 	}
 
 	/**
@@ -73,11 +63,8 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(String id, Credential credential) {
-		PasswordCredential pwdCredential = (PasswordCredential) credential;
-		return OSGiConsolePasswords.INSTANCE.matches(id, new String(pwdCredential.getPassword()))
-				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential), this.principalRoleMapping
-						.getOrDefault(id, Collections.emptyList()).stream().collect(Collectors.toSet()))
-				: null;
+		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(id))
+				.map(entry -> this.account(id, (PasswordCredential) credential)).filter(Objects::nonNull).findFirst().get();
 	}
 
 	/**
@@ -93,4 +80,9 @@ public class OSGiConsoleIdentityManager implements IdentityManager {
 		return null;
 	}
 
+	private OSGiConsoleAccount account(String id, PasswordCredential pwdCredential) {
+		return OSGiConsolePasswords.INSTANCE.matches(id, new String(pwdCredential.getPassword()))
+				? new OSGiConsoleAccount(new OSGiConsolePrincipal(id, pwdCredential), new HashSet<>(this.userRolesMapping.get(id)))
+				: null;
+	}
 }

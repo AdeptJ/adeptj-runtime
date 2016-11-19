@@ -27,7 +27,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
@@ -71,19 +70,16 @@ public enum OSGiConsolePasswords {
 	}
 
 	private boolean matchFromProvisioningConfigFile(String id, String formPwd) {
-		Map<String, Object> users = Configs.INSTANCE.undertow().getObject("common.osgi-console-users").unwrapped();
-		if (users.containsKey(id)) {
-			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)),
-					this.getPasswordBytes((String) users.get(id)));
-		}
-		return false;
+		return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
+				.filter(entry -> entry.getKey().equals(id))
+				.anyMatch(entry -> Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)),
+						this.getPasswordBytes((String) entry.getValue())));
 	}
 
 	private boolean matchFromOsgiManagerConfigFile(String formPwd) {
 		try {
-			String storedPwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream().filter(line -> {
-				return line.startsWith("password=");
-			}).collect(Collectors.joining()).replace("\\", "");
+			String storedPwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream()
+					.filter(line -> line.startsWith("password=")).collect(Collectors.joining()).replace("\\", "");
 			return Arrays.equals(this.getPasswordBytes(this.hashPassword(formPwd)), this.getPasswordBytes(
 					storedPwdLine.substring(storedPwdLine.indexOf('"') + 1, storedPwdLine.length() - 1)));
 		} catch (Exception ex) {
