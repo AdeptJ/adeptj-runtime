@@ -253,8 +253,8 @@ public final class UndertowProvisioner {
 		return headers;
 	}
 	
-	private static PredicateHandler predicateHandler(HttpHandler handler) {
-		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), handler);
+	private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
+		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), initialHandler);
 	}
 
 	private static Set<HttpString> allowedMethods(Config undertowConfig) {
@@ -262,9 +262,9 @@ public final class UndertowProvisioner {
 				.collect(Collectors.toSet());
 	}
 
-	private static HttpHandler rootHandler(HttpHandler handler, Config undertowConfig) {
+	private static HttpHandler rootHandler(HttpHandler initialHandler, Config undertowConfig) {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(predicateHandler(handler), allowedMethods(undertowConfig))));
+				new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(undertowConfig))));
 	}
 	
 	private static List<ErrorPage> errorPages(Config undertowConfig) {
