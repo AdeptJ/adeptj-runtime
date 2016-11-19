@@ -40,7 +40,7 @@ import com.adeptj.runtime.viewengine.ViewEngine;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "OSGiServletContextsErrorServlet")
+@WebServlet(name = "OSGiServletContextsErrorServlet", asyncSupported = true)
 public class OSGiServletContextsErrorServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -5818850813832379842L;
