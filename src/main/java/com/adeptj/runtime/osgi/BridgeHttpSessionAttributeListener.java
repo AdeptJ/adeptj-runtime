@@ -31,34 +31,16 @@ public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeL
 
 	@Override
 	public void attributeAdded(HttpSessionBindingEvent event) {
-		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
-		if (attributeDispatcher != null) {
-			attributeDispatcher.attributeAdded(event);
-		}
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_ADDED, event);
 	}
 
 	@Override
 	public void attributeRemoved(HttpSessionBindingEvent event) {
-		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
-		if (attributeDispatcher != null) {
-			attributeDispatcher.attributeRemoved(event);
-		}
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REMOVED, event);
 	}
 
 	@Override
 	public void attributeReplaced(HttpSessionBindingEvent event) {
-		HttpSessionAttributeListener attributeDispatcher = this.getHttpSessionAttributeListener();
-		if (attributeDispatcher != null) {
-			attributeDispatcher.attributeReplaced(event);
-		}
-	}
-
-	private HttpSessionAttributeListener getHttpSessionAttributeListener() {
-		HttpSessionAttributeListener listener = null;
-		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
-		if (tracker != null) {
-			listener = tracker.getHttpSessionAttributeListener();
-		}
-		return listener;
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REPLACED, event);
 	}
 }

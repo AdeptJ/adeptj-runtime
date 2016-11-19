@@ -35,8 +35,8 @@ import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
 
 /**
  * ProxyDispatcherServlet acting as a front controller for all of the incoming requests and
- * delegates the actual service request to FELIX DispatcherServlet.
- * So in other words it is acting as a Proxy for FELIX DispatcherServlet.
+ * delegates the actual service request to Felix DispatcherServlet.
+ * So in other words it is acting as a Proxy for Felix DispatcherServlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -59,7 +59,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
 	}
 
     /**
-     * Proxy for FELIX DispatcherServlet, delegates all the calls to the underlying DispatcherServlet.
+     * Proxy for Felix DispatcherServlet, delegate all the calls to the underlying DispatcherServlet.
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

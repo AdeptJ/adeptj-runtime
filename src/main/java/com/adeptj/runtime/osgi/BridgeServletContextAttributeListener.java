@@ -33,14 +33,14 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 
 	@Override
 	public void attributeAdded(ServletContextAttributeEvent event) {
-		if (this.isBundleContext(event.getName())) {
+		if (this.isAttributeBundleContext(event.getName())) {
 			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
 		}
 	}
 
 	@Override
 	public void attributeRemoved(ServletContextAttributeEvent event) {
-		if (this.isBundleContext(event.getName())) {
+		if (this.isAttributeBundleContext(event.getName())) {
 			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
 		}
 	}
@@ -50,7 +50,7 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 		// Does nothing as of now.
 	}
 
-	private boolean isBundleContext(String attrName) {
-		return BundleContext.class.getName().equals(attrName);
+	private boolean isAttributeBundleContext(String attributeName) {
+		return BundleContext.class.getName().equals(attributeName);
 	}
 }

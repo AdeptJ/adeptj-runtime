@@ -31,18 +31,7 @@ public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
 
 	@Override
 	public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
-		HttpSessionIdListener sessionIdDispatcher = this.getHttpSessionIdListener();
-		if (sessionIdDispatcher != null) {
-			sessionIdDispatcher.sessionIdChanged(event, oldSessionId);
-		}
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ID_CHANGED, event, oldSessionId);
 	}
 
-	private HttpSessionIdListener getHttpSessionIdListener() {
-		HttpSessionIdListener listener = null;
-		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
-		if (tracker != null) {
-			listener = tracker.getHttpSessionIdListener();
-		}
-		return listener;
-	}
 }

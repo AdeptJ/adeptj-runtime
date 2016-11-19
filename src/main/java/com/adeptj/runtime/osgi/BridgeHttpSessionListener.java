@@ -31,26 +31,12 @@ public class BridgeHttpSessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
-		HttpSessionListener sessionDispatcher = this.getHttpSessionListener();
-		if (sessionDispatcher != null) {
-			sessionDispatcher.sessionCreated(se);
-		}
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_CREATED, se);
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent se) {
-		HttpSessionListener sessionDispatcher = this.getHttpSessionListener();
-		if (sessionDispatcher != null) {
-			sessionDispatcher.sessionDestroyed(se);
-		}
+		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_DESTROYED, se);
 	}
-
-	private HttpSessionListener getHttpSessionListener() {
-		HttpSessionListener listener = null;
-		EventDispatcherTracker tracker = EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
-		if (tracker != null) {
-			listener = tracker.getHttpSessionListener();
-		}
-		return listener;
-	}
+	
 }
