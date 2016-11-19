@@ -34,15 +34,15 @@ import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
 
 /**
- * ProxyDispatcherServlet acting as a front controller for all of the incoming requests and
- * delegates the actual service request to Felix DispatcherServlet.
- * So in other words it is acting as a Proxy for Felix DispatcherServlet.
+ * ProxyServlet acting as a front controller for all of the incoming requests for OSGi resources.
+ * Delegates the service request to Felix DispatcherServlet which maintains a registry of HttpServlet/Filter etc.
+ * Depending upon the resolution by DispatcherServlet the request is being further dispatched.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ProxyDispatcherServlet extends HttpServlet {
+public class ProxyServlet extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyDispatcherServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServlet.class);
 
     private static final long serialVersionUID = 702778293237417284L;
 
@@ -52,10 +52,10 @@ public class ProxyDispatcherServlet extends HttpServlet {
     @Override
 	public void init() throws ServletException {
 		long startTime = System.nanoTime();
-		LOGGER.info("Initializing ProxyDispatcherServlet!!");
+		LOGGER.info("Initializing ProxyServlet!!");
 		LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
 		DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
-		LOGGER.info("ProxyDispatcherServlet initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+		LOGGER.info("ProxyServlet initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 
     /**
@@ -92,7 +92,7 @@ public class ProxyDispatcherServlet extends HttpServlet {
      */
     @Override
     public void destroy() {
-        LOGGER.info("Destroying ProxyDispatcherServlet which in turn closes DispatcherServletTracker!!");
+        LOGGER.info("Destroying ProxyServlet which in turn closes DispatcherServletTracker!!");
         DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
     }
 }

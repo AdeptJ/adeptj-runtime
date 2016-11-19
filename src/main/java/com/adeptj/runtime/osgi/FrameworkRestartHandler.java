@@ -65,7 +65,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
 			try {
 				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
 				// DispatcherServletTrackerSupport already holds a ServletConfig reference
-				// from first time when ProxyDispatcherServlet was initialized.
+				// from first time when ProxyServlet was initialized.
 				// Pass a null, which is just fine.
 				logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
 				DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);

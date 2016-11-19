@@ -39,12 +39,12 @@ import org.slf4j.LoggerFactory;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.servlet.OSGiServletContextsErrorServlet;
-import com.adeptj.runtime.servlet.ProxyDispatcherServlet;
+import com.adeptj.runtime.servlet.PerContextErrorServlet;
+import com.adeptj.runtime.servlet.ProxyServlet;
 import com.typesafe.config.Config;
 
 /**
- * FrameworkProvisioner that handles the OSGi Framework(Apache FELIX) startup and shutdown.
+ * FrameworkProvisioner that handles the OSGi Framework(Apache Felix) startup and shutdown.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -54,7 +54,7 @@ public enum FrameworkProvisioner {
 
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
-    private static final String PROXY_DISPATCHER_SERVLET = "ProxyDispatcherServlet";
+    private static final String PROXY_SERVLET = "ProxyServlet";
 
     private static final String ROOT_MAPPING = "/*";
 
@@ -76,11 +76,11 @@ public enum FrameworkProvisioner {
             BundleProvisioner.provisionBundles(systemBundleContext);
             logger.info("OSGi Framework started in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
             this.initBridgeListeners(context);
-            // Set the BundleContext as a ServletContext attribute as per FELIX HttpBridge Specification.
+            // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
 			List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
-			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiServletContextsErrorServlet(), errorPages);
-			this.registerProxyDispatcherServlet(context, logger);
+			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
+			this.registerProxyServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the BundleProvisioner throws exception.
@@ -120,19 +120,19 @@ public enum FrameworkProvisioner {
 		servletContext.addListener(new BridgeHttpSessionAttributeListener());
 	}
     
-    private void registerProxyDispatcherServlet(ServletContext context, Logger logger) {
-		// Register the ProxyDispatcherServlet after the OSGi Framework started successfully.
-		// This will ensure that the FELIX {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
-		// ProxyDispatcherServlet delegates all the service calls to the FELIX DispatcherServlet.
-		Dynamic proxyDispatcherServlet = context.addServlet(PROXY_DISPATCHER_SERVLET, new ProxyDispatcherServlet());
-		proxyDispatcherServlet.addMapping(ROOT_MAPPING);
+    private void registerProxyServlet(ServletContext context, Logger logger) {
+		// Register the ProxyServlet after the OSGi Framework started successfully.
+		// This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
+		// ProxyServlet delegates all the service calls to the Felix DispatcherServlet.
+		Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
+		proxyServlet.addMapping(ROOT_MAPPING);
 		// Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
 		// Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026: 
 		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-		proxyDispatcherServlet.setAsyncSupported(true);
-		// Load early to detect any issue with OSGi FELIX DispatcherServlet initialization.
-		proxyDispatcherServlet.setLoadOnStartup(0);
-		logger.info("ProxyDispatcherServlet registered successfully!!");
+		proxyServlet.setAsyncSupported(true);
+		// Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
+		proxyServlet.setLoadOnStartup(0);
+		logger.info("ProxyServlet registered successfully!!");
 	}
 
 	private Framework createFramework(Logger logger) throws Exception {

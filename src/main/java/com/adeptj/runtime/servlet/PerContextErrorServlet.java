@@ -34,14 +34,14 @@ import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
 
 /**
- * OSGiServletContextsErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
+ * PerContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
  * 
  * Note: This is independent of UndertowServer and directly managed by OSGi. 
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "OSGiServletContextsErrorServlet", asyncSupported = true)
-public class OSGiServletContextsErrorServlet extends HttpServlet {
+@WebServlet(name = "PerContextErrorServlet", asyncSupported = true)
+public class PerContextErrorServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -5818850813832379842L;
 
