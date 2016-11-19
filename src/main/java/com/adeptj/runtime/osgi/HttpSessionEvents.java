@@ -47,13 +47,12 @@ public enum HttpSessionEvents {
 	SESSION_ATTRIBUTE_REPLACED;
 
 	public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
-		Optional<HttpSessionListener> optionalListener = optionalHttpSessionListener();
 		switch (type) {
 		case SESSION_CREATED:
-			optionalListener.ifPresent(listener -> listener.sessionCreated(event));
+			optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
 			break;
 		case SESSION_DESTROYED:
-			optionalListener.ifPresent(listener -> listener.sessionDestroyed(event));
+			optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
 			break;
 		default:
 			// NO-OP
@@ -62,10 +61,9 @@ public enum HttpSessionEvents {
 	}
 
 	public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event, String oldSessionId) {
-		Optional<HttpSessionIdListener> optionalListener = optionalHttpSessionIdListener();
 		switch (type) {
 		case SESSION_ID_CHANGED:
-			optionalListener.ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
+			optionalSessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
 			break;
 		default:
 			// NO-OP
@@ -74,16 +72,15 @@ public enum HttpSessionEvents {
 	}
 
 	public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
-		Optional<HttpSessionAttributeListener> optionalListener = optionalHttpSessionAttributeListener();
 		switch (type) {
 		case SESSION_ATTRIBUTE_ADDED:
-			optionalListener.ifPresent(listener -> listener.attributeAdded(bindingEvent));
+			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
 			break;
 		case SESSION_ATTRIBUTE_REMOVED:
-			optionalListener.ifPresent(listener -> listener.attributeRemoved(bindingEvent));
+			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
 			break;
 		case SESSION_ATTRIBUTE_REPLACED:
-			optionalListener.ifPresent(listener -> listener.attributeReplaced(bindingEvent));
+			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
 			break;
 		default:
 			// NO-OP
@@ -95,15 +92,15 @@ public enum HttpSessionEvents {
 		return EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
 	}
 
-	private static Optional<HttpSessionListener> optionalHttpSessionListener() {
+	private static Optional<HttpSessionListener> optionalSessionListener() {
 		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionListener());
 	}
 
-	private static Optional<HttpSessionIdListener> optionalHttpSessionIdListener() {
+	private static Optional<HttpSessionIdListener> optionalSessionIdListener() {
 		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionIdListener());
 	}
 
-	private static Optional<HttpSessionAttributeListener> optionalHttpSessionAttributeListener() {
+	private static Optional<HttpSessionAttributeListener> optionalSessionAttributeListener() {
 		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionAttributeListener());
 	}
 }
