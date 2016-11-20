@@ -50,7 +50,7 @@ public final class BundleProvisioner {
 	// No instantiation.
 	private BundleProvisioner() {}
 	
-	private static final String BUNDLES_JAR_DIR = "bundles/";
+	private static final String PREFIX_BUNDLES = "bundles/";
 
 	private static final String EXTN_JAR = ".jar";
 
@@ -97,10 +97,10 @@ public final class BundleProvisioner {
 	private static List<URL> collectBundles(Logger logger) throws IOException {
 		String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
-		Predicate<JarEntry> bundlePredicate = (jarEentry) -> jarEentry.getName().startsWith(BUNDLES_JAR_DIR)
-				&& jarEentry.getName().endsWith(EXTN_JAR);
-		URLConnection conn = BundleProvisioner.class.getResource(rootPath).openConnection();
-		List<URL> bundles = JarURLConnection.class.cast(conn).getJarFile().stream().filter(bundlePredicate)
+		Predicate<JarEntry> bundlePredicate = (jarEentry) -> (jarEentry.getName().startsWith(PREFIX_BUNDLES)
+				&& jarEentry.getName().endsWith(EXTN_JAR));
+		URLConnection connection = BundleProvisioner.class.getResource(rootPath).openConnection();
+		List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
 				.map(jarEentry -> classLoader.getResource(jarEentry.getName())).collect(Collectors.toList());
 		logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
 		return bundles;
