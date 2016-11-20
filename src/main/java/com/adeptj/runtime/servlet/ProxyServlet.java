@@ -63,15 +63,13 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		LOGGER.debug("Handling request: {}", req.getRequestURI());
         HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
 		try {
 			if (dispatcherServlet == null) {
 				LOGGER.error("Can't serve request: [{}], DispatcherServlet is unavailable!!", req.getRequestURI());
 				resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 			} else {
-				dispatcherServlet.service(req, resp);
-				this.logDispatcherException(req);
+				this.doService(dispatcherServlet, req, resp);
 			}
 		} catch (Exception ex) {
             LOGGER.error("Exception while handling request!!", ex);
@@ -79,11 +77,12 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-	private void logDispatcherException(HttpServletRequest req) {
+	private void doService(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		LOGGER.debug("Serving request: {}", req.getRequestURI());
+		servlet.service(req, resp);
 		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
-		Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-		if (exception != null) {
-			LOGGER.error("Exception while handling request!!", exception);
+		if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
+			LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
 		}
 	}
 
