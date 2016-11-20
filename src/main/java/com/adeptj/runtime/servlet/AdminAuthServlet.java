@@ -29,10 +29,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.viewengine.Models;
@@ -62,13 +58,16 @@ public class AdminAuthServlet extends HttpServlet {
 		String requestURI = req.getRequestURI();
 		if (ADMIN_LOGIN_URI.equals(requestURI)) {
 			this.renderLoginPage(req, resp);
-		} else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole("OSGiAdmin")) {
+		} else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
 			this.logout(req, resp);
+		} else {
+			// if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
+			resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
 		}
 	}
 
 	/**
-	 * Control comes here when login to "/auth/j_security_check" fails due to invalid credentials.
+	 * Handle "/auth/j_security_check" validation failure.
 	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -91,16 +90,9 @@ public class AdminAuthServlet extends HttpServlet {
 		ViewEngine.INSTANCE.processView(builder.build());
 	}
 
-	private void logout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// Invalidate the session and redirect back to /system/console page.
-		HttpSession session = req.getSession(false);
-		Logger logger = LoggerFactory.getLogger(AdminAuthServlet.class);
-		if (session == null) {
-			logger.info("No existing session to invalidate!!");
-		} else {
-			logger.info("Invalidating session with id: [{}]", session.getId());
-			session.invalidate();
-		}
+		req.logout();
 		resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
 	}
 }

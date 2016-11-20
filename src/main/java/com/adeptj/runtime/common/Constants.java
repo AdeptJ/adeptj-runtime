@@ -107,6 +107,8 @@ public final class Constants {
 	public static final String HEADER_SERVER = "Server";
 	
 	public static final String PREFIX_ADMIN = "/admin";
+	
+	public static final String OSGI_WEBCONSOLE_ROLE = "OSGiAdmin";
 
 	// Configuration Keys constants start.
 

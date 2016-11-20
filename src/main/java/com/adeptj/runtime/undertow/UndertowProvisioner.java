@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -293,17 +294,26 @@ public final class UndertowProvisioner {
 		return servlets;
 	}
 	
+	private static MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
+		return new MultipartConfigElement(undertowConfig.getString("common.multipart-file-location"),
+				undertowConfig.getLong("common.multipart-max-file-size"),
+				undertowConfig.getLong("common.multipart-max-request-size"),
+				undertowConfig.getInt("common.multipart-file-size-threshold"));
+	}
+	
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())
 				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
 				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
 				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
+				.setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
 				.setIdentityManager(new FileIdentityManager(undertowConfig))
 				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
 				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
 				.addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
 				.addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
+				.setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
 				.addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
 	}
 
