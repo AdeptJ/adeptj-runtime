@@ -64,13 +64,13 @@ public enum ViewEngine {
 				config.getString("admin-view-suffix"), ViewEngine.class.getClassLoader(), false);
 	}
 
-	private Helper resourceBundleHelper() {
-		return new ResourceBundleHelper("messages", Format.MESSAGE);
+	private Helper resourceBundleHelper(Config config) {
+		return new ResourceBundleHelper(config.getString("resource-bundle-basename"), Format.MESSAGE);
 	}
 
 	private MustacheEngine mustacheEngine() {
-		Config config = Configs.INSTANCE.main().getConfig("trimou");
-		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper())
+		Config config = Configs.INSTANCE.trimou();
+		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
 				.addTemplateLocator(templateLocator(config))
 				.setProperty(START_DELIMITER, config.getString("start-delimiter"))
 				.setProperty(END_DELIMITER, config.getString("end-delimiter"))

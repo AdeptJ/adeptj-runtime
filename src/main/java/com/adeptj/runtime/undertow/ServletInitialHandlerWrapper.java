@@ -50,6 +50,7 @@ public class ServletInitialHandlerWrapper implements HandlerWrapper {
 		return new PredicateHandler(
 				Predicates.and(Predicates.prefix(undertowCfg.getString("common.static-resource-prefix")),
 						Predicates.suffixes(extns.toArray(new String[extns.size()]))),
-				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader())), intialHandler);
+				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader(),
+						undertowCfg.getString("common.resource-mgr-prefix"))), intialHandler);
 	}
 }
