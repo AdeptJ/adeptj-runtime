@@ -99,13 +99,13 @@ public enum ViewEngine {
 			} else {
 				response.getWriter().write(mustache.render(context.getModels()));
 			    rendered = true;
+			    if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
+				}
 			}
 		} catch (Exception ex) {
 			LOGGER.error("Exception while processing view: [{}]", view, ex);
 			this.handleException(context, ex);
-		}
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
 		}
 		return rendered;
 	}
@@ -115,9 +115,9 @@ public enum ViewEngine {
 		try {
 			context.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		} catch (IOException ioex) {
-			// Now what? may be log and throw.
-			LOGGER.error("Exception while sending error!!", ex);
-			throw new ViewEngineException(ex.getMessage(), ex);
+			// Now what? may be log and re-throw.
+			LOGGER.error("Exception while sending error!!", ioex);
+			throw new ViewEngineException(ex.getMessage(), ioex);
 		}
 	}
 }
