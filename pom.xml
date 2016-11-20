@@ -396,13 +396,6 @@
 			<version>${felix.log.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.http.servlet-api</artifactId>
-			<version>${felix.http.servlet-api.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		
 		<!-- Here for debugging purpose in eclipse, excluded from being bundled, shaded -->
 		<dependency>
