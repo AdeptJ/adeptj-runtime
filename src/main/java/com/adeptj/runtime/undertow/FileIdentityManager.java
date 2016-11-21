@@ -63,8 +63,9 @@ public class FileIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(Account account) {
-		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(account.getPrincipal().getName()))
-				.anyMatch(entry -> entry.getValue().containsAll(account.getRoles())) ? account : null;
+		Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(account.getPrincipal().getName()) 
+				&& entry.getValue().containsAll(account.getRoles());
+		return this.userRolesMapping.entrySet().stream().filter(predicate).findFirst().isPresent() ? account : null;
 	}
 
 	/**
