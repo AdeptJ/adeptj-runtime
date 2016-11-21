@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
 
-import com.adeptj.runtime.common.CredentialMatcher;
 import com.typesafe.config.Config;
 
 import io.undertow.security.idm.Account;
@@ -47,10 +47,13 @@ public class FileIdentityManager implements IdentityManager {
 	 * User to Roles mapping.
 	 */
 	private Map<String, List<String>> userRolesMapping;
+	
+	private CredentialMatcher matcher;
 
 	@SuppressWarnings("unchecked")
 	public FileIdentityManager(Config undertowCfg) {
 		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
+		this.matcher = new CredentialMatcher();
 	}
 
 	/**
@@ -69,10 +72,12 @@ public class FileIdentityManager implements IdentityManager {
 	 */
 	@Override
 	public Account verify(String id, Credential credential) {
-		return this.userRolesMapping.entrySet().stream().filter(entry -> entry.getKey().equals(id))
-				.map(entry -> CredentialMatcher.INSTANCE.matches(id, new String(((PasswordCredential) credential).getPassword()))
-						? new SimpleAccount(new SimplePrincipal(id), new HashSet<>(this.userRolesMapping.get(id)))
-						: null).filter(Objects::nonNull).findFirst().get();
+		PasswordCredential pwdCredential = (PasswordCredential) credential;
+		Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(id) && pwdCredential.getPassword().length != 0;
+		return this.userRolesMapping.entrySet().stream()
+				.filter(predicate.and(entry -> this.matcher.match(entry.getKey(), new String(pwdCredential.getPassword()))))
+				.map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
+				.findFirst().orElse(null);
 	}
 
 	/**
