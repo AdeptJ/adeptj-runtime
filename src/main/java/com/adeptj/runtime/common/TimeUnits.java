@@ -24,7 +24,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 /**
  * Utility for providing time in multiple ranges.
  * 
- * Rakesh.Kumar, AdeptJ
+ * @author Rakesh.Kumar, AdeptJ
  */
 public final class TimeUnits {
 	
