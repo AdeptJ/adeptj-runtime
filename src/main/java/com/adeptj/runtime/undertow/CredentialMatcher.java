@@ -55,43 +55,43 @@ class CredentialMatcher {
 				.append(OSGI_MGR_CFG_FILE.replace('/', File.separatorChar)).toString();
 	}
 
-	public boolean match(String id, String submittedPwd) {
+	boolean match(String id, String pwd) {
 		boolean matched = false;
 		// This happens when OsgiManager.config file is non-existent as configuration was never saved from OSGi console.
 		if (Files.exists(Paths.get(this.cfgFile))) {
-			matched = this.matchFromOsgiManagerConfig(submittedPwd);
+			matched = this.matchFromOsgiManagerConfig(pwd);
 		} else {
 			// When system starts up very first time, the OsgiManager.config file is non-existent.
 			// Meanwhile make use of default password maintained in provisioning file.
-			matched = this.matchFromProvisioningConfig(id, submittedPwd);
+			matched = this.matchFromProvisioningConfig(id, pwd);
 		}
 		return matched;
 	}
 
-	private boolean matchFromProvisioningConfig(String id, String submittedPwd) {
+	private boolean matchFromProvisioningConfig(String id, String pwd) {
 		return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
 				.filter(entry -> entry.getKey().equals(id)).anyMatch(entry -> Arrays
-						.equals(this.bytes(this.hash(submittedPwd)), this.bytes((String) entry.getValue())));
+						.equals(this.bytes(this.hash(pwd)), this.bytes((String) entry.getValue())));
 	}
 
-	private boolean matchFromOsgiManagerConfig(String submittedPwd) {
+	private boolean matchFromOsgiManagerConfig(String pwd) {
 		boolean matched = false;
 		try {
 			String pwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream()
 					.filter(line -> line.startsWith("password=")).collect(Collectors.joining()).replace("\\", "");
-			matched = Arrays.equals(this.bytes(this.hash(submittedPwd)),
+			matched = Arrays.equals(this.bytes(this.hash(pwd)),
 					this.bytes(pwdLine.substring(pwdLine.indexOf('"') + 1, pwdLine.length() - 1)));
 		} catch (Exception ex) {
-			LoggerFactory.getLogger(CredentialMatcher.class).error("IOException!!", ex);
+			LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
 		}
 		return matched;
 	}
 
-	public byte[] bytes(String pwdHash) {
+	private byte[] bytes(String pwdHash) {
 		return Base64.getDecoder().decode(pwdHash.substring(pwdHash.indexOf('}') + 1));
 	}
 
-	public String hash(String pwd) {
+	private String hash(String pwd) {
 		String hashPassword = pwd;
 		try {
 			MessageDigest md = MessageDigest.getInstance(SHA256);
