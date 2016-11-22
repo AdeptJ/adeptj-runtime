@@ -112,7 +112,8 @@ public class ViewEngineContext {
 		
 		public ViewEngineContext build() {
 			ViewEngineContext context = new ViewEngineContext(this.view, this.models, this.request, this.response);
-			context.locale = this.locale;
+			// English is default Locale if no locale set.
+			context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
 			return context;
 		}
 	}

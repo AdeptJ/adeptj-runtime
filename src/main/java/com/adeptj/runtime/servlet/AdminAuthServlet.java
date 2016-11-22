@@ -79,7 +79,7 @@ public class AdminAuthServlet extends HttpServlet {
 		Models models = new Models();
 		models.put("validation", "Invalid credentials!!");
 		models.put("j_username", req.getParameter("j_username"));
-		builder.view("auth/login").models(models).request(req).response(resp).locale(req.getLocale());
+		builder.view("auth/login").models(models).request(req).response(resp);
 		// Render login page again with validation message.
 		ViewEngine.INSTANCE.processView(builder.build());
 	}

@@ -25,6 +25,7 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENA
 import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
@@ -84,32 +85,14 @@ public enum ViewEngine {
 		LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 	}
 
-	public boolean processView(ViewEngineContext context) {
+	public void processView(ViewEngineContext context) {
 		long startTime = System.nanoTime();
-		boolean rendered = false;
-		String view = context.getView();
-		LOGGER.debug("Processing view: [{}]", view);
-		HttpServletResponse response = context.getResponse();
-		try {
-			Mustache mustache = this.engine.getMustache(view);
-			if (mustache == null) {
-				LOGGER.info("View: [{}] not found!!", view);
-				// Send error so that container's error page mechanism kicks in.
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			} else {
-				response.getWriter().write(mustache.render(context.getModels()));
-			    rendered = true;
-			    if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("Processed view: [{}] in: [{}] ms!!", view, TimeUnits.nanosToMillis(startTime));	
-				}
-			}
-		} catch (Exception ex) {
-			LOGGER.error("Exception while processing view: [{}]", view, ex);
-			this.handleException(context, ex);
+		Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.doProcessView(context, mustache));
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
 		}
-		return rendered;
 	}
-
+	
 	private void handleException(ViewEngineContext context, Exception ex) {
 		context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
 		try {
@@ -118,6 +101,15 @@ public enum ViewEngine {
 			// Now what? may be log and re-throw.
 			LOGGER.error("Exception while sending error!!", ioex);
 			throw new ViewEngineException(ex.getMessage(), ioex);
+		}
+	}
+	
+	private void doProcessView(ViewEngineContext context, Mustache mustache) {
+		try {
+			context.getResponse().getWriter().write(mustache.render(context.getModels()));
+		} catch (Exception ex) {
+			LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
+			this.handleException(context, ex);
 		}
 	}
 }

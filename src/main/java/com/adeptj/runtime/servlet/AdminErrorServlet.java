@@ -28,9 +28,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
 
 /**
  * AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
@@ -49,7 +50,7 @@ public class AdminErrorServlet extends HttpServlet {
 		String requestURI = req.getRequestURI();
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
 		Models models = new Models();
-		builder.models(models).request(req).response(resp).locale(req.getLocale());
+		builder.models(models).request(req).response(resp);
 		if ("/admin/error".equals(requestURI)) {
 			ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
 		} else {
@@ -58,7 +59,9 @@ public class AdminErrorServlet extends HttpServlet {
 			if (exception != null && "500".equals(statusCode)) {
 				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
 				ViewEngine.INSTANCE.processView(builder.view("error/500").build());
-			} else if (!ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build())) {
+			} else if (Configs.INSTANCE.undertow().getStringList("common.status-codes").contains(statusCode)) {
+				ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
+			} else {
 				// if the requested view not found, render 404.
 				ViewEngine.INSTANCE.processView(builder.view("error/404").build());
 			}

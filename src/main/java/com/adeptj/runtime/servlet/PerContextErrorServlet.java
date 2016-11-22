@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
 import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
 
 /**
  * PerContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
@@ -58,13 +58,12 @@ public class PerContextErrorServlet extends HttpServlet {
 	private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
-		builder.models(this.models(req, statusCode)).request(req).response(resp).locale(req.getLocale());
-		if (Integer.valueOf(500).equals(statusCode)) {
-			ViewEngine.INSTANCE.processView(builder.view("error/500").build());
-		} else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
+		builder.models(this.models(req, statusCode)).request(req).response(resp);
+		if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
 			ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
 		} else {
-			ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
+			// if the requested view not found, render 404.
+			ViewEngine.INSTANCE.processView(builder.view("error/404").build());
 		}
 	}
 
