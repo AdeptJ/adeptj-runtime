@@ -56,25 +56,18 @@ class CredentialMatcher {
 	}
 
 	boolean match(String id, String pwd) {
-		boolean matched = false;
-		// This happens when OsgiManager.config file is non-existent as configuration was never saved from OSGi console.
-		if (Files.exists(Paths.get(this.cfgFile))) {
-			matched = this.matchFromOsgiManagerConfig(pwd);
-		} else {
-			// When system starts up very first time, the OsgiManager.config file is non-existent.
-			// Meanwhile make use of default password maintained in provisioning file.
-			matched = this.matchFromProvisioningConfig(id, pwd);
-		}
-		return matched;
+		// When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
+		// default password maintained in provisioning file.
+		return Files.exists(Paths.get(this.cfgFile)) ? this.fromOsgiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
 	}
 
-	private boolean matchFromProvisioningConfig(String id, String pwd) {
+	private boolean fromProvisioningConfig(String id, String pwd) {
 		return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
 				.filter(entry -> entry.getKey().equals(id)).anyMatch(entry -> Arrays
 						.equals(this.bytes(this.hash(pwd)), this.bytes((String) entry.getValue())));
 	}
 
-	private boolean matchFromOsgiManagerConfig(String pwd) {
+	private boolean fromOsgiManagerConfig(String pwd) {
 		boolean matched = false;
 		try {
 			String pwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream()

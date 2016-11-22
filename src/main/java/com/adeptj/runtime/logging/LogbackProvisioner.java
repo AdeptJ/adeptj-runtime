@@ -122,6 +122,13 @@ public class LogbackProvisioner {
 		LoggerContext.class.cast(LoggerFactory.getILoggerFactory()).stop();
 	}
 	
+	public static void addLogger(String name, String level, boolean additivity) {
+		LoggerContext context = LoggerContext.class.cast(LoggerFactory.getILoggerFactory());
+		Logger logger = context.getLogger(name);
+		logger.setLevel(toLevel(level));
+		logger.setAdditive(additivity);
+	}
+	
 	private static void addAppenders(List<Appender<ILoggingEvent>> appenders, Logger logger) {
 		for (Appender<ILoggingEvent> appender : appenders) {
 			logger.addAppender(appender);
@@ -129,7 +136,7 @@ public class LogbackProvisioner {
 	}
 
 	private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {
-		// initialize ROOT Logger at ERROR level.
+		// initialize ROOT Logger at specified level.
 		Logger root = logger(Logger.ROOT_LOGGER_NAME, toLevel(config.getString(ROOT_LOG_LEVEL)), context);
 		root.addAppender(consoleAppender);
 	}
