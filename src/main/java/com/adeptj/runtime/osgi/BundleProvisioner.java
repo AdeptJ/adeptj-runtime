@@ -19,7 +19,13 @@
 */
 package com.adeptj.runtime.osgi;
 
-import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
+import com.adeptj.runtime.common.ServletContextHolder;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
+import org.osgi.framework.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -31,14 +37,7 @@ import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.runtime.common.ServletContextHolder;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 /**
  * BundleProvisioner that handles the installation/activation of required bundles after the system bundle is up and running.
@@ -97,11 +96,11 @@ public final class BundleProvisioner {
 	private static List<URL> collectBundles(Logger logger) throws IOException {
 		String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
 		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
-		Predicate<JarEntry> bundlePredicate = (jarEentry) -> (jarEentry.getName().startsWith(PREFIX_BUNDLES)
-				&& jarEentry.getName().endsWith(EXTN_JAR));
+		Predicate<JarEntry> bundlePredicate = (jarEntry) -> (jarEntry.getName().startsWith(PREFIX_BUNDLES)
+				&& jarEntry.getName().endsWith(EXTN_JAR));
 		URLConnection connection = BundleProvisioner.class.getResource(rootPath).openConnection();
 		List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
-				.map(jarEentry -> classLoader.getResource(jarEentry.getName())).collect(Collectors.toList());
+				.map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
 		logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
 		return bundles;
 	}
