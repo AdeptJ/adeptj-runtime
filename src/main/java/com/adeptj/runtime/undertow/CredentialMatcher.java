@@ -19,16 +19,15 @@
 */
 package com.adeptj.runtime.undertow;
 
-import static com.adeptj.runtime.common.Constants.UTF8;
+import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware;
+import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware;
+import static com.adeptj.runtime.common.Constants.UTF8;
 
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
@@ -46,7 +45,7 @@ class CredentialMatcher {
 	boolean match(String id, String pwd) {
 		// When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
 		// default password maintained in provisioning file.
-		return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOsgiManagerConfig(pwd)
+		return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd)
 				: this.fromProvisioningConfig(id, pwd);
 	}
 
@@ -56,7 +55,7 @@ class CredentialMatcher {
 				.anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
 	}
 
-	private boolean fromOsgiManagerConfig(String pwd) {
+	private boolean fromOSGiManagerConfig(String pwd) {
 		try {
 			return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
 		} catch (Exception ex) {

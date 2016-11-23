@@ -19,14 +19,13 @@
 */
 package com.adeptj.runtime.common;
 
-import java.security.SecureRandom;
-import java.util.Base64;
+import com.adeptj.runtime.config.Configs;
+import com.typesafe.config.Config;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
-import com.adeptj.runtime.config.Configs;
-import com.typesafe.config.Config;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * Passwords, utility for password generation and matching.

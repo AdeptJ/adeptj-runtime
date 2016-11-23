@@ -19,47 +19,47 @@
 ###############################################################################
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.adeptj</groupId>
-		<artifactId>adeptj-parent</artifactId>
-		<version>1.0.0.Final</version>
-	</parent>
-	<artifactId>adeptj-runtime</artifactId>
-	<version>1.0.6-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>AdeptJ Runtime</name>
-	<description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
-	<url>http://www.adeptj.com</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.adeptj</groupId>
+        <artifactId>adeptj-parent</artifactId>
+        <version>1.0.0.Final</version>
+    </parent>
+    <artifactId>adeptj-runtime</artifactId>
+    <version>1.0.6-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>AdeptJ Runtime</name>
+    <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
+    <url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
-	<properties>
-		<!-- Common Dependencies -->
-		<undertow.version>1.4.4.Final</undertow.version>
-		<undertow.websockets.version>1.4.4.Final</undertow.websockets.version>
-		<xnio.version>3.4.1.Final</xnio.version>
-		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
-		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
-		
-		<!-- Apache Felix and OSGi Dependencies Version -->
-		<felix.framework.version>5.6.1</felix.framework.version>
-		
-		<!-- AdeptJ Modular Web Dependencies Version -->
-		<adeptj-modules-webconsole-branding.version>1.0.0.RELEASE</adeptj-modules-webconsole-branding.version>
-		<adeptj-modules-webconsole-security.version>1.0.0.RELEASE</adeptj-modules-webconsole-security.version>
-	</properties>
-	
-	<prerequisites>
+    <properties>
+        <!-- Common Dependencies -->
+        <undertow.version>1.4.4.Final</undertow.version>
+        <undertow.websockets.version>1.4.4.Final</undertow.websockets.version>
+        <xnio.version>3.4.1.Final</xnio.version>
+        <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+        <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+
+        <!-- Apache Felix and OSGi Dependencies Version -->
+        <felix.framework.version>5.6.1</felix.framework.version>
+
+        <!-- AdeptJ Modular Web Dependencies Version -->
+        <adeptj-modules-webconsole-branding.version>1.0.0.RELEASE</adeptj-modules-webconsole-branding.version>
+        <adeptj-modules-webconsole-security.version>1.0.0.RELEASE</adeptj-modules-webconsole-security.version>
+    </properties>
+
+    <prerequisites>
         <maven>3.3.9</maven>
     </prerequisites>
-    
+
     <!-- Project Information -->
     <organization>
         <name>AdeptJ</name>
         <url>http://www.adeptj.com</url>
     </organization>
-    
+
     <licenses>
         <license>
             <name>Apache License Version 2.0</name>
@@ -67,7 +67,7 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
             <id>rakeshk15</id>
@@ -86,8 +86,8 @@
             </properties>
         </developer>
     </developers>
-    
-     <issueManagement>
+
+    <issueManagement>
         <url>https://github.com/AdeptJ/adeptj-runtime/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
@@ -109,1050 +109,1051 @@
         <developerConnection>scm:git:git@github.com:AdeptJ/adeptj-runtime.git</developerConnection>
     </scm>
 
-	<build>
-	
-		<!-- Strip off the version information from final artifact -->
-		<finalName>${project.artifactId}</finalName>
-	    
-		<plugins>
-		    
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<compilerArgument>-parameters</compilerArgument>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-				</configuration>
-			</plugin>
+    <build>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>${maven-shade-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<excludes>
-									<exclude>org.apache.felix:org.apache.felix.http.base:*:jar</exclude>
-								</excludes>
-							</artifactSet>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.adeptj.runtime.initializer.Main</mainClass>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+        <!-- Strip off the version information from final artifact -->
+        <finalName>${project.artifactId}</finalName>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>${maven-dependency-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<excludeScope>runtime</excludeScope>
-							<excludeScope>compile</excludeScope>
-							<includeScope>provided</includeScope>
-							<excludeTransitive>true</excludeTransitive>
-							<excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<overWriteReleases>true</overWriteReleases>
-					<overWriteSnapshots>true</overWriteSnapshots>
-					<stripVersion>false</stripVersion>
-					<!-- All bundles will be copied here -->
-					<outputDirectory>${project.build.directory}/classes/bundles</outputDirectory>
-				</configuration>
-			</plugin>
+        <plugins>
 
-		</plugins>
-		
-	</build>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
 
-	<dependencies>
-	
-		<!-- Undertow Dependencies Starts -->
-		
-		<dependency>
-		    <groupId>org.jboss.logging</groupId>
-		    <artifactId>jboss-logging</artifactId>
-		    <version>3.3.0.Final</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.wildfly.common</groupId>
-		    <artifactId>wildfly-common</artifactId>
-		    <version>1.1.0.Final</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>org.jboss.logging</groupId>
-		    		<artifactId>jboss-logging</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.apache.felix:org.apache.felix.http.base:*:jar</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.adeptj.runtime.initializer.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-		<dependency>
-			<groupId>org.jboss.xnio</groupId>
-			<artifactId>xnio-api</artifactId>
-			<version>${xnio.version}</version>
-		</dependency>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven-dependency-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeScope>runtime</excludeScope>
+                            <excludeScope>compile</excludeScope>
+                            <includeScope>provided</includeScope>
+                            <excludeTransitive>true</excludeTransitive>
+                            <excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <overWriteReleases>true</overWriteReleases>
+                    <overWriteSnapshots>true</overWriteSnapshots>
+                    <stripVersion>false</stripVersion>
+                    <!-- All bundles will be copied here -->
+                    <outputDirectory>${project.build.directory}/classes/bundles</outputDirectory>
+                </configuration>
+            </plugin>
 
-		<dependency>
-			<groupId>org.jboss.xnio</groupId>
-			<artifactId>xnio-nio</artifactId>
-			<version>${xnio.version}</version>
-		</dependency>
-		
-		<!-- Undertow core [provided] dependencies -->
-		
-		<dependency>
-		    <groupId>org.eclipse.jetty.alpn</groupId>
-		    <artifactId>alpn-api</artifactId>
-		    <version>1.1.3.v20160715</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.jdeparser</groupId>
-		    <artifactId>jdeparser</artifactId>
-		    <version>2.0.2.Final</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.logging</groupId>
-		    <artifactId>jboss-logging-annotations</artifactId>
-		    <version>2.0.0.Final</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.logging</groupId>
-		    <artifactId>jboss-logging-processor</artifactId>
-		    <version>2.0.0.Final</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>org.jboss.jdeparser</groupId>
-		    		<artifactId>jdeparser</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.jboss.classfilewriter</groupId>
-		    <artifactId>jboss-classfilewriter</artifactId>
-		    <version>1.1.2.Final</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>io.undertow</groupId>
-		    <artifactId>undertow-parser-generator</artifactId>
-		    <version>${undertow.version}</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>org.jboss.classfilewriter</groupId>
-		    		<artifactId>jboss-classfilewriter</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-		
-		<!-- Undertow core [provided] dependencies -->
-		
-		<dependency>
-			<groupId>io.undertow</groupId>
-			<artifactId>undertow-core</artifactId>
-			<version>${undertow.version}</version>
-		</dependency>
+        </plugins>
 
-		<dependency>
-			<groupId>io.undertow</groupId>
-			<artifactId>undertow-servlet</artifactId>
-			<version>${undertow.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>io.undertow</groupId>
-		    <artifactId>undertow-websockets-jsr</artifactId>
-		    <version>${undertow.websockets.version}</version>
-		</dependency>
+    </build>
 
-		<!-- Undertow Dependencies Ends -->
+    <dependencies>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
+        <!-- Undertow Dependencies Starts -->
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.3.0.Final</version>
+        </dependency>
 
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.framework</artifactId>
-			<version>${felix.framework.version}</version>
-		</dependency>
-		
-		<dependency>
-		    <groupId>com.typesafe</groupId>
-		    <artifactId>config</artifactId>
-		</dependency>
-		
-		<!-- RenderEngine Dependencies -->
-		<dependency>
-		    <groupId>org.trimou</groupId>
-		    <artifactId>trimou-core</artifactId>
-		    <version>2.1.0.Final</version>
-		    <exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <dependency>
+            <groupId>org.wildfly.common</groupId>
+            <artifactId>wildfly-common</artifactId>
+            <version>1.1.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- OSGi Bundles Starts -->
+        <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-api</artifactId>
+            <version>${xnio.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-		    <groupId>io.fastjson</groupId>
-		    <artifactId>boon</artifactId>
-		    <scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+            <version>${xnio.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Undertow core [provided] dependencies -->
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.alpn</groupId>
+            <artifactId>alpn-api</artifactId>
+            <version>1.1.3.v20160715</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.scr</artifactId>
-			<version>${felix.scr.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.jdeparser</groupId>
+            <artifactId>jdeparser</artifactId>
+            <version>2.0.2.Final</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.configadmin</artifactId>
-			<version>${felix.configadmin.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+            <version>2.0.0.Final</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.eventadmin</artifactId>
-			<version>${felix.eventadmin.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>2.0.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.jdeparser</groupId>
+                    <artifactId>jdeparser</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.metatype</artifactId>
-			<version>${felix.metatype.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.jboss.classfilewriter</groupId>
+            <artifactId>jboss-classfilewriter</artifactId>
+            <version>1.1.2.Final</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.log</artifactId>
-			<version>${felix.log.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- Here for debugging purpose in eclipse, excluded from being bundled, shaded -->
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.http.base</artifactId>
-			<version>${felix.http.base.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-parser-generator</artifactId>
+            <version>${undertow.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.classfilewriter</groupId>
+                    <artifactId>jboss-classfilewriter</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.http.bridge</artifactId>
-			<version>${felix.http.bridge.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Undertow core [provided] dependencies -->
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.webconsole</artifactId>
-			<version>${felix.webconsole.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>${undertow.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.inventory</artifactId>
-			<version>${felix.inventory.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-servlet</artifactId>
+            <version>${undertow.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.webconsole.plugins.memoryusage</artifactId>
-			<version>${felix.webconsole.plugins.memoryusage.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.threaddump</artifactId>
-			<version>1.0.0</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.osgi</groupId>
-					<artifactId>org.osgi.core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.felix</groupId>
-					<artifactId>org.apache.felix.inventory</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-websockets-jsr</artifactId>
+            <version>${undertow.websockets.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.webconsole.plugins.event</artifactId>
-			<version>${felix.webconsole.plugins.event.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Undertow Dependencies Ends -->
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.webconsole.plugins.ds</artifactId>
-			<version>${felix.webconsole.plugins.ds.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.webconsole.plugins.packageadmin</artifactId>
-			<version>${felix.webconsole.plugins.packageadmin.version}</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
 
-		<!-- OSGi Bundles Ends -->
-		
-		<!-- AdeptJ Modular Web Bundles Starts-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modules-commons-webconsole-branding</artifactId>
-			<version>${adeptj-modules-webconsole-branding.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.adeptj</groupId>
-			<artifactId>adeptj-modules-commons-webconsole-security</artifactId>
-			<version>${adeptj-modules-webconsole-security.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- AdeptJ Modular Web Bundles Ends-->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.framework.version}</version>
+        </dependency>
 
-	</dependencies>
-	
-	<profiles>
-	
-	   <profile>
-	       <id>Ehcache</id>
-	       
-	        <dependencies>
-	        	
-	        	<dependency>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-collections4</artifactId>
-					<version>4.1</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.ehcache</groupId>
-					<artifactId>ehcache</artifactId>
-					<version>${ehcache.version}</version>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-api</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-			
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-ehcache</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-	       
-	        </dependencies>
-	   
-	   </profile>
-	   
-	   <profile>
-	       <id>Hazelcast</id>
-	       
-	        <dependencies>
-		
-				<dependency>
-				    <groupId>com.hazelcast</groupId>
-				    <artifactId>hazelcast</artifactId>
-				    <version>3.7.2</version>
-				    <scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-api</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-			
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-hazelcast</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-	       
-	        </dependencies>
-	   
-	   </profile>
-	   
-	   <profile>
-	       <id>Infinispan</id>
-	       
-	        <dependencies>
-	        
-				<dependency>
-				    <groupId>org.jboss.marshalling</groupId>
-				    <artifactId>jboss-marshalling-osgi</artifactId>
-				    <version>1.4.10.Final</version>
-				    <scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-				    <groupId>org.jboss.spec.javax.transaction</groupId>
-				    <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-				    <version>1.0.1.Final</version>
-				    <scope>compile</scope>
-				</dependency>
-				
-				<dependency>
-				    <groupId>org.jgroups</groupId>
-				    <artifactId>jgroups</artifactId>
-				    <version>3.6.11.Final</version>
-				    <scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-		    		<groupId>org.infinispan</groupId>
-				    <artifactId>infinispan-commons</artifactId>
-				    <version>8.2.4.Final</version>
-				    <scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-				    <groupId>org.infinispan</groupId>
-				    <artifactId>infinispan-core</artifactId>
-				    <version>8.2.4.Final</version>
-				    <scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-api</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-			
-				<dependency>
-					<groupId>com.adeptj</groupId>
-					<artifactId>adeptj-modules-cache-infinispan</artifactId>
-					<version>1.0.0-SNAPSHOT</version>
-					<scope>provided</scope>
-				</dependency>
-	       
-	        </dependencies>
-	   
-	   </profile>
-	
-		<profile>
-			<id>Shiro</id>
-			
-			<dependencies>
-				
-				<dependency>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-					<version>3.2.1</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-collections4</artifactId>
-					<version>4.1</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-					<version>3.4</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-					<version>1.2</version>
-					<scope>provided</scope>
-				</dependency> 
-				
-				<dependency>
-					<groupId>commons-beanutils</groupId>
-					<artifactId>commons-beanutils</artifactId>
-					<version>1.9.2</version>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>commons-logging</groupId>
-							<artifactId>commons-logging</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.ehcache</groupId>
-					<artifactId>ehcache</artifactId>
-					<version>${ehcache.version}</version>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.apache.shiro</groupId>
-					<artifactId>shiro-core</artifactId>
-					<version>${shiro.version}</version>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>jcl-over-slf4j</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>commons-beanutils</groupId>
-							<artifactId>commons-beanutils</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-log4j12</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.apache.shiro</groupId>
-					<artifactId>shiro-web</artifactId>
-					<version>${shiro.version}</version>
-					<scope>provided</scope>
-				</dependency>
-			
-			</dependencies>
-		</profile>
-	
-		<profile>
-			<id>JPA-EclipseLink</id>
-			
-			<dependencies>
-			
-				<!-- EclipseLink 2.6.3 Dependencies -->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
 
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>javax.persistence</artifactId>
-					<version>${jpa.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.core</artifactId>
-					<version>${eclipselink.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.jpa</artifactId>
-					<version>${eclipselink.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
-					<version>${eclipselink.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.antlr</artifactId>
-					<version>${eclipselink.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>org.eclipse.persistence.asm</artifactId>
-					<version>${eclipselink.version}</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-		            <groupId>com.zaxxer</groupId>
-		            <artifactId>HikariCP</artifactId>
-		            <version>2.4.7</version>
-		            <scope>provided</scope>
-		            <exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.javassist</groupId>
-		                    <artifactId>javassist</artifactId>
-						</exclusion>
-					</exclusions>
-		        </dependency>
-			
-			</dependencies>
-			
-		</profile>
-		
-		<profile>
-			<id>MongoDB</id>
-			
-			<dependencies>
-			
-				<dependency>
-					<groupId>org.mongodb</groupId>
-					<artifactId>mongo-java-driver</artifactId>
-					<version>${mongo.version}</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<!-- Morphia Dependencies -->
-				
-				<dependency>
-					<groupId>org.mongodb.morphia</groupId>
-					<artifactId>morphia</artifactId>
-					<version>1.2.1</version>
-					<exclusions>
-						<exclusion>
-							<groupId>org.mongodb</groupId>
-							<artifactId>mongo-java-driver</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>cglib</groupId>
-							<artifactId>cglib-nodep</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<dependency>
-					<groupId>cglib</groupId>
-					<artifactId>cglib-nodep</artifactId>
-					<version>3.2.4</version>
-				</dependency>
-		
-				<dependency>
-				    <groupId>com.thoughtworks.proxytoys</groupId>
-				    <artifactId>proxytoys</artifactId>
-				    <version>1.0</version>
-				</dependency>
-			
-			</dependencies>
-			
-		</profile>
-		
-		<profile>
-			<id>Thymeleaf</id>
-			
-			<dependencies>
-			
-				<dependency>
-					<groupId>org.javassist</groupId>
-					<artifactId>javassist</artifactId>
-					<version>3.21.0-GA</version>
-				</dependency>
-				
-				<dependency>
-				    <groupId>org.attoparser</groupId>
-				    <artifactId>attoparser</artifactId>
-				    <version>2.0.1.RELEASE</version>
-				</dependency>
-				
-				<dependency>
-				    <groupId>org.unbescape</groupId>
-				    <artifactId>unbescape</artifactId>
-				    <version>1.1.4.RELEASE</version>
-				</dependency>
-				
-				<dependency>
-					<groupId>ognl</groupId>
-					<artifactId>ognl</artifactId>
-					<version>3.1.12</version>
-					<exclusions>
-						<exclusion>
-							<groupId>javassist</groupId>
-							<artifactId>javassist</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.thymeleaf</groupId>
-					<artifactId>thymeleaf</artifactId>
-					<version>3.0.2.RELEASE</version>
-					<exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.attoparser</groupId>
-							<artifactId>attoparser</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.unbescape</groupId>
-							<artifactId>unbescape</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>ognl</groupId>
-							<artifactId>ognl</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-			
-			</dependencies>
-			
-		</profile>
-		
-		<profile>
-			<id>RESTEasy</id>
-			
-			<dependencies>
-			
-				<dependency>
-					<groupId>javax.validation</groupId>
-					<artifactId>validation-api</artifactId>
-					<version>1.1.0.Final</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.jboss.spec.javax.annotation</groupId>
-					<artifactId>jboss-annotations-api_1.2_spec</artifactId>
-					<version>1.0.0.Final</version>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.jboss.spec.javax.ws.rs</groupId>
-					<artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-					<version>1.0.0.Final</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>javax.enterprise</groupId>
-					<artifactId>cdi-api</artifactId>
-					<version>1.2</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.glassfish</groupId>
-					<artifactId>javax.el</artifactId>
-					<version>3.0.0</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.glassfish.web</groupId>
-					<artifactId>javax.el</artifactId>
-					<version>2.2.6</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.jboss.spec.javax.el</groupId>
-					<artifactId>jboss-el-api_2.2_spec</artifactId>
-					<version>1.0.6.Final</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.jboss.spec.javax.interceptor</groupId>
-					<artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-					<version>1.0.0.Final</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.glassfish.hk2.external</groupId>
-					<artifactId>javax.inject</artifactId>
-					<version>2.4.0</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<!-- Hibernate Validator  Dependencies-->
-				
-				<dependency>
-				    <groupId>org.jboss.logging</groupId>
-				    <artifactId>jboss-logging</artifactId>
-				    <version>3.3.0.Final</version>
-				    <exclusions>
-						<exclusion>
-							<groupId>org.slf4j</groupId>
-							<artifactId>slf4j-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>log4j</groupId>
-    						<artifactId>log4j</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.apache.logging.log4j</groupId>
-    						<artifactId>log4j-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.logmanager</groupId>
-    						<artifactId>jboss-logmanager</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<dependency>
-					<groupId>com.fasterxml</groupId>
-					<artifactId>classmate</artifactId>
-					<version>1.3.1</version>
-					<scope>provided</scope>
-				</dependency>
-				
-				<dependency>
-					<groupId>org.hibernate</groupId>
-					<artifactId>hibernate-validator</artifactId>
-					<version>5.2.4.Final</version>
-					<scope>provided</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>org.jboss.logging</groupId>
-							<artifactId>jboss-logging</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>com.fasterxml</groupId>
-							<artifactId>classmate</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				
-				<!-- RESTEasy Dependencies -->
-				
-				<dependency>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-jaxrs</artifactId>
-					<version>${resteasy.version}</version>
-					<scope>compile</scope>
-					<exclusions>
-						<exclusion>
-							<groupId>javax.validation</groupId>
-							<artifactId>validation-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.spec.javax.ws.rs</groupId>
-							<artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.spec.javax.annotation</groupId>
-							<artifactId>jboss-annotations-api_1.2_spec</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.logging</groupId>
-							<artifactId>jboss-logging</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-cdi</artifactId>
-					<version>${resteasy.version}</version>
-					<exclusions>
-						<exclusion>
-							<groupId>javax.validation</groupId>
-							<artifactId>validation-api</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.spec.javax.ws.rs</groupId>
-							<artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.spec.javax.annotation</groupId>
-							<artifactId>jboss-annotations-api_1.2_spec</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.logging</groupId>
-							<artifactId>jboss-logging</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-		
-				<dependency>
-					<groupId>org.jboss.resteasy</groupId>
-					<artifactId>resteasy-validator-provider-11</artifactId>
-					<version>${resteasy.version}</version>
-					<exclusions>
-						<exclusion>
-							<groupId>com.fasterxml</groupId>
-							<artifactId>classmate</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.hibernate</groupId>
-							<artifactId>hibernate-validator</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.jboss.logging</groupId>
-							<artifactId>jboss-logging</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-			
-			</dependencies>
-			
-		</profile>
-		
-		<profile>
-			<id>OAuth</id>
-			
-			<dependencies>
-				
-				<dependency>
-					<groupId>com.github.scribejava</groupId>
-					<artifactId>scribejava-core</artifactId>
-					<version>3.2.0</version>
-					<scope>provided</scope>
-				</dependency>
-		
-				<dependency>
-					<groupId>com.github.scribejava</groupId>
-					<artifactId>scribejava-apis</artifactId>
-					<version>3.2.0</version>
-					<scope>provided</scope>
-				</dependency>
-			
-			</dependencies>
-		
-		</profile>
+        <!-- RenderEngine Dependencies -->
+        <dependency>
+            <groupId>org.trimou</groupId>
+            <artifactId>trimou-core</artifactId>
+            <version>2.1.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<profile>
-			<id>Release</id>
-			<build>
-				<plugins>
-					
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.4</version>
-						<configuration>
-							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					
-				</plugins>
-			</build>
-		</profile>
-		
-	</profiles>
+        <!-- OSGi Bundles Starts -->
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.fastjson</groupId>
+            <artifactId>boon</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr</artifactId>
+            <version>${felix.scr.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin</artifactId>
+            <version>${felix.configadmin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.eventadmin</artifactId>
+            <version>${felix.eventadmin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.metatype</artifactId>
+            <version>${felix.metatype.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.log</artifactId>
+            <version>${felix.log.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Here for debugging purpose in eclipse, excluded from being bundled, shaded -->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.base</artifactId>
+            <version>${felix.http.base.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.bridge</artifactId>
+            <version>${felix.http.bridge.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole</artifactId>
+            <version>${felix.webconsole.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.inventory</artifactId>
+            <version>${felix.inventory.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole.plugins.memoryusage</artifactId>
+            <version>${felix.webconsole.plugins.memoryusage.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.threaddump</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.inventory</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole.plugins.event</artifactId>
+            <version>${felix.webconsole.plugins.event.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole.plugins.ds</artifactId>
+            <version>${felix.webconsole.plugins.ds.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole.plugins.packageadmin</artifactId>
+            <version>${felix.webconsole.plugins.packageadmin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- OSGi Bundles Ends -->
+
+        <!-- AdeptJ Modular Web Bundles Starts-->
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-webconsole-branding</artifactId>
+            <version>${adeptj-modules-webconsole-branding.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-webconsole-security</artifactId>
+            <version>${adeptj-modules-webconsole-security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- AdeptJ Modular Web Bundles Ends-->
+
+    </dependencies>
+
+    <profiles>
+
+        <profile>
+            <id>Ehcache</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-collections4</artifactId>
+                    <version>4.1</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                    <version>${ehcache.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-api</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-ehcache</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>Hazelcast</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.hazelcast</groupId>
+                    <artifactId>hazelcast</artifactId>
+                    <version>3.7.2</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-api</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-hazelcast</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>Infinispan</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.jboss.marshalling</groupId>
+                    <artifactId>jboss-marshalling-osgi</artifactId>
+                    <version>1.4.10.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.spec.javax.transaction</groupId>
+                    <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                    <version>1.0.1.Final</version>
+                    <scope>compile</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jgroups</groupId>
+                    <artifactId>jgroups</artifactId>
+                    <version>3.6.11.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.infinispan</groupId>
+                    <artifactId>infinispan-commons</artifactId>
+                    <version>8.2.4.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.infinispan</groupId>
+                    <artifactId>infinispan-core</artifactId>
+                    <version>8.2.4.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-api</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-infinispan</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>Shiro</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                    <version>3.2.1</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-collections4</artifactId>
+                    <version>4.1</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.4</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                    <version>1.2</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                    <version>1.9.2</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>commons-logging</groupId>
+                            <artifactId>commons-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                    <version>${ehcache.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>shiro-core</artifactId>
+                    <version>${shiro.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>jcl-over-slf4j</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>commons-beanutils</groupId>
+                            <artifactId>commons-beanutils</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>shiro-web</artifactId>
+                    <version>${shiro.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>JPA-EclipseLink</id>
+
+            <dependencies>
+
+                <!-- EclipseLink 2.6.3 Dependencies -->
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>javax.persistence</artifactId>
+                    <version>${jpa.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.core</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.jpa</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.antlr</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.asm</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                    <version>2.4.7</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.javassist</groupId>
+                            <artifactId>javassist</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>MongoDB</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongo-java-driver</artifactId>
+                    <version>${mongo.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <!-- Morphia Dependencies -->
+
+                <dependency>
+                    <groupId>org.mongodb.morphia</groupId>
+                    <artifactId>morphia</artifactId>
+                    <version>1.2.1</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mongodb</groupId>
+                            <artifactId>mongo-java-driver</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>cglib</groupId>
+                            <artifactId>cglib-nodep</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-nodep</artifactId>
+                    <version>3.2.4</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.thoughtworks.proxytoys</groupId>
+                    <artifactId>proxytoys</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>Thymeleaf</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                    <version>3.21.0-GA</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.attoparser</groupId>
+                    <artifactId>attoparser</artifactId>
+                    <version>2.0.1.RELEASE</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.unbescape</groupId>
+                    <artifactId>unbescape</artifactId>
+                    <version>1.1.4.RELEASE</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>ognl</groupId>
+                    <artifactId>ognl</artifactId>
+                    <version>3.1.12</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javassist</groupId>
+                            <artifactId>javassist</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.thymeleaf</groupId>
+                    <artifactId>thymeleaf</artifactId>
+                    <version>3.0.2.RELEASE</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.attoparser</groupId>
+                            <artifactId>attoparser</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.unbescape</groupId>
+                            <artifactId>unbescape</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>ognl</groupId>
+                            <artifactId>ognl</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>RESTEasy</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>1.1.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.spec.javax.annotation</groupId>
+                    <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+                    <version>1.0.0.Final</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                    <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                    <version>1.2</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                    <version>3.0.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
+                    <artifactId>javax.el</artifactId>
+                    <version>2.2.6</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.spec.javax.el</groupId>
+                    <artifactId>jboss-el-api_2.2_spec</artifactId>
+                    <version>1.0.6.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.spec.javax.interceptor</groupId>
+                    <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <version>2.4.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <!-- Hibernate Validator  Dependencies-->
+
+                <dependency>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                    <version>3.3.0.Final</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logmanager</groupId>
+                            <artifactId>jboss-logmanager</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml</groupId>
+                    <artifactId>classmate</artifactId>
+                    <version>1.3.1</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>5.2.4.Final</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.fasterxml</groupId>
+                            <artifactId>classmate</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!-- RESTEasy Dependencies -->
+
+                <dependency>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-jaxrs</artifactId>
+                    <version>${resteasy.version}</version>
+                    <scope>compile</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.validation</groupId>
+                            <artifactId>validation-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.spec.javax.annotation</groupId>
+                            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-cdi</artifactId>
+                    <version>${resteasy.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.validation</groupId>
+                            <artifactId>validation-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.spec.javax.annotation</groupId>
+                            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-validator-provider-11</artifactId>
+                    <version>${resteasy.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.fasterxml</groupId>
+                            <artifactId>classmate</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-validator</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>OAuth</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.github.scribejava</groupId>
+                    <artifactId>scribejava-core</artifactId>
+                    <version>3.2.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.github.scribejava</groupId>
+                    <artifactId>scribejava-apis</artifactId>
+                    <version>3.2.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+            <id>Release</id>
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.10.4</version>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>
