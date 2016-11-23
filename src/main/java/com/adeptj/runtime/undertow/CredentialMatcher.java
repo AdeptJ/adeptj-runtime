@@ -21,17 +21,14 @@ package com.adeptj.runtime.undertow;
 
 import static com.adeptj.runtime.common.Constants.UTF8;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
 
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware;
 
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
@@ -45,43 +42,30 @@ import com.adeptj.runtime.config.Configs;
 class CredentialMatcher {
 
 	private static final String SHA256 = "SHA-256";
-	
-	private static final String OSGI_MGR_CFG_FILE = "/org/apache/felix/webconsole/internal/servlet/OsgiManager.config";
-
-	private final String cfgFile;
-
-	public CredentialMatcher() {
-		this.cfgFile = new StringBuilder(Configs.INSTANCE.felix().getString("felix-cm-dir"))
-				.append(OSGI_MGR_CFG_FILE.replace('/', File.separatorChar)).toString();
-	}
 
 	boolean match(String id, String pwd) {
 		// When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
 		// default password maintained in provisioning file.
-		return Files.exists(Paths.get(this.cfgFile)) ? this.fromOsgiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
+		return WebConsolePasswordUpdateAware.isPasswordSet() ? this.fromOsgiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
 	}
 
 	private boolean fromProvisioningConfig(String id, String pwd) {
 		return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
-				.filter(entry -> entry.getKey().equals(id)).anyMatch(entry -> Arrays
-						.equals(this.bytes(this.hash(pwd)), this.bytes((String) entry.getValue())));
+				.filter(entry -> entry.getKey().equals(id))
+				.anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
 	}
 
 	private boolean fromOsgiManagerConfig(String pwd) {
-		boolean matched = false;
 		try {
-			String pwdLine = Files.readAllLines(Paths.get(this.cfgFile)).stream()
-					.filter(line -> line.startsWith("password=")).collect(Collectors.joining()).replace("\\", "");
-			matched = Arrays.equals(this.bytes(this.hash(pwd)),
-					this.bytes(pwdLine.substring(pwdLine.indexOf('"') + 1, pwdLine.length() - 1)));
+			return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getPassword());
 		} catch (Exception ex) {
-			LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
+			// Don't care!!
 		}
-		return matched;
+		return false;
 	}
 
-	private byte[] bytes(String pwdHash) {
-		return Base64.getDecoder().decode(pwdHash.substring(pwdHash.indexOf('}') + 1));
+	private char[] chars(String pwdHash) {
+		return pwdHash.toCharArray();
 	}
 
 	private String hash(String pwd) {
