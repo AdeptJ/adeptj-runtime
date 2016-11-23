@@ -1,6 +1,6 @@
-/** 
+/**
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -18,6 +18,57 @@
 ###############################################################################
 */
 package com.adeptj.runtime.undertow;
+
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.ServerMode;
+import com.adeptj.runtime.common.Utils;
+import com.adeptj.runtime.common.Verb;
+import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.logging.LogbackProvisioner;
+import com.adeptj.runtime.osgi.FrameworkStartupHandler;
+import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.servlet.AdminAuthServlet;
+import com.adeptj.runtime.servlet.AdminDashboardServlet;
+import com.adeptj.runtime.servlet.AdminErrorServlet;
+import com.typesafe.config.Config;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.Undertow.Builder;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.AllowedMethodsHandler;
+import io.undertow.server.handlers.PredicateHandler;
+import io.undertow.server.handlers.RequestLimitingHandler;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.ErrorPage;
+import io.undertow.servlet.api.SecurityConstraint;
+import io.undertow.servlet.api.ServletContainerInitializerInfo;
+import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.util.ImmediateInstanceFactory;
+import io.undertow.util.HttpString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xnio.Options;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.URL;
+import java.nio.channels.ServerSocketChannel;
+import java.security.KeyStore;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
@@ -37,63 +88,9 @@ import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 
-import java.io.IOException;
-import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.net.URL;
-import java.nio.channels.ServerSocketChannel;
-import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xnio.Options;
-
-import com.adeptj.runtime.common.Utils;
-import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.common.ServerMode;
-import com.adeptj.runtime.common.Verb;
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.logging.LogbackProvisioner;
-import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.sci.StartupHandlerInitializer;
-import com.adeptj.runtime.servlet.AdminAuthServlet;
-import com.adeptj.runtime.servlet.AdminDashboardServlet;
-import com.adeptj.runtime.servlet.AdminErrorServlet;
-import com.typesafe.config.Config;
-
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.Undertow.Builder;
-import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.AllowedMethodsHandler;
-import io.undertow.server.handlers.PredicateHandler;
-import io.undertow.server.handlers.RequestLimitingHandler;
-import io.undertow.servlet.Servlets;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.api.ErrorPage;
-import io.undertow.servlet.api.SecurityConstraint;
-import io.undertow.servlet.api.ServletContainerInitializerInfo;
-import io.undertow.servlet.api.ServletInfo;
-import io.undertow.servlet.util.ImmediateInstanceFactory;
-import io.undertow.util.HttpString;
-
 /**
  * UndertowProvisioner: Provision the Undertow Http Server.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class UndertowProvisioner {
@@ -101,39 +98,39 @@ public final class UndertowProvisioner {
 	private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
 	private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
-	
+
 	private static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
-	
+
 	private static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
-	
+
 	private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
-	
+
 	private static final String KEY_WORKER_OPTIONS = "worker-options";
-	
+
 	private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
-	
+
 	private static final String MODE_DEV = "DEV";
-	
+
 	private static final String MODE_PROD = "PROD";
-	
+
 	private static final String KEY_KEYSTORE = "keyStore";
-	
+
 	private static final String KEY_KEYPWD = "keyPwd";
-	
+
 	private static final String KEY_KEYSTORE_PWD = "keyStorePwd";
-	
+
 	private static final String KEY_HTTPS = "https";
-	
+
 	private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
-	
+
 	private static final String KEY_AJP = "ajp";
-	
+
 	private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
-	
+
 	private static final String SYS_PROP_CHECK_PORT = "check.server.port";
-	
+
 	private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
-	
+
 	private static final String PROTOCOL_TLS = "TLS";
 
 	// No instantiation.
@@ -233,7 +230,7 @@ public final class UndertowProvisioner {
 	}
 
 	private static boolean isPortAvailable(int port, Logger logger) {
-		boolean portAvailable = false;
+		boolean portAvailable;
 		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
 			channel.socket().setReuseAddress(true);
 			channel.socket().bind(new InetSocketAddress(port));
@@ -254,7 +251,7 @@ public final class UndertowProvisioner {
 		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), undertowConfig.getString(KEY_HEADER_POWERED_BY));
 		return headers;
 	}
-	
+
 	private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
 		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), initialHandler);
 	}
@@ -267,7 +264,7 @@ public final class UndertowProvisioner {
 		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
 				new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(undertowConfig))));
 	}
-	
+
 	private static List<ErrorPage> errorPages(Config undertowConfig) {
 		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
 				.map(entry -> Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey())))
@@ -278,14 +275,14 @@ public final class UndertowProvisioner {
 		return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
 				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
 	}
-	
+
 	private static SecurityConstraint securityConstraint(Config undertowConfig) {
 		return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.auth-roles"))
 				.addWebResourceCollection(Servlets.webResourceCollection()
 						.addHttpMethods(undertowConfig.getStringList("common.secured-urls-allowed-methods"))
 						.addUrlPatterns(undertowConfig.getStringList("common.secured-urls")));
 	}
-	
+
 	private static List<ServletInfo> servlets() {
 		List<ServletInfo> servlets = new ArrayList<>();
 		servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
@@ -293,14 +290,14 @@ public final class UndertowProvisioner {
 		servlets.add(Servlets.servlet(AdminAuthServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
 		return servlets;
 	}
-	
+
 	private static MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
 		return new MultipartConfigElement(undertowConfig.getString("common.multipart-file-location"),
 				undertowConfig.getLong("common.multipart-max-file-size"),
 				undertowConfig.getLong("common.multipart-max-request-size"),
 				undertowConfig.getInt("common.multipart-file-size-threshold"));
 	}
-	
+
 	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
 		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
 				.setClassLoader(UndertowProvisioner.class.getClassLoader())

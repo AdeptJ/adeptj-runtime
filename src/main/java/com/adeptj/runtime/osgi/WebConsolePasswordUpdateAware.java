@@ -53,7 +53,7 @@ public final class WebConsolePasswordUpdateAware {
 
         private static final WebConsolePasswordUpdateAware INSTANCE = new WebConsolePasswordUpdateAware();
 
-        private static final WebConsolePasswordUpdateAware getInstance() {
+        private static WebConsolePasswordUpdateAware getInstance() {
             return INSTANCE;
         }
     }
