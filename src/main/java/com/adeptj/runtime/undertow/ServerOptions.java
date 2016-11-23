@@ -19,18 +19,16 @@
 */
 package com.adeptj.runtime.undertow;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
+import com.adeptj.runtime.common.TimeUnits;
+import com.typesafe.config.Config;
+import io.undertow.Undertow.Builder;
+import io.undertow.UndertowOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Option;
 
-import com.adeptj.runtime.common.TimeUnits;
-import com.typesafe.config.Config;
-
-import io.undertow.Undertow.Builder;
-import io.undertow.UndertowOptions;
+import java.lang.reflect.Field;
+import java.util.Map;
 
 /**
  * UNDERTOW Server Options.
@@ -42,8 +40,8 @@ public final class ServerOptions {
 	/**
 	 * Configures the server options dynamically.
 	 * 
-	 * @param builder
-	 * @param undertowConfig
+	 * @param builder Undertow.Builder
+	 * @param undertowConfig Undertow Typesafe Config
 	 */
 	public static void build(Builder builder, Config undertowConfig) {
 		long startTime = System.nanoTime();
@@ -68,12 +66,12 @@ public final class ServerOptions {
 		buildServerOptions(builder, options, logger);
 	}
 
-	private static void longOptions(Builder builder, Map<String, ?> options, Logger logger) {
-		options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), Long.valueOf((String) optVal)));
-	}
-
 	private static void booleanOptions(Builder builder, Map<String, ?> options, Logger logger) {
 		buildServerOptions(builder, options, logger);
+	}
+
+	private static void longOptions(Builder builder, Map<String, ?> options, Logger logger) {
+		options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), Long.valueOf((String) optVal)));
 	}
 
 	@SuppressWarnings("unchecked")

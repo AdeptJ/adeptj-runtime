@@ -46,7 +46,8 @@ class CredentialMatcher {
 	boolean match(String id, String pwd) {
 		// When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
 		// default password maintained in provisioning file.
-		return WebConsolePasswordUpdateAware.isPasswordSet() ? this.fromOsgiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
+		return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOsgiManagerConfig(pwd)
+				: this.fromProvisioningConfig(id, pwd);
 	}
 
 	private boolean fromProvisioningConfig(String id, String pwd) {
@@ -57,7 +58,7 @@ class CredentialMatcher {
 
 	private boolean fromOsgiManagerConfig(String pwd) {
 		try {
-			return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getPassword());
+			return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
 		} catch (Exception ex) {
 			// Don't care!!
 		}

@@ -19,15 +19,13 @@
 */
 package com.adeptj.runtime.undertow;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.logging.LogbackProvisioner;
-
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * ShutdownHook for graceful server shutdown, this first cleans up the deployment and then stops UNDERTOW server.
@@ -61,9 +59,10 @@ public final class UndertowShutdownHook extends Thread {
 			logger.info("AdeptJ Runtime stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
 		} catch (Exception ex) {
 			logger.error("Exception while stopping AdeptJ Runtime!!", ex);
+		} finally {
+			// Let the LOGBACK cleans up it's state.
+			LogbackProvisioner.stop();
 		}
-		// Let the LOGBACK cleans up it's state.
-		LogbackProvisioner.stop();
 	}
 
 }
