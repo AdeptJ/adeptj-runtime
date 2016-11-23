@@ -19,10 +19,9 @@
 */
 package com.adeptj.runtime.viewengine;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Locale;
 
 /**
  * ViewEngineContext.
@@ -79,12 +78,23 @@ public class ViewEngineContext {
 
 		private Models models;
 
+        private Locale locale;
+
 		private HttpServletRequest request;
 
 		private HttpServletResponse response;
 
-		private Locale locale;
-		
+        /**
+         * Initialize the Builder with mandatory request and response.
+         *
+         * @param request the {@link HttpServletRequest}
+         * @param response the {@link HttpServletResponse}
+         */
+		public Builder(HttpServletRequest request, HttpServletResponse response) {
+			this.request = request;
+			this.response = response;
+		}
+
 		public Builder view(String view) {
 			this.view = view;
 			return this;
@@ -92,16 +102,6 @@ public class ViewEngineContext {
 		
 		public Builder models(Models models) {
 			this.models = models;
-			return this;
-		}
-		
-		public Builder request(HttpServletRequest request) {
-			this.request = request;
-			return this;
-		}
-		
-		public Builder response(HttpServletResponse response) {
-			this.response = response;
 			return this;
 		}
 		

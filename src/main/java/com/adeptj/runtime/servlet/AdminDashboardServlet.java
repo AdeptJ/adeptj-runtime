@@ -19,17 +19,16 @@
 */
 package com.adeptj.runtime.servlet;
 
-import java.io.IOException;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import java.io.IOException;
 
 /**
  * AdminDashboardServlet renders the admin dashboard page.
@@ -48,9 +47,7 @@ public class AdminDashboardServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
-		builder.view("auth/dashboard").models(new Models()).request(req).response(resp);
-		ViewEngine.INSTANCE.processView(builder.build());
+		ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").models(new Models()).build());
 	}
 
 	@Override

@@ -19,7 +19,10 @@
 */
 package com.adeptj.runtime.servlet;
 
-import java.io.IOException;
+import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -27,11 +30,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import java.io.IOException;
 
 /**
  * AdminErrorServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
@@ -48,9 +47,8 @@ public class AdminErrorServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String requestURI = req.getRequestURI();
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
 		Models models = new Models();
-		builder.models(models).request(req).response(resp);
 		if ("/admin/error".equals(requestURI)) {
 			ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
 		} else {
@@ -58,6 +56,7 @@ public class AdminErrorServlet extends HttpServlet {
 			String statusCode = this.getStatusCode(requestURI);
 			if (exception != null && "500".equals(statusCode)) {
 				models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+				builder.models(models);
 				ViewEngine.INSTANCE.processView(builder.view("error/500").build());
 			} else if (Configs.INSTANCE.undertow().getStringList("common.status-codes").contains(statusCode)) {
 				ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());

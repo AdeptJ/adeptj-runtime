@@ -19,21 +19,20 @@
 */
 package com.adeptj.runtime.servlet;
 
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
-
-import java.io.IOException;
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.viewengine.Models;
+import com.adeptj.runtime.viewengine.ViewEngine;
+import com.adeptj.runtime.viewengine.ViewEngineContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 
 /**
  * AdminAuthServlet does the following: 
@@ -75,19 +74,16 @@ public class AdminAuthServlet extends HttpServlet {
 	}
 
 	private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
+		ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
 		Models models = new Models();
 		models.put("validation", "Invalid credentials!!");
 		models.put("j_username", req.getParameter("j_username"));
-		builder.view("auth/login").models(models).request(req).response(resp);
 		// Render login page again with validation message.
-		ViewEngine.INSTANCE.processView(builder.build());
+		ViewEngine.INSTANCE.processView(builder.view("auth/login").models(models).build());
 	}
 
 	private void renderLoginPage(HttpServletRequest req, HttpServletResponse resp) {
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder();
-		builder.view("auth/login").models(new Models()).request(req).response(resp).locale(req.getLocale());
-		ViewEngine.INSTANCE.processView(builder.build());
+		ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
 	}
 
 	private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
