@@ -40,7 +40,7 @@ public enum ServletContextHolder {
         return this.context;
     }
 
-    public <T> T getAttr(String name, Class<T> type) {
+    public <T> T getAttributeOfType(String name, Class<T> type) {
         return type.cast(this.context.getAttribute(name));
     }
 }

@@ -25,6 +25,8 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.Optional;
+
 /**
  * Utility for creating OSGi Filter for tracking/finding Services etc.
  *
@@ -44,16 +46,12 @@ public final class OSGiUtils {
             filterExprBuilder.append(filterExpr).append(")");
             return context.createFilter(filterExprBuilder.toString());
         } catch (InvalidSyntaxException ex) {
-            // Probable causes.
-            // 1. objectClass is malformed.
-            // 2. Filter expression is malformed, not RFC 1960-based Filter.
-            throw new IllegalArgumentException("Unexpected InvalidSyntaxException!!", ex);
+            // Filter expression is malformed, not RFC-1960 based Filter.
+            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
         }
     }
 
-    public static void unregisterServiceRegistration(ServiceRegistration<?> registration) {
-        if (registration != null) {
-            registration.unregister();
-        }
+    public static void unregisterService(ServiceRegistration<?> registration) {
+        Optional.ofNullable(registration).ifPresent(ServiceRegistration::unregister);
     }
 }
