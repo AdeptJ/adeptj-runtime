@@ -31,61 +31,61 @@ import javax.servlet.ServletContext;
 
 /**
  * OSGi FrameworkListener.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public class FrameworkRestartHandler implements FrameworkListener {
-	
-	/**
-	 * Handles OSGi Framework restart, does following on System Bundle STARTED event.
-	 * 
-	 * 1. Removes the BundleContext from ServletContext attributes.
-	 * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext.
-	 * 3. Closes the DispatcherServletTracker and open again with new BundleContext.
-	 * 4. As the BundleContext is removed and added from ServletContext the corresponding
-	 *    BridgeServletContextAttributeListener is fired with events which in turn
-	 *    Closes the EventDispatcherTracker and open again with new BundleContext.
-	 */
-	@Override
-	public void frameworkEvent(FrameworkEvent event) {
-		Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
-		switch (event.getType()) {
-		case FrameworkEvent.STARTED:
-			logger.info("Handling OSGi Framework Restart!!");
-			// Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
-			ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
-            servletContext.removeAttribute(BundleContext.class.getName());
-			BundleContext bundleContext = event.getBundle().getBundleContext();
-			servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
-			// Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
-			// after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
-			// while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
-			BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
-			try {
-				DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
-				// DispatcherServletTrackerSupport already holds a ServletConfig reference
-				// from first time when ProxyServlet was initialized.
-				// Pass a null, which is just fine.
-				logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-				DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
-			} catch (Exception ex) {
-				// Note: What shall we do if DispatcherServlet initialization failed.
-				// Log it as of now, we may need to stop the OSGi Framework, will decide later.
-				// Have not seen this yet.
-				logger.error("Exception while restarting OSGi Framework!!", ex);
-			}
-			break;
-		case FrameworkEvent.STOPPED_UPDATE:
-			logger.info("Closing DispatcherServletTracker!!");
-			DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
-			logger.info("Closing EventDispatcherTracker!!");
-			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-			break;
-		default:
-			// log it and ignore.
-			logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
-			break;
-		}
-	}
+
+    /**
+     * Handles OSGi Framework restart, does following on System Bundle STARTED event.
+     * <p>
+     * 1. Removes the BundleContext from ServletContext attributes.
+     * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext.
+     * 3. Closes the DispatcherServletTracker and open again with new BundleContext.
+     * 4. As the BundleContext is removed and added from ServletContext the corresponding
+     * BridgeServletContextAttributeListener is fired with events which in turn
+     * Closes the EventDispatcherTracker and open again with new BundleContext.
+     */
+    @Override
+    public void frameworkEvent(FrameworkEvent event) {
+        Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
+        switch (event.getType()) {
+            case FrameworkEvent.STARTED:
+                logger.info("Handling OSGi Framework Restart!!");
+                // Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
+                ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
+                servletContext.removeAttribute(BundleContext.class.getName());
+                BundleContext bundleContext = event.getBundle().getBundleContext();
+                servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
+                // Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
+                // after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
+                // while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
+                BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
+                try {
+                    DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+                    // DispatcherServletTrackerSupport already holds a ServletConfig reference
+                    // from first time when ProxyServlet was initialized.
+                    // Pass a null, which is just fine.
+                    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
+                    DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
+                } catch (Exception ex) {
+                    // Note: What shall we do if DispatcherServlet initialization failed.
+                    // Log it as of now, we may need to stop the OSGi Framework, will decide later.
+                    // Have not seen this yet.
+                    logger.error("Exception while restarting OSGi Framework!!", ex);
+                }
+                break;
+            case FrameworkEvent.STOPPED_UPDATE:
+                logger.info("Closing DispatcherServletTracker!!");
+                DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+                logger.info("Closing EventDispatcherTracker!!");
+                EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
+                break;
+            default:
+                // log it and ignore.
+                logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+                break;
+        }
+    }
 
 }

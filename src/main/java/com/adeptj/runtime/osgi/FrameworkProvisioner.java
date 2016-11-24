@@ -59,12 +59,12 @@ public enum FrameworkProvisioner {
     private Framework framework;
 
     private FrameworkRestartHandler frameworkListener;
-    
+
     public void startFramework(ServletContext context) {
-    	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
-        	logger.info("Starting the OSGi Framework!!");
-    		long startTime = System.nanoTime();
+            logger.info("Starting the OSGi Framework!!");
+            long startTime = System.nanoTime();
             this.framework = this.createFramework(logger);
             this.framework.start();
             this.frameworkListener = new FrameworkRestartHandler();
@@ -76,9 +76,9 @@ public enum FrameworkProvisioner {
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-			List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
-			OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
-			this.registerProxyServlet(context, logger);
+            List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
+            OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
+            this.registerProxyServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the BundleProvisioner throws exception.
@@ -87,55 +87,55 @@ public enum FrameworkProvisioner {
     }
 
     public void stopFramework() {
-    	Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
         try {
-			if (this.framework != null) {
-				this.removeFrameworkListener();
-				OSGiServlets.INSTANCE.unregisterAll();
-				this.framework.stop();
-				// A value of zero will wait indefinitely.
-				FrameworkEvent event = this.framework.waitForStop(0);
-				logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
-			} else {
-        		logger.info("OSGi Framework not started yet, nothing to stop!!");
-        	}
+            if (this.framework != null) {
+                this.removeFrameworkListener();
+                OSGiServlets.INSTANCE.unregisterAll();
+                this.framework.stop();
+                // A value of zero will wait indefinitely.
+                FrameworkEvent event = this.framework.waitForStop(0);
+                logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+            } else {
+                logger.info("OSGi Framework not started yet, nothing to stop!!");
+            }
         } catch (Exception ex) {
-        	logger.error("Error Stopping OSGi Framework!!", ex);
+            logger.error("Error Stopping OSGi Framework!!", ex);
         }
     }
 
-	private void removeFrameworkListener() {
-		if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
-			BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
-		}
-	}
-    
-	private void initBridgeListeners(ServletContext servletContext) {
-		// add all required listeners
-		servletContext.addListener(new BridgeServletContextAttributeListener());
-		servletContext.addListener(new BridgeHttpSessionListener());
-		servletContext.addListener(new BridgeHttpSessionIdListener());
-		servletContext.addListener(new BridgeHttpSessionAttributeListener());
-	}
-    
-    private void registerProxyServlet(ServletContext context, Logger logger) {
-		// Register the ProxyServlet after the OSGi Framework started successfully.
-		// This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked. 
-		// ProxyServlet delegates all the service calls to the Felix DispatcherServlet.
-		Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
-		proxyServlet.addMapping(ROOT_MAPPING);
-		// Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
-		// Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026: 
-		// Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-		proxyServlet.setAsyncSupported(true);
-		// Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
-		proxyServlet.setLoadOnStartup(0);
-		logger.info("ProxyServlet registered successfully!!");
-	}
+    private void removeFrameworkListener() {
+        if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
+            BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
+        }
+    }
 
-	private Framework createFramework(Logger logger) throws Exception {
-		return ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
-	}
+    private void initBridgeListeners(ServletContext servletContext) {
+        // add all required listeners
+        servletContext.addListener(new BridgeServletContextAttributeListener());
+        servletContext.addListener(new BridgeHttpSessionListener());
+        servletContext.addListener(new BridgeHttpSessionIdListener());
+        servletContext.addListener(new BridgeHttpSessionAttributeListener());
+    }
+
+    private void registerProxyServlet(ServletContext context, Logger logger) {
+        // Register the ProxyServlet after the OSGi Framework started successfully.
+        // This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked.
+        // ProxyServlet delegates all the service calls to the Felix DispatcherServlet.
+        Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
+        proxyServlet.addMapping(ROOT_MAPPING);
+        // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
+        // Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026:
+        // Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
+        proxyServlet.setAsyncSupported(true);
+        // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
+        proxyServlet.setLoadOnStartup(0);
+        logger.info("ProxyServlet registered successfully!!");
+    }
+
+    private Framework createFramework(Logger logger) throws Exception {
+        return ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
+    }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
         Map<String, String> configs = this.loadFrameworkProps();
@@ -147,10 +147,10 @@ public enum FrameworkProvisioner {
     }
 
     private Map<String, String> loadFrameworkProps() throws IOException {
-		Properties props = new Properties();
+        Properties props = new Properties();
         props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> configs.put((String) key, (String) val));
-		return configs;
-	}
+        return configs;
+    }
 }

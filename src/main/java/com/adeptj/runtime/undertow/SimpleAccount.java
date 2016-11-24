@@ -31,25 +31,25 @@ import java.util.Set;
  */
 public class SimpleAccount implements Account {
 
-	private static final long serialVersionUID = -2090504892837494810L;
-	
-	private SimplePrincipal principal;
-	
-	private Set<String> roles;
-	
-	public SimpleAccount(SimplePrincipal principal, Set<String> roles) {
-		this.principal = principal;
-		this.roles = roles;
-	}
+    private static final long serialVersionUID = -2090504892837494810L;
 
-	@Override
-	public Principal getPrincipal() {
-		return principal;
-	}
+    private SimplePrincipal principal;
 
-	@Override
-	public Set<String> getRoles() {
-		return roles;
-	}
+    private Set<String> roles;
+
+    public SimpleAccount(SimplePrincipal principal, Set<String> roles) {
+        this.principal = principal;
+        this.roles = roles;
+    }
+
+    @Override
+    public Principal getPrincipal() {
+        return principal;
+    }
+
+    @Override
+    public Set<String> getRoles() {
+        return roles;
+    }
 
 }

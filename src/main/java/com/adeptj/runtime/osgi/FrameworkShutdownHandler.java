@@ -36,21 +36,21 @@ import javax.servlet.annotation.WebListener;
 @WebListener("Stops the OSGi Framework when ServletContext is destroyed")
 public class FrameworkShutdownHandler implements ServletContextListener {
 
-	@Override
-	public void contextInitialized(ServletContextEvent event) {
-		// Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
-	}
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        // Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
+    }
 
-	@Override
-	public void contextDestroyed(ServletContextEvent event) {
-		long startTime = System.nanoTime();
-		Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
-		logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
-		logger.info("Closing EventDispatcherTracker!!");
-		EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-		FrameworkProvisioner.INSTANCE.stopFramework();
-		ServletContextHolder.INSTANCE.setServletContext(null);
-		logger.info("OSGi Framework stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-	}
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        long startTime = System.nanoTime();
+        Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
+        logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
+        logger.info("Closing EventDispatcherTracker!!");
+        EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
+        FrameworkProvisioner.INSTANCE.stopFramework();
+        ServletContextHolder.INSTANCE.setServletContext(null);
+        logger.info("OSGi Framework stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+    }
 
 }

@@ -32,24 +32,24 @@ import java.util.List;
 
 /**
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
- * 
+ * <p>
  * Here it registers Undertow ClassPath based ResourceHandler for serving static content.
  * If the Predicate grouping is true then it invokes the non blocking ResourceHandler
  * completely bypassing security handler chain, which is desirable as we don't need security
  * and blocking I/O to kick in while serving static content.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public class ServletInitialHandlerWrapper implements HandlerWrapper {
 
-	@Override
-	public HttpHandler wrap(HttpHandler intialHandler) {
-		Config undertowCfg = Configs.INSTANCE.undertow();
-		List<String> extns = undertowCfg.getStringList("common.static-resource-extns");
-		return new PredicateHandler(
-				Predicates.and(Predicates.prefix(undertowCfg.getString("common.static-resource-prefix")),
-						Predicates.suffixes(extns.toArray(new String[extns.size()]))),
-				Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader(),
-						undertowCfg.getString("common.resource-mgr-prefix"))), intialHandler);
-	}
+    @Override
+    public HttpHandler wrap(HttpHandler intialHandler) {
+        Config undertowCfg = Configs.INSTANCE.undertow();
+        List<String> extns = undertowCfg.getStringList("common.static-resource-extns");
+        return new PredicateHandler(
+                Predicates.and(Predicates.prefix(undertowCfg.getString("common.static-resource-prefix")),
+                        Predicates.suffixes(extns.toArray(new String[extns.size()]))),
+                Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader(),
+                        undertowCfg.getString("common.resource-mgr-prefix"))), intialHandler);
+    }
 }

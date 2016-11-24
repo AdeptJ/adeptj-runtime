@@ -29,40 +29,40 @@ import org.slf4j.LoggerFactory;
 
 /**
  * ShutdownHook for graceful server shutdown, this first cleans up the deployment and then stops UNDERTOW server.
- * 
+ * <p>
  * Rakesh.Kumar, AdeptJ
  */
 public final class UndertowShutdownHook extends Thread {
 
-	private Undertow server;
+    private Undertow server;
 
-	private DeploymentManager manager;
+    private DeploymentManager manager;
 
-	public UndertowShutdownHook(Undertow server, DeploymentManager manager) {
-		super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
-		this.server = server;
-		this.manager = manager;
-	}
+    public UndertowShutdownHook(Undertow server, DeploymentManager manager) {
+        super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
+        this.server = server;
+        this.manager = manager;
+    }
 
-	/**
-	 * Handles Graceful server shutdown and resource cleanup.
-	 */
-	@Override
-	public void run() {
-		long startTime = System.nanoTime();
-		Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
-		logger.info("Stopping AdeptJ Runtime!!");
-		try {
-			this.manager.stop();
-			this.manager.undeploy();
-			this.server.stop();
-			logger.info("AdeptJ Runtime stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-		} catch (Exception ex) {
-			logger.error("Exception while stopping AdeptJ Runtime!!", ex);
-		} finally {
-			// Let the LOGBACK cleans up it's state.
-			LogbackProvisioner.stop();
-		}
-	}
+    /**
+     * Handles Graceful server shutdown and resource cleanup.
+     */
+    @Override
+    public void run() {
+        long startTime = System.nanoTime();
+        Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
+        logger.info("Stopping AdeptJ Runtime!!");
+        try {
+            this.manager.stop();
+            this.manager.undeploy();
+            this.server.stop();
+            logger.info("AdeptJ Runtime stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        } catch (Exception ex) {
+            logger.error("Exception while stopping AdeptJ Runtime!!", ex);
+        } finally {
+            // Let the LOGBACK cleans up it's state.
+            LogbackProvisioner.stop();
+        }
+    }
 
 }

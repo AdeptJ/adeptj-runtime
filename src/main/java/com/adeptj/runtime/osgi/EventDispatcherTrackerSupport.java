@@ -24,32 +24,32 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Support for EventDispatcherTracker.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum EventDispatcherTrackerSupport {
 
-	INSTANCE;
+    INSTANCE;
 
-	private EventDispatcherTracker eventDispatcherTracker;
+    private EventDispatcherTracker eventDispatcherTracker;
 
-	protected EventDispatcherTracker getEventDispatcherTracker() {
-		return this.eventDispatcherTracker;
-	}
+    protected EventDispatcherTracker getEventDispatcherTracker() {
+        return this.eventDispatcherTracker;
+    }
 
-	protected void openEventDispatcherTracker(BundleContext bundleContext) {
-		if (this.eventDispatcherTracker == null) {
-			LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("Opening EventDispatcherTracker!!");
-			this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
-			this.eventDispatcherTracker.open();
-		}
-	}
+    protected void openEventDispatcherTracker(BundleContext bundleContext) {
+        if (this.eventDispatcherTracker == null) {
+            LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("Opening EventDispatcherTracker!!");
+            this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+            this.eventDispatcherTracker.open();
+        }
+    }
 
-	protected void closeEventDispatcherTracker() {
-		if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
-			this.eventDispatcherTracker.close();
-			LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
-		}
-		this.eventDispatcherTracker = null;
-	}
+    protected void closeEventDispatcherTracker() {
+        if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
+            this.eventDispatcherTracker.close();
+            LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
+        }
+        this.eventDispatcherTracker = null;
+    }
 }

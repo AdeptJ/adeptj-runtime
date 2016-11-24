@@ -33,56 +33,56 @@ import java.util.Map;
 
 /**
  * Entry point for initializing the AdeptJ Runtime.
- * 
+ * <p>
  * Rakesh.Kumar, AdeptJ
  */
 public final class Main {
 
-	/**
-	 * Entry point for initializing the AdeptJ Runtime.
-	 * 
-	 * It does the following tasks in order.
-	 * 
-	 * 1. Initializes the LOGBACK logging framework.
-	 * 2. Does the deployment to embedded UNDERTOW.
-	 * 3. Starts the OSGi Framework.
-	 * 4. Starts the UNDERTOW server.
-	 * 5. Registers the runtime ShutdownHook. 
-	 */
-	public static void main(String[] args) {
-		Thread.currentThread().setName("AdeptJ Provisioner");
-		long startTime = System.nanoTime();
-		// First of all initialize LOGBACK.
-		LogbackProvisioner.start();
-		Logger logger = LoggerFactory.getLogger(Main.class);
-		try {
-			UndertowProvisioner.provision(parseCommands(args));
-			logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-		} catch (Throwable th) {
-			stopOSGiFramework(logger);
-			logger.error("Shutting down JVM!!", th);
-			// Let the LOGBACK cleans up it's state.
-			LogbackProvisioner.stop();
-			System.exit(-1);
-		}
-	}
+    /**
+     * Entry point for initializing the AdeptJ Runtime.
+     * <p>
+     * It does the following tasks in order.
+     * <p>
+     * 1. Initializes the LOGBACK logging framework.
+     * 2. Does the deployment to embedded UNDERTOW.
+     * 3. Starts the OSGi Framework.
+     * 4. Starts the UNDERTOW server.
+     * 5. Registers the runtime ShutdownHook.
+     */
+    public static void main(String[] args) {
+        Thread.currentThread().setName("AdeptJ Provisioner");
+        long startTime = System.nanoTime();
+        // First of all initialize LOGBACK.
+        LogbackProvisioner.start();
+        Logger logger = LoggerFactory.getLogger(Main.class);
+        try {
+            UndertowProvisioner.provision(parseCommands(args));
+            logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        } catch (Throwable th) {
+            stopOSGiFramework(logger);
+            logger.error("Shutting down JVM!!", th);
+            // Let the LOGBACK cleans up it's state.
+            LogbackProvisioner.stop();
+            System.exit(-1);
+        }
+    }
 
-	private static void stopOSGiFramework(Logger logger) {
-		// Check if OSGi Framework was already started, try to stop the framework gracefully.
-		if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
-			logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-			FrameworkProvisioner.INSTANCE.stopFramework();
-		}
-	}
+    private static void stopOSGiFramework(Logger logger) {
+        // Check if OSGi Framework was already started, try to stop the framework gracefully.
+        if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
+            logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
+            FrameworkProvisioner.INSTANCE.stopFramework();
+        }
+    }
 
-	private static Map<String, String> parseCommands(String[] commands) {
-		Map<String, String> arguments = new HashMap<>();
-		// Parse the command line.
-		for (String cmd : commands) {
-			int indexOfEq = cmd.indexOf(Constants.REGEX_EQ);
-			arguments.put(cmd.substring(0, indexOfEq), cmd.substring(indexOfEq + 1, cmd.length()));
-		}
-		return arguments;
-	}
+    private static Map<String, String> parseCommands(String[] commands) {
+        Map<String, String> arguments = new HashMap<>();
+        // Parse the command line.
+        for (String cmd : commands) {
+            int indexOfEq = cmd.indexOf(Constants.REGEX_EQ);
+            arguments.put(cmd.substring(0, indexOfEq), cmd.substring(indexOfEq + 1, cmd.length()));
+        }
+        return arguments;
+    }
 
 }

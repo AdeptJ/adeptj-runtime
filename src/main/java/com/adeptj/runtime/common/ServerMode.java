@@ -21,14 +21,14 @@ package com.adeptj.runtime.common;
 
 /**
  * Execution mode for optimizing server settings according to the mode provided.
- * 
+ * <p>
  * Note: Defaults to DEV mode.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum ServerMode {
 
-	DEV,
-	
-	PROD
+    DEV,
+
+    PROD
 }

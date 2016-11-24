@@ -29,13 +29,13 @@ import javax.servlet.http.HttpSessionListener;
  */
 public class BridgeHttpSessionListener implements HttpSessionListener {
 
-	@Override
-	public void sessionCreated(HttpSessionEvent se) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_CREATED, se);
-	}
+    @Override
+    public void sessionCreated(HttpSessionEvent se) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_CREATED, se);
+    }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent se) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_DESTROYED, se);
-	}
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_DESTROYED, se);
+    }
 }

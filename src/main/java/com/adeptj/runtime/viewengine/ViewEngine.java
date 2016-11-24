@@ -45,69 +45,69 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXP
 
 /**
  * ViewEngine.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public enum ViewEngine {
 
-	INSTANCE;
+    INSTANCE;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
-	
-	private static final String RB_HELPER_NAME = "msg";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
 
-	private final MustacheEngine engine;
-	
-	private TemplateLocator templateLocator(Config config) {
-		return new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"), config.getString("admin-view-root"),
-				config.getString("admin-view-suffix"), ViewEngine.class.getClassLoader(), false);
-	}
+    private static final String RB_HELPER_NAME = "msg";
 
-	private Helper resourceBundleHelper(Config config) {
-		return new ResourceBundleHelper(config.getString("resource-bundle-basename"), Format.MESSAGE);
-	}
+    private final MustacheEngine engine;
 
-	private MustacheEngine mustacheEngine() {
-		Config config = Configs.INSTANCE.trimou();
-		return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
-				.addTemplateLocator(templateLocator(config))
-				.setProperty(START_DELIMITER, config.getString("start-delimiter"))
-				.setProperty(END_DELIMITER, config.getString("end-delimiter"))
-				.setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean("template-cache-enabled"))
-				.setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt("template-cache-expiration")).build();
-	}
-	
-	ViewEngine() {
-		long startTime = System.nanoTime();
-		this.engine = this.mustacheEngine();
-		LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-	}
+    private TemplateLocator templateLocator(Config config) {
+        return new ClassPathTemplateLocator(config.getInt("admin-template-locator-priority"), config.getString("admin-view-root"),
+                config.getString("admin-view-suffix"), ViewEngine.class.getClassLoader(), false);
+    }
 
-	public void processView(ViewEngineContext context) {
-		long startTime = System.nanoTime();
-		Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.doProcessView(context, mustache));
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
-		}
-	}
-	
-	private void handleException(ViewEngineContext context, Exception ex) {
-		context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
-		try {
-			context.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} catch (IOException ioex) {
-			// Now what? may be log and re-throw.
-			LOGGER.error("Exception while sending error!!", ioex);
-			throw new ViewEngineException(ex.getMessage(), ioex);
-		}
-	}
-	
-	private void doProcessView(ViewEngineContext context, Mustache mustache) {
-		try {
-			context.getResponse().getWriter().write(mustache.render(context.getModels()));
-		} catch (Exception ex) {
-			LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
-			this.handleException(context, ex);
-		}
-	}
+    private Helper resourceBundleHelper(Config config) {
+        return new ResourceBundleHelper(config.getString("resource-bundle-basename"), Format.MESSAGE);
+    }
+
+    private MustacheEngine mustacheEngine() {
+        Config config = Configs.INSTANCE.trimou();
+        return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
+                .addTemplateLocator(templateLocator(config))
+                .setProperty(START_DELIMITER, config.getString("start-delimiter"))
+                .setProperty(END_DELIMITER, config.getString("end-delimiter"))
+                .setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean("template-cache-enabled"))
+                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt("template-cache-expiration")).build();
+    }
+
+    ViewEngine() {
+        long startTime = System.nanoTime();
+        this.engine = this.mustacheEngine();
+        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+    }
+
+    public void processView(ViewEngineContext context) {
+        long startTime = System.nanoTime();
+        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.doProcessView(context, mustache));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
+        }
+    }
+
+    private void handleException(ViewEngineContext context, Exception ex) {
+        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
+        try {
+            context.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (IOException ioex) {
+            // Now what? may be log and re-throw.
+            LOGGER.error("Exception while sending error!!", ioex);
+            throw new ViewEngineException(ex.getMessage(), ioex);
+        }
+    }
+
+    private void doProcessView(ViewEngineContext context, Mustache mustache) {
+        try {
+            context.getResponse().getWriter().write(mustache.render(context.getModels()));
+        } catch (Exception ex) {
+            LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
+            this.handleException(context, ex);
+        }
+    }
 }

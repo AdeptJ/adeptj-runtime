@@ -29,9 +29,9 @@ import javax.servlet.http.HttpSessionIdListener;
  */
 public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
 
-	@Override
-	public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ID_CHANGED, event, oldSessionId);
-	}
+    @Override
+    public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ID_CHANGED, event, oldSessionId);
+    }
 
 }

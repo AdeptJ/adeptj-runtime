@@ -21,22 +21,22 @@ package com.adeptj.runtime.viewengine;
 
 /**
  * ViewEngineException.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public class ViewEngineException extends RuntimeException {
 
-	private static final long serialVersionUID = -8077495079692215520L;
+    private static final long serialVersionUID = -8077495079692215520L;
 
-	public ViewEngineException(String message) {
-		super(message);
-	}
+    public ViewEngineException(String message) {
+        super(message);
+    }
 
-	public ViewEngineException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ViewEngineException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public ViewEngineException(Throwable cause) {
-		super(cause);
-	}
+    public ViewEngineException(Throwable cause) {
+        super(cause);
+    }
 }

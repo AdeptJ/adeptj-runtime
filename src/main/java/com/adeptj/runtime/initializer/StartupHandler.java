@@ -24,17 +24,17 @@ import javax.servlet.ServletException;
 
 /**
  * StartupHandler that will be called by the ServletContainerInitializer while startup is in progress.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public interface StartupHandler {
 
-	/**
-	 * This method will be called by the StartupHandlerInitializer while startup is in
-	 * progress.
-	 * 
-	 * @param context the {@link ServletContext} in which this handler runs in.
-	 * @throws ServletException exception thrown by initializer code
-	 */
-	void onStartup(ServletContext context) throws ServletException;
+    /**
+     * This method will be called by the StartupHandlerInitializer while startup is in
+     * progress.
+     *
+     * @param context the {@link ServletContext} in which this handler runs in.
+     * @throws ServletException exception thrown by initializer code
+     */
+    void onStartup(ServletContext context) throws ServletException;
 }

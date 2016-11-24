@@ -35,60 +35,60 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 
 /**
- * AdminAuthServlet does the following: 
- * 
+ * AdminAuthServlet does the following:
+ * <p>
  * 1. Serves the login page and handles the validation failure on wrong credentials submission.
  * 2. Logout the currently logged in Admin user and renders the login page again.
- * 
+ * <p>
  * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdminAuthServlet", urlPatterns = { ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI })
+@WebServlet(name = "AdminAuthServlet", urlPatterns = {ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI})
 public class AdminAuthServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -3339904764769823449L;
+    private static final long serialVersionUID = -3339904764769823449L;
 
-	/**
-	 * Render login page.
-	 */
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String requestURI = req.getRequestURI();
-		if (ADMIN_LOGIN_URI.equals(requestURI)) {
-			this.renderLoginPage(req, resp);
-		} else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
-			this.logout(req, resp);
-		} else {
-			// if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
-			resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
-		}
-	}
+    /**
+     * Render login page.
+     */
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String requestURI = req.getRequestURI();
+        if (ADMIN_LOGIN_URI.equals(requestURI)) {
+            this.renderLoginPage(req, resp);
+        } else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
+            this.logout(req, resp);
+        } else {
+            // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
+            resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
+        }
+    }
 
-	/**
-	 * Handle "/auth/j_security_check" validation failure.
-	 */
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		this.handleLoginFailure(req, resp);
-	}
+    /**
+     * Handle "/auth/j_security_check" validation failure.
+     */
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.handleLoginFailure(req, resp);
+    }
 
-	private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
-		Models models = new Models();
-		models.put("validation", "Invalid credentials!!");
-		models.put("j_username", req.getParameter("j_username"));
-		// Render login page again with validation message.
-		ViewEngine.INSTANCE.processView(builder.view("auth/login").models(models).build());
-	}
+    private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
+        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
+        Models models = new Models();
+        models.put("validation", "Invalid credentials!!");
+        models.put("j_username", req.getParameter("j_username"));
+        // Render login page again with validation message.
+        ViewEngine.INSTANCE.processView(builder.view("auth/login").models(models).build());
+    }
 
-	private void renderLoginPage(HttpServletRequest req, HttpServletResponse resp) {
-		ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
-	}
+    private void renderLoginPage(HttpServletRequest req, HttpServletResponse resp) {
+        ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
+    }
 
-	private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// Invalidate the session and redirect back to /system/console page.
-		req.logout();
-		resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
-	}
+    private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Invalidate the session and redirect back to /system/console page.
+        req.logout();
+        resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
+    }
 }

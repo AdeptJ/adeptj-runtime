@@ -37,44 +37,44 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 /**
  * An ServletContainerInitializer that is called by the Container while initialization is in progress.
  * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this Initializer.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 @HandlesTypes(StartupHandler.class)
 public class StartupHandlerInitializer implements ServletContainerInitializer {
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onStartup(Set<Class<?>> handlers, ServletContext context) throws ServletException {
-		Logger logger = LoggerFactory.getLogger(StartupHandlerInitializer.class);
-		if (handlers == null) {
-			// We can't go ahead if FrameworkStartupHandler is not passed by container.
-			logger.error("No @HandlesTypes(StartupHandler) on classpath!!");
-			throw new IllegalStateException("No @HandlesTypes(StartupHandler) on classpath!!");
-		} else {
-			ServletContextHolder.INSTANCE.setServletContext(context);
-			context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
-			handlers.forEach(handler -> this.handleStartupHandler(context, logger, handler));
-			// If we are here means startup went well above, register FrameworkShutdownHandler now.
-			context.addListener(FrameworkShutdownHandler.class);
-		}
-	}
 
-	private void handleStartupHandler(ServletContext context, Logger logger, Class<?> handler) {
-		logger.info("Handling @HandlesTypes: [{}]", handler);
-		try {
-			if (StartupHandler.class.isAssignableFrom(handler)) {
-				StartupHandler.class.cast(handler.newInstance()).onStartup(context);
-			} else {
-				logger.warn("Unknown @HandlesTypes: [{}]", handler);
-				throw new IllegalStateException("Only StartupHandler types are supported!!");
-			}
-		} catch (Exception ex) {
-			logger.error("StartupHandler Exception!!", ex);
-			throw new RuntimeException("StartupHandler Exception!!", ex);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStartup(Set<Class<?>> handlers, ServletContext context) throws ServletException {
+        Logger logger = LoggerFactory.getLogger(StartupHandlerInitializer.class);
+        if (handlers == null) {
+            // We can't go ahead if FrameworkStartupHandler is not passed by container.
+            logger.error("No @HandlesTypes(StartupHandler) on classpath!!");
+            throw new IllegalStateException("No @HandlesTypes(StartupHandler) on classpath!!");
+        } else {
+            ServletContextHolder.INSTANCE.setServletContext(context);
+            context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
+            handlers.forEach(handler -> this.handleStartupHandler(context, logger, handler));
+            // If we are here means startup went well above, register FrameworkShutdownHandler now.
+            context.addListener(FrameworkShutdownHandler.class);
+        }
+    }
+
+    private void handleStartupHandler(ServletContext context, Logger logger, Class<?> handler) {
+        logger.info("Handling @HandlesTypes: [{}]", handler);
+        try {
+            if (StartupHandler.class.isAssignableFrom(handler)) {
+                StartupHandler.class.cast(handler.newInstance()).onStartup(context);
+            } else {
+                logger.warn("Unknown @HandlesTypes: [{}]", handler);
+                throw new IllegalStateException("Only StartupHandler types are supported!!");
+            }
+        } catch (Exception ex) {
+            logger.error("StartupHandler Exception!!", ex);
+            throw new RuntimeException("StartupHandler Exception!!", ex);
+        }
+    }
 
 }

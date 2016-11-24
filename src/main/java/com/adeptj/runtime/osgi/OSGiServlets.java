@@ -48,82 +48,82 @@ import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHIT
  */
 public enum OSGiServlets {
 
-	INSTANCE;
+    INSTANCE;
 
-	private static final String CONTEXT_SELECT_FILTER = "(osgi.http.whiteboard.context.name=*)";
-	
-	/**
-	 * HttpServlet FQCN to ServiceRegistration mapping.
-	 */
-	private Map<String, ServiceRegistration<? extends Servlet>> servlets = new HashMap<>();
+    private static final String CONTEXT_SELECT_FILTER = "(osgi.http.whiteboard.context.name=*)";
 
-	public void registerAll(BundleContext ctx, List<HttpServlet> servlets) {
-		servlets.forEach(servlet -> this.register(ctx, servlet));
-	}
+    /**
+     * HttpServlet FQCN to ServiceRegistration mapping.
+     */
+    private Map<String, ServiceRegistration<? extends Servlet>> servlets = new HashMap<>();
 
-	public void register(BundleContext ctx, HttpServlet servlet) {
-		Class<? extends HttpServlet> klazz = servlet.getClass();
-		WebServlet webServlet = this.validateWebServletAnnotation(klazz);
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put(HTTP_WHITEBOARD_SERVLET_PATTERN,
-				webServlet.urlPatterns().length == 0 ? webServlet.value() : webServlet.urlPatterns());
-		properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
-		this.handleInitParams(webServlet, properties);
-		this.handleName(klazz, webServlet.name(), properties);
-		String servletFQCN = klazz.getName();
-		LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi Servlet: [{}]", servletFQCN);
-		this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, servlet, properties));
-	}
+    public void registerAll(BundleContext ctx, List<HttpServlet> servlets) {
+        servlets.forEach(servlet -> this.register(ctx, servlet));
+    }
 
-	protected void registerErrorServlet(BundleContext ctx, HttpServlet errorServlet, List<String> errors) {
-		Class<? extends HttpServlet> klazz = errorServlet.getClass();
-		WebServlet webServlet = this.validateWebServletAnnotation(klazz);
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
-		// Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
-		properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, CONTEXT_SELECT_FILTER);
-		properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
-		this.handleInitParams(webServlet, properties);
-		this.handleName(klazz, webServlet.name(), properties);
-		String servletFQCN = klazz.getName();
-		LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi ErrorServlet: [{}]", servletFQCN);
-		this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, errorServlet, properties));
-	}
+    public void register(BundleContext ctx, HttpServlet servlet) {
+        Class<? extends HttpServlet> klazz = servlet.getClass();
+        WebServlet webServlet = this.validateWebServletAnnotation(klazz);
+        Dictionary<String, Object> properties = new Hashtable<>();
+        properties.put(HTTP_WHITEBOARD_SERVLET_PATTERN,
+                webServlet.urlPatterns().length == 0 ? webServlet.value() : webServlet.urlPatterns());
+        properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
+        this.handleInitParams(webServlet, properties);
+        this.handleName(klazz, webServlet.name(), properties);
+        String servletFQCN = klazz.getName();
+        LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi Servlet: [{}]", servletFQCN);
+        this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, servlet, properties));
+    }
 
-	public void unregister(Class<HttpServlet> klazz) {
-		ServiceRegistration<? extends Servlet> serviceRegistration = this.servlets.get(klazz.getName());
-		if (serviceRegistration != null) {
-			serviceRegistration.unregister();
-		}
-	}
+    protected void registerErrorServlet(BundleContext ctx, HttpServlet errorServlet, List<String> errors) {
+        Class<? extends HttpServlet> klazz = errorServlet.getClass();
+        WebServlet webServlet = this.validateWebServletAnnotation(klazz);
+        Dictionary<String, Object> properties = new Hashtable<>();
+        properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
+        // Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
+        properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, CONTEXT_SELECT_FILTER);
+        properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
+        this.handleInitParams(webServlet, properties);
+        this.handleName(klazz, webServlet.name(), properties);
+        String servletFQCN = klazz.getName();
+        LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi ErrorServlet: [{}]", servletFQCN);
+        this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, errorServlet, properties));
+    }
 
-	public void unregisterAll() {
-		Logger logger = LoggerFactory.getLogger(OSGiServlets.class);
-		this.servlets.forEach((servletName, serviceRegistration) -> {
-			logger.info("Unregistering OSGi Servlet: [{}]", servletName);
-			serviceRegistration.unregister();
-		});
-	}
-	
-	private WebServlet validateWebServletAnnotation(Class<? extends HttpServlet> klazz) {
-		WebServlet webServlet = klazz.getAnnotation(WebServlet.class);
-		if (webServlet == null) {
-			throw new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!");
-		}
-		return webServlet;
-	}
+    public void unregister(Class<HttpServlet> klazz) {
+        ServiceRegistration<? extends Servlet> serviceRegistration = this.servlets.get(klazz.getName());
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+        }
+    }
 
-	private void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
-		for (WebInitParam initParam : webServlet.initParams()) {
-			properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value());
-		}
-	}
+    public void unregisterAll() {
+        Logger logger = LoggerFactory.getLogger(OSGiServlets.class);
+        this.servlets.forEach((servletName, serviceRegistration) -> {
+            logger.info("Unregistering OSGi Servlet: [{}]", servletName);
+            serviceRegistration.unregister();
+        });
+    }
 
-	private void handleName(Class<? extends HttpServlet> klazz, String name, Dictionary<String, Object> props) {
-		if (name.isEmpty()) {
-			props.put(HTTP_WHITEBOARD_SERVLET_NAME, klazz.getSimpleName());
-		} else {
-			props.put(HTTP_WHITEBOARD_SERVLET_NAME, name);
-		}
-	}
+    private WebServlet validateWebServletAnnotation(Class<? extends HttpServlet> klazz) {
+        WebServlet webServlet = klazz.getAnnotation(WebServlet.class);
+        if (webServlet == null) {
+            throw new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!");
+        }
+        return webServlet;
+    }
+
+    private void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
+        for (WebInitParam initParam : webServlet.initParams()) {
+            properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value());
+        }
+    }
+
+    private void handleName(Class<? extends HttpServlet> klazz, String name, Dictionary<String, Object> props) {
+        if (name.isEmpty()) {
+            props.put(HTTP_WHITEBOARD_SERVLET_NAME, klazz.getSimpleName());
+        } else {
+            props.put(HTTP_WHITEBOARD_SERVLET_NAME, name);
+        }
+    }
 }

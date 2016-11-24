@@ -29,18 +29,18 @@ import javax.servlet.http.HttpSessionBindingEvent;
  */
 public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeListener {
 
-	@Override
-	public void attributeAdded(HttpSessionBindingEvent event) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_ADDED, event);
-	}
+    @Override
+    public void attributeAdded(HttpSessionBindingEvent event) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_ADDED, event);
+    }
 
-	@Override
-	public void attributeRemoved(HttpSessionBindingEvent event) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REMOVED, event);
-	}
+    @Override
+    public void attributeRemoved(HttpSessionBindingEvent event) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REMOVED, event);
+    }
 
-	@Override
-	public void attributeReplaced(HttpSessionBindingEvent event) {
-		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REPLACED, event);
-	}
+    @Override
+    public void attributeReplaced(HttpSessionBindingEvent event) {
+        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ATTRIBUTE_REPLACED, event);
+    }
 }

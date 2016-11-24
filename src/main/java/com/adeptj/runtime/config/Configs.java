@@ -37,35 +37,35 @@ import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
  */
 public enum Configs {
 
-	INSTANCE;
+    INSTANCE;
 
-	private final Config main;
+    private final Config main;
 
-	Configs() {
-		this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
-	}
-	
-	public Config main() {
-		return this.main;
-	}
-	
-	public Config undertow() {
-		return this.main.getConfig(UNDERTOW_CONF_SECTION);
-	}
-	
-	public Config felix() {
-		return this.main.getConfig(FELIX_CONF_SECTION);
-	}
-	
-	public Config common() {
-		return this.main.getConfig(COMMON_CONF_SECTION);
-	}
-	
-	public Config thymeleaf() {
-		return this.main.getConfig(THYMELEAF_CONF_SECTION);
-	}
-	
-	public Config trimou() {
-		return this.main.getConfig(TRIMOU_CONF_SECTION);
-	}
+    Configs() {
+        this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
+    }
+
+    public Config main() {
+        return this.main;
+    }
+
+    public Config undertow() {
+        return this.main.getConfig(UNDERTOW_CONF_SECTION);
+    }
+
+    public Config felix() {
+        return this.main.getConfig(FELIX_CONF_SECTION);
+    }
+
+    public Config common() {
+        return this.main.getConfig(COMMON_CONF_SECTION);
+    }
+
+    public Config thymeleaf() {
+        return this.main.getConfig(THYMELEAF_CONF_SECTION);
+    }
+
+    public Config trimou() {
+        return this.main.getConfig(TRIMOU_CONF_SECTION);
+    }
 }

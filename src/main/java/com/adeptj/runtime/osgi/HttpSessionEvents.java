@@ -33,73 +33,73 @@ import java.util.Optional;
  */
 public enum HttpSessionEvents {
 
-	SESSION_CREATED,
+    SESSION_CREATED,
 
-	SESSION_DESTROYED,
+    SESSION_DESTROYED,
 
-	SESSION_ID_CHANGED,
+    SESSION_ID_CHANGED,
 
-	SESSION_ATTRIBUTE_ADDED,
+    SESSION_ATTRIBUTE_ADDED,
 
-	SESSION_ATTRIBUTE_REMOVED,
+    SESSION_ATTRIBUTE_REMOVED,
 
-	SESSION_ATTRIBUTE_REPLACED;
+    SESSION_ATTRIBUTE_REPLACED;
 
-	public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
-		switch (type) {
-		case SESSION_CREATED:
-			optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
-			break;
-		case SESSION_DESTROYED:
-			optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
-			break;
-		default:
-			// NO-OP
-			break;
-		}
-	}
+    public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
+        switch (type) {
+            case SESSION_CREATED:
+                optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
+                break;
+            case SESSION_DESTROYED:
+                optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
+                break;
+            default:
+                // NO-OP
+                break;
+        }
+    }
 
-	public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event, String oldSessionId) {
-		switch (type) {
-		case SESSION_ID_CHANGED:
-			optionalSessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
-			break;
-		default:
-			// NO-OP
-			break;
-		}
-	}
+    public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event, String oldSessionId) {
+        switch (type) {
+            case SESSION_ID_CHANGED:
+                optionalSessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
+                break;
+            default:
+                // NO-OP
+                break;
+        }
+    }
 
-	public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
-		switch (type) {
-		case SESSION_ATTRIBUTE_ADDED:
-			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
-			break;
-		case SESSION_ATTRIBUTE_REMOVED:
-			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
-			break;
-		case SESSION_ATTRIBUTE_REPLACED:
-			optionalSessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
-			break;
-		default:
-			// NO-OP
-			break;
-		}
-	}
+    public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
+        switch (type) {
+            case SESSION_ATTRIBUTE_ADDED:
+                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
+                break;
+            case SESSION_ATTRIBUTE_REMOVED:
+                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
+                break;
+            case SESSION_ATTRIBUTE_REPLACED:
+                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
+                break;
+            default:
+                // NO-OP
+                break;
+        }
+    }
 
-	private static EventDispatcherTracker tracker() {
-		return EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
-	}
+    private static EventDispatcherTracker tracker() {
+        return EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+    }
 
-	private static Optional<HttpSessionListener> optionalSessionListener() {
-		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionListener());
-	}
+    private static Optional<HttpSessionListener> optionalSessionListener() {
+        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionListener());
+    }
 
-	private static Optional<HttpSessionIdListener> optionalSessionIdListener() {
-		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionIdListener());
-	}
+    private static Optional<HttpSessionIdListener> optionalSessionIdListener() {
+        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionIdListener());
+    }
 
-	private static Optional<HttpSessionAttributeListener> optionalSessionAttributeListener() {
-		return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionAttributeListener());
-	}
+    private static Optional<HttpSessionAttributeListener> optionalSessionAttributeListener() {
+        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionAttributeListener());
+    }
 }

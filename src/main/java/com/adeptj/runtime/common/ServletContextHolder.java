@@ -23,24 +23,24 @@ import javax.servlet.ServletContext;
 
 /**
  * This Enum provides the access to the {@link ServletContext} and corresponding attributes.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum ServletContextHolder {
 
-	INSTANCE;
+    INSTANCE;
 
-	private ServletContext context;
+    private ServletContext context;
 
-	public void setServletContext(ServletContext context) {
-		this.context = context;
-	}
+    public void setServletContext(ServletContext context) {
+        this.context = context;
+    }
 
-	public ServletContext getServletContext() {
-		return this.context;
-	}
+    public ServletContext getServletContext() {
+        return this.context;
+    }
 
-	public <T> T getAttr(String name, Class<T> type) {
-		return type.cast(this.context.getAttribute(name));
-	}
+    public <T> T getAttr(String name, Class<T> type) {
+        return type.cast(this.context.getAttribute(name));
+    }
 }

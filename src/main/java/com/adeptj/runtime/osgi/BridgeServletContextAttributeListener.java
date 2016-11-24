@@ -31,26 +31,26 @@ import javax.servlet.ServletContextAttributeListener;
  */
 public class BridgeServletContextAttributeListener implements ServletContextAttributeListener {
 
-	@Override
-	public void attributeAdded(ServletContextAttributeEvent event) {
-		if (this.isAttributeBundleContext(event.getName())) {
-			EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
-		}
-	}
+    @Override
+    public void attributeAdded(ServletContextAttributeEvent event) {
+        if (this.isAttributeBundleContext(event.getName())) {
+            EventDispatcherTrackerSupport.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
+        }
+    }
 
-	@Override
-	public void attributeRemoved(ServletContextAttributeEvent event) {
-		if (this.isAttributeBundleContext(event.getName())) {
-			EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-		}
-	}
+    @Override
+    public void attributeRemoved(ServletContextAttributeEvent event) {
+        if (this.isAttributeBundleContext(event.getName())) {
+            EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
+        }
+    }
 
-	@Override
-	public void attributeReplaced(ServletContextAttributeEvent event) {
-		// Does nothing as of now.
-	}
+    @Override
+    public void attributeReplaced(ServletContextAttributeEvent event) {
+        // Does nothing as of now.
+    }
 
-	private boolean isAttributeBundleContext(String attributeName) {
-		return BundleContext.class.getName().equals(attributeName);
-	}
+    private boolean isAttributeBundleContext(String attributeName) {
+        return BundleContext.class.getName().equals(attributeName);
+    }
 }

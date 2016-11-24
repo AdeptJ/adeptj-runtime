@@ -34,47 +34,47 @@ import java.io.IOException;
 
 /**
  * PerContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
- * 
- * Note: This is independent of UndertowServer and directly managed by OSGi. 
+ * <p>
+ * Note: This is independent of UndertowServer and directly managed by OSGi.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 @WebServlet(name = "PerContextErrorServlet", asyncSupported = true)
 public class PerContextErrorServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -5818850813832379842L;
+    private static final long serialVersionUID = -5818850813832379842L;
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		this.handleError(req, resp);
-	}
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.handleError(req, resp);
+    }
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		this.doGet(req, resp);
-	}
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.doGet(req, resp);
+    }
 
-	private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-		ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
+    private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
         Models models = this.models(req, statusCode);
         builder.models(models);
-		if (models.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
+        if (models.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
             ViewEngine.INSTANCE.processView(builder.view("error/500").build());
         } else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
-			ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
-		} else {
-			// if the requested view not found, render 404.
-			ViewEngine.INSTANCE.processView(builder.view("error/404").build());
-		}
-	}
+            ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
+        } else {
+            // if the requested view not found, render 404.
+            ViewEngine.INSTANCE.processView(builder.view("error/404").build());
+        }
+    }
 
-	private Models models(HttpServletRequest req, Integer statusCode) {
-		Models models = new Models();
-		models.put("statusCode", statusCode);
-		models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
-		models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
-		models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-		return models;
-	}
+    private Models models(HttpServletRequest req, Integer statusCode) {
+        Models models = new Models();
+        models.put("statusCode", statusCode);
+        models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
+        models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
+        models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+        return models;
+    }
 }

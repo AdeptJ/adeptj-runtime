@@ -29,7 +29,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the 
+ * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the
  * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
  * are called in an unspecified order.
  *
@@ -40,5 +40,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface StartupOrder {
 
-	public int value() default 0;
+    public int value() default 0;
 }

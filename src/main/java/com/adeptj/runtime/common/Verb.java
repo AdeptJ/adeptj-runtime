@@ -23,28 +23,28 @@ import io.undertow.util.HttpString;
 
 /**
  * ENUM for denoting HTTP methods.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum Verb {
 
-	GET,
+    GET,
 
-	POST,
+    POST,
 
-	PUT,
+    PUT,
 
-	DELETE,
+    DELETE,
 
-	OPTIONS,
+    OPTIONS,
 
-	PATCH;
+    PATCH;
 
-	public HttpString toHttpString() {
-		return HttpString.tryFromString(this.toString());
-	}
-	
-	public static HttpString from(String verb) {
-		return HttpString.tryFromString(verb);
-	}
+    public HttpString toHttpString() {
+        return HttpString.tryFromString(this.toString());
+    }
+
+    public static HttpString from(String verb) {
+        return HttpString.tryFromString(verb);
+    }
 }

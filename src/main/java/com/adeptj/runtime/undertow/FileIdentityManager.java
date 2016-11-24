@@ -40,56 +40,56 @@ import java.util.function.Predicate;
  */
 public class FileIdentityManager implements IdentityManager {
 
-	private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
-	
-	/**
-	 * User to Roles mapping.
-	 */
-	private Map<String, List<String>> userRolesMapping;
-	
-	private CredentialMatcher matcher;
+    private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
 
-	@SuppressWarnings("unchecked")
-	public FileIdentityManager(Config undertowCfg) {
-		this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
-		this.matcher = new CredentialMatcher();
-	}
+    /**
+     * User to Roles mapping.
+     */
+    private Map<String, List<String>> userRolesMapping;
 
-	/**
-	 * In our case, this method is called by CachedAuthenticatedSessionMechanism.
-	 * 
-	 * This is queried on each request after user is successfully logged in.
-	 */
-	@Override
-	public Account verify(Account account) {
-		Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(account.getPrincipal().getName()) 
-				&& entry.getValue().containsAll(account.getRoles());
-		return this.userRolesMapping.entrySet().stream().filter(predicate).findFirst().isPresent() ? account : null;
-	}
+    private CredentialMatcher matcher;
 
-	/**
-	 * Called by FormAuthenticationMechanism when user submits the login form.
-	 */
-	@Override
-	public Account verify(String id, Credential credential) {
-		PasswordCredential pwdCredential = (PasswordCredential) credential;
-		Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(id) && pwdCredential.getPassword().length != 0;
-		return this.userRolesMapping.entrySet().stream()
-				.filter(predicate.and(entry -> this.matcher.match(entry.getKey(), new String(pwdCredential.getPassword()))))
-				.map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
-				.findFirst().orElse(null);
-	}
+    @SuppressWarnings("unchecked")
+    public FileIdentityManager(Config undertowCfg) {
+        this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
+        this.matcher = new CredentialMatcher();
+    }
 
-	/**
-	 * Used here:
-	 * 
-	 * 1. ClientCertAuthenticationMechanism.
-	 * 2. GSSAPIAuthenticationMechanism
-	 * 
-	 * We are not covering both the use cases therefore returning a null.
-	 */
-	@Override
-	public Account verify(Credential credential) {
-		return null;
-	}
+    /**
+     * In our case, this method is called by CachedAuthenticatedSessionMechanism.
+     * <p>
+     * This is queried on each request after user is successfully logged in.
+     */
+    @Override
+    public Account verify(Account account) {
+        Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(account.getPrincipal().getName())
+                && entry.getValue().containsAll(account.getRoles());
+        return this.userRolesMapping.entrySet().stream().filter(predicate).findFirst().isPresent() ? account : null;
+    }
+
+    /**
+     * Called by FormAuthenticationMechanism when user submits the login form.
+     */
+    @Override
+    public Account verify(String id, Credential credential) {
+        PasswordCredential pwdCredential = (PasswordCredential) credential;
+        Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(id) && pwdCredential.getPassword().length != 0;
+        return this.userRolesMapping.entrySet().stream()
+                .filter(predicate.and(entry -> this.matcher.match(entry.getKey(), new String(pwdCredential.getPassword()))))
+                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
+                .findFirst().orElse(null);
+    }
+
+    /**
+     * Used here:
+     * <p>
+     * 1. ClientCertAuthenticationMechanism.
+     * 2. GSSAPIAuthenticationMechanism
+     * <p>
+     * We are not covering both the use cases therefore returning a null.
+     */
+    @Override
+    public Account verify(Credential credential) {
+        return null;
+    }
 }

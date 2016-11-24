@@ -45,63 +45,64 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class BundleProvisioner {
-	
-	// No instantiation.
-	private BundleProvisioner() {}
-	
-	private static final String PREFIX_BUNDLES = "bundles/";
 
-	private static final String EXTN_JAR = ".jar";
+    // No instantiation.
+    private BundleProvisioner() {
+    }
 
-	public static void provisionBundles(BundleContext systemBundleContext) throws Exception {
-		Logger logger = LoggerFactory.getLogger(BundleProvisioner.class);
-		// Start all the Bundles after collection and installation phase.
-		startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
-	}
+    private static final String PREFIX_BUNDLES = "bundles/";
 
-	private static void startBundles(List<Bundle> bundles, Logger logger) {
-		// Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-		bundles.stream().filter(bundle -> bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null)
-				.forEach(bundle -> startBundle(bundle, logger));
-	}
+    private static final String EXTN_JAR = ".jar";
 
-	private static void startBundle(Bundle bundle, Logger logger) {
-		logger.debug("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
-		try {
-			bundle.start();
-		} catch (BundleException | IllegalStateException | SecurityException ex) {
-			logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
-		}
-	}
+    public static void provisionBundles(BundleContext systemBundleContext) throws Exception {
+        Logger logger = LoggerFactory.getLogger(BundleProvisioner.class);
+        // Start all the Bundles after collection and installation phase.
+        startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
+    }
 
-	private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
-		// First install all the Bundles.
-		List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
-				.filter(Objects::nonNull).collect(Collectors.toList());
-		logger.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
-		return installedBundles;
-	}
+    private static void startBundles(List<Bundle> bundles, Logger logger) {
+        // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
+        bundles.stream().filter(bundle -> bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null)
+                .forEach(bundle -> startBundle(bundle, logger));
+    }
 
-	private static Bundle installBundle(URL url, BundleContext context, Logger logger) {
-		logger.debug("Installing Bundle from location: [{}]", url);
-		Bundle bundle = null;
-		try {
-			bundle = context.installBundle(url.toExternalForm());
-		} catch (BundleException | IllegalStateException | SecurityException ex) {
-			logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
-		}
-		return bundle;
-	}
+    private static void startBundle(Bundle bundle, Logger logger) {
+        logger.debug("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
+        try {
+            bundle.start();
+        } catch (BundleException | IllegalStateException | SecurityException ex) {
+            logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
+        }
+    }
 
-	private static List<URL> collectBundles(Logger logger) throws IOException {
-		String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-		ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
-		Predicate<JarEntry> bundlePredicate = (jarEntry) -> (jarEntry.getName().startsWith(PREFIX_BUNDLES)
-				&& jarEntry.getName().endsWith(EXTN_JAR));
-		URLConnection connection = BundleProvisioner.class.getResource(rootPath).openConnection();
-		List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
-				.map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
-		logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
-		return bundles;
-	}
+    private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
+        // First install all the Bundles.
+        List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
+                .filter(Objects::nonNull).collect(Collectors.toList());
+        logger.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
+        return installedBundles;
+    }
+
+    private static Bundle installBundle(URL url, BundleContext context, Logger logger) {
+        logger.debug("Installing Bundle from location: [{}]", url);
+        Bundle bundle = null;
+        try {
+            bundle = context.installBundle(url.toExternalForm());
+        } catch (BundleException | IllegalStateException | SecurityException ex) {
+            logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
+        }
+        return bundle;
+    }
+
+    private static List<URL> collectBundles(Logger logger) throws IOException {
+        String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+        ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
+        Predicate<JarEntry> bundlePredicate = (jarEntry) -> (jarEntry.getName().startsWith(PREFIX_BUNDLES)
+                && jarEntry.getName().endsWith(EXTN_JAR));
+        URLConnection connection = BundleProvisioner.class.getResource(rootPath).openConnection();
+        List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
+                .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
+        logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
+        return bundles;
+    }
 }

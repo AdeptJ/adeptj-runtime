@@ -21,35 +21,35 @@ package com.adeptj.runtime.osgi;
 
 /**
  * WebConsolePasswordUpdateAware.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class WebConsolePasswordUpdateAware {
 
-	private char[] password;
-	
-	public static WebConsolePasswordUpdateAware getInstance() {
+    private char[] password;
+
+    public static WebConsolePasswordUpdateAware getInstance() {
         return Holder.getInstance();
     }
 
-	public char[] getPassword() {
-		return this.password;
-	}
+    public char[] getPassword() {
+        return this.password;
+    }
 
-	public void setPassword(char[] pwd) {
-		this.password = pwd;
-	}
+    public void setPassword(char[] pwd) {
+        this.password = pwd;
+    }
 
-	public boolean isPasswordSet() {
-		return this.password != null;
-	}
+    public boolean isPasswordSet() {
+        return this.password != null;
+    }
 
-	/**
-	 * WebConsolePasswordUpdateAware.Holder
-	 * 
-	 * @author Rakesh.Kumar, AdeptJ
-	 */
-	private static class Holder {
+    /**
+     * WebConsolePasswordUpdateAware.Holder
+     *
+     * @author Rakesh.Kumar, AdeptJ
+     */
+    private static class Holder {
 
         private static final WebConsolePasswordUpdateAware INSTANCE = new WebConsolePasswordUpdateAware();
 

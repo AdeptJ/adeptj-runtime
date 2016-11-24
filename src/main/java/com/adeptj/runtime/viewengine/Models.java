@@ -28,24 +28,24 @@ import java.util.Set;
 
 /**
  * Models.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public class Models extends AbstractMap<String, Object> implements Iterable<Entry<String, Object>> {
 
-	private Map<String, Object> delegate = new HashMap<>();
+    private Map<String, Object> delegate = new HashMap<>();
 
-	@Override
-	public Object put(String key, Object value) {
-		return this.delegate.put(key, value);
-	}
+    @Override
+    public Object put(String key, Object value) {
+        return this.delegate.put(key, value);
+    }
 
-	public Iterator<Entry<String, Object>> iterator() {
-		return this.entrySet().iterator();
-	}
+    public Iterator<Entry<String, Object>> iterator() {
+        return this.entrySet().iterator();
+    }
 
-	@Override
-	public Set<Entry<String, Object>> entrySet() {
-		return this.delegate.entrySet();
-	}
+    @Override
+    public Set<Entry<String, Object>> entrySet() {
+        return this.delegate.entrySet();
+    }
 }

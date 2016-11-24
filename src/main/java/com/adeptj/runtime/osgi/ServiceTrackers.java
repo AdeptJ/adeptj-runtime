@@ -32,36 +32,36 @@ import java.util.Optional;
  */
 public enum ServiceTrackers {
 
-	INSTANCE;
+    INSTANCE;
 
-	private Map<String, ServiceTracker<?, ?>> trackers = new HashMap<>();
+    private Map<String, ServiceTracker<?, ?>> trackers = new HashMap<>();
 
-	public void track(Class<? extends ServiceTracker<?, ?>> klazz, ServiceTracker<?, ?> tracker) {
-		this.trackers.put(klazz.getName(), tracker);
-		tracker.open();
-	}
+    public void track(Class<? extends ServiceTracker<?, ?>> klazz, ServiceTracker<?, ?> tracker) {
+        this.trackers.put(klazz.getName(), tracker);
+        tracker.open();
+    }
 
-	public void close(Class<? extends ServiceTracker<?, ?>> klazz) {
-		Optional.ofNullable(this.trackers.remove(klazz.getName())).ifPresent(tracker -> tracker.close());
-	}
+    public void close(Class<? extends ServiceTracker<?, ?>> klazz) {
+        Optional.ofNullable(this.trackers.remove(klazz.getName())).ifPresent(tracker -> tracker.close());
+    }
 
-	public void closeAll() {
-		this.trackers.forEach((klazz, tracker) -> tracker.close());
-	}
+    public void closeAll() {
+        this.trackers.forEach((klazz, tracker) -> tracker.close());
+    }
 
-	public ServiceTracker<?, ?> getTracker(Class<? extends ServiceTracker<?, ?>> klazz) {
-		return this.trackers.get(klazz.getName());
-	}
+    public ServiceTracker<?, ?> getTracker(Class<? extends ServiceTracker<?, ?>> klazz) {
+        return this.trackers.get(klazz.getName());
+    }
 
-	public static void close(ServiceTracker<?, ?> tracker) {
-		tracker.close();
-	}
+    public static void close(ServiceTracker<?, ?> tracker) {
+        tracker.close();
+    }
 
-	public static void closeQuietly(ServiceTracker<?, ?> tracker) {
-		try {
-			tracker.close();
-		} catch (Exception ex) {
-			// Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
-		}
-	}
+    public static void closeQuietly(ServiceTracker<?, ?> tracker) {
+        try {
+            tracker.close();
+        } catch (Exception ex) {
+            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
+        }
+    }
 }

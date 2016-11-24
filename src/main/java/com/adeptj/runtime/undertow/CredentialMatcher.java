@@ -32,51 +32,51 @@ import static com.adeptj.runtime.common.Constants.UTF8;
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
  * in [org.apache.felix.webconsole.internal.servlet.Password]
- * 
+ * <p>
  * Because, we want to be consistent with the hashing mechanism used by OSGi Web Console configuration management,
  * but supporting classes available there are package private and therefore can't be accessible to outside world.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 class CredentialMatcher {
 
-	private static final String SHA256 = "SHA-256";
+    private static final String SHA256 = "SHA-256";
 
-	boolean match(String id, String pwd) {
-		// When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
-		// default password maintained in provisioning file.
-		return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd)
-				: this.fromProvisioningConfig(id, pwd);
-	}
+    boolean match(String id, String pwd) {
+        // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
+        // default password maintained in provisioning file.
+        return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd)
+                : this.fromProvisioningConfig(id, pwd);
+    }
 
-	private boolean fromProvisioningConfig(String id, String pwd) {
-		return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
-				.filter(entry -> entry.getKey().equals(id))
-				.anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
-	}
+    private boolean fromProvisioningConfig(String id, String pwd) {
+        return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
+                .filter(entry -> entry.getKey().equals(id))
+                .anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
+    }
 
-	private boolean fromOSGiManagerConfig(String pwd) {
-		try {
-			return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
-		} catch (Exception ex) {
-			// Don't care!!
-		}
-		return false;
-	}
+    private boolean fromOSGiManagerConfig(String pwd) {
+        try {
+            return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
+        } catch (Exception ex) {
+            // Don't care!!
+        }
+        return false;
+    }
 
-	private char[] chars(String pwdHash) {
-		return pwdHash.toCharArray();
-	}
+    private char[] chars(String pwdHash) {
+        return pwdHash.toCharArray();
+    }
 
-	private String hash(String pwd) {
-		String hashPassword = pwd;
-		try {
-			MessageDigest md = MessageDigest.getInstance(SHA256);
-			hashPassword = new StringBuilder().append('{').append(SHA256.toLowerCase()).append('}')
-					.append(new String(Base64.getEncoder().encode(md.digest(pwd.getBytes(UTF8))), UTF8)).toString();
-		} catch (Exception ex) {
-			LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
-		}
-		return hashPassword;
-	}
+    private String hash(String pwd) {
+        String hashPassword = pwd;
+        try {
+            MessageDigest md = MessageDigest.getInstance(SHA256);
+            hashPassword = new StringBuilder().append('{').append(SHA256.toLowerCase()).append('}')
+                    .append(new String(Base64.getEncoder().encode(md.digest(pwd.getBytes(UTF8))), UTF8)).toString();
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
+        }
+        return hashPassword;
+    }
 }

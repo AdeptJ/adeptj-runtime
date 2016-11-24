@@ -29,47 +29,47 @@ import java.util.Base64;
 
 /**
  * Passwords, utility for password generation and matching.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum Passwords {
 
-	INSTANCE;
+    INSTANCE;
 
-	/**
-	 * Generates the salt for hashing.
-	 * 
-	 * @return UTF-8 Base64 encoded hash.
-	 */
-	public String generateSalt() {
-		try {
-			Config config = Configs.INSTANCE.common();
-			byte[] salt = new byte[config.getInt("salt-size")];
-			SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
-			return new String(Base64.getEncoder().encode(salt), Constants.UTF8);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+    /**
+     * Generates the salt for hashing.
+     *
+     * @return UTF-8 Base64 encoded hash.
+     */
+    public String generateSalt() {
+        try {
+            Config config = Configs.INSTANCE.common();
+            byte[] salt = new byte[config.getInt("salt-size")];
+            SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
+            return new String(Base64.getEncoder().encode(salt), Constants.UTF8);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
-	/**
-	 * Generates UTF-8 Base64 encoded hashed password
-	 * 
-	 * @param pwd the password to hash
-	 * @param salt the additive for more secure hashing
-	 * @return Hashed password
-	 */
-	public String hashPwd(String pwd, String salt) {
-		try {
-			Config config = Configs.INSTANCE.common();
-			return new String(
-					Base64.getEncoder()
-							.encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
-									.generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(Constants.UTF8),
-											config.getInt("iteration-count"), config.getInt("derived-key-size")))
-									.getEncoded()), Constants.UTF8);
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
-	}
+    /**
+     * Generates UTF-8 Base64 encoded hashed password
+     *
+     * @param pwd  the password to hash
+     * @param salt the additive for more secure hashing
+     * @return Hashed password
+     */
+    public String hashPwd(String pwd, String salt) {
+        try {
+            Config config = Configs.INSTANCE.common();
+            return new String(
+                    Base64.getEncoder()
+                            .encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
+                                    .generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(Constants.UTF8),
+                                            config.getInt("iteration-count"), config.getInt("derived-key-size")))
+                                    .getEncoded()), Constants.UTF8);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

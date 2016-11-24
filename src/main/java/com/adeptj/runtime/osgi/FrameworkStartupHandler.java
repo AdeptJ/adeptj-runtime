@@ -33,7 +33,7 @@ import javax.servlet.ServletException;
  */
 @StartupOrder()
 public class FrameworkStartupHandler implements StartupHandler {
-	
+
     /**
      * This method will be called by the {@link StartupHandlerInitializer} while application startup is in
      * progress.
@@ -42,7 +42,7 @@ public class FrameworkStartupHandler implements StartupHandler {
      * @throws ServletException
      */
     @Override
-	public void onStartup(ServletContext context) throws ServletException {
-		FrameworkProvisioner.INSTANCE.startFramework(context);
-	}
+    public void onStartup(ServletContext context) throws ServletException {
+        FrameworkProvisioner.INSTANCE.startFramework(context);
+    }
 }

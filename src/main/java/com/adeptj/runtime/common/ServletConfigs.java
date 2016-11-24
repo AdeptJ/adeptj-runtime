@@ -26,24 +26,24 @@ import java.util.Map;
 
 /**
  * Maintains a mapping of {@link ServletConfig} instances.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public enum ServletConfigs {
 
-	INSTANCE;
+    INSTANCE;
 
-	private Map<String, ServletConfig> configs = new HashMap<>();
+    private Map<String, ServletConfig> configs = new HashMap<>();
 
-	public void add(Class<? extends HttpServlet> klazz, ServletConfig config) {
-		this.configs.put(klazz.getName(), config);
-	}
+    public void add(Class<? extends HttpServlet> klazz, ServletConfig config) {
+        this.configs.put(klazz.getName(), config);
+    }
 
-	public void remove(Class<? extends HttpServlet> klazz) {
-		this.configs.remove(klazz.getName());
-	}
+    public void remove(Class<? extends HttpServlet> klazz) {
+        this.configs.remove(klazz.getName());
+    }
 
-	public ServletConfig get(Class<? extends HttpServlet> klazz) {
-		return this.configs.get(klazz.getName());
-	}
+    public ServletConfig get(Class<? extends HttpServlet> klazz) {
+        return this.configs.get(klazz.getName());
+    }
 }

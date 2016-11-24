@@ -26,36 +26,36 @@ package com.adeptj.runtime.osgi;
  */
 public enum FrameworkEvents {
 
-	STARTED(1),
+    STARTED(1),
 
-	ERROR(2),
-	
-	PACKAGES_REFRESHED(4),
+    ERROR(2),
 
-	STOPPED(64),
+    PACKAGES_REFRESHED(4),
 
-	STOPPED_UPDATE(128),
+    STOPPED(64),
 
-	WAIT_TIMEDOUT(512);
+    STOPPED_UPDATE(128),
 
-	private int code;
+    WAIT_TIMEDOUT(512);
 
-	FrameworkEvents(int code) {
-		this.code = code;
-	}
+    private int code;
 
-	public int getCode() {
-		return code;
-	}
+    FrameworkEvents(int code) {
+        this.code = code;
+    }
 
-	public static String asString(int code) {
-		String event = "UNKNOWN";
-		for (FrameworkEvents events : values()) {
-			if (code == events.getCode()) {
-				event = events.toString();
-				break;
-			}
-		}
-		return event;
-	}
+    public int getCode() {
+        return code;
+    }
+
+    public static String asString(int code) {
+        String event = "UNKNOWN";
+        for (FrameworkEvents events : values()) {
+            if (code == events.getCode()) {
+                event = events.toString();
+                break;
+            }
+        }
+        return event;
+    }
 }

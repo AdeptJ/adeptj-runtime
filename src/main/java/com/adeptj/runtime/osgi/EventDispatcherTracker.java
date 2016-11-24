@@ -34,66 +34,66 @@ import java.util.EventListener;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.
- * 
+ * <p>
  * Issue: When OSGi Framework is being restarted from FELIX web console, original EventDispatcherTracker still holds
  * the stale BundleContext and Framework tries to call the ServiceTracker.addingService method which in turn
  * uses the stale BundleContext for getting the EventDispatcher OSGi service and thus fails with following exception.
- * 
+ * <p>
  * <em><b>java.lang.IllegalStateException: Invalid BundleContext</b></em>
- * 
+ * <p>
  * To fix the above issue, we close the ServiceTracker in removedService method itself.
  * So that Framework initialize the new EventDispatcherTracker with a fresh BundleContext.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 public class EventDispatcherTracker extends ServiceTracker<EventListener, EventListener> {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTracker.class);
 
-	private final static String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTracker.class);
 
-	private HttpSessionListener sessionListener;
+    private final static String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
 
-	private HttpSessionIdListener sessionIdListener;
+    private HttpSessionListener sessionListener;
 
-	private HttpSessionAttributeListener sessionAttributeListener;
+    private HttpSessionIdListener sessionIdListener;
 
-	public EventDispatcherTracker(BundleContext context) {
-		super(context, OSGiUtils.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
-	}
+    private HttpSessionAttributeListener sessionAttributeListener;
 
-	@Override
-	public EventListener addingService(ServiceReference<EventListener> reference) {
-		LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-		EventListener listener = super.addingService(reference);
-		if (listener instanceof HttpSessionListener) {
-			this.sessionListener = (HttpSessionListener) listener;
-		} else if (listener instanceof HttpSessionIdListener) {
-			this.sessionIdListener = (HttpSessionIdListener) listener;
-		} else if (listener instanceof HttpSessionAttributeListener) {
-			this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
-		}
-		return listener;
-	}
+    public EventDispatcherTracker(BundleContext context) {
+        super(context, OSGiUtils.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
+    }
 
-	@Override
-	public void removedService(ServiceReference<EventListener> reference, EventListener service) {
-		LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-		super.removedService(reference, service);
-		// NOTE: See class header why ServiceTracker is closed here.
-		// ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
-		ServiceTrackers.closeQuietly(this);
-	}
+    @Override
+    public EventListener addingService(ServiceReference<EventListener> reference) {
+        LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+        EventListener listener = super.addingService(reference);
+        if (listener instanceof HttpSessionListener) {
+            this.sessionListener = (HttpSessionListener) listener;
+        } else if (listener instanceof HttpSessionIdListener) {
+            this.sessionIdListener = (HttpSessionIdListener) listener;
+        } else if (listener instanceof HttpSessionAttributeListener) {
+            this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
+        }
+        return listener;
+    }
 
-	HttpSessionListener getHttpSessionListener() {
-		return this.sessionListener;
-	}
+    @Override
+    public void removedService(ServiceReference<EventListener> reference, EventListener service) {
+        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+        super.removedService(reference, service);
+        // NOTE: See class header why ServiceTracker is closed here.
+        // ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
+        ServiceTrackers.closeQuietly(this);
+    }
 
-	HttpSessionIdListener getHttpSessionIdListener() {
-		return this.sessionIdListener;
-	}
+    HttpSessionListener getHttpSessionListener() {
+        return this.sessionListener;
+    }
 
-	HttpSessionAttributeListener getHttpSessionAttributeListener() {
-		return this.sessionAttributeListener;
-	}
+    HttpSessionIdListener getHttpSessionIdListener() {
+        return this.sessionIdListener;
+    }
+
+    HttpSessionAttributeListener getHttpSessionAttributeListener() {
+        return this.sessionAttributeListener;
+    }
 }

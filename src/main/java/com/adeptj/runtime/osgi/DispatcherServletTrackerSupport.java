@@ -32,44 +32,44 @@ import javax.servlet.http.HttpServlet;
  */
 public enum DispatcherServletTrackerSupport {
 
-	INSTANCE;
+    INSTANCE;
 
-	private boolean dispatcherServletInitialized;
+    private boolean dispatcherServletInitialized;
 
-	private DispatcherServletTracker dispatcherServletTracker;
+    private DispatcherServletTracker dispatcherServletTracker;
 
-	private ServletConfig servletConfig;
+    private ServletConfig servletConfig;
 
-	public void openDispatcherServletTracker(ServletConfig servletConfig) {
-		this.initServletConfig(servletConfig);
-		if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
-			BundleContext ctx = BundleContextHolder.INSTANCE.getBundleContext();
-			DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
-			dispatcherServletTracker.open();
-			this.dispatcherServletTracker = dispatcherServletTracker;
-			this.dispatcherServletInitialized = true;
-		}
-	}
+    public void openDispatcherServletTracker(ServletConfig servletConfig) {
+        this.initServletConfig(servletConfig);
+        if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
+            BundleContext ctx = BundleContextHolder.INSTANCE.getBundleContext();
+            DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
+            dispatcherServletTracker.open();
+            this.dispatcherServletTracker = dispatcherServletTracker;
+            this.dispatcherServletInitialized = true;
+        }
+    }
 
-	public HttpServlet getDispatcherServlet() {
-		return this.dispatcherServletTracker.getDispatcherServlet();
-	}
+    public HttpServlet getDispatcherServlet() {
+        return this.dispatcherServletTracker.getDispatcherServlet();
+    }
 
-	public void closeDispatcherServletTracker() {
-		this.dispatcherServletInitialized = false;
-		if (this.dispatcherServletTracker != null && !this.dispatcherServletTracker.isEmpty()) {
-			this.dispatcherServletTracker.close();
-		}
-		this.dispatcherServletTracker = null;
-	}
+    public void closeDispatcherServletTracker() {
+        this.dispatcherServletInitialized = false;
+        if (this.dispatcherServletTracker != null && !this.dispatcherServletTracker.isEmpty()) {
+            this.dispatcherServletTracker.close();
+        }
+        this.dispatcherServletTracker = null;
+    }
 
-	public ServletConfig getServletConfig() {
-		return servletConfig;
-	}
+    public ServletConfig getServletConfig() {
+        return servletConfig;
+    }
 
-	private void initServletConfig(ServletConfig servletConfig) {
-		if (this.servletConfig == null) {
-			this.servletConfig = servletConfig;
-		}
-	}
+    private void initServletConfig(ServletConfig servletConfig) {
+        if (this.servletConfig == null) {
+            this.servletConfig = servletConfig;
+        }
+    }
 }

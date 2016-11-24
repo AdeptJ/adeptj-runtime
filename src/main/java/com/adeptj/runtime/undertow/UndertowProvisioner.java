@@ -95,240 +95,240 @@ import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
  */
 public final class UndertowProvisioner {
 
-	private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
+    private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
-	private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
+    private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
 
-	private static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
+    private static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
 
-	private static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
+    private static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
 
-	private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
+    private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
 
-	private static final String KEY_WORKER_OPTIONS = "worker-options";
+    private static final String KEY_WORKER_OPTIONS = "worker-options";
 
-	private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
+    private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
 
-	private static final String MODE_DEV = "DEV";
+    private static final String MODE_DEV = "DEV";
 
-	private static final String MODE_PROD = "PROD";
+    private static final String MODE_PROD = "PROD";
 
-	private static final String KEY_KEYSTORE = "keyStore";
+    private static final String KEY_KEYSTORE = "keyStore";
 
-	private static final String KEY_KEYPWD = "keyPwd";
+    private static final String KEY_KEYPWD = "keyPwd";
 
-	private static final String KEY_KEYSTORE_PWD = "keyStorePwd";
+    private static final String KEY_KEYSTORE_PWD = "keyStorePwd";
 
-	private static final String KEY_HTTPS = "https";
+    private static final String KEY_HTTPS = "https";
 
-	private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
+    private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
 
-	private static final String KEY_AJP = "ajp";
+    private static final String KEY_AJP = "ajp";
 
-	private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
+    private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
 
-	private static final String SYS_PROP_CHECK_PORT = "check.server.port";
+    private static final String SYS_PROP_CHECK_PORT = "check.server.port";
 
-	private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
+    private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
 
-	private static final String PROTOCOL_TLS = "TLS";
+    private static final String PROTOCOL_TLS = "TLS";
 
-	// No instantiation.
-	private UndertowProvisioner() {
-	}
+    // No instantiation.
+    private UndertowProvisioner() {
+    }
 
-	public static void provision(Map<String, String> arguments) throws Exception {
-		Config undertowConf = Configs.INSTANCE.undertow();
-		Config httpConf = undertowConf.getConfig(KEY_HTTP);
-		Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
-		int httpPort = handlePortAvailability(httpConf, logger);
-		logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
-		logger.info(Utils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
-		Builder undertowBuilder = Undertow.builder();
-		DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
-		manager.deploy();
-		boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
-		HttpHandler handler = prodMode ? manager.start() : new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
-		ServerOptions.build(undertowBuilder, undertowConf);
-		undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-		enableHttp2(undertowConf, undertowBuilder, logger);
-		enableAJP(undertowConf, undertowBuilder, logger);
-		Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
-		server.start();
-		Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
-		if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
-			Utils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
-		}
-	}
+    public static void provision(Map<String, String> arguments) throws Exception {
+        Config undertowConf = Configs.INSTANCE.undertow();
+        Config httpConf = undertowConf.getConfig(KEY_HTTP);
+        Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
+        int httpPort = handlePortAvailability(httpConf, logger);
+        logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
+        logger.info(Utils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
+        Builder undertowBuilder = Undertow.builder();
+        DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
+        manager.deploy();
+        boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
+        HttpHandler handler = prodMode ? manager.start() : new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
+        ServerOptions.build(undertowBuilder, undertowConf);
+        undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
+        enableHttp2(undertowConf, undertowBuilder, logger);
+        enableAJP(undertowConf, undertowBuilder, logger);
+        Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
+        server.start();
+        Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
+        if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
+            Utils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+        }
+    }
 
-	private static boolean handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-		boolean prodMode = ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
-		if (prodMode) {
-			Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
-			// defaults to 64
-			int coreTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
-			// defaults to double of [worker-task-core-threads] i.e 128
-			int maxTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
-			int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
-			if (sysTaskThreads > coreTaskThreadsConfig) {
-				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads);
-			} else {
-				undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, coreTaskThreadsConfig);
-			}
-			int calcMaxTaskThreadsConfig = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
-			if (calcMaxTaskThreadsConfig > maxTaskThreadsConfig) {
-				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreadsConfig);
-			} else {
-				undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
-			}
-		}
-		logger.info("Provisioning AdeptJ Runtime for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
-		return prodMode;
-	}
+    private static boolean handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
+        boolean prodMode = ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
+        if (prodMode) {
+            Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
+            // defaults to 64
+            int coreTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
+            // defaults to double of [worker-task-core-threads] i.e 128
+            int maxTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
+            if (sysTaskThreads > coreTaskThreadsConfig) {
+                undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads);
+            } else {
+                undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, coreTaskThreadsConfig);
+            }
+            int calcMaxTaskThreadsConfig = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
+            if (calcMaxTaskThreadsConfig > maxTaskThreadsConfig) {
+                undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreadsConfig);
+            } else {
+                undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
+            }
+        }
+        logger.info("Provisioning AdeptJ Runtime for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
+        return prodMode;
+    }
 
-	private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
-		if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-			Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
-			char[] keyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
-			char[] keyPwd = httpsConf.getString(KEY_KEYPWD).toCharArray();
-			int httpsPort = httpsConf.getInt(KEY_PORT);
-			undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-					sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd), keyPwd));
-			logger.info("HTTP2 enabled on port: [{}]", httpsPort);
-		}
-	}
+    private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
+        if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
+            Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
+            char[] keyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
+            char[] keyPwd = httpsConf.getString(KEY_KEYPWD).toCharArray();
+            int httpsPort = httpsConf.getInt(KEY_PORT);
+            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
+                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd), keyPwd));
+            logger.info("HTTP2 enabled on port: [{}]", httpsPort);
+        }
+    }
 
-	private static void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
-		if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
-			Config ajpConf = undertowConf.getConfig(KEY_AJP);
-			int ajpPort = ajpConf.getInt(KEY_PORT);
-			undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
-			logger.info("AJP enabled on port: [{}]", ajpPort);
-		}
-	}
+    private static void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
+        if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
+            Config ajpConf = undertowConf.getConfig(KEY_AJP);
+            int ajpPort = ajpConf.getInt(KEY_PORT);
+            undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
+            logger.info("AJP enabled on port: [{}]", ajpPort);
+        }
+    }
 
-	private static int handlePortAvailability(Config httpConf, Logger logger) {
-		String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
-		int port;
-		if (propertyPort == null || propertyPort.isEmpty()) {
-			port = httpConf.getInt(KEY_PORT);
-			logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
-		} else {
-			port = Integer.parseInt(propertyPort);
-		}
-		// Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
-		// started already and another server start(from same location) will again start new OSGi Framework which may interfere
-		// with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
-		// this is unknown at this moment but just to be on safer side doing this.
-		if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-			logger.error("JVM shutting down!!");
-			// Let the LOGBACK cleans up it's state.
-			LogbackProvisioner.stop();
-			System.exit(-1);
-		}
-		return port;
-	}
+    private static int handlePortAvailability(Config httpConf, Logger logger) {
+        String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
+        int port;
+        if (propertyPort == null || propertyPort.isEmpty()) {
+            port = httpConf.getInt(KEY_PORT);
+            logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
+        } else {
+            port = Integer.parseInt(propertyPort);
+        }
+        // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
+        // started already and another server start(from same location) will again start new OSGi Framework which may interfere
+        // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
+        // this is unknown at this moment but just to be on safer side doing this.
+        if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
+            logger.error("JVM shutting down!!");
+            // Let the LOGBACK cleans up it's state.
+            LogbackProvisioner.stop();
+            System.exit(-1);
+        }
+        return port;
+    }
 
-	private static boolean isPortAvailable(int port, Logger logger) {
-		boolean portAvailable;
-		try (ServerSocketChannel channel = ServerSocketChannel.open()) {
-			channel.socket().setReuseAddress(true);
-			channel.socket().bind(new InetSocketAddress(port));
-			portAvailable = true;
-		} catch (BindException ex) {
-			logger.error("BindException while aquiring port: [{}], cause:", port, ex);
-			portAvailable = false;
-		} catch (IOException ex) {
-			logger.error("IOException while aquiring port: [{}], cause:", port, ex);
-			portAvailable = false;
-		}
-		return portAvailable;
-	}
+    private static boolean isPortAvailable(int port, Logger logger) {
+        boolean portAvailable;
+        try (ServerSocketChannel channel = ServerSocketChannel.open()) {
+            channel.socket().setReuseAddress(true);
+            channel.socket().bind(new InetSocketAddress(port));
+            portAvailable = true;
+        } catch (BindException ex) {
+            logger.error("BindException while aquiring port: [{}], cause:", port, ex);
+            portAvailable = false;
+        } catch (IOException ex) {
+            logger.error("IOException while aquiring port: [{}], cause:", port, ex);
+            portAvailable = false;
+        }
+        return portAvailable;
+    }
 
-	private static Map<HttpString, String> serverHeaders(Config undertowConfig) {
-		Map<HttpString, String> headers = new HashMap<>();
-		headers.put(HttpString.tryFromString(HEADER_SERVER), undertowConfig.getString(KEY_HEADER_SERVER));
-		headers.put(HttpString.tryFromString(HEADER_POWERED_BY), undertowConfig.getString(KEY_HEADER_POWERED_BY));
-		return headers;
-	}
+    private static Map<HttpString, String> serverHeaders(Config undertowConfig) {
+        Map<HttpString, String> headers = new HashMap<>();
+        headers.put(HttpString.tryFromString(HEADER_SERVER), undertowConfig.getString(KEY_HEADER_SERVER));
+        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), undertowConfig.getString(KEY_HEADER_POWERED_BY));
+        return headers;
+    }
 
-	private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
-		return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), initialHandler);
-	}
+    private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
+        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), initialHandler);
+    }
 
-	private static Set<HttpString> allowedMethods(Config undertowConfig) {
-		return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
-	}
+    private static Set<HttpString> allowedMethods(Config undertowConfig) {
+        return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
+    }
 
-	private static HttpHandler rootHandler(HttpHandler initialHandler, Config undertowConfig) {
-		return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-				new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(undertowConfig))));
-	}
+    private static HttpHandler rootHandler(HttpHandler initialHandler, Config undertowConfig) {
+        return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
+                new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(undertowConfig))));
+    }
 
-	private static List<ErrorPage> errorPages(Config undertowConfig) {
-		return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
-				.map(entry -> Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey())))
-				.collect(Collectors.toList());
-	}
+    private static List<ErrorPage> errorPages(Config undertowConfig) {
+        return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
+                .map(entry -> Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey())))
+                .collect(Collectors.toList());
+    }
 
-	private static ServletContainerInitializerInfo sciInfo() {
-		return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
-				new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
-	}
+    private static ServletContainerInitializerInfo sciInfo() {
+        return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
+                new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
+    }
 
-	private static SecurityConstraint securityConstraint(Config undertowConfig) {
-		return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.auth-roles"))
-				.addWebResourceCollection(Servlets.webResourceCollection()
-						.addHttpMethods(undertowConfig.getStringList("common.secured-urls-allowed-methods"))
-						.addUrlPatterns(undertowConfig.getStringList("common.secured-urls")));
-	}
+    private static SecurityConstraint securityConstraint(Config undertowConfig) {
+        return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.auth-roles"))
+                .addWebResourceCollection(Servlets.webResourceCollection()
+                        .addHttpMethods(undertowConfig.getStringList("common.secured-urls-allowed-methods"))
+                        .addUrlPatterns(undertowConfig.getStringList("common.secured-urls")));
+    }
 
-	private static List<ServletInfo> servlets() {
-		List<ServletInfo> servlets = new ArrayList<>();
-		servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
-		servlets.add(Servlets.servlet(AdminDashboardServlet.class).addMapping("/admin/dashboard/*"));
-		servlets.add(Servlets.servlet(AdminAuthServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
-		return servlets;
-	}
+    private static List<ServletInfo> servlets() {
+        List<ServletInfo> servlets = new ArrayList<>();
+        servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
+        servlets.add(Servlets.servlet(AdminDashboardServlet.class).addMapping("/admin/dashboard/*"));
+        servlets.add(Servlets.servlet(AdminAuthServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
+        return servlets;
+    }
 
-	private static MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
-		return new MultipartConfigElement(undertowConfig.getString("common.multipart-file-location"),
-				undertowConfig.getLong("common.multipart-max-file-size"),
-				undertowConfig.getLong("common.multipart-max-request-size"),
-				undertowConfig.getInt("common.multipart-file-size-threshold"));
-	}
+    private static MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
+        return new MultipartConfigElement(undertowConfig.getString("common.multipart-file-location"),
+                undertowConfig.getLong("common.multipart-max-file-size"),
+                undertowConfig.getLong("common.multipart-max-request-size"),
+                undertowConfig.getInt("common.multipart-file-size-threshold"));
+    }
 
-	private static DeploymentInfo deploymentInfo(Config undertowConfig) {
-		return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
-				.setClassLoader(UndertowProvisioner.class.getClassLoader())
-				.setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
-				.setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
-				.setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
-				.setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
-				.setIdentityManager(new FileIdentityManager(undertowConfig))
-				.setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
-				.setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
-				.addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
-				.addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
-				.setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
-				.addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
-	}
+    private static DeploymentInfo deploymentInfo(Config undertowConfig) {
+        return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
+                .setClassLoader(UndertowProvisioner.class.getClassLoader())
+                .setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
+                .setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
+                .setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
+                .setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
+                .setIdentityManager(new FileIdentityManager(undertowConfig))
+                .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
+                .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
+                .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
+                .addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
+                .setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
+                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
+    }
 
-	private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
-		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keyStore.load(UndertowProvisioner.class.getResourceAsStream(keyStoreName), keyStorePwd);
-		return keyStore;
-	}
+    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(UndertowProvisioner.class.getResourceAsStream(keyStoreName), keyStorePwd);
+        return keyStore;
+    }
 
-	private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
-		SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-		sslContext.init(keyMgrs(keyStore, keyPwd), null, null);
-		return sslContext;
-	}
+    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
+        SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
+        sslContext.init(keyMgrs(keyStore, keyPwd), null, null);
+        return sslContext;
+    }
 
-	private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(keyStore, keyPwd);
-		return kmf.getKeyManagers();
-	}
+    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(keyStore, keyPwd);
+        return kmf.getKeyManagers();
+    }
 }

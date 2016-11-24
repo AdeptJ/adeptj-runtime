@@ -38,7 +38,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
-	private final static String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
+    private final static String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
 
     private HttpServlet dispatcherServlet;
 
@@ -51,7 +51,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         HttpServlet dispatcherServlet = null;
         try {
             dispatcherServlet = super.addingService(reference);
-			LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+            LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
             this.handleDispatcherServlet(dispatcherServlet);
         } catch (Exception ex) {
             // This might be due to the OSGi framework restart from Felix WebConsole.
@@ -80,7 +80,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         */
         ServiceTrackers.closeQuietly(this);
     }
-    
+
     HttpServlet getDispatcherServlet() {
         return this.dispatcherServlet;
     }
@@ -91,24 +91,24 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         this.initDispatcherServlet();
     }
 
-	private void destroyDispatcherServlet() {
-		if (this.dispatcherServlet != null) {
-			LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
-			this.dispatcherServlet.destroy();
-			// Set dispatcherServlet as null, don't want to call dispatcherServlet.init with this reference.
-			this.dispatcherServlet = null;
-		}
-	}
+    private void destroyDispatcherServlet() {
+        if (this.dispatcherServlet != null) {
+            LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+            this.dispatcherServlet.destroy();
+            // Set dispatcherServlet as null, don't want to call dispatcherServlet.init with this reference.
+            this.dispatcherServlet = null;
+        }
+    }
 
-	private void initDispatcherServlet() {
-		if (this.dispatcherServlet != null) {
-			try {
-				LOGGER.info("Initializing Felix DispatcherServlet!!");
-				this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
-				LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
-			} catch (Exception ex) {
-				LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
-			}
-		}
-	}
+    private void initDispatcherServlet() {
+        if (this.dispatcherServlet != null) {
+            try {
+                LOGGER.info("Initializing Felix DispatcherServlet!!");
+                this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
+                LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+            } catch (Exception ex) {
+                LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
+            }
+        }
+    }
 }

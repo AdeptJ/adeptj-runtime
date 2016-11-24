@@ -25,96 +25,96 @@ import java.util.Locale;
 
 /**
  * ViewEngineContext.
- * 
+ *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public class ViewEngineContext {
 
-	private final String view;
+    private final String view;
 
-	private final Models models;
+    private final Models models;
 
-	private final HttpServletRequest request;
+    private final HttpServletRequest request;
 
-	private final HttpServletResponse response;
+    private final HttpServletResponse response;
 
-	private Locale locale;
+    private Locale locale;
 
-	private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp) {
-		this.view = view;
-		this.models = models;
-		this.request = req;
-		this.response = resp;
-	}
+    private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp) {
+        this.view = view;
+        this.models = models;
+        this.request = req;
+        this.response = resp;
+    }
 
-	public String getView() {
-		return view;
-	}
+    public String getView() {
+        return view;
+    }
 
-	public Models getModels() {
-		return models;
-	}
+    public Models getModels() {
+        return models;
+    }
 
-	public HttpServletRequest getRequest() {
-		return request;
-	}
+    public HttpServletRequest getRequest() {
+        return request;
+    }
 
-	public HttpServletResponse getResponse() {
-		return response;
-	}
+    public HttpServletResponse getResponse() {
+        return response;
+    }
 
-	public Locale getLocale() {
-		return locale;
-	}
-	
-	/**
-	 * Builder for ViewEngineContext.
-	 * 
-	 * @author Rakesh.Kumar, AdeptJ.
-	 */
-	public static class Builder {
-		
-		private String view;
+    public Locale getLocale() {
+        return locale;
+    }
 
-		private Models models;
+    /**
+     * Builder for ViewEngineContext.
+     *
+     * @author Rakesh.Kumar, AdeptJ.
+     */
+    public static class Builder {
+
+        private String view;
+
+        private Models models;
 
         private Locale locale;
 
-		private HttpServletRequest request;
+        private HttpServletRequest request;
 
-		private HttpServletResponse response;
+        private HttpServletResponse response;
 
         /**
          * Initialize the Builder with mandatory request and response.
          *
-         * @param request the {@link HttpServletRequest}
+         * @param request  the {@link HttpServletRequest}
          * @param response the {@link HttpServletResponse}
          */
-		public Builder(HttpServletRequest request, HttpServletResponse response) {
-			this.request = request;
-			this.response = response;
-		}
+        public Builder(HttpServletRequest request, HttpServletResponse response) {
+            this.request = request;
+            this.response = response;
+        }
 
-		public Builder view(String view) {
-			this.view = view;
-			return this;
-		}
-		
-		public Builder models(Models models) {
-			this.models = models;
-			return this;
-		}
-		
-		public Builder locale(Locale locale) {
-			this.locale = locale;
-			return this;
-		}
-		
-		public ViewEngineContext build() {
-			ViewEngineContext context = new ViewEngineContext(this.view, this.models, this.request, this.response);
-			// English is default Locale if no locale set.
-			context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
-			return context;
-		}
-	}
+        public Builder view(String view) {
+            this.view = view;
+            return this;
+        }
+
+        public Builder models(Models models) {
+            this.models = models;
+            return this;
+        }
+
+        public Builder locale(Locale locale) {
+            this.locale = locale;
+            return this;
+        }
+
+        public ViewEngineContext build() {
+            ViewEngineContext context = new ViewEngineContext(this.view, this.models, this.request, this.response);
+            // English is default Locale if no locale set.
+            context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
+            return context;
+        }
+    }
 }
