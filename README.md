@@ -1,4 +1,14 @@
-[![Join the chat at https://gitter.im/AdeptJ/adeptj-runtime](https://badges.gitter.im/AdeptJ/adeptj-runtime.svg)](https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+<p>
+  
+  <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
+    <img src="https://camo.githubusercontent.com/64af58db769a4ad81ae61fac30422b835f495326/68747470733a2f2f6261646765732e6769747465722e696d2f41646570744a2f61646570746a2d72756e74696d652e737667" alt="Join the chat at https://gitter.im/AdeptJ/adeptj-runtime" data-canonical-src="https://badges.gitter.im/AdeptJ/adeptj-runtime.svg" style="max-width:100%;">
+  </a>
+    
+  <a href="https://twitter.com/adept_j">
+     <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social&style=plastic"> 
+  </a>
+
+</p>
 
 **AdeptJ Runtime**
 
