@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -21,9 +21,7 @@ package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import static com.adeptj.runtime.common.Constants.EMPTY;
@@ -33,15 +31,13 @@ import static com.adeptj.runtime.common.Constants.OS;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
 /**
- * Common Utilities
+ * EnvironmentUtils.
  *
- * @author Rakesh.Kumar, AdeptJ
+ * @author Rakesh.Kumar, AdeptJ.
  */
-public class Utils {
+public class EnvironmentUtils {
 
-    private static final int EOF = -1;
-
-    private static final int DEFAULT_BUFFER_SIZE = 1024;
+    private static final int OFFSET = 0;
 
     private static final String SPACE = " ";
 
@@ -51,30 +47,10 @@ public class Utils {
 
     private static final String CMD_OPT = "-c";
 
-    private static final int OFFSET = 0;
-
     /**
      * Deny direct instantiation.
      */
-    private Utils() {
-    }
-
-    public static String toString(InputStream input) throws IOException {
-        return toByteArrayOutputStream(input).toString(Constants.UTF8);
-    }
-
-    public static byte[] toBytes(InputStream input) throws IOException {
-        return toByteArrayOutputStream(input).toByteArray();
-    }
-
-    public static ByteArrayOutputStream toByteArrayOutputStream(InputStream input) throws IOException {
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int numberOfBytesRead;
-        while ((numberOfBytesRead = input.read(buffer)) != EOF) {
-            out.write(buffer, OFFSET, numberOfBytesRead);
-        }
-        return out;
+    private EnvironmentUtils() {
     }
 
     public static boolean isMac() {

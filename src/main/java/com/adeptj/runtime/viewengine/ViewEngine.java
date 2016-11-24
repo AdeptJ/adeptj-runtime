@@ -77,7 +77,7 @@ public enum ViewEngine {
     private MustacheEngine mustacheEngine() {
         ViewEngineConfig config = ConfigBeanFactory.create(Configs.INSTANCE.trimou(), ViewEngineConfig.class);
         return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
-                .addTemplateLocator(templateLocator(config))
+                .addTemplateLocator(this.templateLocator(config))
                 .setProperty(START_DELIMITER, config.getStartDelimiter())
                 .setProperty(END_DELIMITER, config.getEndDelimiter())
                 .setProperty(TEMPLATE_CACHE_ENABLED, config.isCacheEnabled())
@@ -92,14 +92,14 @@ public enum ViewEngine {
         }
     }
 
-    private void handleException(ViewEngineContext context, Exception ex) {
-        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
+    private void handleException(ViewEngineContext context, Exception originalException) {
+        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, originalException);
         try {
             context.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (IOException ioex) {
+        } catch (IOException ex) {
             // Now what? may be log and re-throw.
-            LOGGER.error("Exception while sending error!!", ioex);
-            throw new ViewEngineException(ex.getMessage(), ioex);
+            LOGGER.error("Exception while sending error!!", ex);
+            throw new ViewEngineException(originalException.getMessage(), ex);
         }
     }
 

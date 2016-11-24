@@ -20,7 +20,7 @@
 package com.adeptj.runtime.common;
 
 /**
- * Constants.
+ * Constants, common constants for AdeptJ Runtime.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -139,4 +139,10 @@ public final class Constants {
     public static final String KEY_HEADER_SERVER = "common.header-server";
 
     // Configuration Keys constants ends.
+
+    /**
+     * Deny direct instantiation.
+     */
+    private Constants() {
+    }
 }
