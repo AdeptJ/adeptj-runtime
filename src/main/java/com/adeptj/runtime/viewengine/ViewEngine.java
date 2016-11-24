@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,17 +19,9 @@
 */
 package com.adeptj.runtime.viewengine;
 
-import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENABLED;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
-
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletResponse;
-
+import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.config.Configs;
+import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
@@ -41,9 +33,15 @@ import org.trimou.handlebars.Helper;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
 import org.trimou.handlebars.i18n.ResourceBundleHelper.Format;
 
-import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.config.Configs;
-import com.typesafe.config.Config;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Optional;
+
+import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
+import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
+import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENABLED;
+import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
 
 /**
  * ViewEngine.

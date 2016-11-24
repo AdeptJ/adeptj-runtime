@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,15 +19,14 @@
 */
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
+import com.adeptj.runtime.common.ServletContextHolder;
+import com.adeptj.runtime.common.TimeUnits;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.common.TimeUnits;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 /**
  * ContextListener that handles the OSGi Framework shutdown.

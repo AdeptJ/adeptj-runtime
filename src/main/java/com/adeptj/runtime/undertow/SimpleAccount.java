@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,10 +19,10 @@
 */
 package com.adeptj.runtime.undertow;
 
+import io.undertow.security.idm.Account;
+
 import java.security.Principal;
 import java.util.Set;
-
-import io.undertow.security.idm.Account;
 
 /**
  * SimpleAccount.

@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,16 +19,15 @@
 */
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.ServletContext;
-
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.ServletContextHolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.ServletContextHolder;
+import javax.servlet.ServletContext;
 
 /**
  * OSGi FrameworkListener.

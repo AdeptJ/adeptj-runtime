@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,11 +19,10 @@
 */
 package com.adeptj.runtime.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Maintains a mapping of {@link ServletConfig} instances.
@@ -39,7 +38,7 @@ public enum ServletConfigs {
 	public void add(Class<? extends HttpServlet> klazz, ServletConfig config) {
 		this.configs.put(klazz.getName(), config);
 	}
-	
+
 	public void remove(Class<? extends HttpServlet> klazz) {
 		this.configs.remove(klazz.getName());
 	}

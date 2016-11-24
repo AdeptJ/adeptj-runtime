@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,22 +19,20 @@
 */
 package com.adeptj.runtime.sci;
 
-import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
-import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
-
-import java.util.Set;
+import com.adeptj.runtime.common.ServletContextHolder;
+import com.adeptj.runtime.initializer.StartupHandler;
+import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.initializer.StartupHandler;
-import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 
 /**
  * An ServletContainerInitializer that is called by the Container while initialization is in progress.

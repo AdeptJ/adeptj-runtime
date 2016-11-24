@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,11 +19,11 @@
 */
 package com.adeptj.runtime.osgi;
 
+import org.osgi.util.tracker.ServiceTracker;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * ServiceTrackers. Utility for performing operations on OSGi ServiceTracker instances.

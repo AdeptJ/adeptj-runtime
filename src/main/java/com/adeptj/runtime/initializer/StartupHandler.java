@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -33,8 +33,8 @@ public interface StartupHandler {
 	 * This method will be called by the StartupHandlerInitializer while startup is in
 	 * progress.
 	 * 
-	 * @param context
-	 * @throws ServletException
+	 * @param context the {@link ServletContext} in which this handler runs in.
+	 * @throws ServletException exception thrown by initializer code
 	 */
 	void onStartup(ServletContext context) throws ServletException;
 }

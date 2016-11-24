@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,8 +19,7 @@
 */
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.http.HttpServlet;
-
+import com.adeptj.runtime.common.OSGiUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -28,7 +27,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.OSGiUtils;
+import javax.servlet.http.HttpServlet;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.

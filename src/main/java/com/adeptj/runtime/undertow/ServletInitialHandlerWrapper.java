@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,17 +19,16 @@
 */
 package com.adeptj.runtime.undertow;
 
-import java.util.List;
-
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
-
 import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
+
+import java.util.List;
 
 /**
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.

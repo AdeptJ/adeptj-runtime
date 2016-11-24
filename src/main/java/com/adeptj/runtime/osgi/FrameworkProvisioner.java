@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,16 +19,12 @@
 */
 package com.adeptj.runtime.osgi;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
-
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.servlet.PerContextErrorServlet;
+import com.adeptj.runtime.servlet.ProxyServlet;
+import com.typesafe.config.Config;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
@@ -36,12 +32,14 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.servlet.PerContextErrorServlet;
-import com.adeptj.runtime.servlet.ProxyServlet;
-import com.typesafe.config.Config;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration.Dynamic;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * FrameworkProvisioner that handles the OSGi Framework(Apache Felix) startup and shutdown.

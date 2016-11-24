@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -38,5 +38,4 @@ public class BridgeHttpSessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_DESTROYED, se);
 	}
-	
 }

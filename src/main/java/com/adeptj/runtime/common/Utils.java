@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,18 +19,18 @@
 */
 package com.adeptj.runtime.common;
 
-import static com.adeptj.runtime.common.Constants.EMPTY;
-import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
-import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
-import static com.adeptj.runtime.common.Constants.OS;
-import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
+import com.adeptj.runtime.config.Configs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import com.adeptj.runtime.config.Configs;
+import static com.adeptj.runtime.common.Constants.EMPTY;
+import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
+import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
+import static com.adeptj.runtime.common.Constants.OS;
+import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
 /**
  * Common Utilities

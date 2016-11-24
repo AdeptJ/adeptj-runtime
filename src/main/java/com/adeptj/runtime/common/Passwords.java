@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -36,8 +36,6 @@ public enum Passwords {
 
 	INSTANCE;
 
-	public static final String UTF8 = "UTF-8";
-
 	/**
 	 * Generates the salt for hashing.
 	 * 
@@ -48,7 +46,7 @@ public enum Passwords {
 			Config config = Configs.INSTANCE.common();
 			byte[] salt = new byte[config.getInt("salt-size")];
 			SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
-			return new String(Base64.getEncoder().encode(salt), UTF8);
+			return new String(Base64.getEncoder().encode(salt), Constants.UTF8);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -57,8 +55,8 @@ public enum Passwords {
 	/**
 	 * Generates UTF-8 Base64 encoded hashed password
 	 * 
-	 * @param pwd
-	 * @param salt
+	 * @param pwd the password to hash
+	 * @param salt the additive for more secure hashing
 	 * @return Hashed password
 	 */
 	public String hashPwd(String pwd, String salt) {
@@ -67,9 +65,9 @@ public enum Passwords {
 			return new String(
 					Base64.getEncoder()
 							.encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
-									.generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8),
+									.generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(Constants.UTF8),
 											config.getInt("iteration-count"), config.getInt("derived-key-size")))
-									.getEncoded()), UTF8);
+									.getEncoded()), Constants.UTF8);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}

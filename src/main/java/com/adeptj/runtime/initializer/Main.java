@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,18 +19,17 @@
 */
 package com.adeptj.runtime.initializer;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
 import com.adeptj.runtime.logging.LogbackProvisioner;
 import com.adeptj.runtime.osgi.FrameworkProvisioner;
 import com.adeptj.runtime.undertow.UndertowProvisioner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Entry point for initializing the AdeptJ Runtime.

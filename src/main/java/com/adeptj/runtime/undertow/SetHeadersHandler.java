@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,11 +19,11 @@
 */
 package com.adeptj.runtime.undertow;
 
-import java.util.Map;
-
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HttpString;
+
+import java.util.Map;
 
 /**
  * Sets the given headers in the response header map on each request, then call the next handler.

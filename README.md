@@ -1,3 +1,5 @@
+[![Join the chat at https://gitter.im/AdeptJ/adeptj-runtime](https://badges.gitter.im/AdeptJ/adeptj-runtime.svg)](https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **AdeptJ Runtime**
 
 **Highly performant, dynamic, modular(OSGi based) runtime for developing/deploying WebApps and MicroServices.**
@@ -70,4 +72,3 @@ Start Parameters and VM arguments
    limitations under the License.
 
 
-[![Join the chat at https://gitter.im/AdeptJ/adeptj-runtime](https://badges.gitter.im/AdeptJ/adeptj-runtime.svg)](https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

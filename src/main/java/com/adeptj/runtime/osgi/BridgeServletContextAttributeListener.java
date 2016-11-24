@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,10 +19,10 @@
 */
 package com.adeptj.runtime.osgi;
 
+import org.osgi.framework.BundleContext;
+
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
-
-import org.osgi.framework.BundleContext;
 
 /**
  * BridgeServletContextAttributeListener.

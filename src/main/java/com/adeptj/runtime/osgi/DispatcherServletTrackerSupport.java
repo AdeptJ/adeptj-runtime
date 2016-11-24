@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,12 +19,11 @@
 */
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
-
+import com.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
 
-import com.adeptj.runtime.common.BundleContextHolder;
+import javax.servlet.ServletConfig;
+import javax.servlet.http.HttpServlet;
 
 /**
  * Support for DispatcherServletTracker.

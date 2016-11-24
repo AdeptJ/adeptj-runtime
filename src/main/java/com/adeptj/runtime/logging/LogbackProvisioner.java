@@ -1,4 +1,4 @@
-/** 
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://adeptj.com)                               #
@@ -19,17 +19,6 @@
 */
 package com.adeptj.runtime.logging;
 
-import static ch.qos.logback.classic.Level.toLevel;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.config.Configs;
-import com.typesafe.config.Config;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -40,6 +29,15 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
+import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.config.Configs;
+import com.typesafe.config.Config;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static ch.qos.logback.classic.Level.toLevel;
 
 /**
  * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH. 
