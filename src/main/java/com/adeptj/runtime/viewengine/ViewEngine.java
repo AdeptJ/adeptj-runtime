@@ -45,7 +45,7 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENA
 import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
 
 /**
- * ViewEngine.
+ * ViewEngine. Rendering Html Templates
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -85,11 +85,7 @@ public enum ViewEngine {
     }
 
     public void processView(ViewEngineContext context) {
-        long startTime = System.nanoTime();
         Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.doProcessView(context, mustache));
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
-        }
     }
 
     private void handleException(ViewEngineContext context, Exception originalException) {
@@ -99,13 +95,17 @@ public enum ViewEngine {
         } catch (IOException ex) {
             // Now what? may be log and re-throw.
             LOGGER.error("Exception while sending error!!", ex);
-            throw new ViewEngineException(originalException.getMessage(), ex);
+            throw new ViewEngineException(ex.getMessage(), ex);
         }
     }
 
     private void doProcessView(ViewEngineContext context, Mustache mustache) {
         try {
+            long startTime = System.nanoTime();
             context.getResponse().getWriter().write(mustache.render(context.getModels()));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
+            }
         } catch (Exception ex) {
             LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
             this.handleException(context, ex);

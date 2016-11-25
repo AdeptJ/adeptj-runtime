@@ -117,11 +117,12 @@ public class LogbackProvisioner {
     }
 
     public static void stop() {
-        LoggerContext.class.cast(LoggerFactory.getILoggerFactory()).stop();
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        context.stop();
     }
 
     public static void addLogger(String name, String level, boolean additivity) {
-        LoggerContext context = LoggerContext.class.cast(LoggerFactory.getILoggerFactory());
+        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger logger = context.getLogger(name);
         logger.setLevel(toLevel(level));
         logger.setAdditive(additivity);
