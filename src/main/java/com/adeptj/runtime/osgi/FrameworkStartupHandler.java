@@ -21,7 +21,6 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.core.StartupAware;
-import com.adeptj.runtime.sci.Initializer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -35,8 +34,7 @@ import javax.servlet.ServletException;
 public class FrameworkStartupHandler implements StartupAware {
 
     /**
-     * This method will be called by the {@link Initializer} while application startup is in
-     * progress.
+     * This method will be called by the ServletContainerInitializer while startup is in progress.
      *
      * @param context the {@link ServletContext}
      * @throws ServletException if the framework startup failed for some reason.

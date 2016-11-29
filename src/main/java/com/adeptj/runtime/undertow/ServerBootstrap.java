@@ -27,7 +27,7 @@ import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LoggingBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.sci.Initializer;
+import com.adeptj.runtime.core.Initializer;
 import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
@@ -187,7 +187,7 @@ public final class ServerBootstrap {
                 undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
             }
         }
-        logger.info("Provisioning AdeptJ Runtime for [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
+        logger.info("Bootstrapping AdeptJ Runtime in [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
         return prodMode;
     }
 

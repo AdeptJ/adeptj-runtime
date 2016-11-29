@@ -17,10 +17,9 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.sci;
+package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.core.StartupAware;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
