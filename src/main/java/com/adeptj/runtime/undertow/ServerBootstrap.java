@@ -25,9 +25,9 @@ import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.logging.LogbackProvisioner;
+import com.adeptj.runtime.logging.LoggingBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.sci.Initializer;
 import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
@@ -90,11 +90,11 @@ import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 
 /**
- * UndertowProvisioner: Provision the Undertow Http Server.
+ * ServerBootstrap: Provision the Undertow Http Server.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class UndertowProvisioner {
+public final class ServerBootstrap {
 
     private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
@@ -135,16 +135,16 @@ public final class UndertowProvisioner {
     private static final String PROTOCOL_TLS = "TLS";
 
     // No instantiation.
-    private UndertowProvisioner() {
+    private ServerBootstrap() {
     }
 
     public static void provision(Map<String, String> arguments) throws Exception {
         Config undertowConf = Configs.INSTANCE.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        Logger logger = LoggerFactory.getLogger(UndertowProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(ServerBootstrap.class);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
-        logger.info(IOUtils.toString(UndertowProvisioner.class.getResourceAsStream(STARTUP_INFO)));
+        logger.info(IOUtils.toString(ServerBootstrap.class.getResourceAsStream(STARTUP_INFO)));
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
@@ -156,7 +156,11 @@ public final class UndertowProvisioner {
         enableAJP(undertowConf, undertowBuilder, logger);
         Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
         server.start();
-        Runtime.getRuntime().addShutdownHook(new UndertowShutdownHook(server, manager));
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
+        launchBrowser(arguments, httpPort);
+    }
+
+    private static void launchBrowser(Map<String, String> arguments, int httpPort) throws IOException {
         if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
             EnvironmentUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
         }
@@ -224,7 +228,7 @@ public final class UndertowProvisioner {
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("JVM shutting down!!");
             // Let the LOGBACK cleans up it's state.
-            LogbackProvisioner.stop();
+            LoggingBootstrap.stop();
             System.exit(-1);
         }
         return port;
@@ -273,8 +277,8 @@ public final class UndertowProvisioner {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(StartupHandlerInitializer.class,
-                new ImmediateInstanceFactory<>(new StartupHandlerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
+        return new ServletContainerInitializerInfo(Initializer.class,
+                new ImmediateInstanceFactory<>(new Initializer()), Collections.singleton(FrameworkStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config undertowConfig) {
@@ -301,7 +305,7 @@ public final class UndertowProvisioner {
 
     private static DeploymentInfo deploymentInfo(Config undertowConfig) {
         return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
-                .setClassLoader(UndertowProvisioner.class.getClassLoader())
+                .setClassLoader(ServerBootstrap.class.getClassLoader())
                 .setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
@@ -317,7 +321,7 @@ public final class UndertowProvisioner {
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(UndertowProvisioner.class.getResourceAsStream(keyStoreName), keyStorePwd);
+        keyStore.load(ServerBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
         return keyStore;
     }
 

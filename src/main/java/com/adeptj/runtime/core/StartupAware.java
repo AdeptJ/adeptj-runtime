@@ -17,24 +17,23 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.initializer;
+package com.adeptj.runtime.core;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
- * StartupHandler that will be called by the ServletContainerInitializer while startup is in progress.
+ * StartupAware that will be called by the ServletContainerInitializer while startup is in progress.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public interface StartupHandler {
+public interface StartupAware {
 
     /**
-     * This method will be called by the StartupHandlerInitializer while startup is in
-     * progress.
+     * This method will be called by the Initializer while startup is in progress.
      *
      * @param context the {@link ServletContext} in which this handler runs in.
-     * @throws ServletException exception thrown by initializer code
+     * @throws ServletException exception thrown by core code
      */
     void onStartup(ServletContext context) throws ServletException;
 }

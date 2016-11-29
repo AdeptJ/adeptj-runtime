@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.common;
 
-import com.adeptj.runtime.initializer.StartupHandler;
+import com.adeptj.runtime.core.StartupAware;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -29,8 +29,8 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The annotated type's {@link StartupHandler#onStartup(javax.servlet.ServletContext)} must be call in the
- * StartupOrder#order() specified as ascending order. If the order of one or many StartupHandler same then they
+ * The annotated type's {@link StartupAware#onStartup(javax.servlet.ServletContext)} must be call in the
+ * StartupOrder#order() specified as ascending order. If the order of one or many StartupAware same then they
  * are called in an unspecified order.
  *
  * @author Rakesh.Kumar, AdeptJ.
@@ -40,5 +40,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface StartupOrder {
 
-    public int value() default 0;
+    int value() default 0;
 }

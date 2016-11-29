@@ -145,7 +145,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.adeptj.runtime.initializer.Main</mainClass>
+                                    <mainClass>com.adeptj.runtime.core.Launcher</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

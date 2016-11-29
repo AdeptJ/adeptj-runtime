@@ -40,14 +40,14 @@ import java.util.stream.Collectors;
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 /**
- * BundleProvisioner that handles the installation/activation of required bundles after the system bundle is up and running.
+ * Bundles utility that handles the installation/activation of required bundles after the system bundle is up and running.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class BundleProvisioner {
+public final class Bundles {
 
     // No instantiation.
-    private BundleProvisioner() {
+    private Bundles() {
     }
 
     private static final String PREFIX_BUNDLES = "bundles/";
@@ -55,7 +55,7 @@ public final class BundleProvisioner {
     private static final String EXTN_JAR = ".jar";
 
     public static void provisionBundles(BundleContext systemBundleContext) throws Exception {
-        Logger logger = LoggerFactory.getLogger(BundleProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(Bundles.class);
         // Start all the Bundles after collection and installation phase.
         startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
     }
@@ -96,10 +96,10 @@ public final class BundleProvisioner {
 
     private static List<URL> collectBundles(Logger logger) throws IOException {
         String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-        ClassLoader classLoader = BundleProvisioner.class.getClassLoader();
+        ClassLoader classLoader = Bundles.class.getClassLoader();
         Predicate<JarEntry> bundlePredicate = (jarEntry) -> (jarEntry.getName().startsWith(PREFIX_BUNDLES)
                 && jarEntry.getName().endsWith(EXTN_JAR));
-        URLConnection connection = BundleProvisioner.class.getResource(rootPath).openConnection();
+        URLConnection connection = Bundles.class.getResource(rootPath).openConnection();
         List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
                 .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
         logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());

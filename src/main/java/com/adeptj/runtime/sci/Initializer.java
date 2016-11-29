@@ -20,7 +20,7 @@
 package com.adeptj.runtime.sci;
 
 import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.initializer.StartupHandler;
+import com.adeptj.runtime.core.StartupAware;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,40 +40,40 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@HandlesTypes(StartupHandler.class)
-public class StartupHandlerInitializer implements ServletContainerInitializer {
+@HandlesTypes(StartupAware.class)
+public class Initializer implements ServletContainerInitializer {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onStartup(Set<Class<?>> handlers, ServletContext context) throws ServletException {
-        Logger logger = LoggerFactory.getLogger(StartupHandlerInitializer.class);
-        if (handlers == null) {
+    public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) throws ServletException {
+        Logger logger = LoggerFactory.getLogger(Initializer.class);
+        if (startupAwareClasses == null) {
             // We can't go ahead if FrameworkStartupHandler is not passed by container.
-            logger.error("No @HandlesTypes(StartupHandler) on classpath!!");
-            throw new IllegalStateException("No @HandlesTypes(StartupHandler) on classpath!!");
+            logger.error("No @HandlesTypes(StartupAware) on classpath!!");
+            throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
             ServletContextHolder.INSTANCE.setServletContext(context);
             context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
-            handlers.forEach(handler -> this.handleStartupHandler(context, logger, handler));
+            startupAwareClasses.forEach(startupAwareClass -> this.handleStartupAware(context, logger, startupAwareClass));
             // If we are here means startup went well above, register FrameworkShutdownHandler now.
             context.addListener(FrameworkShutdownHandler.class);
         }
     }
 
-    private void handleStartupHandler(ServletContext context, Logger logger, Class<?> handler) {
-        logger.info("Handling @HandlesTypes: [{}]", handler);
+    private void handleStartupAware(ServletContext context, Logger logger, Class<?> startupAwareClass) {
+        logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
         try {
-            if (StartupHandler.class.isAssignableFrom(handler)) {
-                StartupHandler.class.cast(handler.newInstance()).onStartup(context);
+            if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
+                StartupAware.class.cast(startupAwareClass.newInstance()).onStartup(context);
             } else {
-                logger.warn("Unknown @HandlesTypes: [{}]", handler);
-                throw new IllegalStateException("Only StartupHandler types are supported!!");
+                logger.warn("Unknown @HandlesTypes: [{}]", startupAwareClass);
+                throw new IllegalStateException("Only StartupAware types are supported!!");
             }
         } catch (Exception ex) {
-            logger.error("StartupHandler Exception!!", ex);
-            throw new RuntimeException("StartupHandler Exception!!", ex);
+            logger.error("StartupAware Exception!!", ex);
+            throw new RuntimeException("StartupAware Exception!!", ex);
         }
     }
 

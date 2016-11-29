@@ -63,7 +63,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
         LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-        // Passing null so that DispatcherServlet.init() won't be called again.
+        // Passing null so that DispatcherServlet.core() won't be called again.
         this.handleDispatcherServlet(null);
         super.removedService(reference, service);
         /*
@@ -95,7 +95,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcherServlet != null) {
             LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
             this.dispatcherServlet.destroy();
-            // Set dispatcherServlet as null, don't want to call dispatcherServlet.init with this reference.
+            // Set dispatcherServlet as null, don't want to call dispatcherServlet.core with this reference.
             this.dispatcherServlet = null;
         }
     }

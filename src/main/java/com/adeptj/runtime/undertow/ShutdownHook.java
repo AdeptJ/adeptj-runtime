@@ -21,7 +21,7 @@ package com.adeptj.runtime.undertow;
 
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.logging.LogbackProvisioner;
+import com.adeptj.runtime.logging.LoggingBootstrap;
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
 import org.slf4j.Logger;
@@ -32,13 +32,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Rakesh.Kumar, AdeptJ
  */
-public final class UndertowShutdownHook extends Thread {
+public final class ShutdownHook extends Thread {
 
     private Undertow server;
 
     private DeploymentManager manager;
 
-    public UndertowShutdownHook(Undertow server, DeploymentManager manager) {
+    public ShutdownHook(Undertow server, DeploymentManager manager) {
         super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
         this.server = server;
         this.manager = manager;
@@ -50,7 +50,7 @@ public final class UndertowShutdownHook extends Thread {
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(UndertowShutdownHook.class);
+        Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
         logger.info("Stopping AdeptJ Runtime!!");
         try {
             this.manager.stop();
@@ -61,7 +61,7 @@ public final class UndertowShutdownHook extends Thread {
             logger.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the LOGBACK cleans up it's state.
-            LogbackProvisioner.stop();
+            LoggingBootstrap.stop();
         }
     }
 

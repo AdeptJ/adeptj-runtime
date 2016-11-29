@@ -20,29 +20,29 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.StartupOrder;
-import com.adeptj.runtime.initializer.StartupHandler;
-import com.adeptj.runtime.sci.StartupHandlerInitializer;
+import com.adeptj.runtime.core.StartupAware;
+import com.adeptj.runtime.sci.Initializer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
- * StartupHandler is a {@link javax.servlet.annotation.HandlesTypes} that handles the OSGi Framework startup.
+ * FrameworkStartupHandler is a {@link com.adeptj.runtime.core.StartupAware} that handles the OSGi Framework startup.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder()
-public class FrameworkStartupHandler implements StartupHandler {
+@StartupOrder
+public class FrameworkStartupHandler implements StartupAware {
 
     /**
-     * This method will be called by the {@link StartupHandlerInitializer} while application startup is in
+     * This method will be called by the {@link Initializer} while application startup is in
      * progress.
      *
      * @param context the {@link ServletContext}
-     * @throws ServletException
+     * @throws ServletException if the framework startup failed for some reason.
      */
     @Override
     public void onStartup(ServletContext context) throws ServletException {
-        FrameworkProvisioner.INSTANCE.startFramework(context);
+        FrameworkBootstrap.INSTANCE.startFramework(context);
     }
 }

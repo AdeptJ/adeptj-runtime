@@ -39,6 +39,9 @@ public class FrameworkShutdownHandler implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         // Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
+        // Can't do the Framework initialization here we register EventListener(s) and HttpServlet(s)
+        // using the ServletContext passed which results in java.lang.UnsupportedOperationException
+        // UT010042: This method cannot be called from a servlet context listener that has been added programatically.
     }
 
     @Override
@@ -48,7 +51,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
         logger.info("Closing EventDispatcherTracker!!");
         EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
-        FrameworkProvisioner.INSTANCE.stopFramework();
+        FrameworkBootstrap.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);
         logger.info("OSGi Framework stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
     }

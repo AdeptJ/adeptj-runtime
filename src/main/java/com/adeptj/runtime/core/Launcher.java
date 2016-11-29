@@ -17,14 +17,14 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.initializer;
+package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.logging.LogbackProvisioner;
-import com.adeptj.runtime.osgi.FrameworkProvisioner;
-import com.adeptj.runtime.undertow.UndertowProvisioner;
+import com.adeptj.runtime.logging.LoggingBootstrap;
+import com.adeptj.runtime.osgi.FrameworkBootstrap;
+import com.adeptj.runtime.undertow.ServerBootstrap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ import java.util.Map;
  * <p>
  * Rakesh.Kumar, AdeptJ
  */
-public final class Main {
+public final class Launcher {
 
     /**
      * Entry point for initializing the AdeptJ Runtime.
@@ -53,16 +53,16 @@ public final class Main {
         Thread.currentThread().setName("AdeptJ Provisioner");
         long startTime = System.nanoTime();
         // First of all initialize LOGBACK.
-        LogbackProvisioner.start();
-        Logger logger = LoggerFactory.getLogger(Main.class);
+        LoggingBootstrap.start();
+        Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
-            UndertowProvisioner.provision(parseCommands(args));
+            ServerBootstrap.provision(parseCommands(args));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
         } catch (Throwable th) {
             stopOSGiFramework(logger);
             logger.error("Shutting down JVM!!", th);
             // Let the LOGBACK cleans up it's state.
-            LogbackProvisioner.stop();
+            LoggingBootstrap.stop();
             System.exit(-1);
         }
     }
@@ -71,7 +71,7 @@ public final class Main {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-            FrameworkProvisioner.INSTANCE.stopFramework();
+            FrameworkBootstrap.INSTANCE.stopFramework();
         }
     }
 

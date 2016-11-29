@@ -42,11 +42,11 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 /**
- * FrameworkProvisioner that handles the OSGi Framework(Apache Felix) startup and shutdown.
+ * FrameworkBootstrap that handles the OSGi Framework(Apache Felix) startup and shutdown.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum FrameworkProvisioner {
+public enum FrameworkBootstrap {
 
     INSTANCE;
 
@@ -61,7 +61,7 @@ public enum FrameworkProvisioner {
     private FrameworkRestartHandler frameworkListener;
 
     public void startFramework(ServletContext context) {
-        Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkBootstrap.class);
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
@@ -71,7 +71,7 @@ public enum FrameworkProvisioner {
             BundleContext systemBundleContext = this.framework.getBundleContext();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            BundleProvisioner.provisionBundles(systemBundleContext);
+            Bundles.provisionBundles(systemBundleContext);
             logger.info("OSGi Framework started in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
             this.initBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
@@ -81,13 +81,13 @@ public enum FrameworkProvisioner {
             this.registerProxyServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to start OSGi Framework!!", ex);
-            // Stop the Framework if the BundleProvisioner throws exception.
+            // Stop the Framework if the Bundles throws exception.
             this.stopFramework();
         }
     }
 
     public void stopFramework() {
-        Logger logger = LoggerFactory.getLogger(FrameworkProvisioner.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkBootstrap.class);
         try {
             if (this.framework != null) {
                 this.removeFrameworkListener();
@@ -148,7 +148,7 @@ public enum FrameworkProvisioner {
 
     private Map<String, String> loadFrameworkProps() throws IOException {
         Properties props = new Properties();
-        props.load(FrameworkProvisioner.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
+        props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> configs.put((String) key, (String) val));
         return configs;

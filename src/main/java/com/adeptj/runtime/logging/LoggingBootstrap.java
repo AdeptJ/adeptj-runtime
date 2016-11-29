@@ -46,7 +46,7 @@ import static ch.qos.logback.classic.Level.toLevel;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LogbackProvisioner {
+public class LoggingBootstrap {
 
     private static final String ADEPTJ_LOG_LEVEL = "adeptj-log-level";
 
@@ -112,7 +112,7 @@ public class LogbackProvisioner {
         // thymeleafLogger(context, appenders, config);
         trimouLogger(context, appenders, config);
         context.start();
-        Logger logger = context.getLogger(LogbackProvisioner.class);
+        Logger logger = context.getLogger(LoggingBootstrap.class);
         logger.info("Logback initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
     }
 
