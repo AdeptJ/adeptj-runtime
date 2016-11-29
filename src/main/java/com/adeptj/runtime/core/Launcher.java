@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Entry point for initializing the AdeptJ Runtime.
+ * Entry point for launching the AdeptJ Runtime.
  * <p>
  * Rakesh.Kumar, AdeptJ
  */
@@ -50,7 +50,7 @@ public final class Launcher {
      * 5. Registers the runtime ShutdownHook.
      */
     public static void main(String[] args) {
-        Thread.currentThread().setName("AdeptJ Provisioner");
+        Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
         // First of all initialize LOGBACK.
         LoggingBootstrap.start();

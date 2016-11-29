@@ -23,17 +23,18 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
- * StartupAware that will be called by the ServletContainerInitializer while startup is in progress.
+ * This will be called by the ServletContainerInitializer while startup is in progress because this is
+ * declared as a HandlesTypes.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 public interface StartupAware {
 
     /**
-     * This method will be called by the Initializer while startup is in progress.
+     * This method will be called by the ServletContainerInitializer while startup is in progress.
      *
-     * @param context the {@link ServletContext} in which this handler runs in.
-     * @throws ServletException exception thrown by core code
+     * @param context the {@link ServletContext} in which this StartupAware runs in.
+     * @throws ServletException exception thrown by startup code
      */
     void onStartup(ServletContext context) throws ServletException;
 }

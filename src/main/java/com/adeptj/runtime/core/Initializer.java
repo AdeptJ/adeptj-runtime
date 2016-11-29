@@ -34,7 +34,7 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 
 /**
- * An ServletContainerInitializer that is called by the Container while initialization is in progress.
+ * An ServletContainerInitializer that is called by the Container while startup is in progress.
  * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this Initializer.
  *
  * @author Rakesh.Kumar, AdeptJ
