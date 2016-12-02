@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
+import javax.servlet.ServletRegistration;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -72,12 +72,12 @@ public enum FrameworkBootstrap {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             Bundles.provisionBundles(systemBundleContext);
-            logger.info("OSGi Framework started in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
-            this.initBridgeListeners(context);
-            // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
-            context.setAttribute(BundleContext.class.getName(), systemBundleContext);
             List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
+            logger.info("OSGi Framework started in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+            this.registerBridgeListeners(context);
+            // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
+            context.setAttribute(BundleContext.class.getName(), systemBundleContext);
             this.registerProxyServlet(context, logger);
         } catch (Exception ex) {
             logger.error("Failed to startLoggerContext OSGi Framework!!", ex);
@@ -110,7 +110,7 @@ public enum FrameworkBootstrap {
         }
     }
 
-    private void initBridgeListeners(ServletContext servletContext) {
+    private void registerBridgeListeners(ServletContext servletContext) {
         // add all required listeners
         servletContext.addListener(new BridgeServletContextAttributeListener());
         servletContext.addListener(new BridgeHttpSessionListener());
@@ -122,7 +122,7 @@ public enum FrameworkBootstrap {
         // Register the ProxyServlet after the OSGi Framework started successfully.
         // This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked.
         // ProxyServlet delegates all the service calls to the Felix DispatcherServlet.
-        Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
+        ServletRegistration.Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
         proxyServlet.addMapping(ROOT_MAPPING);
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
         // Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026:
