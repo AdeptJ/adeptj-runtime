@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
 import com.typesafe.config.Config;
 import io.undertow.security.idm.Account;

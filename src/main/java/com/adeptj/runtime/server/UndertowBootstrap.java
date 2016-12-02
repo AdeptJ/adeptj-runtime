@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.EnvironmentUtils;
@@ -25,9 +25,9 @@ import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.logging.LoggingBootstrap;
+import com.adeptj.runtime.core.ContainerInitializer;
+import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.core.Initializer;
 import com.adeptj.runtime.servlet.AdminAuthServlet;
 import com.adeptj.runtime.servlet.AdminDashboardServlet;
 import com.adeptj.runtime.servlet.AdminErrorServlet;
@@ -90,11 +90,11 @@ import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 
 /**
- * ServerBootstrap: Provision the Undertow Http Server.
+ * UndertowBootstrap: Provision the Undertow Http Server.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class ServerBootstrap {
+public final class UndertowBootstrap {
 
     private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
@@ -135,16 +135,16 @@ public final class ServerBootstrap {
     private static final String PROTOCOL_TLS = "TLS";
 
     // No instantiation.
-    private ServerBootstrap() {
+    private UndertowBootstrap() {
     }
 
     public static void provision(Map<String, String> arguments) throws Exception {
         Config undertowConf = Configs.INSTANCE.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        Logger logger = LoggerFactory.getLogger(ServerBootstrap.class);
+        Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
-        logger.info(IOUtils.toString(ServerBootstrap.class.getResourceAsStream(STARTUP_INFO)));
+        logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO)));
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
@@ -222,13 +222,13 @@ public final class ServerBootstrap {
             port = Integer.parseInt(propertyPort);
         }
         // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
-        // started already and another server start(from same location) will again start new OSGi Framework which may interfere
+        // started already and another server startLoggerContext(from same location) will again startLoggerContext new OSGi Framework which may interfere
         // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
         // this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("JVM shutting down!!");
             // Let the LOGBACK cleans up it's state.
-            LoggingBootstrap.stop();
+            LogbackBootstrap.stopLoggerContext();
             System.exit(-1);
         }
         return port;
@@ -277,8 +277,8 @@ public final class ServerBootstrap {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(Initializer.class,
-                new ImmediateInstanceFactory<>(new Initializer()), Collections.singleton(FrameworkStartupHandler.class));
+        return new ServletContainerInitializerInfo(ContainerInitializer.class,
+                new ImmediateInstanceFactory<>(new ContainerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config undertowConfig) {
@@ -305,7 +305,7 @@ public final class ServerBootstrap {
 
     private static DeploymentInfo deploymentInfo(Config undertowConfig) {
         return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
-                .setClassLoader(ServerBootstrap.class.getClassLoader())
+                .setClassLoader(UndertowBootstrap.class.getClassLoader())
                 .setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
@@ -321,7 +321,7 @@ public final class ServerBootstrap {
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(ServerBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
+        keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
         return keyStore;
     }
 

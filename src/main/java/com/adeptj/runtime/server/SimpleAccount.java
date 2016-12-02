@@ -17,22 +17,39 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Constants;
-import io.undertow.predicate.Predicate;
-import io.undertow.server.HttpServerExchange;
+import io.undertow.security.idm.Account;
+
+import java.security.Principal;
+import java.util.Set;
 
 /**
- * Predicate checks if the request is for context root "/".
+ * SimpleAccount.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ContextRootPredicate implements Predicate {
+public class SimpleAccount implements Account {
+
+    private static final long serialVersionUID = -2090504892837494810L;
+
+    private SimplePrincipal principal;
+
+    private Set<String> roles;
+
+    public SimpleAccount(SimplePrincipal principal, Set<String> roles) {
+        this.principal = principal;
+        this.roles = roles;
+    }
 
     @Override
-    public boolean resolve(HttpServerExchange exchange) {
-        return Constants.CONTEXT_PATH.equals(exchange.getRequestURI());
+    public Principal getPrincipal() {
+        return principal;
+    }
+
+    @Override
+    public Set<String> getRoles() {
+        return roles;
     }
 
 }

@@ -80,7 +80,7 @@ public enum FrameworkBootstrap {
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
             this.registerProxyServlet(context, logger);
         } catch (Exception ex) {
-            logger.error("Failed to start OSGi Framework!!", ex);
+            logger.error("Failed to startLoggerContext OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
             this.stopFramework();
         }
@@ -97,7 +97,7 @@ public enum FrameworkBootstrap {
                 FrameworkEvent event = this.framework.waitForStop(0);
                 logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
             } else {
-                logger.info("OSGi Framework not started yet, nothing to stop!!");
+                logger.info("OSGi Framework not started yet, nothing to stopLoggerContext!!");
             }
         } catch (Exception ex) {
             logger.error("Error Stopping OSGi Framework!!", ex);

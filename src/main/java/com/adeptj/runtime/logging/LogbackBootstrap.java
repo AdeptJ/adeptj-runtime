@@ -46,7 +46,7 @@ import static ch.qos.logback.classic.Level.toLevel;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LoggingBootstrap {
+public class LogbackBootstrap {
 
     private static final String ADEPTJ_LOG_LEVEL = "adeptj-log-level";
 
@@ -84,7 +84,7 @@ public class LoggingBootstrap {
 
     private static final String APPENDER_FILE = "FILE";
 
-    public static void start() {
+    public static void startLoggerContext() {
         long startTime = System.nanoTime();
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         Config config = Configs.INSTANCE.common();
@@ -112,11 +112,11 @@ public class LoggingBootstrap {
         // thymeleafLogger(context, appenders, config);
         trimouLogger(context, appenders, config);
         context.start();
-        Logger logger = context.getLogger(LoggingBootstrap.class);
+        Logger logger = context.getLogger(LogbackBootstrap.class);
         logger.info("Logback initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
     }
 
-    public static void stop() {
+    public static void stopLoggerContext() {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         context.stop();
     }

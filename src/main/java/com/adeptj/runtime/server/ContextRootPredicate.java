@@ -17,34 +17,22 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
-import io.undertow.server.HttpHandler;
+import com.adeptj.runtime.common.Constants;
+import io.undertow.predicate.Predicate;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HttpString;
-
-import java.util.Map;
 
 /**
- * Sets the given headers in the response header map on each request, then call the next handler.
+ * Predicate checks if the request is for context root "/".
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class SetHeadersHandler implements HttpHandler {
-
-    private final HttpHandler servletHandler;
-
-    private Map<HttpString, String> headers;
-
-    public SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
-        this.servletHandler = servletHandler;
-        this.headers = headers;
-    }
+public class ContextRootPredicate implements Predicate {
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        this.headers.forEach((headerName, headerValue) -> exchange.getResponseHeaders().put(headerName, headerValue));
-        this.servletHandler.handleRequest(exchange);
+    public boolean resolve(HttpServerExchange exchange) {
+        return Constants.CONTEXT_PATH.equals(exchange.getRequestURI());
     }
 
 }

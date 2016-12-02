@@ -17,55 +17,34 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
-import java.security.Principal;
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.util.HttpString;
+
+import java.util.Map;
 
 /**
- * SimplePrincipal.
+ * Sets the given headers in the response header map on each request, then call the next handler.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class SimplePrincipal implements Principal {
+public class SetHeadersHandler implements HttpHandler {
 
-    private String name;
+    private final HttpHandler servletHandler;
 
-    public SimplePrincipal(String name) {
-        this.name = name;
+    private Map<HttpString, String> headers;
+
+    public SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
+        this.servletHandler = servletHandler;
+        this.headers = headers;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public void handleRequest(HttpServerExchange exchange) throws Exception {
+        this.headers.forEach((headerName, headerValue) -> exchange.getResponseHeaders().put(headerName, headerValue));
+        this.servletHandler.handleRequest(exchange);
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SimplePrincipal other = (SimplePrincipal) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "SimplePrincipal [name=" + name + "]";
-    }
 }

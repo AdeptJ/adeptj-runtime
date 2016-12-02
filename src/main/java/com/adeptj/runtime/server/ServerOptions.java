@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.TimeUnits;
 import com.typesafe.config.Config;

@@ -17,11 +17,11 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.logging.LoggingBootstrap;
+import com.adeptj.runtime.logging.LogbackBootstrap;
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public final class ShutdownHook extends Thread {
             logger.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the LOGBACK cleans up it's state.
-            LoggingBootstrap.stop();
+            LogbackBootstrap.stopLoggerContext();
         }
     }
 

@@ -35,19 +35,19 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 
 /**
  * An ServletContainerInitializer that is called by the Container while startup is in progress.
- * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this Initializer.
+ * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this ContainerInitializer.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 @HandlesTypes(StartupAware.class)
-public class Initializer implements ServletContainerInitializer {
+public class ContainerInitializer implements ServletContainerInitializer {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) throws ServletException {
-        Logger logger = LoggerFactory.getLogger(Initializer.class);
+        Logger logger = LoggerFactory.getLogger(ContainerInitializer.class);
         if (startupAwareClasses == null) {
             // We can't go ahead if FrameworkStartupHandler is not passed by container.
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");

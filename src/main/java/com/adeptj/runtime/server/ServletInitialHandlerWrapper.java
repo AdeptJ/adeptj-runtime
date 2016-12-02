@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.undertow;
+package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;

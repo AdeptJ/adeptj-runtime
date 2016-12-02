@@ -22,9 +22,10 @@ package com.adeptj.runtime.core;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.TimeUnits;
-import com.adeptj.runtime.logging.LoggingBootstrap;
+import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkBootstrap;
-import com.adeptj.runtime.undertow.ServerBootstrap;
+import com.adeptj.runtime.server.UndertowBootstrap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,22 +54,22 @@ public final class Launcher {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
         // First of all initialize LOGBACK.
-        LoggingBootstrap.start();
+        LogbackBootstrap.startLoggerContext();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
-            ServerBootstrap.provision(parseCommands(args));
+            UndertowBootstrap.provision(parseCommands(args));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
         } catch (Throwable th) {
             stopOSGiFramework(logger);
             logger.error("Shutting down JVM!!", th);
             // Let the LOGBACK cleans up it's state.
-            LoggingBootstrap.stop();
+            LogbackBootstrap.stopLoggerContext();
             System.exit(-1);
         }
     }
 
     private static void stopOSGiFramework(Logger logger) {
-        // Check if OSGi Framework was already started, try to stop the framework gracefully.
+        // Check if OSGi Framework was already started, try to stopLoggerContext the framework gracefully.
         if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
             FrameworkBootstrap.INSTANCE.stopFramework();
