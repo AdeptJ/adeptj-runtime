@@ -42,7 +42,7 @@ public enum ServiceTrackers {
     }
 
     public void close(Class<? extends ServiceTracker<?, ?>> klazz) {
-        Optional.ofNullable(this.trackers.remove(klazz.getName())).ifPresent(tracker -> tracker.close());
+        Optional.ofNullable(this.trackers.remove(klazz.getName())).ifPresent(ServiceTracker::close);
     }
 
     public void closeAll() {

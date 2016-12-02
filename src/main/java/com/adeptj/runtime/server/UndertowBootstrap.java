@@ -138,12 +138,12 @@ public final class UndertowBootstrap {
     private UndertowBootstrap() {
     }
 
-    public static void provision(Map<String, String> arguments) throws Exception {
+    public static void bootstrap(Map<String, String> arguments) throws Exception {
         Config undertowConf = Configs.INSTANCE.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
         int httpPort = handlePortAvailability(httpConf, logger);
-        logger.info("Starting AdeptJ Runtime on port: [{}]", httpPort);
+        logger.info("Starting AdeptJ Runtime @ port: [{}]", httpPort);
         logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO)));
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
@@ -199,7 +199,7 @@ public final class UndertowBootstrap {
             int httpsPort = httpsConf.getInt(KEY_PORT);
             undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
                     sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd), keyPwd));
-            logger.info("HTTP2 enabled on port: [{}]", httpsPort);
+            logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
 
@@ -208,7 +208,7 @@ public final class UndertowBootstrap {
             Config ajpConf = undertowConf.getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
             undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
-            logger.info("AJP enabled on port: [{}]", ajpPort);
+            logger.info("AJP enabled @ port: [{}]", ajpPort);
         }
     }
 

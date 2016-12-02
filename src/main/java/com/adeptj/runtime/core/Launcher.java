@@ -57,7 +57,7 @@ public final class Launcher {
         LogbackBootstrap.startLoggerContext();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
-            UndertowBootstrap.provision(parseCommands(args));
+            UndertowBootstrap.bootstrap(parseCommands(args));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
         } catch (Throwable th) {
             stopOSGiFramework(logger);

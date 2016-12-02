@@ -79,7 +79,7 @@ public final class Bundles {
         // First install all the Bundles.
         List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
                 .filter(Objects::nonNull).collect(Collectors.toList());
-        logger.info("Total:[{}] Bundles(excluding system bundle) installed!!", installedBundles.size());
+        logger.info("Total Bundles installed: [{}]", installedBundles.size());
         return installedBundles;
     }
 
@@ -102,7 +102,7 @@ public final class Bundles {
         URLConnection connection = Bundles.class.getResource(rootPath).openConnection();
         List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
                 .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
-        logger.info("Bundles(excluding system bundle) collected: [{}]", bundles.size());
+        logger.info("Total Bundles collected: [{}]", bundles.size());
         return bundles;
     }
 }
