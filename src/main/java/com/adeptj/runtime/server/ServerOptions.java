@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.typesafe.config.Config;
 import io.undertow.Undertow.Builder;
 import io.undertow.UndertowOptions;
@@ -51,7 +51,7 @@ public final class ServerOptions {
         integerOptions(builder, serverOptionsCfg.getObject("options-type-integer").unwrapped(), logger);
         longOptions(builder, serverOptionsCfg.getObject("options-type-long").unwrapped(), logger);
         booleanOptions(builder, serverOptionsCfg.getObject("options-type-boolean").unwrapped(), logger);
-        logger.info("ServerOptions populated in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        logger.info("ServerOptions populated in [{}] ms!!", Times.elapsedSince(startTime));
     }
 
     private static void buildServerOptions(Builder builder, Map<String, ?> options, Logger logger) {

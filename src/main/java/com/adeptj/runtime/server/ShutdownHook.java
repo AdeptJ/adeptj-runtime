@@ -20,7 +20,7 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentManager;
@@ -56,7 +56,7 @@ public final class ShutdownHook extends Thread {
             this.manager.stop();
             this.manager.undeploy();
             this.server.stop();
-            logger.info("AdeptJ Runtime stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+            logger.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedSince(startTime));
         } catch (Exception ex) {
             logger.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {

@@ -29,7 +29,7 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.slf4j.LoggerFactory;
@@ -113,7 +113,7 @@ public class LogbackBootstrap {
         trimouLogger(context, appenders, config);
         context.start();
         Logger logger = context.getLogger(LogbackBootstrap.class);
-        logger.info("Logback initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        logger.info("Logback initialized in [{}] ms!!", Times.elapsedSince(startTime));
     }
 
     public static void stopLoggerContext() {
@@ -135,7 +135,7 @@ public class LogbackBootstrap {
     }
 
     private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {
-        // initialize ROOT Logger at specified level.
+        // initialize ROOT Logger at specified level which just logs to ConsoleAppender.
         Logger root = logger(Logger.ROOT_LOGGER_NAME, toLevel(config.getString(ROOT_LOG_LEVEL)), context);
         root.addAppender(consoleAppender);
     }

@@ -21,7 +21,7 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkBootstrap;
 import com.adeptj.runtime.server.UndertowBootstrap;
@@ -58,7 +58,7 @@ public final class Launcher {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             UndertowBootstrap.bootstrap(parseCommands(args));
-            logger.info("AdeptJ Runtime initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedSince(startTime));
         } catch (Throwable th) {
             stopOSGiFramework(logger);
             logger.error("Shutting down JVM!!", th);

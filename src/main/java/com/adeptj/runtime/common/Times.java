@@ -26,19 +26,19 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class TimeUnits {
+public final class Times {
 
     // No instances, just utility methods.
-    private TimeUnits() {
+    private Times() {
     }
 
     /**
-     * Converts the nanoseconds time to milliseconds.
+     * Returns elapsed time in milliseconds from the provided time in nanoseconds.
      *
-     * @param startTime
-     * @return time in milliseconds
+     * @param startTime time in milliseconds
+     * @return elapsed time in milliseconds
      */
-    public static final long nanosToMillis(final long startTime) {
+    public static long elapsedSince(final long startTime) {
         return NANOSECONDS.toMillis(System.nanoTime() - startTime);
     }
 }

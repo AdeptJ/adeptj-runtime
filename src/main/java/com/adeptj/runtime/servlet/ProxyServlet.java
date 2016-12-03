@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class ProxyServlet extends HttpServlet {
         LOGGER.info("Initializing ProxyServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
-        LOGGER.info("ProxyServlet initialized in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        LOGGER.info("ProxyServlet initialized in [{}] ms!!", Times.elapsedSince(startTime));
     }
 
     /**

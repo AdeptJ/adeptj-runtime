@@ -20,7 +20,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
         FrameworkBootstrap.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);
-        logger.info("OSGi Framework stopped in [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedSince(startTime));
     }
 
 }

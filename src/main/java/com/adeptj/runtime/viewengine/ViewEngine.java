@@ -19,7 +19,7 @@
 */
 package com.adeptj.runtime.viewengine;
 
-import com.adeptj.runtime.common.TimeUnits;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.config.ViewEngineConfig;
 import com.typesafe.config.ConfigBeanFactory;
@@ -62,7 +62,7 @@ public enum ViewEngine {
     ViewEngine() {
         long startTime = System.nanoTime();
         this.engine = this.mustacheEngine();
-        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", TimeUnits.nanosToMillis(startTime));
+        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedSince(startTime));
     }
 
     private TemplateLocator templateLocator(ViewEngineConfig config) {
@@ -104,7 +104,7 @@ public enum ViewEngine {
             long startTime = System.nanoTime();
             context.getResponse().getWriter().write(mustache.render(context.getModels()));
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), TimeUnits.nanosToMillis(startTime));
+                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
             }
         } catch (Exception ex) {
             LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
