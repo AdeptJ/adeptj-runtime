@@ -85,30 +85,48 @@ public enum ViewEngine {
     }
 
     public void processView(ViewEngineContext context) {
-        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.doProcessView(context, mustache));
+        this.processViewInternal(context);
     }
 
-    private void handleException(ViewEngineContext context, Exception originalException) {
-        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, originalException);
+    private void sendError(HttpServletResponse resp, int errorCode) {
+        LOGGER.info("Sending error: [{}]", errorCode);
         try {
-            context.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(errorCode);
         } catch (IOException ex) {
-            // Now what? may be log and re-throw.
+            // Now what? may be log and re-throw. Let container handle it.
             LOGGER.error("Exception while sending error!!", ex);
             throw new ViewEngineException(ex.getMessage(), ex);
         }
     }
 
-    private void doProcessView(ViewEngineContext context, Mustache mustache) {
-        try {
-            long startTime = System.nanoTime();
-            context.getResponse().getWriter().write(mustache.render(context.getModels()));
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
-            this.handleException(context, ex);
+    private void handleException(ViewEngineContext context, Exception ex) {
+        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
+        this.sendError(context.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    private void handleViewNotFound(ViewEngineContext context) {
+        // Check if the view not rendered and it was not an exception which is set as request attribute.
+        if (!context.isViewRendered() && context.getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
+            this.sendError(context.getResponse(), HttpServletResponse.SC_NOT_FOUND);
         }
+    }
+
+    private void processViewInternal(ViewEngineContext context) {
+        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent((Mustache mustache) -> {
+            try {
+                long startTime = System.nanoTime();
+                context.getResponse().getWriter().write(mustache.render(context.getModels()));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
+                }
+                // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
+                context.setViewRendered(true);
+            } catch (Exception ex) {
+                LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
+                this.handleException(context, ex);
+            }
+        });
+        // Now check if the view actually rendered(may not due to a 404), if not then handle the 404 response properly.
+        this.handleViewNotFound(context);
     }
 }

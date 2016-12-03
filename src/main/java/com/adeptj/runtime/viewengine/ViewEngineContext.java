@@ -40,6 +40,8 @@ public class ViewEngineContext {
 
     private Locale locale;
 
+    private boolean viewRendered;
+
     private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp) {
         this.view = view;
         this.models = models;
@@ -65,6 +67,14 @@ public class ViewEngineContext {
 
     public Locale getLocale() {
         return locale;
+    }
+
+    public boolean isViewRendered() {
+        return viewRendered;
+    }
+
+    public void setViewRendered(boolean viewRendered) {
+        this.viewRendered = viewRendered;
     }
 
     /**
