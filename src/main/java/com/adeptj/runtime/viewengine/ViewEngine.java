@@ -107,6 +107,7 @@ public enum ViewEngine {
     private void handleViewNotFound(ViewEngineContext context) {
         // Check if the view not rendered and it was not an exception which is set as request attribute.
         if (!context.isViewRendered() && context.getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
+            LOGGER.info("View not found: [{}]", context.getView());
             this.sendError(context.getResponse(), HttpServletResponse.SC_NOT_FOUND);
         }
     }
