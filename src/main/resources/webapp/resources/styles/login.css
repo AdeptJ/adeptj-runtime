@@ -22,9 +22,9 @@ body {
 
 .login-card {
 	width: 100%;
-	max-width: 300px;
-	height: 280px;
-	background-color: #fff;
+	max-width: 250px;
+	height: 210px;
+	background-color: rgba(248, 250, 255, 0.39);
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -35,28 +35,29 @@ body {
 	box-shadow: 0 0px 5px 0 rgba(0, 0, 0, 0.1), 0 16px 20px -8px rgba(0, 0, 0, 0.3);
 	box-shadow: 0 3px 9px 0 rgba(0, 0, 0, 0.1), 0 24px 38px -16px rgba(0, 0, 0, 0.2);
 	border: none;
-	padding: 15px;
-	padding-top: 30px;
-	border-radius: 2px;
+	padding: 39px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-radius: 12px;
 }
 
 body form {
-	margin: 10px 45px;
+	margin: 5px 5px;
 }
 
-body h1 {
-	font-weight: 400;
-	font-size: 16px;
+body h2 {
+	font-weight: 550;
+	font-size: 19px;
 	padding: 0;
-	margin-top: 20px;
-	margin-bottom: 10px;
-	text-align: center;
-	color: #00A0E3;
+	margin-top: 15px;
+	margin-bottom: -5px;
+	text-align: left;
+	color: rgba(89, 87, 90, 0.86);
 }
 
 .sep-top {
 	width: 100%;
-	height: 17px;
+	height: 10px;
 	background: transparent;
 }
 
@@ -65,21 +66,21 @@ body h1 {
 
 .login-card .group {
 	position: relative;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 	line-height: normal;
 }
 
 .login-card .group input {
-	font-size: 13px;
-	padding: 10px 8px 10px 0px;
+	font-size: 12px;
+	font-weight:600;
+	padding: 8px 8px 8px 0px;
 	-webkit-appearance: none;
 	display: block;
-	background: transparent;
-	color: #636363;
+	background: rgba(239, 239, 239, 0.69);
+	color: #1e1e1e;
 	width: 100%;
 	border: none;
-	border-radius: 0;
-	border-bottom: 1px solid #ddd;
+	border-radius: 3px;
 }
 
 .login-card .group input:focus {
@@ -88,77 +89,10 @@ body h1 {
 
 .login-card .validation-error {
 	font-family: 'Lato', sans-serif;
+	margin-left: 30px;
 	font-size: 14px;
-	color: red;
+	color: rgb(231, 5, 5);
 }
-
-
-/* Label */
-
-.login-card .group label {
-	color: #ddd;
-	font-size: 10px;
-	font-weight: normal;
-	position: absolute;
-	pointer-events: none;
-	left: 5px;
-	top: 10px;
-	transition: all 0.2s ease;
-}
-
-
-/* active */
-
-.login-card .group input:focus ~ label,
-.login-card .group input.used ~ label {
-	top: -20px;
-	transform: scale(.75);
-	left: -4px;
-	color: #00A0E3;
-}
-
-
-/* Underline */
-
-.login-card .bar {
-	position: relative;
-	display: block;
-	width: 100%;
-}
-
-.login-card .bar:before,
-.login-card .bar:after {
-	content: '';
-	height: 1px;
-	width: 0;
-	bottom: 1px;
-	position: absolute;
-	background: #00A0E3;
-	-webkit-transition: all 0.2s ease;
-	-moz-transition: all 0.2s ease;
-	-ms-transition: all 0.2s ease;
-	-o-transition: all 0.2s ease;
-	transition: all 0.2s ease;
-}
-
-.login-card .bar:before {
-	left: 50%;
-}
-
-.login-card .bar:after {
-	right: 50%;
-}
-
-
-/* active */
-
-.login-card .group input:focus ~ .bar:before,
-.login-card .group input:focus ~ .bar:after {
-	width: 50%;
-}
-
-
-/* Button */
 
 .button {
 	position: relative;
@@ -184,7 +118,7 @@ body h1 {
 	transition: all 0.15s ease;
 	border-radius: 3px;
 	box-shadow: 0 1px 0 rgba(0,0,0,0.05);
-	float: right;
+	float: left;
 }
 
 .button:focus {
@@ -192,7 +126,7 @@ body h1 {
 }
 
 .button:hover {
-	background: #46ADD8;
+	background: rgba(52, 90, 124, 0.68);
 	box-shadow: inset 0 -2px 0 rgba(0,0,0,0.27);
 }
 
@@ -200,10 +134,9 @@ body h1 {
 /* Button modifiers */
 
 .buttonBlue {
-	background: #00A0E3;
-	text-shadow: 1px 1px 0 rgba(39, 110, 204, .5);
+	background: rgba(55, 52, 84, 0.8);
 }
 
 .buttonBlue:hover {
-	background: #0092D0;
+	background: rgba(92, 91, 112, 0.85);
 }
