@@ -332,6 +332,14 @@
         </dependency>
 
         <!-- OSGi Bundles Starts -->
+        
+        <!-- Admin Runtime UI dependency -->
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-runtime-ui</artifactId>
+            <version>1.0.0.Final</version>
+        </dependency>
+        
 
         <dependency>
             <groupId>org.json</groupId>
