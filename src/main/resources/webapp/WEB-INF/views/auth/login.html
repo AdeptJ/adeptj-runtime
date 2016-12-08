@@ -11,14 +11,14 @@
 				    <h2>Welcome!</h2>
 				    <div class="sep-top"></div>
 				    <form method="post" name="loginForm" action="/auth/j_security_check">
-				            <div class="group">
-				                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="#{j_username}" autofocus="autofocus" required ><span class="bar"></span>
+				            <div class="group user-icon">
+				                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="#{j_username}" autofocus="autofocus" required >
 				            </div>
-				            <div class="group">
-				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required ><span class="bar"></span>
+				            <div class="group lock-icon">
+				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required >
 				            </div>
-				           	<span class="validation-error">#{validation}</span>
-				        	<button type="submit" class="button buttonBlue">Login</button>
+                            <button type="submit" class="button buttonBlue">Login</button>
+                            <span class="error">#{error}</span>
 				    </form>
 				
 				</div>

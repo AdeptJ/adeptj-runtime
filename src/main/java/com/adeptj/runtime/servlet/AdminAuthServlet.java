@@ -76,7 +76,7 @@ public class AdminAuthServlet extends HttpServlet {
     private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
         ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
         Models models = new Models();
-        models.put("validation", "Invalid credentials!!");
+        models.put("error", "Invalid credentials!!");
         models.put("j_username", req.getParameter("j_username"));
         // Render login page again with validation message.
         ViewEngine.INSTANCE.processView(builder.view("auth/login").models(models).build());

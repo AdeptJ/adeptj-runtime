@@ -48,9 +48,10 @@ body form {
 body h2 {
 	font-weight: 550;
 	font-size: 19px;
-	padding: 0;
+	padding: 0px;
 	margin-top: 15px;
 	margin-bottom: -5px;
+	margin-left: -9px;
 	text-align: left;
 	color: rgba(89, 87, 90, 0.86);
 }
@@ -73,25 +74,41 @@ body h2 {
 .login-card .group input {
 	font-size: 12px;
 	font-weight:600;
-	padding: 8px 8px 8px 0px;
+	padding: 8px 0px 8px 0px;
 	-webkit-appearance: none;
 	display: block;
-	background: rgba(239, 239, 239, 0.69);
 	color: #1e1e1e;
 	width: 100%;
 	border: none;
 	border-radius: 3px;
+	margin-left: -9px;
 }
+
+.login-card .user-icon input {
+	background: rgba(239, 239, 239, 0.69) url('/resources/images/user.png') left no-repeat;
+	padding-left: 18px;
+}
+
+.login-card .lock-icon input {
+	background: rgba(239, 239, 239, 0.69) url('/resources/images/lock.png') left no-repeat;
+	padding-left: 18px;
+}
+
 
 .login-card .group input:focus {
 	outline: none;
 }
 
-.login-card .validation-error {
+.login-card .error {
+    position: relative;
+	padding: 5px;
+	text-align: center;
+	line-height: 46px;
+	letter-spacing: 0.5px;
 	font-family: 'Lato', sans-serif;
 	margin-left: 30px;
 	font-size: 14px;
-	color: rgb(231, 5, 5);
+	color: rgba(224, 24, 33, 1);
 }
 
 .button {
@@ -119,6 +136,7 @@ body h2 {
 	border-radius: 3px;
 	box-shadow: 0 1px 0 rgba(0,0,0,0.05);
 	float: left;
+	margin-left: -9px;
 }
 
 .button:focus {
