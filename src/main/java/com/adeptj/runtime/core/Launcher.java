@@ -49,6 +49,8 @@ public final class Launcher {
      * 3. Starts the OSGi Framework.
      * 4. Starts the UNDERTOW server.
      * 5. Registers the runtime ShutdownHook.
+     * 
+     * @param args command line arguments for the Launcher.
      */
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
