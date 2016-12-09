@@ -19,7 +19,6 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.viewengine.Models;
 import com.adeptj.runtime.viewengine.ViewEngine;
 import com.adeptj.runtime.viewengine.ViewEngineContext;
 
@@ -37,7 +36,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = {"/admin/dashboard/*"})
+@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/dashboard/*" })
 public class AdminDashboardServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -47,7 +46,7 @@ public class AdminDashboardServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").models(new Models()).build());
+        ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").build());
     }
 
     @Override
