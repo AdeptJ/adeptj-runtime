@@ -8,8 +8,8 @@
    <img src="https://img.shields.io/badge/OSGi-R6-f08d1c.svg?style=flat">
   </a>
   
-  <a href="https://maven.apache.org">
-    <img src="https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg">
+  <a href="https://travis-ci.org/AdeptJ/adeptj-runtime/builds">
+     <img src="https://api.travis-ci.org/AdeptJ/adeptj-runtime.svg?branch=master&style=flat">
   </a>
   
   <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
@@ -20,10 +20,6 @@
      <img src="https://img.shields.io/badge/twitter-AdeptJ-f08d1c.svg?style=social&style=flat"> 
   </a>
   
-  <a href="https://travis-ci.org/AdeptJ/adeptj-runtime/builds">
-     <img src="https://api.travis-ci.org/AdeptJ/adeptj-runtime.svg?branch=master&style=flat">
-  </a>
-
 </p>
 
 **AdeptJ Runtime**
