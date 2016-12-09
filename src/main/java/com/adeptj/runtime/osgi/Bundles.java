@@ -54,7 +54,7 @@ public final class Bundles {
 
     private static final String EXTN_JAR = ".jar";
 
-    public static void provisionBundles(BundleContext systemBundleContext) throws Exception {
+    public static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         // Start all the Bundles after collection and installation phase.
         startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
@@ -67,7 +67,7 @@ public final class Bundles {
     }
 
     private static void startBundle(Bundle bundle, Logger logger) {
-        logger.debug("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
+        logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
         try {
             bundle.start();
         } catch (BundleException | IllegalStateException | SecurityException ex) {
@@ -102,7 +102,7 @@ public final class Bundles {
         URLConnection connection = Bundles.class.getResource(rootPath).openConnection();
         List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
                 .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
-        logger.info("Total Bundles collected: [{}]", bundles.size());
+        logger.debug("Total Bundles collected: [{}]", bundles.size());
         return bundles;
     }
 }
