@@ -29,6 +29,8 @@ import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
+import ch.qos.logback.core.util.FileSize;
+
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
@@ -178,7 +180,7 @@ public class LogbackBootstrap {
 
     private static SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy(Config config) {
         SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy = new SizeAndTimeBasedFNATP<>();
-        triggeringPolicy.setMaxFileSize(config.getString(KEY_LOG_MAX_SIZE));
+        triggeringPolicy.setMaxFileSize(FileSize.valueOf(config.getString(KEY_LOG_MAX_SIZE)));
         return triggeringPolicy;
     }
 
