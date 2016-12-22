@@ -316,7 +316,7 @@ public final class UndertowBootstrap {
                 .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
                 .addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
                 .setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
-                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
+                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper(undertowConfig));
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {

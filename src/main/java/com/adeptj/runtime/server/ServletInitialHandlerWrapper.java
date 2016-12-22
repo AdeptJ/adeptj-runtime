@@ -19,7 +19,6 @@
 */
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
@@ -42,14 +41,24 @@ import java.util.List;
  */
 public class ServletInitialHandlerWrapper implements HandlerWrapper {
 
+    private String[] resourceExtns;
+
+    private String staticResourcePrefix;
+
+    private String resourceMgrPrefix;
+
+    public ServletInitialHandlerWrapper(Config undertowConfig) {
+        List<String> extns = undertowConfig.getStringList("common.static-resource-extns");
+        this.resourceExtns = extns.toArray(new String[extns.size()]);
+        this.staticResourcePrefix = undertowConfig.getString("common.static-resource-prefix");
+        this.resourceMgrPrefix = undertowConfig.getString("common.resource-mgr-prefix");
+    }
+
     @Override
-    public HttpHandler wrap(HttpHandler intialHandler) {
-        Config undertowCfg = Configs.INSTANCE.undertow();
-        List<String> extns = undertowCfg.getStringList("common.static-resource-extns");
-        return new PredicateHandler(
-                Predicates.and(Predicates.prefix(undertowCfg.getString("common.static-resource-prefix")),
-                        Predicates.suffixes(extns.toArray(new String[extns.size()]))),
+    public HttpHandler wrap(HttpHandler initialHandler) {
+        return new PredicateHandler(Predicates.and(Predicates.prefix(this.staticResourcePrefix),
+                Predicates.suffixes(this.resourceExtns)),
                 Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader(),
-                        undertowCfg.getString("common.resource-mgr-prefix"))), intialHandler);
+                        this.resourceMgrPrefix)), initialHandler);
     }
 }
