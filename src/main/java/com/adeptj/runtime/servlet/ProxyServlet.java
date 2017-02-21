@@ -89,7 +89,8 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     public void destroy() {
-        LOGGER.info("Destroying ProxyServlet which in turn closes DispatcherServletTracker!!");
-        DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+    	LOGGER.info("Destroying ProxyServlet!!");
+    	// Code moved to FrameworkShutdownHandler due to - https://github.com/AdeptJ/adeptj-runtime/issues/4
+        //DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
     }
 }

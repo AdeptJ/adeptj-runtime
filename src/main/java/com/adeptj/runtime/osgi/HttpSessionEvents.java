@@ -24,6 +24,10 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Optional;
 
 /**
@@ -51,6 +55,8 @@ public enum HttpSessionEvents {
                 optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
                 break;
             case SESSION_DESTROYED:
+            	Logger logger = LoggerFactory.getLogger(HttpSessionEvents.class);
+                logger.info("Destroying HttpSession: [{}]", event.getSession());
                 optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
                 break;
             default:

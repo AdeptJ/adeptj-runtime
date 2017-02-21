@@ -43,7 +43,7 @@
         <maven-dependency-plugin.version>3.0.0</maven-dependency-plugin.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
-        <felix.framework.version>5.6.1</felix.framework.version>
+        <felix.framework.version>5.6.2</felix.framework.version>
 
         <!-- AdeptJ Modular Web Dependencies Version -->
         <adeptj-modules-webconsole-branding.version>1.0.0.RELEASE</adeptj-modules-webconsole-branding.version>
