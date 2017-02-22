@@ -57,12 +57,16 @@ public enum HttpSessionEvents {
     public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
             case SESSION_CREATED:
-            	LOGGER.info("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(), LocalDateTime.now());
+            	if (LOGGER.isDebugEnabled()) {
+            	    LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(), LocalDateTime.now());
+            	}
                 optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
                 break;
             case SESSION_DESTROYED:
-            	LOGGER.info("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(), 
-			    		Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
+            	if (LOGGER.isDebugEnabled()) {
+            	    LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(), 
+			    		    Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
+            	}
                 optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
                 break;
             default:
