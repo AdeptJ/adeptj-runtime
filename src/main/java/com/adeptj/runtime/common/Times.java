@@ -20,6 +20,7 @@
 package com.adeptj.runtime.common;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Utility for providing time in multiple ranges.
@@ -40,5 +41,15 @@ public final class Times {
      */
     public static long elapsedSince(final long startTime) {
         return NANOSECONDS.toMillis(System.nanoTime() - startTime);
+    }
+    
+    /**
+     * Returns elapsed time in seconds from the provided time in milliseconds.
+     *
+     * @param startTime time in milliseconds
+     * @return elapsed time in seconds
+     */
+    public static long elapsedSinceSeconds(final long startTime) {
+        return MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
     }
 }

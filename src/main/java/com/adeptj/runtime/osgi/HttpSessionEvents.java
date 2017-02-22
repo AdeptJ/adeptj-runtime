@@ -19,8 +19,8 @@
 */
 package com.adeptj.runtime.osgi;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
@@ -30,6 +30,8 @@ import javax.servlet.http.HttpSessionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.adeptj.runtime.common.Times;
 
 /**
  * HttpSessionEvents. takes care of HttpSession events.
@@ -49,16 +51,18 @@ public enum HttpSessionEvents {
     SESSION_ATTRIBUTE_REMOVED,
 
     SESSION_ATTRIBUTE_REPLACED;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
 
     public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
             case SESSION_CREATED:
+            	LOGGER.info("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(), LocalDateTime.now());
                 optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
                 break;
             case SESSION_DESTROYED:
-            	Logger logger = LoggerFactory.getLogger(HttpSessionEvents.class);
-			    logger.info("Destroying HttpSession with id: [{}], totalActiveTime: [{}] seconds.", event.getSession().getId(), 
-			    		TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - event.getSession().getCreationTime()));
+            	LOGGER.info("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(), 
+			    		Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
                 optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
                 break;
             default:
