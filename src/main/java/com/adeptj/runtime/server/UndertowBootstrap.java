@@ -222,7 +222,7 @@ public final class UndertowBootstrap {
             port = Integer.parseInt(propertyPort);
         }
         // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
-        // started already and another server startLoggerContext(from same location) will again startLoggerContext new OSGi Framework which may interfere
+        // started already and another server start(from same location) will again start new OSGi Framework which may interfere
         // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
         // this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {

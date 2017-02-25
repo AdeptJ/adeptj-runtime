@@ -36,8 +36,8 @@
 
     <properties>
         <!-- Common Dependencies -->
-        <undertow.version>1.4.10.Final</undertow.version>
-        <undertow.websockets.version>1.4.10.Final</undertow.websockets.version>
+        <undertow.version>1.4.11.Final</undertow.version>
+        <undertow.websockets.version>1.4.11.Final</undertow.websockets.version>
         <xnio.version>3.4.3.Final</xnio.version>
         <maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.0</maven-dependency-plugin.version>

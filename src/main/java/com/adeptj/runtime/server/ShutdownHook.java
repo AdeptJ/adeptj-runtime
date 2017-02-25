@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * ShutdownHook for graceful server shutdown, this first cleans up the deployment and then stops UNDERTOW server.
  * <p>
- * Rakesh.Kumar, AdeptJ
+ * @author Rakesh.Kumar, AdeptJ
  */
 public final class ShutdownHook extends Thread {
 
