@@ -77,6 +77,18 @@ Start Parameters and VM arguments
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
 
+**Sponsors**:
+
+The AdeptJ team uses the [Yourkit Java Profiler](https://www.yourkit.com/) when working on the AdeptJ Runtime project.
+
+Many thanks to YourKit for sponsoring our Open Source projects with a license!
+
+<a href="https://www.yourkit.com/">
+    <img src="https://www.yourkit.com/images/yklogo.png"> 
+</a>
+
+YourKit supports open source projects with its full-featured Java Profiler. YourKit, LLC is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/) and [YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/), innovative and intelligent tools for profiling Java and .NET applications.
+
 **LICENSE**
 
    Copyright 2016, AdeptJ (http://adeptj.com)
