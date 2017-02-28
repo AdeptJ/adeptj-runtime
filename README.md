@@ -59,7 +59,7 @@ The platform embeds OSGi and Undertow with modules described above.
 4. Above step will create AdeptJ Runtime Uber jar.
 4. Now cd target
 5. java -server -jar adeptj-runtime.jar
-6. Go to [AdeptJ Admin Dashboard](http://localhost:9007/admin/dashboard)
+6. Go to [AdeptJ Admin Dashboard](http://localhost:9007/admin/dashboard) or [OSGi Console](http://localhost:9007/system/console)
 7. System will ask for username/password, provide the default ones [admin/admin]
 
 Debug options:
