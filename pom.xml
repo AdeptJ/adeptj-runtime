@@ -717,7 +717,7 @@
                 <dependency>
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-lang3</artifactId>
-                    <version>3.4</version>
+                    <version>3.5</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -841,7 +841,7 @@
                 <dependency>
                     <groupId>com.zaxxer</groupId>
                     <artifactId>HikariCP</artifactId>
-                    <version>2.4.7</version>
+                    <version>2.6.0</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -913,25 +913,25 @@
                 <dependency>
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
-                    <version>3.21.0-GA</version>
+                    <version>${javaassit.version}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.attoparser</groupId>
                     <artifactId>attoparser</artifactId>
-                    <version>2.0.1.RELEASE</version>
+                    <version>${attoparser.version}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.unbescape</groupId>
                     <artifactId>unbescape</artifactId>
-                    <version>1.1.4.RELEASE</version>
+                    <version>${unbescape.version}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>ognl</groupId>
                     <artifactId>ognl</artifactId>
-                    <version>3.1.12</version>
+                    <version>${ognl.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>javassist</groupId>
@@ -943,7 +943,7 @@
                 <dependency>
                     <groupId>org.thymeleaf</groupId>
                     <artifactId>thymeleaf</artifactId>
-                    <version>3.0.2.RELEASE</version>
+                    <version>${thymeleaf.version}</version>
                     <exclusions>
                         <exclusion>
                             <groupId>org.slf4j</groupId>
@@ -1168,14 +1168,14 @@
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-core</artifactId>
-                    <version>3.2.0</version>
+                    <version>4.0.0</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-apis</artifactId>
-                    <version>3.2.0</version>
+                    <version>4.0.0</version>
                     <scope>provided</scope>
                 </dependency>
 
