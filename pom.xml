@@ -73,7 +73,7 @@
             <id>rakeshk15</id>
             <name>Rakesh Kumar</name>
             <email>irakeshk@outlook.com</email>
-            <url>https://www.linkedin.com/in/iamrakesh</url>
+            <url>https://www.linkedin.com/in/rakeshk15</url>
             <organization>AdeptJ</organization>
             <organizationUrl>http://www.adeptj.com</organizationUrl>
             <roles>
@@ -82,7 +82,7 @@
             </roles>
             <timezone>+5:30</timezone>
             <properties>
-                <picUrl>https://media.licdn.com/mpr/mpr/shrinknp_200_200/p/6/005/0b5/282/397d47f.jpg</picUrl>
+                <picUrl>https://media.licdn.com/media/AAEAAQAAAAAAAAecAAAAJDdjMDcwZjM3LWY0OWYtNDkwYS05Njg4LWU0YWJjNWU5Mzk2Mw.jpg</picUrl>
             </properties>
         </developer>
     </developers>
@@ -195,6 +195,8 @@
             <version>3.3.0.Final</version>
         </dependency>
 
+        <!-- Required by XNIO-API below. -->
+        
         <dependency>
             <groupId>org.wildfly.common</groupId>
             <artifactId>wildfly-common</artifactId>
@@ -213,13 +215,15 @@
             <version>${xnio.version}</version>
         </dependency>
 
+        <!-- Required at runtime by XNIO-API above. -->
+        
         <dependency>
             <groupId>org.jboss.xnio</groupId>
             <artifactId>xnio-nio</artifactId>
             <version>${xnio.version}</version>
         </dependency>
 
-        <!-- Undertow core [provided] dependencies -->
+        <!-- Undertow core [provided] scoped dependencies -->
 
         <dependency>
             <groupId>org.eclipse.jetty.alpn</groupId>
@@ -236,17 +240,21 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
-            <version>2.0.0.Final</version>
+            <version>2.0.2.Final</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
-            <version>2.0.0.Final</version>
+            <version>2.0.2.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.jdeparser</groupId>
                     <artifactId>jdeparser</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -254,7 +262,7 @@
         <dependency>
             <groupId>org.jboss.classfilewriter</groupId>
             <artifactId>jboss-classfilewriter</artifactId>
-            <version>1.1.2.Final</version>
+            <version>1.2.1.Final</version>
         </dependency>
 
         <dependency>
