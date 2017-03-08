@@ -113,21 +113,23 @@ public enum ViewEngine {
     }
 
     private void processViewInternal(ViewEngineContext context) {
-        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent((Mustache mustache) -> {
-            try {
-                long startTime = System.nanoTime();
-                context.getResponse().getWriter().write(mustache.render(context.getModels()));
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
-                }
-                // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
-                context.setViewRendered(true);
-            } catch (Exception ex) {
-                LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
-                this.handleException(context, ex);
-            }
-        });
+        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.render(context, mustache));
         // Now check if the view actually rendered(may not due to a 404), if not then handle the 404 response properly.
         this.handleViewNotFound(context);
+    }
+
+    private void render(ViewEngineContext context, Mustache mustache) {
+        try {
+            long startTime = System.nanoTime();
+            context.getResponse().getWriter().write(mustache.render(context.getModels()));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
+            }
+            // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
+            context.setViewRendered(true);
+        } catch (Exception ex) {
+            LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
+            this.handleException(context, ex);
+        }
     }
 }
