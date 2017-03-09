@@ -571,7 +571,10 @@
 
     <profiles>
 
+        <!-- Plan is to modularize the build process so that the requisite modules can be embedded in the Uber jar. -->
+        
         <profile>
+            
             <id>Ehcache</id>
 
             <dependencies>
@@ -599,14 +602,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-ehcache</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -615,6 +618,7 @@
         </profile>
 
         <profile>
+            
             <id>Hazelcast</id>
 
             <dependencies>
@@ -629,14 +633,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-hazelcast</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -645,6 +649,7 @@
         </profile>
 
         <profile>
+            
             <id>Infinispan</id>
 
             <dependencies>
@@ -687,14 +692,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-cache-infinispan</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -703,6 +708,7 @@
         </profile>
 
         <profile>
+            
             <id>Shiro</id>
 
             <dependencies>
@@ -794,9 +800,11 @@
                 </dependency>
 
             </dependencies>
+            
         </profile>
 
         <profile>
+            
             <id>JPA-EclipseLink</id>
 
             <dependencies>
@@ -867,6 +875,7 @@
         </profile>
 
         <profile>
+            
             <id>MongoDB</id>
 
             <dependencies>
@@ -913,6 +922,7 @@
         </profile>
 
         <profile>
+            
             <id>Thymeleaf</id>
 
             <dependencies>
@@ -976,6 +986,7 @@
         </profile>
 
         <profile>
+            
             <id>RESTEasy</id>
 
             <dependencies>
@@ -1168,7 +1179,8 @@
         </profile>
 
         <profile>
-            <id>OAuth</id>
+            
+            <id>OAuth2</id>
 
             <dependencies>
 
