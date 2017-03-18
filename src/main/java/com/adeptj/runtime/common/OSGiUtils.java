@@ -40,11 +40,8 @@ public final class OSGiUtils {
 
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
         try {
-            StringBuilder filterExprBuilder = new StringBuilder();
-            filterExprBuilder.append("(&(").append(Constants.OBJECTCLASS).append("=");
-            filterExprBuilder.append(objectClass.getName()).append(")");
-            filterExprBuilder.append(filterExpr).append(")");
-            return context.createFilter(filterExprBuilder.toString());
+            return context.createFilter(new StringBuilder("(&(").append(Constants.OBJECTCLASS).append("=")
+                    .append(objectClass.getName()).append(")").append(filterExpr).append(")").toString());
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
             throw new IllegalArgumentException("InvalidSyntaxException!!", ex);

@@ -62,7 +62,12 @@ import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -319,19 +324,19 @@ public final class UndertowBootstrap {
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper(undertowConfig));
     }
 
-    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws Exception {
+    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
         return keyStore;
     }
 
-    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws Exception {
+    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException, KeyStoreException {
         SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
         sslContext.init(keyMgrs(keyStore, keyPwd), null, null);
         return sslContext;
     }
 
-    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws Exception {
+    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(keyStore, keyPwd);
         return kmf.getKeyManagers();

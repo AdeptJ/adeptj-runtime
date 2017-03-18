@@ -36,7 +36,7 @@ public final class Times {
     /**
      * Returns elapsed time in milliseconds from the provided time in nanoseconds.
      *
-     * @param startTime time in milliseconds
+     * @param startTime time in nanoseconds
      * @return elapsed time in milliseconds
      */
     public static long elapsedSince(final long startTime) {

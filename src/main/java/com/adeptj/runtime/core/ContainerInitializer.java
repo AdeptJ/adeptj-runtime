@@ -20,6 +20,7 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.ServletContextHolder;
+import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class ContainerInitializer implements ServletContainerInitializer {
             }
         } catch (Exception ex) {
             logger.error("StartupAware Exception!!", ex);
-            throw new RuntimeException("StartupAware Exception!!", ex);
+            throw new InitializationException("StartupAware Exception!!", ex);
         }
     }
 
