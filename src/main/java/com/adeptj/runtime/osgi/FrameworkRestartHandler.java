@@ -39,12 +39,11 @@ public class FrameworkRestartHandler implements FrameworkListener {
     /**
      * Handles OSGi Framework restart, does following on System Bundle STARTED event.
      * <p>
-     * 1. Removes the BundleContext from ServletContext attributes.
-     * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext.
-     * 3. Closes the DispatcherServletTracker and open again with new BundleContext.
-     * 4. As the BundleContext is removed and added from ServletContext the corresponding
-     * BridgeServletContextAttributeListener is fired with events which in turn
-     * Closes the EventDispatcherTracker and open again with new BundleContext.
+     * 1. Removes the BundleContext from ServletContext attributes. <br>
+     * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext. <br>
+     * 3. Closes the DispatcherServletTracker and open again with new BundleContext. <br>
+     * 4. As the BundleContext is removed and added from ServletContext the corresponding BridgeServletContextAttributeListener 
+     *    is fired with events which in turn closes the EventDispatcherTracker and open again with new BundleContext.
      */
     @Override
     public void frameworkEvent(FrameworkEvent event) {

@@ -138,7 +138,7 @@ public enum FrameworkBootstrap {
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
-        Map<String, String> configs = this.loadFrameworkProps();
+        Map<String, String> configs = this.loadFrameworkProperties();
         Config felixConf = Configs.INSTANCE.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
         configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
@@ -146,7 +146,7 @@ public enum FrameworkBootstrap {
         return configs;
     }
 
-    private Map<String, String> loadFrameworkProps() throws IOException {
+    private Map<String, String> loadFrameworkProperties() throws IOException {
         Properties props = new Properties();
         props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();

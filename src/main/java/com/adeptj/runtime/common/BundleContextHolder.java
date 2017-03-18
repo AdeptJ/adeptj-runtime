@@ -31,16 +31,19 @@ public enum BundleContextHolder {
     INSTANCE;
 
     private BundleContext bundleContext;
+    
+    private volatile boolean bundleContextSet;
 
     public BundleContext getBundleContext() {
         return this.bundleContext;
     }
 
     public boolean isBundleContextSet() {
-        return this.bundleContext != null;
+        return this.bundleContextSet;
     }
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
+        this.bundleContextSet = true;
     }
 }
