@@ -52,26 +52,9 @@ public class FrameworkRestartHandler implements FrameworkListener {
             case FrameworkEvent.STARTED:
                 logger.info("Handling OSGi Framework Restart!!");
                 // Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
-                ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
-                servletContext.removeAttribute(BundleContext.class.getName());
                 BundleContext bundleContext = event.getBundle().getBundleContext();
-                servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
-                // Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
-                // after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
-                // while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
-                BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
-                try {
-                    DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
-                    // DispatcherServletTrackerSupport already holds a ServletConfig reference
-                    // from first time when ProxyServlet was initialized. Pass a null, which is just fine.
-                    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                    DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
-                } catch (Exception ex) {
-                    // Note: What shall we do if DispatcherServlet initialization failed.
-                    // Log it as of now, we may need to stop the OSGi Framework, will decide later.
-                    // Have not seen this yet.
-                    logger.error("Exception while restarting OSGi Framework!!", ex);
-                }
+			    this.handleBundleContext(bundleContext);
+                this.handleDispatcherServletTracker(logger);
                 break;
             case FrameworkEvent.STOPPED_UPDATE:
                 logger.info("Closing DispatcherServletTracker!!");
@@ -81,9 +64,36 @@ public class FrameworkRestartHandler implements FrameworkListener {
                 break;
             default:
                 // log it and ignore.
-                logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+            	if (logger.isDebugEnabled()) {
+            		logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+            	}
                 break;
         }
     }
+
+	private void handleBundleContext(BundleContext bundleContext) {
+		ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
+		servletContext.removeAttribute(BundleContext.class.getName());
+		servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
+		// Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
+        // after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
+        // while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
+        BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
+	}
+
+	private void handleDispatcherServletTracker(Logger logger) {
+		try {
+		    DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+		    // DispatcherServletTrackerSupport already holds a ServletConfig reference
+		    // from first time when ProxyServlet was initialized. Pass a null, which is just fine.
+		    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
+		    DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
+		} catch (Exception ex) {
+		    // Note: What shall we do if DispatcherServlet initialization failed.
+		    // Log it as of now, we may need to stop the OSGi Framework, will decide later.
+		    // Have not seen this yet.
+		    logger.error("Exception while restarting OSGi Framework!!", ex);
+		}
+	}
 
 }

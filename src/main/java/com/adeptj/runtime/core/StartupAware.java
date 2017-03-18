@@ -28,6 +28,7 @@ import javax.servlet.ServletException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
+@FunctionalInterface
 public interface StartupAware {
 
     /**

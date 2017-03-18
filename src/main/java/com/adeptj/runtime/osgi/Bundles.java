@@ -46,13 +46,13 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
  */
 public final class Bundles {
 
-    // No instantiation.
-    private Bundles() {
-    }
-
     private static final String PREFIX_BUNDLES = "bundles/";
 
     private static final String EXTN_JAR = ".jar";
+    
+    // No instantiation.
+    private Bundles() {
+    }
 
     public static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         Logger logger = LoggerFactory.getLogger(Bundles.class);
@@ -97,8 +97,8 @@ public final class Bundles {
     private static List<URL> collectBundles(Logger logger) throws IOException {
         String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
         ClassLoader classLoader = Bundles.class.getClassLoader();
-        Predicate<JarEntry> bundlePredicate = (jarEntry) -> (jarEntry.getName().startsWith(PREFIX_BUNDLES)
-                && jarEntry.getName().endsWith(EXTN_JAR));
+        Predicate<JarEntry> bundlePredicate = jarEntry -> jarEntry.getName().startsWith(PREFIX_BUNDLES)
+                && jarEntry.getName().endsWith(EXTN_JAR);
         URLConnection connection = Bundles.class.getResource(rootPath).openConnection();
         List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
                 .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());

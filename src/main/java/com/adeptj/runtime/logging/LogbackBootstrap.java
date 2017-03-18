@@ -85,6 +85,10 @@ public class LogbackBootstrap {
     private static final String APPENDER_CONSOLE = "CONSOLE";
 
     private static final String APPENDER_FILE = "FILE";
+    
+    // Utility methods only.
+    private LogbackBootstrap() {
+    }
 
     public static void startLoggerContext() {
         long startTime = System.nanoTime();
@@ -111,7 +115,7 @@ public class LogbackBootstrap {
         adeptjLogger(context, appenders, config);
         undertowLogger(context, appenders, config);
         xnioLogger(context, appenders, config);
-        // thymeleafLogger(context, appenders, config);
+        thymeleafLogger(context, appenders, config);
         trimouLogger(context, appenders, config);
         context.start();
         Logger logger = context.getLogger(LogbackBootstrap.class);
@@ -160,7 +164,7 @@ public class LogbackBootstrap {
         adeptjLogger.setAdditive(false);
     }
 
-    static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
+    private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
         Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
         addAppenders(appenders, thymeleafLogger);
         thymeleafLogger.setAdditive(false);

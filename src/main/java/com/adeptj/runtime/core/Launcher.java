@@ -38,6 +38,10 @@ import java.util.Map;
  * Rakesh.Kumar, AdeptJ
  */
 public final class Launcher {
+	
+	// Deny direct instantiation.
+	private Launcher() {
+	}
 
     /**
      * Entry point for initializing the AdeptJ Runtime.

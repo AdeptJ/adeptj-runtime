@@ -44,9 +44,9 @@ public enum DispatcherServletTrackerSupport {
         this.initServletConfig(servletConfig);
         if (!this.dispatcherServletInitialized && this.dispatcherServletTracker == null) {
             BundleContext ctx = BundleContextHolder.INSTANCE.getBundleContext();
-            DispatcherServletTracker dispatcherServletTracker = new DispatcherServletTracker(ctx);
-            dispatcherServletTracker.open();
-            this.dispatcherServletTracker = dispatcherServletTracker;
+            DispatcherServletTracker tracker = new DispatcherServletTracker(ctx);
+            tracker.open();
+            this.dispatcherServletTracker = tracker;
             this.dispatcherServletInitialized = true;
         }
     }

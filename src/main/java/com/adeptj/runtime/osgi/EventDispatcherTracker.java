@@ -50,7 +50,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTracker.class);
 
-    private final static String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
+    private static final String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
 
     private HttpSessionListener sessionListener;
 

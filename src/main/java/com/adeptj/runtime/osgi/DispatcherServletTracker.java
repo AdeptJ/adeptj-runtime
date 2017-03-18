@@ -38,7 +38,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
-    private final static String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
+    private static final String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
 
     private HttpServlet dispatcherServlet;
 
@@ -48,16 +48,16 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     @Override
     public HttpServlet addingService(ServiceReference<HttpServlet> reference) {
-        HttpServlet dispatcherServlet = null;
+        HttpServlet httpServlet = null;
         try {
-            dispatcherServlet = super.addingService(reference);
+            httpServlet = super.addingService(reference);
             LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-            this.handleDispatcherServlet(dispatcherServlet);
+            this.handleDispatcherServlet(httpServlet);
         } catch (Exception ex) {
             // This might be due to the OSGi framework restart from Felix WebConsole.
             LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
         }
-        return dispatcherServlet;
+        return httpServlet;
     }
 
     @Override
