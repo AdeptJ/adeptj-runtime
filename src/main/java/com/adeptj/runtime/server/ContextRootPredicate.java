@@ -28,7 +28,7 @@ import io.undertow.server.HttpServerExchange;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ContextRootPredicate implements Predicate {
+final class ContextRootPredicate implements Predicate {
 
     @Override
     public boolean resolve(HttpServerExchange exchange) {

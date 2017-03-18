@@ -38,7 +38,7 @@ import static com.adeptj.runtime.common.Constants.UTF8;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-class CredentialMatcher {
+final class CredentialMatcher {
 
     private static final String SHA256 = "SHA-256";
 

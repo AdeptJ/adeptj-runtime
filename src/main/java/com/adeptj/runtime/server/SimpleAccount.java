@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class SimpleAccount implements Account {
+final class SimpleAccount implements Account {
 
     private static final long serialVersionUID = -2090504892837494810L;
 

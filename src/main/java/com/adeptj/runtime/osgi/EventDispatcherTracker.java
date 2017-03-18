@@ -82,7 +82,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
         super.removedService(reference, service);
         // NOTE: See class header why ServiceTracker is closed here.
         // ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
-        ServiceTrackers.closeQuietly(this);
+        ServiceTrackers.INSTANCE.closeQuietly(this);
     }
 
     HttpSessionListener getHttpSessionListener() {

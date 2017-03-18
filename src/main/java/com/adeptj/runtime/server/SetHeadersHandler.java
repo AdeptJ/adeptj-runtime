@@ -30,7 +30,7 @@ import java.util.Map;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class SetHeadersHandler implements HttpHandler {
+final class SetHeadersHandler implements HttpHandler {
 
     private final HttpHandler servletHandler;
 

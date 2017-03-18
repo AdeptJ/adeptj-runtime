@@ -53,11 +53,11 @@ public enum ServiceTrackers {
         return this.trackers.get(klazz.getName());
     }
 
-    public static void close(ServiceTracker<?, ?> tracker) {
+    public void close(ServiceTracker<?, ?> tracker) {
         tracker.close();
     }
 
-    public static void closeQuietly(ServiceTracker<?, ?> tracker) {
+    public void closeQuietly(ServiceTracker<?, ?> tracker) {
         try {
             tracker.close();
         } catch (Exception ex) {

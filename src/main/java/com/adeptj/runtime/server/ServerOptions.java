@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class ServerOptions {
+final class ServerOptions {
 
     /**
      * Configures the server options dynamically.

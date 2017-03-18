@@ -315,7 +315,7 @@ public final class UndertowBootstrap {
                 .setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
                 .setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
-                .setIdentityManager(new FileIdentityManager(undertowConfig))
+                .setIdentityManager(new TextIdentityManager(undertowConfig))
                 .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
                 .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))

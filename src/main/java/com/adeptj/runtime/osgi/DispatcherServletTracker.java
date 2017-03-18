@@ -78,7 +78,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * 
          * Ignore exceptions, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
         */
-        ServiceTrackers.closeQuietly(this);
+        ServiceTrackers.INSTANCE.closeQuietly(this);
     }
 
     HttpServlet getDispatcherServlet() {

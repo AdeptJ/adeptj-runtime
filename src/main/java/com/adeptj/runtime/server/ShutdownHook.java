@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class ShutdownHook extends Thread {
+final class ShutdownHook extends Thread {
 
     private Undertow server;
 

@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ServletInitialHandlerWrapper implements HandlerWrapper {
+final class ServletInitialHandlerWrapper implements HandlerWrapper {
 
     private String[] resourceExtns;
 
