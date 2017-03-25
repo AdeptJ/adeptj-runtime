@@ -25,12 +25,12 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkBootstrap;
 import com.adeptj.runtime.server.UndertowBootstrap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Entry point for launching the AdeptJ Runtime.
@@ -38,10 +38,10 @@ import java.util.Map;
  * Rakesh.Kumar, AdeptJ
  */
 public final class Launcher {
-	
-	// Deny direct instantiation.
-	private Launcher() {
-	}
+
+    // Deny direct instantiation.
+    private Launcher() {
+    }
 
     /**
      * Entry point for initializing the AdeptJ Runtime.
@@ -53,7 +53,7 @@ public final class Launcher {
      * 3. Starts the OSGi Framework.
      * 4. Starts the UNDERTOW server.
      * 5. Registers the runtime ShutdownHook.
-     * 
+     *
      * @param args command line arguments for the Launcher.
      */
     public static void main(String[] args) {
@@ -83,13 +83,8 @@ public final class Launcher {
     }
 
     private static Map<String, String> parseCommands(String[] commands) {
-        Map<String, String> arguments = new HashMap<>();
-        // Parse the command line.
-        for (String cmd : commands) {
-            int indexOfEq = cmd.indexOf(Constants.REGEX_EQ);
-            arguments.put(cmd.substring(0, indexOfEq), cmd.substring(indexOfEq + 1, cmd.length()));
-        }
-        return arguments;
+        return Arrays.stream(commands).map(cmd -> cmd.split(Constants.REGEX_EQ)).collect(Collectors.toMap(cmdArray -> cmdArray[0],
+                cmdArray -> cmdArray[1]));
     }
 
 }

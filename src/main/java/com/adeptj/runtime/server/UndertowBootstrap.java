@@ -147,6 +147,7 @@ public final class UndertowBootstrap {
         Config undertowConf = Configs.INSTANCE.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
+        logger.info("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @ port: [{}]", httpPort);
         logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO)));

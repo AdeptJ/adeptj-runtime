@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Option;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -78,12 +77,7 @@ final class ServerOptions {
     private static <T> Option<T> toOption(String name, Logger logger) {
         Option<T> option = null;
         try {
-            Field field = UndertowOptions.class.getField(name);
-            if (field == null || !field.getName().equals(name)) {
-                logger.warn("No such field: [{}] in class: [{}]", name, UndertowOptions.class.getName());
-            } else {
-                option = (Option<T>) field.get(null);
-            }
+            option = (Option<T>) UndertowOptions.class.getField(name).get(null);
         } catch (Exception ex) {
             logger.error("Exception!!", ex);
         }
