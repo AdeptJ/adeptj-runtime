@@ -62,7 +62,7 @@ public enum ViewEngine {
     ViewEngine() {
         long startTime = System.nanoTime();
         this.engine = this.mustacheEngine();
-        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedSince(startTime));
+        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     private TemplateLocator templateLocator(ViewEngineConfig config) {
@@ -122,9 +122,7 @@ public enum ViewEngine {
         try {
             long startTime = System.nanoTime();
             context.getResponse().getWriter().write(mustache.render(context.getModels()));
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSince(startTime));
-            }
+            LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSinceMillis(startTime));
             // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
             context.setViewRendered(true);
         } catch (Exception ex) {

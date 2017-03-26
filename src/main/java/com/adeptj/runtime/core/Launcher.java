@@ -64,8 +64,8 @@ public final class Launcher {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             UndertowBootstrap.bootstrap(parseCommands(args));
-            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedSince(startTime));
-        } catch (Throwable th) {
+            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        } catch (Throwable th) { // NOSONAR
             stopOSGiFramework(logger);
             logger.error("Shutting down JVM!!", th);
             // Let the LOGBACK cleans up it's state.

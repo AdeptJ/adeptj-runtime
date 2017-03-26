@@ -59,7 +59,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
         FrameworkBootstrap.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);
-        logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedSince(startTime));
+        logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
 }

@@ -39,7 +39,7 @@ public final class Times {
      * @param startTime time in nanoseconds
      * @return elapsed time in milliseconds
      */
-    public static long elapsedSince(final long startTime) {
+    public static long elapsedSinceMillis(final long startTime) {
         return NANOSECONDS.toMillis(System.nanoTime() - startTime);
     }
     

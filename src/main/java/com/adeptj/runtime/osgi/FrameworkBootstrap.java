@@ -74,7 +74,7 @@ public enum FrameworkBootstrap {
             Bundles.provisionBundles(systemBundleContext);
             List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
-            logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSince(startTime));
+            logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             this.registerBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);

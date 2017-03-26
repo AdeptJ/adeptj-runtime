@@ -56,7 +56,7 @@ final class ShutdownHook extends Thread {
             this.manager.stop();
             this.manager.undeploy();
             this.server.stop();
-            logger.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedSince(startTime));
+            logger.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedSinceMillis(startTime));
         } catch (Exception ex) {
             logger.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {

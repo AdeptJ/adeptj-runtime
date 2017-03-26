@@ -32,9 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * ProxyServlet acting as a front controller for all of the incoming requests for OSGi resources.
+ * ProxyServlet acts as a facade for all of the incoming requests for OSGi resources.
  * Delegates the service request to Felix DispatcherServlet which maintains a registry of HttpServlet/Filter etc.
  * Depending upon the resolution by DispatcherServlet the request is being further dispatched.
+ * 
+ * <p>
+ * <b>This HttpServlet listens at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -53,7 +56,7 @@ public class ProxyServlet extends HttpServlet {
         LOGGER.info("Initializing ProxyServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
-        LOGGER.info("ProxyServlet initialized in [{}] ms!!", Times.elapsedSince(startTime));
+        LOGGER.info("ProxyServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     /**
@@ -61,28 +64,29 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    	long startTime = System.nanoTime();
         HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error("Can't serve request: [{}], DispatcherServlet is unavailable!!", req.getRequestURI());
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
-                this.doService(dispatcherServlet, req, resp);
+            	dispatcherServlet.service(req, resp);
+                this.logExceptionIfPresent(req);
+                LOGGER.debug("Request: [{}] took [{}] ms!!", req.getRequestURI(), Times.elapsedSinceMillis(startTime));
             }
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request!!", ex);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void doService(HttpServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        LOGGER.debug("Serving request: {}", req.getRequestURI());
-        servlet.service(req, resp);
-        // Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
-        if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
-            LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-        }
-    }
+	private void logExceptionIfPresent(HttpServletRequest req) {
+		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
+		if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
+		    LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+		}
+	}
 
     /**
      * Close the DispatcherServletTracker.

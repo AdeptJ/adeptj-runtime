@@ -119,7 +119,7 @@ public class LogbackBootstrap {
         trimouLogger(context, appenders, config);
         context.start();
         Logger logger = context.getLogger(LogbackBootstrap.class);
-        logger.info("Logback initialized in [{}] ms!!", Times.elapsedSince(startTime));
+        logger.info("Logback initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     public static void stopLoggerContext() {
