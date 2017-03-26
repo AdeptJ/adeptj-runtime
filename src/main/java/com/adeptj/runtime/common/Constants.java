@@ -109,6 +109,10 @@ public final class Constants {
     public static final String PREFIX_ADMIN = "/admin";
 
     public static final String OSGI_WEBCONSOLE_ROLE = "OSGiAdmin";
+    
+    public static final String MODE_DEV = "DEV";
+
+    public static final String MODE_PROD = "PROD";
 
     // Configuration Keys constants start.
 

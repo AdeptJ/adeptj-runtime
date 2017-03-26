@@ -115,10 +115,6 @@ public final class UndertowBootstrap {
 
     private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
 
-    private static final String MODE_DEV = "DEV";
-
-    private static final String MODE_PROD = "PROD";
-
     private static final String KEY_KEYSTORE = "keyStore";
 
     private static final String KEY_KEYPWD = "keyPwd";
@@ -154,13 +150,13 @@ public final class UndertowBootstrap {
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
-        boolean prodMode = handleProdMode(undertowBuilder, undertowConf, logger);
-        HttpHandler handler = prodMode ? manager.start() : new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
+        optimizeForProdMode(undertowBuilder, undertowConf, logger);
+        HttpHandler initialHandler = new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
         ServerOptions.build(undertowBuilder, undertowConf);
         undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         enableHttp2(undertowConf, undertowBuilder, logger);
         enableAJP(undertowConf, undertowBuilder, logger);
-        Undertow server = undertowBuilder.setHandler(rootHandler(handler, undertowConf)).build();
+        Undertow server = undertowBuilder.setHandler(rootHandler(initialHandler, undertowConf)).build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
         launchBrowser(arguments, httpPort);
@@ -172,29 +168,20 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static boolean handleProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-        boolean prodMode = ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
-        if (prodMode) {
+    private static void optimizeForProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
+        String serverMode = System.getProperty(SYS_PROP_SERVER_MODE);
+        if (ServerMode.PROD.toString().equalsIgnoreCase(serverMode)) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
-            int coreTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
-            // defaults to double of [worker-task-core-threads] i.e 128
-            int maxTaskThreadsConfig = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            int coreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
-            if (sysTaskThreads > coreTaskThreadsConfig) {
-                undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads);
-            } else {
-                undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, coreTaskThreadsConfig);
-            }
-            int calcMaxTaskThreadsConfig = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
-            if (calcMaxTaskThreadsConfig > maxTaskThreadsConfig) {
-                undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreadsConfig);
-            } else {
-                undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, maxTaskThreadsConfig);
-            }
+            undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads > coreTaskThreads ? sysTaskThreads : coreTaskThreads);
+            // defaults to double of [worker-task-core-threads] i.e 128
+            int maxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            int calcMaxTaskThreads = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
+            undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads : maxTaskThreads);
         }
-        logger.info("Bootstrapping AdeptJ Runtime in [{}] mode.", prodMode ? MODE_PROD : MODE_DEV);
-        return prodMode;
+        logger.info("Optimized AdeptJ Runtime for [{}] mode.", serverMode);
     }
 
     private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
