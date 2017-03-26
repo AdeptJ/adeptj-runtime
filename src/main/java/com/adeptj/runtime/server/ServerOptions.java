@@ -19,15 +19,17 @@
 */
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Times;
-import com.typesafe.config.Config;
-import io.undertow.Undertow.Builder;
-import io.undertow.UndertowOptions;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Option;
 
-import java.util.Map;
+import com.adeptj.runtime.common.Times;
+import com.typesafe.config.Config;
+
+import io.undertow.Undertow.Builder;
+import io.undertow.UndertowOptions;
 
 /**
  * UNDERTOW Server Options.
@@ -77,9 +79,9 @@ final class ServerOptions {
     private static <T> Option<T> toOption(String name, Logger logger) {
         Option<T> option = null;
         try {
-            option = (Option<T>) UndertowOptions.class.getField(name).get(null);
-        } catch (Exception ex) {
-            logger.error("Exception!!", ex);
+            option = Option.class.cast(UndertowOptions.class.getField(name).get(null));
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            logger.error("Exception while accessing field: [{}]", name, ex);
         }
         return option;
     }

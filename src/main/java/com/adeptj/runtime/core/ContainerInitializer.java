@@ -56,24 +56,22 @@ public class ContainerInitializer implements ServletContainerInitializer {
         } else {
             ServletContextHolder.INSTANCE.setServletContext(context);
             context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
-            startupAwareClasses.forEach(startupAwareClass -> this.handleStartupAware(context, logger, startupAwareClass));
+            startupAwareClasses.forEach(startupAwareClass -> {
+            	logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
+                try {
+                    if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
+                        StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance()).onStartup(context);
+                    } else {
+                        logger.warn("Unknown @HandlesTypes: [{}]", startupAwareClass);
+                        throw new IllegalStateException("Only StartupAware types are supported!!");
+                    }
+                } catch (Exception ex) {
+                    logger.error("StartupAware Exception!!", ex);
+                    throw new InitializationException("StartupAware Exception!!", ex);
+                }
+            });
             // If we are here means startup went well above, register FrameworkShutdownHandler now.
             context.addListener(FrameworkShutdownHandler.class);
-        }
-    }
-
-    private void handleStartupAware(ServletContext context, Logger logger, Class<?> startupAwareClass) {
-        logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
-        try {
-            if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
-                StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance()).onStartup(context);
-            } else {
-                logger.warn("Unknown @HandlesTypes: [{}]", startupAwareClass);
-                throw new IllegalStateException("Only StartupAware types are supported!!");
-            }
-        } catch (Exception ex) {
-            logger.error("StartupAware Exception!!", ex);
-            throw new InitializationException("StartupAware Exception!!", ex);
         }
     }
 

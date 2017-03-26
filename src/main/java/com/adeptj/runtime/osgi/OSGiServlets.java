@@ -104,11 +104,7 @@ public enum OSGiServlets {
     }
 
     private WebServlet checkWebServletAnnotation(Class<? extends HttpServlet> klazz) {
-        WebServlet webServlet = klazz.getAnnotation(WebServlet.class);
-        if (webServlet == null) {
-            throw new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!");
-        }
-        return webServlet;
+        return Optional.ofNullable(klazz.getAnnotation(WebServlet.class)).orElseThrow(() -> new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
     }
 
     private void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
@@ -117,10 +113,6 @@ public enum OSGiServlets {
     }
 
     private void handleName(Class<? extends HttpServlet> klazz, String name, Dictionary<String, Object> props) {
-        if (name.isEmpty()) {
-            props.put(HTTP_WHITEBOARD_SERVLET_NAME, klazz.getSimpleName());
-        } else {
-            props.put(HTTP_WHITEBOARD_SERVLET_NAME, name);
-        }
+        props.put(HTTP_WHITEBOARD_SERVLET_NAME, name.isEmpty() ? klazz.getSimpleName() : name);
     }
 }
