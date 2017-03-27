@@ -46,7 +46,7 @@ public class AdminDashboardServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").build());
+        ViewEngine.TRIMOU.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").build());
     }
 
     @Override

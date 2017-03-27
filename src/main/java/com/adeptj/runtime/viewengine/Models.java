@@ -27,13 +27,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Models.
+ * Models for storing data used in view rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public class Models extends AbstractMap<String, Object> implements Iterable<Entry<String, Object>> {
 
-    private Map<String, Object> delegate = new HashMap<>();
+    private Map<String, Object> delegate;
+    
+    public Models() {
+    	this.delegate = new HashMap<>();
+    }
 
     @Override
     public Object put(String key, Object value) {

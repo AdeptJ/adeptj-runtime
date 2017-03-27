@@ -51,7 +51,7 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXP
  */
 public enum ViewEngine {
 
-    INSTANCE;
+    TRIMOU;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
 
@@ -75,7 +75,7 @@ public enum ViewEngine {
     }
 
     private MustacheEngine mustacheEngine() {
-        ViewEngineConfig config = ConfigBeanFactory.create(Configs.INSTANCE.trimou(), ViewEngineConfig.class);
+        ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
         return MustacheEngineBuilder.newBuilder().registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
                 .addTemplateLocator(this.templateLocator(config))
                 .setProperty(START_DELIMITER, config.getStartDelimiter())

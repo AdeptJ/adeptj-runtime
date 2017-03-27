@@ -64,16 +64,16 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	long startTime = System.nanoTime();
         HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error("Can't serve request: [{}], DispatcherServlet is unavailable!!", req.getRequestURI());
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             } else {
+            	long startTime = System.nanoTime();
             	dispatcherServlet.service(req, resp);
-                this.logExceptionIfPresent(req);
                 LOGGER.debug("Request: [{}] took [{}] ms!!", req.getRequestURI(), Times.elapsedSinceMillis(startTime));
+                this.logExceptionAttribute(req);
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request!!", ex);
@@ -81,7 +81,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-	private void logExceptionIfPresent(HttpServletRequest req) {
+	private void logExceptionAttribute(HttpServletRequest req) {
 		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
 		if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
 		    LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));

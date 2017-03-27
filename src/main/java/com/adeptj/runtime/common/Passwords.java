@@ -43,7 +43,7 @@ public enum Passwords {
      */
     public String generateSalt() {
         try {
-            Config config = Configs.INSTANCE.common();
+            Config config = Configs.DEFAULT.common();
             byte[] salt = new byte[config.getInt("salt-size")];
             SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
             return new String(Base64.getEncoder().encode(salt), Constants.UTF8);
@@ -61,7 +61,7 @@ public enum Passwords {
      */
     public String hashPwd(String pwd, String salt) {
         try {
-            Config config = Configs.INSTANCE.common();
+            Config config = Configs.DEFAULT.common();
             return new String(
                     Base64.getEncoder()
                             .encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))

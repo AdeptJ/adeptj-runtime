@@ -93,7 +93,7 @@ public class LogbackBootstrap {
     public static void startLoggerContext() {
         long startTime = System.nanoTime();
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Config config = Configs.INSTANCE.common();
+        Config config = Configs.DEFAULT.common();
         // Console Appender
         ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, config);
         // File Appender

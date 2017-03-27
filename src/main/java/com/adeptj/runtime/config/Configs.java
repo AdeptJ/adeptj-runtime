@@ -37,7 +37,7 @@ import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
  */
 public enum Configs {
 
-    INSTANCE;
+    DEFAULT;
 
     private final Config main;
 

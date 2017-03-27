@@ -60,12 +60,12 @@ public class PerContextErrorServlet extends HttpServlet {
         Models models = this.models(req, statusCode);
         builder.models(models);
         if (models.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
-            ViewEngine.INSTANCE.processView(builder.view("error/500").build());
-        } else if (Configs.INSTANCE.undertow().getIntList("common.status-codes").contains(statusCode)) {
-            ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
+            ViewEngine.TRIMOU.processView(builder.view("error/500").build());
+        } else if (Configs.DEFAULT.undertow().getIntList("common.status-codes").contains(statusCode)) {
+            ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
         } else {
             // if the requested view not found, render 404.
-            ViewEngine.INSTANCE.processView(builder.view("error/404").build());
+            ViewEngine.TRIMOU.processView(builder.view("error/404").build());
         }
     }
 

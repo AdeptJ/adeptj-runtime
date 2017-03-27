@@ -72,7 +72,7 @@ public enum FrameworkBootstrap {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             Bundles.provisionBundles(systemBundleContext);
-            List<String> errorPages = Configs.INSTANCE.undertow().getStringList("common.error-pages");
+            List<String> errorPages = Configs.DEFAULT.undertow().getStringList("common.error-pages");
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerContextErrorServlet(), errorPages);
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             this.registerBridgeListeners(context);
@@ -139,7 +139,7 @@ public enum FrameworkBootstrap {
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
         Map<String, String> configs = this.loadFrameworkProperties();
-        Config felixConf = Configs.INSTANCE.felix();
+        Config felixConf = Configs.DEFAULT.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
         configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
         logger.debug("OSGi Framework Configurations: {}", configs);

@@ -50,7 +50,7 @@ final class CredentialMatcher {
     }
 
     private boolean fromProvisioningConfig(String id, String pwd) {
-        return Configs.INSTANCE.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
+        return Configs.DEFAULT.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
                 .filter(entry -> entry.getKey().equals(id))
                 .anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
     }

@@ -50,19 +50,19 @@ public class AdminErrorServlet extends HttpServlet {
         ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
         Models models = new Models();
         if ("/admin/error".equals(requestURI)) {
-            ViewEngine.INSTANCE.processView(builder.view("error/generic").build());
+            ViewEngine.TRIMOU.processView(builder.view("error/generic").build());
         } else {
             Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
             String statusCode = this.getStatusCode(requestURI);
             if (exception != null && "500".equals(statusCode)) {
                 models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
                 builder.models(models);
-                ViewEngine.INSTANCE.processView(builder.view("error/500").build());
-            } else if (Configs.INSTANCE.undertow().getStringList("common.status-codes").contains(statusCode)) {
-                ViewEngine.INSTANCE.processView(builder.view(String.format("error/%s", statusCode)).build());
+                ViewEngine.TRIMOU.processView(builder.view("error/500").build());
+            } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {
+                ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
             } else {
                 // if the requested view not found, render 404.
-                ViewEngine.INSTANCE.processView(builder.view("error/404").build());
+                ViewEngine.TRIMOU.processView(builder.view("error/404").build());
             }
         }
     }

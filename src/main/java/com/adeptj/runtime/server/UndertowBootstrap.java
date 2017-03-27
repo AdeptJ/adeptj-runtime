@@ -140,7 +140,7 @@ public final class UndertowBootstrap {
     }
 
     public static void bootstrap(Map<String, String> arguments) throws Exception {
-        Config undertowConf = Configs.INSTANCE.undertow();
+        Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
         logger.info("Commands to AdeptJ Runtime: {}", arguments);
@@ -150,7 +150,7 @@ public final class UndertowBootstrap {
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
-        optimizeForProdMode(undertowBuilder, undertowConf, logger);
+        optimizeWorkerOptionsForProdMode(undertowBuilder, undertowConf, logger);
         HttpHandler initialHandler = new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
         ServerOptions.build(undertowBuilder, undertowConf);
         undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
@@ -168,7 +168,7 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static void optimizeForProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
+    private static void optimizeWorkerOptionsForProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
         String serverMode = System.getProperty(SYS_PROP_SERVER_MODE);
         if (ServerMode.PROD.toString().equalsIgnoreCase(serverMode)) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
@@ -180,8 +180,8 @@ public final class UndertowBootstrap {
             int maxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
             int calcMaxTaskThreads = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
             undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads : maxTaskThreads);
+            logger.info("Optimized AdeptJ Runtime for [{}] mode.", serverMode);
         }
-        logger.info("Optimized AdeptJ Runtime for [{}] mode.", serverMode);
     }
 
     private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
@@ -219,26 +219,24 @@ public final class UndertowBootstrap {
         // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
         // this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-            logger.error("JVM shutting down!!");
+        	logger.error("Port: [{}] unavailable, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
             LogbackBootstrap.stopLoggerContext();
-            System.exit(-1);
+            System.exit(-1); // NOSONAR
         }
         return port;
     }
 
     private static boolean isPortAvailable(int port, Logger logger) {
-        boolean portAvailable;
+        boolean portAvailable = false;
         try (ServerSocketChannel channel = ServerSocketChannel.open()) {
             channel.socket().setReuseAddress(true);
             channel.socket().bind(new InetSocketAddress(port));
             portAvailable = true;
         } catch (BindException ex) {
             logger.error("BindException while aquiring port: [{}], cause:", port, ex);
-            portAvailable = false;
         } catch (IOException ex) {
             logger.error("IOException while aquiring port: [{}], cause:", port, ex);
-            portAvailable = false;
         }
         return portAvailable;
     }

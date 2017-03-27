@@ -79,11 +79,11 @@ public class AdminAuthServlet extends HttpServlet {
         models.put("error", "Invalid credentials!!");
         models.put("j_username", req.getParameter("j_username"));
         // Render login page again with validation message.
-        ViewEngine.INSTANCE.processView(builder.view("auth/login").models(models).build());
+        ViewEngine.TRIMOU.processView(builder.view("auth/login").models(models).build());
     }
 
     private void renderLoginPage(HttpServletRequest req, HttpServletResponse resp) {
-        ViewEngine.INSTANCE.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
+        ViewEngine.TRIMOU.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
