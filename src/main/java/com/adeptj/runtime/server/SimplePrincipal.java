@@ -19,6 +19,7 @@
 */
 package com.adeptj.runtime.server;
 
+import java.io.Serializable;
 import java.security.Principal;
 
 /**
@@ -26,9 +27,11 @@ import java.security.Principal;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class SimplePrincipal implements Principal {
+final class SimplePrincipal implements Principal, Serializable {
 
-    private String name;
+	private static final long serialVersionUID = 7723547817002486608L;
+	
+	private String name;
 
     public SimplePrincipal(String name) {
         this.name = name;

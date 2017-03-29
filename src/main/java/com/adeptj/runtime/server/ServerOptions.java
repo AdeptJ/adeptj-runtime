@@ -37,6 +37,10 @@ import io.undertow.UndertowOptions;
  * @author Rakesh.Kumar, AdeptJ
  */
 final class ServerOptions {
+	
+	/** Utility methods only */
+	private ServerOptions() {
+	}
 
     /**
      * Configures the server options dynamically.

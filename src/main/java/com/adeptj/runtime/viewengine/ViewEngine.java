@@ -125,7 +125,7 @@ public enum ViewEngine {
             LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSinceMillis(startTime));
             // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
             context.setViewRendered(true);
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
             this.handleException(context, ex);
         }

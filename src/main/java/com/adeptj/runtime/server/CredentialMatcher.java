@@ -58,7 +58,7 @@ final class CredentialMatcher {
     private boolean fromOSGiManagerConfig(String pwd) {
         try {
             return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             // Don't care!!
         }
         return false;
@@ -71,10 +71,10 @@ final class CredentialMatcher {
     private String hash(String pwd) {
         String hashPassword = pwd;
         try {
-            MessageDigest md = MessageDigest.getInstance(SHA256);
             hashPassword = new StringBuilder().append('{').append(SHA256.toLowerCase()).append('}')
-                    .append(new String(Base64.getEncoder().encode(md.digest(pwd.getBytes(UTF8))), UTF8)).toString();
-        } catch (Exception ex) {
+                    .append(new String(Base64.getEncoder().encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), 
+                    		UTF8)).toString();
+        } catch (Exception ex) { // NOSONAR
             LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
         }
         return hashPassword;

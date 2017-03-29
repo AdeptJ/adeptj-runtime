@@ -60,7 +60,7 @@ public enum ServiceTrackers {
     public void closeQuietly(ServiceTracker<?, ?> tracker) {
         try {
             tracker.close();
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
         }
     }

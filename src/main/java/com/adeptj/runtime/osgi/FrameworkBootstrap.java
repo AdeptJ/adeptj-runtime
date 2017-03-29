@@ -79,7 +79,7 @@ public enum FrameworkBootstrap {
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
             this.registerProxyServlet(context, logger);
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
             this.stopFramework();
@@ -99,7 +99,7 @@ public enum FrameworkBootstrap {
             } else {
                 logger.info("OSGi Framework not started yet, nothing to stop!!");
             }
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             logger.error("Error Stopping OSGi Framework!!", ex);
         }
     }

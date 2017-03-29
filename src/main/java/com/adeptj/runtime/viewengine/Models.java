@@ -44,6 +44,7 @@ public class Models extends AbstractMap<String, Object> implements Iterable<Entr
         return this.delegate.put(key, value);
     }
 
+    @Override
     public Iterator<Entry<String, Object>> iterator() {
         return this.entrySet().iterator();
     }

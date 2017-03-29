@@ -53,7 +53,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
             httpServlet = super.addingService(reference);
             LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
             this.handleDispatcherServlet(httpServlet);
-        } catch (Exception ex) {
+        } catch (Exception ex) { // NOSONAR
             // This might be due to the OSGi framework restart from Felix WebConsole.
             LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
         }
@@ -106,7 +106,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
                 this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
                 LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
-            } catch (Exception ex) {
+            } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
             }
         }
