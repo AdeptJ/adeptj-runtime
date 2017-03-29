@@ -26,6 +26,7 @@ import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
+import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.servlet.AdminAuthServlet;
@@ -184,14 +185,14 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) throws Exception {
+    private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             char[] keyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
             char[] keyPwd = httpsConf.getString(KEY_KEYPWD).toCharArray();
             int httpsPort = httpsConf.getInt(KEY_PORT);
             undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd), keyPwd));
+                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd, logger), keyPwd, logger));
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
@@ -310,21 +311,39 @@ public final class UndertowBootstrap {
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper(undertowConfig));
     }
 
-    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
-        return keyStore;
+    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {
+        KeyStore keyStore = null;
+		try {
+			keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+			keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
+			return keyStore;
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
+			logger.error("Exception while loading KeyStore!!", ex);
+			throw new InitializationException(ex.getMessage(), ex);
+		}
     }
 
-    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd) throws NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException, KeyStoreException {
-        SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-        sslContext.init(keyMgrs(keyStore, keyPwd), null, null);
-        return sslContext;
+    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd, Logger logger) {
+        SSLContext sslContext = null;
+		try {
+			sslContext = SSLContext.getInstance(PROTOCOL_TLS);
+			sslContext.init(keyMgrs(keyStore, keyPwd, logger), null, null);
+			return sslContext;
+		} catch (NoSuchAlgorithmException | KeyManagementException ex) {
+			logger.error("Exception while initializing SSLContext!!", ex);
+			throw new InitializationException(ex.getMessage(), ex);
+		}
     }
 
-    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd) throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException {
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(keyStore, keyPwd);
-        return kmf.getKeyManagers();
+    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd, Logger logger) {
+        KeyManagerFactory kmf;
+		try {
+			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			kmf.init(keyStore, keyPwd);
+			return kmf.getKeyManagers();
+		} catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
+			logger.error("Exception while initializing KeyManagers!!", ex);
+			throw new InitializationException(ex.getMessage(), ex);
+		}
     }
 }
