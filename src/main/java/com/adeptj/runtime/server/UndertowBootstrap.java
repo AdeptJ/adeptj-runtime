@@ -57,6 +57,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.BindException;
@@ -140,7 +141,7 @@ public final class UndertowBootstrap {
     private UndertowBootstrap() {
     }
 
-    public static void bootstrap(Map<String, String> arguments) throws Exception {
+    public static void bootstrap(Map<String, String> arguments) throws ServletException, IOException  {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);

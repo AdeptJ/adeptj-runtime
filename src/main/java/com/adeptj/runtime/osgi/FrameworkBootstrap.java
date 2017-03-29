@@ -133,7 +133,7 @@ public enum FrameworkBootstrap {
         logger.info("ProxyServlet registered successfully!!");
     }
 
-    private Framework createFramework(Logger logger) throws Exception {
+    private Framework createFramework(Logger logger) throws IOException  {
         return ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
     }
 

@@ -65,7 +65,7 @@ public enum OSGiServlets {
     public void register(BundleContext ctx, HttpServlet servlet) {
         Class<? extends HttpServlet> klazz = servlet.getClass();
         WebServlet webServlet = this.checkWebServletAnnotation(klazz);
-        Dictionary<String, Object> properties = new Hashtable<>();
+        Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
         properties.put(HTTP_WHITEBOARD_SERVLET_PATTERN,
                 webServlet.urlPatterns().length == 0 ? webServlet.value() : webServlet.urlPatterns());
         properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
@@ -79,7 +79,7 @@ public enum OSGiServlets {
     protected void registerErrorServlet(BundleContext ctx, HttpServlet errorServlet, List<String> errors) {
         Class<? extends HttpServlet> klazz = errorServlet.getClass();
         WebServlet webServlet = this.checkWebServletAnnotation(klazz);
-        Dictionary<String, Object> properties = new Hashtable<>();
+        Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
         properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
         // Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
         properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, CONTEXT_SELECT_FILTER);
