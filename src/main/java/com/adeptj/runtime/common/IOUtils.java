@@ -23,18 +23,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.xnio.streams.Streams;
+
 /**
  * Common Utilities
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 public class IOUtils {
-
-    private static final int EOF = -1;
-
-    private static final int DEFAULT_BUFFER_SIZE = 1024;
-
-    private static final int OFFSET = 0;
 
     /**
      * Deny direct instantiation.
@@ -50,13 +46,9 @@ public class IOUtils {
         return toByteArrayOutputStream(input).toByteArray();
     }
 
-    public static ByteArrayOutputStream toByteArrayOutputStream(InputStream input) throws IOException {
-        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+    public static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int numberOfBytesRead;
-        while ((numberOfBytesRead = input.read(buffer)) != EOF) {
-            out.write(buffer, OFFSET, numberOfBytesRead);
-        }
+        Streams.copyStream(source, out);
         return out;
     }
 }
