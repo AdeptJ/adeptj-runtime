@@ -33,20 +33,38 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * PerContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
+ * ErrorPageServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
  * <p>
- * Note: This is independent of UndertowServer and directly managed by OSGi.
+ * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "PerContextErrorServlet", asyncSupported = true)
-public class PerContextErrorServlet extends HttpServlet {
+@WebServlet(name = "ErrorPageServlet", urlPatterns = {"/admin/error/*"})
+public class ErrorPageServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -5818850813832379842L;
+    private static final long serialVersionUID = -3339904764769823449L;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.handleError(req, resp);
+        String requestURI = req.getRequestURI();
+        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
+        Models models = new Models();
+        if ("/admin/error".equals(requestURI)) {
+            ViewEngine.TRIMOU.processView(builder.view("error/generic").build());
+        } else {
+            Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+            String statusCode = this.getStatusCode(requestURI);
+            if (exception != null && "500".equals(statusCode)) {
+                models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+                builder.models(models);
+                ViewEngine.TRIMOU.processView(builder.view("error/500").build());
+            } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {
+                ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
+            } else {
+                // if the requested view not found, render 404.
+                ViewEngine.TRIMOU.processView(builder.view("error/404").build());
+            }
+        }
     }
 
     @Override
@@ -54,27 +72,7 @@ public class PerContextErrorServlet extends HttpServlet {
         this.doGet(req, resp);
     }
 
-    private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
-        Models models = this.models(req, statusCode);
-        builder.models(models);
-        if (models.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
-            ViewEngine.TRIMOU.processView(builder.view("error/500").build());
-        } else if (Configs.DEFAULT.undertow().getIntList("common.status-codes").contains(statusCode)) {
-            ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
-        } else {
-            // if the requested view not found, render 404.
-            ViewEngine.TRIMOU.processView(builder.view("error/404").build());
-        }
-    }
-
-    private Models models(HttpServletRequest req, Integer statusCode) {
-        Models models = new Models();
-        models.put("statusCode", statusCode);
-        models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
-        models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
-        models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-        return models;
+    private String getStatusCode(String requestURI) {
+        return requestURI.substring(requestURI.lastIndexOf('/') + 1);
     }
 }

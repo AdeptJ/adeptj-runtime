@@ -30,14 +30,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * AdminDashboardServlet renders the admin dashboard page.
+ * DashboardServlet renders the admin dashboard page.
  * <p>
  * Note: This is independent of OSGi and directly managed by UndertowServer.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdminDashboardServlet", urlPatterns = { "/admin/dashboard/*" })
-public class AdminDashboardServlet extends HttpServlet {
+@WebServlet(name = "DashboardServlet", urlPatterns = { "/admin/dashboard/*" })
+public class DashboardServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 

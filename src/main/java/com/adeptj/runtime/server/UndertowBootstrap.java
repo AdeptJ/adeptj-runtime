@@ -29,9 +29,9 @@ import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.servlet.AdminAuthServlet;
-import com.adeptj.runtime.servlet.AdminDashboardServlet;
-import com.adeptj.runtime.servlet.AdminErrorServlet;
+import com.adeptj.runtime.servlet.LoginServlet;
+import com.adeptj.runtime.servlet.DashboardServlet;
+import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -177,11 +177,13 @@ public final class UndertowBootstrap {
             // defaults to 64
             int coreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
-            undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads > coreTaskThreads ? sysTaskThreads : coreTaskThreads);
+            undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads > coreTaskThreads ? sysTaskThreads
+            		: coreTaskThreads);
             // defaults to double of [worker-task-core-threads] i.e 128
             int maxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
             int calcMaxTaskThreads = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
-            undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads : maxTaskThreads);
+            undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads
+            		: maxTaskThreads);
             logger.info("Optimized AdeptJ Runtime for [{}] mode.", serverMode);
         }
     }
@@ -189,11 +191,9 @@ public final class UndertowBootstrap {
     private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
-            char[] keyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
-            char[] keyPwd = httpsConf.getString(KEY_KEYPWD).toCharArray();
             int httpsPort = httpsConf.getInt(KEY_PORT);
-            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), keyStorePwd, logger), keyPwd, logger));
+            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), 
+            		httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger), httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
@@ -265,7 +265,7 @@ public final class UndertowBootstrap {
 
     private static List<ErrorPage> errorPages(Config undertowConfig) {
         return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
-                .map(entry -> Servlets.errorPage((String) entry.getValue(), Integer.parseInt(entry.getKey())))
+                .map(entry -> Servlets.errorPage(String.valueOf(entry.getValue()), Integer.parseInt(entry.getKey())))
                 .collect(Collectors.toList());
     }
 
@@ -283,9 +283,9 @@ public final class UndertowBootstrap {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(AdminErrorServlet.class).addMapping("/admin/error/*"));
-        servlets.add(Servlets.servlet(AdminDashboardServlet.class).addMapping("/admin/dashboard/*"));
-        servlets.add(Servlets.servlet(AdminAuthServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
+        servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/admin/error/*"));
+        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/admin/dashboard/*"));
+        servlets.add(Servlets.servlet(LoginServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
         return servlets;
     }
 
@@ -313,9 +313,8 @@ public final class UndertowBootstrap {
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {
-        KeyStore keyStore = null;
 		try {
-			keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
 			keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
 			return keyStore;
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
@@ -325,10 +324,9 @@ public final class UndertowBootstrap {
     }
 
     private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd, Logger logger) {
-        SSLContext sslContext = null;
 		try {
-			sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-			sslContext.init(keyMgrs(keyStore, keyPwd, logger), null, null);
+            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
+			sslContext.init(keyManagers(keyStore, keyPwd, logger), null, null);
 			return sslContext;
 		} catch (NoSuchAlgorithmException | KeyManagementException ex) {
 			logger.error("Exception while initializing SSLContext!!", ex);
@@ -336,10 +334,9 @@ public final class UndertowBootstrap {
 		}
     }
 
-    private static KeyManager[] keyMgrs(KeyStore keyStore, char[] keyPwd, Logger logger) {
-        KeyManagerFactory kmf;
+    private static KeyManager[] keyManagers(KeyStore keyStore, char[] keyPwd, Logger logger) {
 		try {
-			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 			kmf.init(keyStore, keyPwd);
 			return kmf.getKeyManagers();
 		} catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {

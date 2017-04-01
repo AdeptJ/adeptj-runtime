@@ -35,7 +35,7 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 
 /**
- * AdminAuthServlet does the following:
+ * LoginServlet does the following:
  * <p>
  * 1. Serves the login page and handles the validation failure on wrong credentials submission.
  * 2. Logout the currently logged in Admin user and renders the login page again.
@@ -44,8 +44,8 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdminAuthServlet", urlPatterns = {ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI})
-public class AdminAuthServlet extends HttpServlet {
+@WebServlet(name = "LoginServlet", urlPatterns = {ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI})
+public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
