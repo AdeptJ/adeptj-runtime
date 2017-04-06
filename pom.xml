@@ -36,8 +36,8 @@
 
     <properties>
         <!-- Common Dependencies -->
-        <undertow.version>1.4.11.Final</undertow.version>
-        <undertow.websockets.version>1.4.11.Final</undertow.websockets.version>
+        <undertow.version>1.4.12.Final</undertow.version>
+        <undertow.websockets.version>1.4.12.Final</undertow.websockets.version>
         <xnio.version>3.4.4.Final</xnio.version>
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.0</maven-dependency-plugin.version>
@@ -49,10 +49,6 @@
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.0.Final</adeptj-modules-webconsole-security.version>
     </properties>
-
-    <prerequisites>
-        <maven>3.3.9</maven>
-    </prerequisites>
 
     <!-- Project Information -->
     <organization>
@@ -125,6 +121,34 @@
                     <target>${jdk.version}</target>
                 </configuration>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+                
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.5.0</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>1.8</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -192,7 +216,7 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
-            <version>3.3.0.Final</version>
+            <version>3.3.1.Final</version>
         </dependency>
 
         <!-- Required by XNIO-API below. -->

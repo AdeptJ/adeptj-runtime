@@ -145,9 +145,9 @@ public final class UndertowBootstrap {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
-        logger.info("Commands to AdeptJ Runtime: {}", arguments);
+        logger.debug("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
-        logger.info("Starting AdeptJ Runtime @ port: [{}]", httpPort);
+        logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO))); // NOSONAR
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));

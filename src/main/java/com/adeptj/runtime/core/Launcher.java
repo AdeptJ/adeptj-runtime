@@ -39,7 +39,11 @@ import java.util.stream.Collectors;
  */
 public final class Launcher {
 
-    // Deny direct instantiation.
+    private static final String JAVA_RT_VERSION = "java.runtime.version";
+    
+	private static final String JAVA_RT_NAME = "java.runtime.name";
+
+	// Deny direct instantiation.
     private Launcher() {
     }
 
@@ -63,6 +67,7 @@ public final class Launcher {
         LogbackBootstrap.startLoggerContext();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
+        	logger.info("JRE: [{}], Version: [{}]", System.getProperty(JAVA_RT_NAME), System.getProperty(JAVA_RT_VERSION));
             UndertowBootstrap.bootstrap(parseCommands(args));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
         } catch (Throwable th) { // NOSONAR
