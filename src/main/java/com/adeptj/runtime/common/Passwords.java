@@ -20,11 +20,15 @@
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.exception.SystemException;
 import com.typesafe.config.Config;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 /**
@@ -42,14 +46,16 @@ public enum Passwords {
      * @return UTF-8 Base64 encoded hash.
      */
     public String generateSalt() {
+        String salt = null;
+        Config config = Configs.DEFAULT.common();
+        byte[] saltBytes = new byte[config.getInt("salt-size")];
         try {
-            Config config = Configs.DEFAULT.common();
-            byte[] salt = new byte[config.getInt("salt-size")];
-            SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(salt);
-            return new String(Base64.getEncoder().encode(salt), Constants.UTF8);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(saltBytes);
+            salt = new String(Base64.getEncoder().encode(saltBytes), Constants.UTF8);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            throw new SystemException(ex.getMessage(), ex);
         }
+        return salt;
     }
 
     /**
@@ -60,16 +66,18 @@ public enum Passwords {
      * @return Hashed password
      */
     public String hashPwd(String pwd, String salt) {
+        String hashedStr = null;
         try {
             Config config = Configs.DEFAULT.common();
-            return new String(
+            hashedStr = new String(
                     Base64.getEncoder()
                             .encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
                                     .generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(Constants.UTF8),
                                             config.getInt("iteration-count"), config.getInt("derived-key-size")))
                                     .getEncoded()), Constants.UTF8);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeySpecException ex) {
+            throw new SystemException(ex.getMessage(), ex);
         }
+        return hashedStr;
     }
 }
