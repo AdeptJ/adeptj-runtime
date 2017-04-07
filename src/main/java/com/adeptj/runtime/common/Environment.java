@@ -31,11 +31,11 @@ import static com.adeptj.runtime.common.Constants.OS;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
 /**
- * EnvironmentUtils.
+ * Environment.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class EnvironmentUtils {
+public class Environment {
 
     private static final int OFFSET = 0;
 
@@ -50,7 +50,7 @@ public class EnvironmentUtils {
     /**
      * Deny direct instantiation.
      */
-    private EnvironmentUtils() {
+    private Environment() {
     }
 
     public static boolean isMac() {

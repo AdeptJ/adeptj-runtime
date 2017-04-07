@@ -20,7 +20,7 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.common.EnvironmentUtils;
+import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Verb;
@@ -166,7 +166,7 @@ public final class UndertowBootstrap {
 
     private static void launchBrowser(Map<String, String> arguments, int httpPort) throws IOException {
         if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
-            EnvironmentUtils.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+            Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
         }
     }
 

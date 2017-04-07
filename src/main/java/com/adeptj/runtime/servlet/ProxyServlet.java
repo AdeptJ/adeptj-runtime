@@ -73,7 +73,7 @@ public class ProxyServlet extends HttpServlet {
             	long startTime = System.nanoTime();
             	dispatcherServlet.service(req, resp);
                 LOGGER.debug("Request: [{}] took [{}] ms!!", req.getRequestURI(), Times.elapsedSinceMillis(startTime));
-                this.logExceptionAttribute(req);
+                this.checkAndlogExceptionAttribute(req);
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request!!", ex);
@@ -81,7 +81,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-	private void logExceptionAttribute(HttpServletRequest req) {
+	private void checkAndlogExceptionAttribute(HttpServletRequest req) {
 		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
 		if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
 		    LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
