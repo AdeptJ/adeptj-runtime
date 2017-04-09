@@ -95,7 +95,7 @@ public enum FrameworkBootstrap {
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
-                logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+                logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType())); // NOSONAR
             } else {
                 logger.info("OSGi Framework not started yet, nothing to stop!!");
             }
@@ -105,7 +105,7 @@ public enum FrameworkBootstrap {
     }
 
     private void removeFrameworkListener() {
-        if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
+        if (BundleContextHolder.INSTANCE.isBundleContextValid()) {
             BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
         }
     }

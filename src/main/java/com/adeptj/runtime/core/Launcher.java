@@ -81,7 +81,7 @@ public final class Launcher {
 
     private static void stopOSGiFramework(Logger logger) {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
-        if (BundleContextHolder.INSTANCE.isBundleContextSet()) {
+        if (BundleContextHolder.INSTANCE.isBundleContextValid()) {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
             FrameworkBootstrap.INSTANCE.stopFramework();
         }
