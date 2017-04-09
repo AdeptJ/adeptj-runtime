@@ -88,7 +88,7 @@ enum Trimou implements TemplateEngine {
      * {@inheritDoc}
      */
     @Override
-    public void render(TemplateContext context) throws RenderException {
+    public void render(TemplateContext context) {
     	Optional.ofNullable(this.engine.getMustache(context.getTemplate())).ifPresent(mustache -> this.renderInternal(context, mustache));
         // Now check if the view actually rendered(may not due to a 404), if not then handle the 404 response properly.
         this.handleTemplateNotFound(context);

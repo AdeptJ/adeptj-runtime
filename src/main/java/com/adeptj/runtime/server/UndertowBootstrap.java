@@ -141,14 +141,14 @@ public final class UndertowBootstrap {
     private UndertowBootstrap() {
     }
 
-    public static void bootstrap(Map<String, String> arguments) throws ServletException, IOException  {
+    public static void bootstrap(Map<String, String> arguments) throws ServletException  {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
         logger.debug("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
-        logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO))); // NOSONAR
+        printStartupInfo(logger);
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
@@ -161,12 +161,26 @@ public final class UndertowBootstrap {
         Undertow server = undertowBuilder.setHandler(rootHandler(initialHandler, undertowConf)).build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
-        launchBrowser(arguments, httpPort);
+        launchBrowser(arguments, httpPort, logger);
     }
 
-    private static void launchBrowser(Map<String, String> arguments, int httpPort) throws IOException {
+	private static void printStartupInfo(Logger logger) {
+		try {
+        	logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO))); // NOSONAR
+		} catch (IOException ex) {
+			// Just log it, its not critical.
+			logger.error("IOException!!", ex);
+		}
+	}
+
+    private static void launchBrowser(Map<String, String> arguments, int httpPort, Logger logger) {
         if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
-            Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+            try {
+				Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+			} catch (IOException ex) {
+				// Just log it, its okay if browser is not launched.
+				logger.error("IOException!!", ex);
+			}
         }
     }
 

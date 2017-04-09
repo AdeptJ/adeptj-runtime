@@ -32,7 +32,7 @@ public interface TemplateEngine {
 	 * @param context
 	 * @throws RenderException
 	 */
-	void render(TemplateContext context) throws RenderException;
+	void render(TemplateContext context);
 	
 	static TemplateEngine instance() {
 		return Trimou.INSTANCE;
