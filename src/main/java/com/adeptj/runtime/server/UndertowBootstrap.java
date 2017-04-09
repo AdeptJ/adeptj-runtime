@@ -78,8 +78,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
@@ -283,9 +283,9 @@ public final class UndertowBootstrap {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/admin/error/*"));
-        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/admin/dashboard/*"));
-        servlets.add(Servlets.servlet(LoginServlet.class).addMappings(ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI));
+        servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/tools/error/*"));
+        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/tools/*"));
+        servlets.add(Servlets.servlet(LoginServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI));
         return servlets;
     }
 
@@ -305,11 +305,11 @@ public final class UndertowBootstrap {
                 .setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
                 .setIdentityManager(new TextIdentityManager(undertowConfig))
                 .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
-                .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
+                .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
                 .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
                 .addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
                 .setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
-                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper(undertowConfig));
+                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {

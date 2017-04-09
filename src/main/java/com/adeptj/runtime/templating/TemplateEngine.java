@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,26 +17,24 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.templating;
 
 /**
- * ViewEngineException.
+ * TemplateEngine for rendering the HTML templates.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ViewEngineException extends RuntimeException {
+public interface TemplateEngine {
 
-    private static final long serialVersionUID = -8077495079692215520L;
-
-    public ViewEngineException(String message) {
-        super(message);
-    }
-
-    public ViewEngineException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ViewEngineException(Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * Renders the template contained by the TemplateContext.
+	 * 
+	 * @param context
+	 * @throws RenderException
+	 */
+	void render(TemplateContext context) throws RenderException;
+	
+	static TemplateEngine instance() {
+		return Trimou.INSTANCE;
+	}
 }

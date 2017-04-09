@@ -47,7 +47,7 @@
 
         <!-- AdeptJ Modular Web Dependencies Version -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
-        <adeptj-modules-webconsole-security.version>1.0.0.Final</adeptj-modules-webconsole-security.version>
+        <adeptj-modules-webconsole-security.version>1.0.1.Final</adeptj-modules-webconsole-security.version>
     </properties>
 
     <!-- Project Information -->
@@ -353,7 +353,7 @@
         <dependency>
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
-            <version>2.1.0.Final</version>
+            <version>2.2.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -367,7 +367,7 @@
         <!-- Admin Runtime UI dependency -->
         <dependency>
             <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-runtime-ui</artifactId>
+            <artifactId>adeptj-runtime-tools</artifactId>
             <version>1.0.0.Final</version>
         </dependency>
 

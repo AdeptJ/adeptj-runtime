@@ -19,14 +19,19 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.osgi.framework.Bundle;
+
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.templating.ContextObject;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateEngine;
+
 import java.io.IOException;
 
 /**
@@ -36,7 +41,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "DashboardServlet", urlPatterns = { "/admin/dashboard/*" })
+@WebServlet(name = "DashboardServlet", urlPatterns = { "/tools/*" })
 public class DashboardServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -46,11 +51,21 @@ public class DashboardServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ViewEngine.TRIMOU.processView(new ViewEngineContext.Builder(req, resp).view("auth/dashboard").build());
+    	ContextObject ctxObj = new ContextObject();
+    	ctxObj.put("username", req.getRemoteUser()).put("sysProps", System.getProperties().entrySet());
+    	Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
+    	ctxObj.put("totalBundles", bundles.length).put("bundles", bundles);
+    	StringBuilder jreInfo = new StringBuilder(System.getProperty("java.runtime.name"));
+    	jreInfo.append("(build ").append(System.getProperty("java.runtime.version")).append(")");
+    	ctxObj.put("runtime", jreInfo.toString());
+    	StringBuilder jvmInfo = new StringBuilder(System.getProperty("java.vm.name")).append("(build ");
+    	jvmInfo.append(System.getProperty("java.vm.version")).append(", ").append(System.getProperty("java.vm.info")).append(")");
+    	ctxObj.put("jvm", jvmInfo.toString()).put("processors", Runtime.getRuntime().availableProcessors());
+        TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).contextObject(ctxObj).template("auth/tools").build());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/admin/dashboard");
+        resp.sendRedirect("/tools");
     }
 }

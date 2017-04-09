@@ -20,9 +20,9 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.templating.ContextObject;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateEngine;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 
 /**
  * LoginServlet does the following:
@@ -44,7 +44,7 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "LoginServlet", urlPatterns = {ADMIN_LOGIN_URI, ADMIN_LOGOUT_URI})
+@WebServlet(name = "LoginServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
 public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -55,9 +55,9 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
-        if (ADMIN_LOGIN_URI.equals(requestURI)) {
-            this.renderLoginPage(req, resp);
-        } else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
+        if (TOOLS_LOGIN_URI.equals(requestURI)) {
+        	TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).template("auth/login").build());
+        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
             this.logout(req, resp);
         } else {
             // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
@@ -74,16 +74,11 @@ public class LoginServlet extends HttpServlet {
     }
 
     private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
-        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
-        Models models = new Models();
-        models.put("error", "Invalid credentials!!");
-        models.put("j_username", req.getParameter("j_username"));
+        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
+        ContextObject ctxObj = new ContextObject();
+        ctxObj.put("error", "Invalid credentials!!").put("j_username", req.getParameter("j_username"));
         // Render login page again with validation message.
-        ViewEngine.TRIMOU.processView(builder.view("auth/login").models(models).build());
-    }
-
-    private void renderLoginPage(HttpServletRequest req, HttpServletResponse resp) {
-        ViewEngine.TRIMOU.processView(new ViewEngineContext.Builder(req, resp).view("auth/login").build());
+        TemplateEngine.instance().render(builder.template("auth/login").contextObject(ctxObj).build());
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -20,9 +20,9 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.templating.ContextObject;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateEngine;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -56,25 +56,23 @@ public class OSGiPerServletContextErrorServlet extends HttpServlet {
 
     private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
-        Models models = this.models(req, statusCode);
-        builder.models(models);
-        if (models.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
-            ViewEngine.TRIMOU.processView(builder.view("error/500").build());
+        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
+        ContextObject ctxObj = this.contextObject(req, statusCode);
+        builder.contextObject(ctxObj);
+        TemplateEngine templateEngine = TemplateEngine.instance();
+		if (ctxObj.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
+        	templateEngine.render(builder.template("error/500").build());
         } else if (Configs.DEFAULT.undertow().getIntList("common.status-codes").contains(statusCode)) {
-            ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
+        	templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
         } else {
             // if the requested view not found, render 404.
-            ViewEngine.TRIMOU.processView(builder.view("error/404").build());
+        	templateEngine.render(builder.template("error/404").build());
         }
     }
 
-    private Models models(HttpServletRequest req, Integer statusCode) {
-        Models models = new Models();
-        models.put("statusCode", statusCode);
-        models.put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE));
-        models.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI));
-        models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-        return models;
-    }
+	private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
+		return new ContextObject().put("statusCode", statusCode).put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE))
+				.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI))
+				.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+	}
 }

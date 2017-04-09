@@ -19,6 +19,7 @@
 */
 package com.adeptj.runtime.server;
 
+import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
@@ -26,13 +27,12 @@ import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
-
-import java.util.List;
+import io.undertow.servlet.handlers.ServletInitialHandler;
 
 /**
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
  * <p>
- * Here it registers Undertow ClassPath based ResourceHandler for serving static content.
+ * Here it registers Undertow's ClassPath based ResourceHandler for serving static content.
  * If the Predicate grouping is true then it invokes the non blocking ResourceHandler
  * completely bypassing security handler chain, which is desirable as we don't need security
  * and blocking I/O to kick in while serving static content.
@@ -41,24 +41,19 @@ import java.util.List;
  */
 final class ServletInitialHandlerWrapper implements HandlerWrapper {
 
-    private String[] resourceExtns;
-
-    private String staticResourcePrefix;
-
-    private String resourceMgrPrefix;
-
-    public ServletInitialHandlerWrapper(Config undertowConfig) {
-        List<String> extns = undertowConfig.getStringList("common.static-resource-extns");
-        this.resourceExtns = extns.toArray(new String[extns.size()]);
-        this.staticResourcePrefix = undertowConfig.getString("common.static-resource-prefix");
-        this.resourceMgrPrefix = undertowConfig.getString("common.resource-mgr-prefix");
-    }
-
+    /**
+     * Wraps the passed {@link ServletInitialHandler} with a PredicateHandler for serving static content.
+     * @see ServletInitialHandlerWrapper class header for detailed information.
+     * 
+     * @param handler the ServletInitialHandler
+     * @return PredicateHandler
+     */
     @Override
-    public HttpHandler wrap(HttpHandler initialHandler) {
-        return new PredicateHandler(Predicates.and(Predicates.prefix(this.staticResourcePrefix),
-                Predicates.suffixes(this.resourceExtns)),
-                Handlers.resource(new ClassPathResourceManager(getClass().getClassLoader(),
-                        this.resourceMgrPrefix)), initialHandler);
+    public HttpHandler wrap(HttpHandler handler) {
+    	Config cfg = Configs.DEFAULT.undertow();
+        return new PredicateHandler(Predicates.and(Predicates.prefix(cfg.getString("common.static-resource-prefix")),
+                Predicates.suffixes(cfg.getStringList("common.static-resource-extns").toArray(new String[0]))),
+                Handlers.resource(new ClassPathResourceManager(this.getClass().getClassLoader(),
+                		cfg.getString("common.resource-mgr-prefix"))), handler);
     }
 }

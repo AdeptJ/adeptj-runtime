@@ -20,9 +20,9 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.viewengine.Models;
-import com.adeptj.runtime.viewengine.ViewEngine;
-import com.adeptj.runtime.viewengine.ViewEngineContext;
+import com.adeptj.runtime.templating.ContextObject;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateEngine;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -39,7 +39,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "ErrorPageServlet", urlPatterns = {"/admin/error/*"})
+@WebServlet(name = "ErrorPageServlet", urlPatterns = {"/tools/error/*"})
 public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -47,22 +47,22 @@ public class ErrorPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
-        ViewEngineContext.Builder builder = new ViewEngineContext.Builder(req, resp);
-        Models models = new Models();
-        if ("/admin/error".equals(requestURI)) {
-            ViewEngine.TRIMOU.processView(builder.view("error/generic").build());
+        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
+        ContextObject ctxObj = new ContextObject();
+        TemplateEngine templateEngine = TemplateEngine.instance();
+		if ("/admin/error".equals(requestURI)) {
+        	templateEngine.render(builder.template("error/generic").build());
         } else {
             Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
             String statusCode = this.getStatusCode(requestURI);
             if (exception != null && "500".equals(statusCode)) {
-                models.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-                builder.models(models);
-                ViewEngine.TRIMOU.processView(builder.view("error/500").build());
+                builder.contextObject(ctxObj.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION)));
+                templateEngine.render(builder.template("error/500").build());
             } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {
-                ViewEngine.TRIMOU.processView(builder.view(String.format("error/%s", statusCode)).build());
+            	templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
             } else {
                 // if the requested view not found, render 404.
-                ViewEngine.TRIMOU.processView(builder.view("error/404").build());
+            	templateEngine.render(builder.template("error/404").build());
             }
         }
     }

@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.templating;
 
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
@@ -45,33 +45,24 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENA
 import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
 
 /**
- * ViewEngine. Rendering Html Templates
+ * Trimou. Rendering Html Templates
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public enum ViewEngine {
+enum Trimou implements TemplateEngine {
 
-    TRIMOU;
+    INSTANCE;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ViewEngine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Trimou.class);
 
     private static final String RB_HELPER_NAME = "msg";
 
     private final MustacheEngine engine;
 
-    ViewEngine() {
+    Trimou() {
         long startTime = System.nanoTime();
         this.engine = this.mustacheEngine();
-        LoggerFactory.getLogger(ViewEngine.class).info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedSinceMillis(startTime));
-    }
-
-    private TemplateLocator templateLocator(ViewEngineConfig config) {
-        return new ClassPathTemplateLocator(config.getTemplateLocatorPriority(), config.getPrefix(),
-                config.getSuffix(), ViewEngine.class.getClassLoader(), false);
-    }
-
-    private Helper resourceBundleHelper(ViewEngineConfig config) {
-        return new ResourceBundleHelper(config.getResourceBundleBasename(), Format.MESSAGE);
+        LoggerFactory.getLogger(Trimou.class).info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     private MustacheEngine mustacheEngine() {
@@ -83,11 +74,52 @@ public enum ViewEngine {
                 .setProperty(TEMPLATE_CACHE_ENABLED, config.isCacheEnabled())
                 .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getCacheExpiration()).build();
     }
-
-    public void processView(ViewEngineContext context) {
-        this.processViewInternal(context);
+    
+    private TemplateLocator templateLocator(ViewEngineConfig config) {
+        return new ClassPathTemplateLocator(config.getTemplateLocatorPriority(), config.getPrefix(),
+                config.getSuffix(), Trimou.class.getClassLoader(), false);
     }
 
+    private Helper resourceBundleHelper(ViewEngineConfig config) {
+        return new ResourceBundleHelper(config.getResourceBundleBasename(), Format.MESSAGE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void render(TemplateContext context) throws RenderException {
+    	Optional.ofNullable(this.engine.getMustache(context.getTemplate())).ifPresent(mustache -> this.renderInternal(context, mustache));
+        // Now check if the view actually rendered(may not due to a 404), if not then handle the 404 response properly.
+        this.handleTemplateNotFound(context);
+    }
+    
+    private void renderInternal(TemplateContext context, Mustache mustache) {
+        try {
+            long startTime = System.nanoTime();
+            context.getResponse().getWriter().write(mustache.render(context.getContextObject()));
+            LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getTemplate(), Times.elapsedSinceMillis(startTime));
+            // if we are here means view rendered properly, set the TemplateContext#templateRendered attribute.
+            context.setTemplateRendered(true);
+        } catch (Exception ex) { // NOSONAR
+            LOGGER.error("Exception while processing view: [{}]", context.getTemplate(), ex);
+            this.handleException(context, ex);
+        }
+    }
+
+    private void handleTemplateNotFound(TemplateContext context) {
+        // Check if the view not rendered and it was not an exception which is set as request attribute.
+        if (!context.isTemplateRendered() && context.getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
+            LOGGER.info("View not found: [{}]", context.getTemplate());
+            this.sendError(context.getResponse(), HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private void handleException(TemplateContext context, Exception ex) {
+        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
+        this.sendError(context.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+    
     private void sendError(HttpServletResponse resp, int errorCode) {
         LOGGER.info("Sending error: [{}]", errorCode);
         try {
@@ -95,39 +127,7 @@ public enum ViewEngine {
         } catch (IOException ex) {
             // Now what? may be log and re-throw. Let container handle it.
             LOGGER.error("Exception while sending error!!", ex);
-            throw new ViewEngineException(ex.getMessage(), ex);
-        }
-    }
-
-    private void handleException(ViewEngineContext context, Exception ex) {
-        context.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
-        this.sendError(context.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-
-    private void handleViewNotFound(ViewEngineContext context) {
-        // Check if the view not rendered and it was not an exception which is set as request attribute.
-        if (!context.isViewRendered() && context.getRequest().getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
-            LOGGER.info("View not found: [{}]", context.getView());
-            this.sendError(context.getResponse(), HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
-    private void processViewInternal(ViewEngineContext context) {
-        Optional.ofNullable(this.engine.getMustache(context.getView())).ifPresent(mustache -> this.render(context, mustache));
-        // Now check if the view actually rendered(may not due to a 404), if not then handle the 404 response properly.
-        this.handleViewNotFound(context);
-    }
-
-    private void render(ViewEngineContext context, Mustache mustache) {
-        try {
-            long startTime = System.nanoTime();
-            context.getResponse().getWriter().write(mustache.render(context.getModels()));
-            LOGGER.debug("Processed view: [{}] in: [{}] ms!!", context.getView(), Times.elapsedSinceMillis(startTime));
-            // if we are here means view rendered properly, set the ViewEngineContext#viewRendered attribute.
-            context.setViewRendered(true);
-        } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while processing view: [{}]", context.getView(), ex);
-            this.handleException(context, ex);
+            throw new RenderException(ex.getMessage(), ex);
         }
     }
 }

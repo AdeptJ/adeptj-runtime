@@ -17,40 +17,36 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.templating;
 
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+
+import org.trimou.engine.resolver.Mapper;
 
 /**
- * Models for storing data used in view rendering.
+ * ContextObject for storing variables used in view rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class Models extends AbstractMap<String, Object> implements Iterable<Entry<String, Object>> {
+public class ContextObject implements Mapper, Iterable<Entry<String, Object>> {
 
-    private Map<String, Object> delegate;
+    private Map<String, Object> variables = new HashMap<>();
     
-    public Models() {
-    	this.delegate = new HashMap<>();
+    public ContextObject put(String key, Object value) {
+        this.variables.put(key, value);
+        return this;
     }
-
+    
     @Override
-    public Object put(String key, Object value) {
-        return this.delegate.put(key, value);
+    public Object get(String key) {
+        return this.variables.get(key);
     }
 
     @Override
     public Iterator<Entry<String, Object>> iterator() {
-        return this.entrySet().iterator();
-    }
-
-    @Override
-    public Set<Entry<String, Object>> entrySet() {
-        return this.delegate.entrySet();
+        return this.variables.entrySet().iterator();
     }
 }

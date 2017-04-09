@@ -17,22 +17,22 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.viewengine;
+package com.adeptj.runtime.templating;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 
 /**
- * ViewEngineContext.
+ * TemplateContext.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ViewEngineContext {
+public class TemplateContext {
 
-    private final String view;
+    private final String template;
 
-    private final Models models;
+    private final ContextObject contextObject;
 
     private final HttpServletRequest request;
 
@@ -40,21 +40,21 @@ public class ViewEngineContext {
 
     private Locale locale;
 
-    private boolean viewRendered;
+    private boolean templateRendered;
 
-    private ViewEngineContext(String view, Models models, HttpServletRequest req, HttpServletResponse resp) {
-        this.view = view;
-        this.models = models;
+    private TemplateContext(String template, ContextObject contextObject, HttpServletRequest req, HttpServletResponse resp) {
+        this.template = template;
+        this.contextObject = contextObject;
         this.request = req;
         this.response = resp;
     }
 
-    public String getView() {
-        return view;
+    public String getTemplate() {
+        return template;
     }
 
-    public Models getModels() {
-        return models;
+    public ContextObject getContextObject() {
+        return contextObject;
     }
 
     public HttpServletRequest getRequest() {
@@ -69,24 +69,24 @@ public class ViewEngineContext {
         return locale;
     }
 
-    public boolean isViewRendered() {
-        return viewRendered;
+    public boolean isTemplateRendered() {
+        return templateRendered;
     }
 
-    public void setViewRendered(boolean viewRendered) {
-        this.viewRendered = viewRendered;
+    public void setTemplateRendered(boolean templateRendered) {
+        this.templateRendered = templateRendered;
     }
 
     /**
-     * Builder for ViewEngineContext.
+     * Builder for TemplateContext.
      *
      * @author Rakesh.Kumar, AdeptJ.
      */
     public static class Builder {
 
-        private String view;
+        private String template;
 
-        private Models models;
+        private ContextObject contextObject;
 
         private Locale locale;
 
@@ -105,13 +105,13 @@ public class ViewEngineContext {
             this.response = response;
         }
 
-        public Builder view(String view) {
-            this.view = view;
+        public Builder template(String template) {
+            this.template = template;
             return this;
         }
 
-        public Builder models(Models models) {
-            this.models = models;
+        public Builder contextObject(ContextObject contextObject) {
+            this.contextObject = contextObject;
             return this;
         }
 
@@ -120,8 +120,8 @@ public class ViewEngineContext {
             return this;
         }
 
-        public ViewEngineContext build() {
-            ViewEngineContext context = new ViewEngineContext(this.view, this.models, this.request, this.response);
+        public TemplateContext build() {
+            TemplateContext context = new TemplateContext(this.template, this.contextObject, this.request, this.response);
             // English is default Locale if no locale set.
             context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
             return context;
