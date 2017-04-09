@@ -19,6 +19,8 @@
 */
 package com.adeptj.runtime.osgi;
 
+import javax.annotation.Nonnull;
+
 /**
  * OSGi Framework event code to string mapping.
  *
@@ -48,6 +50,7 @@ public enum FrameworkEvents {
         return code;
     }
 
+    @Nonnull
     public static String asString(int code) {
         String event = "UNKNOWN";
         for (FrameworkEvents events : values()) {

@@ -29,6 +29,8 @@ public final class Constants {
     public static final String BUNDLES_ROOT_DIR_KEY = "BundlesRootDir";
 
     public static final String BUNDLES_ROOT_DIR_VALUE = "/bundles/";
+    
+    public static final String BUNDLE_CTX_ATTR = "org.osgi.framework.BundleContext";
 
     public static final String PROVISIONING_FILE = "provisioning";
 

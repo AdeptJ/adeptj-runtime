@@ -20,6 +20,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.ServletContextHolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -73,8 +74,8 @@ public class FrameworkRestartHandler implements FrameworkListener {
 
 	private void handleBundleContext(BundleContext bundleContext) {
 		ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
-		servletContext.removeAttribute(BundleContext.class.getName());
-		servletContext.setAttribute(BundleContext.class.getName(), bundleContext);
+		servletContext.removeAttribute(Constants.BUNDLE_CTX_ATTR);
+		servletContext.setAttribute(Constants.BUNDLE_CTX_ATTR, bundleContext);
 		// Sets the new BundleContext in BundleContextHolder so that whenever the Server shuts down
         // after a restart of OSGi Framework, it should not throw [java.lang.IllegalStateException]
         // while removing this listener by calling removeFrameworkListener method when OSGi Framework stops itself.
@@ -84,9 +85,9 @@ public class FrameworkRestartHandler implements FrameworkListener {
 	private void handleDispatcherServletTracker(Logger logger) {
 		try {
 		    DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+		    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
 		    // DispatcherServletTrackerSupport already holds a ServletConfig reference
 		    // from first time when ProxyServlet was initialized. Pass a null, which is just fine.
-		    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
 		    DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
 		} catch (Exception ex) { // NOSONAR
 		    // Note: What shall we do if DispatcherServlet initialization failed.
