@@ -38,7 +38,7 @@
         <!-- Common Dependencies -->
         <undertow.version>1.4.12.Final</undertow.version>
         <undertow.websockets.version>1.4.12.Final</undertow.websockets.version>
-        <xnio.version>3.4.4.Final</xnio.version>
+        <xnio.version>3.4.5.Final</xnio.version>
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.0</maven-dependency-plugin.version>
 
@@ -224,7 +224,7 @@
         <dependency>
             <groupId>org.wildfly.common</groupId>
             <artifactId>wildfly-common</artifactId>
-            <version>1.1.0.Final</version>
+            <version>1.2.0.Beta8</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
@@ -247,8 +247,8 @@
             <version>${xnio.version}</version>
         </dependency>
 
-        <!-- Undertow core [provided] scoped dependencies -->
-
+        <!-- Undertow core [provided] scoped dependencies start -->
+        
         <dependency>
             <groupId>org.eclipse.jetty.alpn</groupId>
             <artifactId>alpn-api</artifactId>
@@ -301,7 +301,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Undertow core [provided] dependencies -->
+        <!-- Undertow core [provided] dependencies end -->
 
         <dependency>
             <groupId>io.undertow</groupId>
@@ -326,11 +326,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
         </dependency>
 
         <dependency>
@@ -568,6 +563,75 @@
                     <artifactId>org.osgi.compendium</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.webconsole.plugins.useradmin</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+            <version>3.5.8</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.jaas</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework.security</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.framework</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.useradmin</artifactId>
+            <version>1.0.3</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.compendium</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.framework</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.useradmin</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.http.sslfilter</artifactId>
+            <version>1.2.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- OSGi Bundles Ends -->

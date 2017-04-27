@@ -19,9 +19,10 @@
 */
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Constants;
 import io.undertow.predicate.Predicate;
 import io.undertow.server.HttpServerExchange;
+
+import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 
 /**
  * Predicate checks if the request is for context root "/".
@@ -32,7 +33,7 @@ final class ContextRootPredicate implements Predicate {
 
     @Override
     public boolean resolve(HttpServerExchange exchange) {
-        return Constants.CONTEXT_PATH.equals(exchange.getRequestURI());
+        return CONTEXT_PATH.equals(exchange.getRequestURI());
     }
 
 }

@@ -19,19 +19,18 @@
 */
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Environment;
-import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.IOUtils;
+import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.servlet.LoginServlet;
 import com.adeptj.runtime.servlet.DashboardServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
+import com.adeptj.runtime.servlet.LoginServlet;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -78,8 +77,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
@@ -93,8 +90,11 @@ import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.runtime.common.Constants.OSGI_WEBCONSOLE_URI;
 import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 
 /**
  * UndertowBootstrap: Provision the Undertow Http Server.
@@ -206,7 +206,7 @@ public final class UndertowBootstrap {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
-            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE), 
+            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE),
             		httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger), httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
@@ -250,35 +250,35 @@ public final class UndertowBootstrap {
             channel.socket().bind(new InetSocketAddress(port));
             portAvailable = true;
         } catch (BindException ex) {
-            logger.error("BindException while aquiring port: [{}], cause:", port, ex);
+            logger.error("BindException while acquiring port: [{}], cause:", port, ex);
         } catch (IOException ex) {
-            logger.error("IOException while aquiring port: [{}], cause:", port, ex);
+            logger.error("IOException while acquiring port: [{}], cause:", port, ex);
         }
         return portAvailable;
     }
 
-    private static Map<HttpString, String> serverHeaders(Config undertowConfig) {
+    private static Map<HttpString, String> serverHeaders(Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
-        headers.put(HttpString.tryFromString(HEADER_SERVER), undertowConfig.getString(KEY_HEADER_SERVER));
-        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), undertowConfig.getString(KEY_HEADER_POWERED_BY));
+        headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
+        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), cfg.getString(KEY_HEADER_POWERED_BY));
         return headers;
     }
 
     private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
-        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(Constants.OSGI_WEBCONSOLE_URI), initialHandler);
+        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_URI), initialHandler);
     }
 
-    private static Set<HttpString> allowedMethods(Config undertowConfig) {
-        return undertowConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
+    private static Set<HttpString> allowedMethods(Config cfg) {
+        return cfg.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
     }
 
-    private static HttpHandler rootHandler(HttpHandler initialHandler, Config undertowConfig) {
-        return Handlers.gracefulShutdown(new RequestLimitingHandler(undertowConfig.getInt(KEY_MAX_CONCURRENT_REQS),
-                new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(undertowConfig))));
+    private static HttpHandler rootHandler(HttpHandler initialHandler, Config cfg) {
+        return Handlers.gracefulShutdown(new RequestLimitingHandler(cfg.getInt(KEY_MAX_CONCURRENT_REQS),
+                new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(cfg))));
     }
 
-    private static List<ErrorPage> errorPages(Config undertowConfig) {
-        return undertowConfig.getObject("error-pages").unwrapped().entrySet().stream()
+    private static List<ErrorPage> errorPages(Config cfg) {
+        return cfg.getObject("error-pages").unwrapped().entrySet().stream()
                 .map(entry -> Servlets.errorPage(String.valueOf(entry.getValue()), Integer.parseInt(entry.getKey())))
                 .collect(Collectors.toList());
     }
@@ -288,11 +288,11 @@ public final class UndertowBootstrap {
                 new ImmediateInstanceFactory<>(new ContainerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
     }
 
-    private static SecurityConstraint securityConstraint(Config undertowConfig) {
-        return Servlets.securityConstraint().addRolesAllowed(undertowConfig.getStringList("common.auth-roles"))
+    private static SecurityConstraint securityConstraint(Config cfg) {
+        return Servlets.securityConstraint().addRolesAllowed(cfg.getStringList("common.auth-roles"))
                 .addWebResourceCollection(Servlets.webResourceCollection()
-                        .addHttpMethods(undertowConfig.getStringList("common.secured-urls-allowed-methods"))
-                        .addUrlPatterns(undertowConfig.getStringList("common.secured-urls")));
+                        .addHttpMethods(cfg.getStringList("common.secured-urls-allowed-methods"))
+                        .addUrlPatterns(cfg.getStringList("common.secured-urls")));
     }
 
     private static List<ServletInfo> servlets() {
@@ -303,26 +303,26 @@ public final class UndertowBootstrap {
         return servlets;
     }
 
-    private static MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
-        return new MultipartConfigElement(undertowConfig.getString("common.multipart-file-location"),
-                undertowConfig.getLong("common.multipart-max-file-size"),
-                undertowConfig.getLong("common.multipart-max-request-size"),
-                undertowConfig.getInt("common.multipart-file-size-threshold"));
+    private static MultipartConfigElement defaultMultipartConfig(Config cfg) {
+        return new MultipartConfigElement(cfg.getString("common.multipart-file-location"),
+                cfg.getLong("common.multipart-max-file-size"),
+                cfg.getLong("common.multipart-max-request-size"),
+                cfg.getInt("common.multipart-file-size-threshold"));
     }
 
-    private static DeploymentInfo deploymentInfo(Config undertowConfig) {
+    private static DeploymentInfo deploymentInfo(Config cfg) {
         return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
                 .setClassLoader(UndertowBootstrap.class.getClassLoader())
-                .setIgnoreFlush(undertowConfig.getBoolean(KEY_IGNORE_FLUSH))
-                .setDefaultEncoding(undertowConfig.getString(KEY_DEFAULT_ENCODING))
-                .setDefaultSessionTimeout(undertowConfig.getInt("common.session-timeout"))
-                .setInvalidateSessionOnLogout(undertowConfig.getBoolean("common.invalidate-session-on-logout"))
-                .setIdentityManager(new TextIdentityManager(undertowConfig))
-                .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean("common.use-cached-auth-mechanism"))
+                .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
+                .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
+                .setDefaultSessionTimeout(cfg.getInt("common.session-timeout"))
+                .setInvalidateSessionOnLogout(cfg.getBoolean("common.invalidate-session-on-logout"))
+                .setIdentityManager(new TextIdentityManager(cfg))
+                .setUseCachedAuthenticationMechanism(cfg.getBoolean("common.use-cached-auth-mechanism"))
                 .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
-                .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(undertowConfig))
-                .addServlets(servlets()).addErrorPages(errorPages(undertowConfig))
-                .setDefaultMultipartConfig(defaultMultipartConfig(undertowConfig))
+                .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(cfg))
+                .addServlets(servlets()).addErrorPages(errorPages(cfg))
+                .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
     }
 

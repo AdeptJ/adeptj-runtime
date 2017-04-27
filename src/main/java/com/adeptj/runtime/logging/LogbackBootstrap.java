@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -30,16 +30,15 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
-
-import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ch.qos.logback.classic.Level.toLevel;
+import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
 
 /**
  * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH.
@@ -76,7 +75,9 @@ public class LogbackBootstrap {
 
     private static final String KEY_ROLLOVER_SERVER_LOG_FILE = "rollover-server-log-file";
 
-    private static final String KEY_LOG_PATTERN = "log-pattern";
+    private static final String KEY_LOG_PATTERN_FILE = "log-pattern-file";
+
+    private static final String KEY_LOG_PATTERN_CONSOLE = "log-pattern-console";
 
     private static final String KEY_LOG_MAX_HISTORY = "log-max-history";
 
@@ -109,17 +110,17 @@ public class LogbackBootstrap {
         fileAppender.setRollingPolicy(rollingPolicy);
         fileAppender.setTriggeringPolicy(triggeringPolicy);
         fileAppender.start();
+        List<Appender<ILoggingEvent>> appenders = new ArrayList<>();
+        appenders.add(consoleAppender);
+        appenders.add(fileAppender);
         // initialize all the required loggers.
         rootLogger(context, consoleAppender, config);
-        List<Appender<ILoggingEvent>> appenders = Arrays.asList(consoleAppender, fileAppender);
         adeptjLogger(context, appenders, config);
         undertowLogger(context, appenders, config);
         xnioLogger(context, appenders, config);
-        thymeleafLogger(context, appenders, config);
         trimouLogger(context, appenders, config);
         context.start();
-        Logger logger = context.getLogger(LogbackBootstrap.class);
-        logger.info("Logback initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        context.getLogger(LogbackBootstrap.class).info("Logback initialized in [{}] ms!!", elapsedSinceMillis(startTime));
     }
 
     public static void stopLoggerContext() {
@@ -164,12 +165,6 @@ public class LogbackBootstrap {
         adeptjLogger.setAdditive(false);
     }
 
-    private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
-        addAppenders(appenders, thymeleafLogger);
-        thymeleafLogger.setAdditive(false);
-    }
-
     private static void trimouLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
         Logger thymeleafLogger = logger(LOGGER_TRIMOU, toLevel(config.getString(TRIMOU_LOG_LEVEL)), context);
         addAppenders(appenders, thymeleafLogger);
@@ -198,10 +193,10 @@ public class LogbackBootstrap {
 
     private static RollingFileAppender<ILoggingEvent> fileAppender(LoggerContext context, Config config) {
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
+        fileAppender.setName(APPENDER_FILE);
         fileAppender.setFile(config.getString(KEY_SERVER_LOG_FILE));
         fileAppender.setAppend(true);
-        fileAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN)));
-        fileAppender.setName(APPENDER_FILE);
+        fileAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN_FILE)));
         fileAppender.setContext(context);
         return fileAppender;
     }
@@ -210,7 +205,7 @@ public class LogbackBootstrap {
         ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
         consoleAppender.setName(APPENDER_CONSOLE);
         consoleAppender.setContext(context);
-        consoleAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN)));
+        consoleAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN_CONSOLE)));
         consoleAppender.start();
         return consoleAppender;
     }
