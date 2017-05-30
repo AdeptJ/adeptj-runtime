@@ -118,6 +118,7 @@ public class LogbackBootstrap {
         adeptjLogger(context, appenders, config);
         undertowLogger(context, appenders, config);
         xnioLogger(context, appenders, config);
+        thymeleafLogger(context, appenders, config);
         trimouLogger(context, appenders, config);
         context.start();
         context.getLogger(LogbackBootstrap.class).info("Logback initialized in [{}] ms!!", elapsedSinceMillis(startTime));
@@ -163,6 +164,12 @@ public class LogbackBootstrap {
         Logger adeptjLogger = logger(LOGGER_ADEPTJ, toLevel(config.getString(ADEPTJ_LOG_LEVEL)), context);
         addAppenders(appenders, adeptjLogger);
         adeptjLogger.setAdditive(false);
+    }
+    
+    private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
+        Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
+        addAppenders(appenders, thymeleafLogger);
+        thymeleafLogger.setAdditive(false);
     }
 
     private static void trimouLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
