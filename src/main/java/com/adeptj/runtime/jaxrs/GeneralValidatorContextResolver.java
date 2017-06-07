@@ -25,6 +25,7 @@ import org.hibernate.validator.parameternameprovider.ReflectionParameterNameProv
 import org.jboss.resteasy.plugins.validation.GeneralValidatorImpl;
 import org.jboss.resteasy.plugins.validation.i18n.Messages;
 import org.jboss.resteasy.spi.validation.GeneralValidator;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.Validation;
 import javax.validation.ValidationException;
@@ -68,6 +69,7 @@ public class GeneralValidatorContextResolver implements ContextResolver<GeneralV
 		private ValidatorFactory getValidatorFactory() {
 			HibernateValidatorConfiguration config = Validation.byProvider(HibernateValidator.class).configure();
 			config.parameterNameProvider(new ReflectionParameterNameProvider());
+            LoggerFactory.getLogger(ValidatorFactoryInitializer.class).info("Hibernate Validator Initialized!!");
 			return config.buildValidatorFactory();
 		}
 	}

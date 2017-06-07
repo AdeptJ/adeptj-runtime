@@ -48,6 +48,16 @@ public final class OSGiUtils {
         }
     }
 
+    public static Filter anyServiceFilter(BundleContext context, String filterExpr) {
+        try {
+            return context.createFilter(new StringBuilder("(&(").append(Constants.OBJECTCLASS).append("=")
+                    .append("*").append(")").append(filterExpr).append(")").toString());
+        } catch (InvalidSyntaxException ex) {
+            // Filter expression is malformed, not RFC-1960 based Filter.
+            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
+        }
+    }
+
     public static void unregisterService(ServiceRegistration<?> registration) {
         Optional.ofNullable(registration).ifPresent(ServiceRegistration::unregister);
     }

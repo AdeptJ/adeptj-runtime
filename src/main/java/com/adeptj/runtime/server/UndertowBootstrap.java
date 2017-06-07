@@ -35,6 +35,7 @@ import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
+import io.undertow.Version;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.PredicateHandler;
@@ -83,7 +84,6 @@ import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.HEADER_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
-import static com.adeptj.runtime.common.Constants.KEY_HEADER_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
@@ -260,7 +260,7 @@ public final class UndertowBootstrap {
     private static Map<HttpString, String> serverHeaders(Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
-        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), cfg.getString(KEY_HEADER_POWERED_BY));
+        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), Version.getFullVersionString());
         return headers;
     }
 

@@ -20,6 +20,7 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.OSGiUtils;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.jaxrs.GeneralValidatorContextResolver;
 import com.adeptj.runtime.jaxrs.ResourceTracker;
@@ -29,8 +30,6 @@ import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.spi.validation.GeneralValidator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,35 +58,31 @@ public class RESTEasyServlet extends HttpServletDispatcher {
 	
 	private static final String JAXRS_RESOURCE_SERVICE_FILTER = "(&(objectClass=*)(osgi.jaxrs.resource.base=*))";
 
+	private static final String FIELD_CTX_RESOLVERS = "contextResolvers";
+
+    private static final String FIELD_PROVIDER_CLASSES = "providerClasses";
+
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		try {
 			super.init(servletConfig);
 			Dispatcher dispatcher = this.getDispatcher();
 			BundleContext context = BundleContextHolder.INSTANCE.getBundleContext();
-			ResourceTracker resourceTracker = new ResourceTracker(context, this.getFilter(context), dispatcher.getRegistry());
-			ServiceTrackers.INSTANCE.track(ResourceTracker.class, resourceTracker);
-			this.handleGeneralValidatorContextResolver(dispatcher.getProviderFactory());
+			ServiceTrackers.INSTANCE.track(ResourceTracker.class, new ResourceTracker(context, OSGiUtils.anyServiceFilter(
+			        context, JAXRS_RESOURCE_SERVICE_FILTER), dispatcher.getRegistry()));
+			this.registerGeneralValidatorContextResolver(dispatcher.getProviderFactory());
 			LOGGER.info("RESTEasy HttpServletDispatcher initialized successfully!!");
-		} catch (Exception ex) {
+		} catch (Exception ex) { // NOSONAR
 			LOGGER.error("Exception while initializing RESTEasy HttpServletDispatcher!!", ex);
 			throw new InitializationException(ex.getMessage(), ex);
 		}
 	}
-	
-	private Filter getFilter(BundleContext context) {
-		try {
-			return context.createFilter(JAXRS_RESOURCE_SERVICE_FILTER);
-		} catch (InvalidSyntaxException ise) {
-			throw new IllegalStateException(ise);
-		}
-	}
 
-	protected void handleGeneralValidatorContextResolver(ResteasyProviderFactory factory) {
+	protected void registerGeneralValidatorContextResolver(ResteasyProviderFactory factory) {
 		try {
-			Map.class.cast(getDeclaredField(ResteasyProviderFactory.class, "contextResolvers", true).get(factory))
+			Map.class.cast(getDeclaredField(ResteasyProviderFactory.class, FIELD_CTX_RESOLVERS , true).get(factory))
 					.remove(GeneralValidator.class);
-			Set.class.cast(getDeclaredField(ResteasyProviderFactory.class, "providerClasses", true).get(factory))
+			Set.class.cast(getDeclaredField(ResteasyProviderFactory.class, FIELD_PROVIDER_CLASSES, true).get(factory))
 					.remove(GeneralValidatorContextResolver.class);
 			factory.registerProvider(GeneralValidatorContextResolver.class);
 		} catch (IllegalArgumentException | IllegalAccessException ex) {
