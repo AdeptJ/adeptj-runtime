@@ -20,4 +20,5 @@ org.jboss.resteasy.plugins.interceptors.GZIPDecodingInterceptor
 org.jboss.resteasy.plugins.interceptors.GZIPEncodingInterceptor
 org.jboss.resteasy.plugins.interceptors.ServerContentEncodingAnnotationFeature
 org.jboss.resteasy.plugins.interceptors.RoleBasedSecurityFeature
+com.adeptj.runtime.jaxrs.GeneralValidatorContextResolver
 com.adeptj.runtime.jaxrs.CORSFeature

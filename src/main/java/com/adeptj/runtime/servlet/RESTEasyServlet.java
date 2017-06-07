@@ -78,7 +78,7 @@ public class RESTEasyServlet extends HttpServletDispatcher {
 		}
 	}
 
-	protected void registerGeneralValidatorContextResolver(ResteasyProviderFactory factory) {
+	private void registerGeneralValidatorContextResolver(ResteasyProviderFactory factory) {
 		try {
 			Map.class.cast(getDeclaredField(ResteasyProviderFactory.class, FIELD_CTX_RESOLVERS , true).get(factory))
 					.remove(GeneralValidator.class);
