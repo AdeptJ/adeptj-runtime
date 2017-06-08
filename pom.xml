@@ -1145,6 +1145,23 @@
 
         <profile>
 
+            <id>MySQL</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>6.0.6</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
             <id>MongoDB</id>
 
             <dependencies>
