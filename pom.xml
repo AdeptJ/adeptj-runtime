@@ -36,7 +36,7 @@
 
     <properties>
         <!-- Common Dependencies -->
-        <undertow.version>1.4.15.Final</undertow.version>
+        <undertow.version>1.4.16.Final</undertow.version>
         <undertow.websockets.version>1.4.15.Final</undertow.websockets.version>
         <xnio.version>3.4.5.Final</xnio.version>
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
@@ -355,7 +355,15 @@
             <artifactId>config</artifactId>
         </dependency>
 
-        <!-- RenderEngine Dependencies -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+
+
+       <!-- RenderEngine Dependencies -->
+
         <dependency>
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
@@ -584,6 +592,20 @@
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-tools</artifactId>
             <version>1.0.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
