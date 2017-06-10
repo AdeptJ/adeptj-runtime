@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -26,6 +26,7 @@ import com.adeptj.runtime.servlet.OSGiPerServletContextErrorServlet;
 import com.adeptj.runtime.servlet.ProxyServlet;
 import com.adeptj.runtime.servlet.RESTEasyServlet;
 import com.typesafe.config.Config;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
@@ -140,7 +141,7 @@ public enum FrameworkBootstrap {
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
-        Map<String, String> configs = this.loadFrameworkProperties();
+        Map<String, String> configs = this.loadFrameworkProperties(logger);
         Config felixConf = Configs.DEFAULT.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
         configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
@@ -148,11 +149,13 @@ public enum FrameworkBootstrap {
         return configs;
     }
 
-    private Map<String, String> loadFrameworkProperties() throws IOException {
+    private Map<String, String> loadFrameworkProperties(Logger logger) throws IOException {
+        long startTime = System.nanoTime();
         Properties props = new Properties();
         props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> configs.put((String) key, (String) val));
+        logger.info("Framework properties population took [{}] ms.", Times.elapsedSinceMillis(startTime));
         return configs;
     }
 }
