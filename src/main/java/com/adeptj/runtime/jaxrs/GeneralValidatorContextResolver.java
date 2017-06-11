@@ -38,7 +38,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * GeneralValidatorContextResolver.
+ * GeneralValidatorContextResolver used to provide the ValidatorFactory that gives the parameter names of validated fields.
+ *
+ * RESTEasy does not provide that.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -68,6 +70,7 @@ public class GeneralValidatorContextResolver implements ContextResolver<GeneralV
 
 		private ValidatorFactory getValidatorFactory() {
 			HibernateValidatorConfiguration config = Validation.byProvider(HibernateValidator.class).configure();
+			// ValidatorFactory Provided by RESTEasy does not give the parameter names of validated fields.
 			config.parameterNameProvider(new ReflectionParameterNameProvider());
             LoggerFactory.getLogger(ValidatorFactoryInitializer.class).info("Hibernate Validator Initialized!!");
 			return config.buildValidatorFactory();

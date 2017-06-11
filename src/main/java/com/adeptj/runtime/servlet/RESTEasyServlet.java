@@ -26,7 +26,7 @@ import com.adeptj.runtime.jaxrs.GeneralValidatorContextResolver;
 import com.adeptj.runtime.jaxrs.ResourceTracker;
 import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
+import org.jboss.resteasy.plugins.server.servlet.HttpServlet30Dispatcher;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.jboss.resteasy.spi.validation.GeneralValidator;
 import org.osgi.framework.BundleContext;
@@ -50,7 +50,7 @@ import static org.apache.commons.lang3.reflect.FieldUtils.getDeclaredField;
  */
 @WebServlet(name = "RESTEasy HttpServletDispatcher", urlPatterns = "/*", asyncSupported = true, initParams = {
 		@WebInitParam(name = "resteasy.servlet.mapping.prefix", value = "/") })
-public class RESTEasyServlet extends HttpServletDispatcher {
+public class RESTEasyServlet extends HttpServlet30Dispatcher {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RESTEasyServlet.class);
 
