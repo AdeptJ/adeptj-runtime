@@ -24,7 +24,6 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.servlet.OSGiPerServletContextErrorServlet;
 import com.adeptj.runtime.servlet.ProxyServlet;
-import com.adeptj.runtime.servlet.RESTEasyServlet;
 import com.typesafe.config.Config;
 
 import org.osgi.framework.BundleContext;
@@ -76,7 +75,6 @@ public enum FrameworkBootstrap {
             Bundles.provisionBundles(systemBundleContext);
             List<String> errorPages = Configs.DEFAULT.undertow().getStringList("common.error-pages");
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiPerServletContextErrorServlet(), errorPages);
-            OSGiServlets.INSTANCE.register(systemBundleContext, new RESTEasyServlet());
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             this.registerBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
