@@ -43,12 +43,12 @@ import java.util.Set;
 import static org.apache.commons.lang3.reflect.FieldUtils.getDeclaredField;
 
 /**
- * RESTEasyServlet extends RESTEasy HttpServletDispatcher so that the providers can be loaded from 
- * META-INF/services using Framework class loader.
+ * RESTEasyServlet extends RESTEasy HttpServlet30Dispatcher so that Servlet 3.0 Async behaviour can be leveraged.
+ * It also registers the JAX-RS resource ServiceTracker and GeneralValidatorContextResolver.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-@WebServlet(name = "RESTEasy HttpServletDispatcher", urlPatterns = "/*", asyncSupported = true, initParams = {
+@WebServlet(name = "RESTEasy HttpServlet30Dispatcher", urlPatterns = "/*", asyncSupported = true, initParams = {
 		@WebInitParam(name = "resteasy.servlet.mapping.prefix", value = "/") })
 public class RESTEasyServlet extends HttpServlet30Dispatcher {
 
@@ -68,17 +68,17 @@ public class RESTEasyServlet extends HttpServlet30Dispatcher {
 			super.init(servletConfig);
 			Dispatcher dispatcher = this.getDispatcher();
 			BundleContext context = BundleContextHolder.INSTANCE.getBundleContext();
-			ServiceTrackers.INSTANCE.track(ResourceTracker.class, new ResourceTracker(context, OSGiUtils.anyServiceFilter(
-			        context, JAXRS_RESOURCE_SERVICE_FILTER), dispatcher.getRegistry()));
-			this.registerGeneralValidatorContextResolver(dispatcher.getProviderFactory());
-			LOGGER.info("RESTEasy HttpServletDispatcher initialized successfully!!");
+			ServiceTrackers.INSTANCE.track(ResourceTracker.class, new ResourceTracker(context,
+                    OSGiUtils.anyServiceFilter(context, JAXRS_RESOURCE_SERVICE_FILTER), dispatcher.getRegistry()));
+			this.registerContextResolver(dispatcher.getProviderFactory());
+			LOGGER.info("RESTEasyServlet initialized successfully!!");
 		} catch (Exception ex) { // NOSONAR
 			LOGGER.error("Exception while initializing RESTEasy HttpServletDispatcher!!", ex);
 			throw new InitializationException(ex.getMessage(), ex);
 		}
 	}
 
-	private void registerGeneralValidatorContextResolver(ResteasyProviderFactory factory) {
+	private void registerContextResolver(ResteasyProviderFactory factory) {
 		try {
 			Map.class.cast(getDeclaredField(ResteasyProviderFactory.class, FIELD_CTX_RESOLVERS , true).get(factory))
 					.remove(GeneralValidator.class);
@@ -92,6 +92,7 @@ public class RESTEasyServlet extends HttpServlet30Dispatcher {
 	
 	@Override
 	public void destroy() {
+        LOGGER.info("Destroying RESTEasyServlet!!");
 		super.destroy();
 		ServiceTrackers.INSTANCE.close(ResourceTracker.class);
 	}

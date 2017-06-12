@@ -46,7 +46,7 @@ public class ResourceTracker extends ServiceTracker<Object, Object> {
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		Object resource = super.addingService(reference);
-		LOGGER.info("Adding Resource: [{}]", resource);
+		LOGGER.info("Adding JAX-RS Resource: [{}]", resource);
 		this.registry.addSingletonResource(resource);
 		return resource;
 	}
@@ -54,7 +54,7 @@ public class ResourceTracker extends ServiceTracker<Object, Object> {
 	@Override
 	public void removedService(ServiceReference<Object> reference, Object service) {
 		super.removedService(reference, service);
-		LOGGER.info("Removing Resource: [{}]", service);
+		LOGGER.info("Removing JAX-RS Resource: [{}]", service);
 		this.registry.removeRegistrations(service.getClass());
 	}
 
