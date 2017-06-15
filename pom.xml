@@ -885,6 +885,23 @@
 
         <profile>
 
+            <id>AWS</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-commons-aws-base</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
             <id>Ehcache</id>
 
             <dependencies>
