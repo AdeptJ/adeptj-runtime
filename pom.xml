@@ -867,6 +867,13 @@
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-jaxrs-base</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
                     <version>1.0.0.Final</version>
                     <scope>provided</scope>
