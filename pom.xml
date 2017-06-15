@@ -238,7 +238,7 @@
         <dependency>
             <groupId>org.wildfly.common</groupId>
             <artifactId>wildfly-common</artifactId>
-            <version>1.2.0.Beta11</version>
+            <version>1.1.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
