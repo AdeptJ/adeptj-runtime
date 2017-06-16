@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -143,6 +144,7 @@ public enum FrameworkBootstrap {
         Config felixConf = Configs.DEFAULT.felix();
         configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
         configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
+        Optional.ofNullable(System.getProperty("felix.log.level")).ifPresent(logLevel -> configs.put("felix.log.level", logLevel));
         logger.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
