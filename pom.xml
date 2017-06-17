@@ -879,15 +879,6 @@
                     <scope>provided</scope>
                 </dependency>
 
-                <!-- H2 Database for storing Auth info of REST API users -->
-
-                <dependency>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                    <version>1.4.196</version>
-                    <scope>provided</scope>
-                </dependency>
-
             </dependencies>
 
         </profile>
