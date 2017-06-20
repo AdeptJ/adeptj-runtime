@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             #
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -78,6 +78,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
@@ -90,11 +91,10 @@ import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
-import static com.adeptj.runtime.common.Constants.OSGI_WEBCONSOLE_URI;
-import static com.adeptj.runtime.common.Constants.STARTUP_INFO;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 
 /**
  * UndertowBootstrap: Provision the Undertow Http Server.
@@ -148,7 +148,7 @@ public final class UndertowBootstrap {
         logger.debug("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
-        printStartupInfo(logger);
+        printBanner(logger);
         Builder undertowBuilder = Undertow.builder();
         DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
@@ -164,9 +164,9 @@ public final class UndertowBootstrap {
         launchBrowser(arguments, httpPort, logger);
     }
 
-	private static void printStartupInfo(Logger logger) {
+	private static void printBanner(Logger logger) {
 		try {
-        	logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(STARTUP_INFO))); // NOSONAR
+        	logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(BANNER_TXT))); // NOSONAR
 		} catch (IOException ex) {
 			// Just log it, its not critical.
 			logger.error("IOException!!", ex);
@@ -198,7 +198,7 @@ public final class UndertowBootstrap {
             int calcMaxTaskThreads = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
             undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads
             		: maxTaskThreads);
-            logger.info("Optimized AdeptJ Runtime for [{}] mode.", serverMode);
+            logger.info("Optimized AdeptJ Runtime for [PROD] mode.");
         }
     }
 
@@ -222,13 +222,10 @@ public final class UndertowBootstrap {
     }
 
     private static int handlePortAvailability(Config httpConf, Logger logger) {
-        String propertyPort = System.getProperty(SYS_PROP_SERVER_PORT);
-        int port;
-        if (propertyPort == null || propertyPort.isEmpty()) {
-            port = httpConf.getInt(KEY_PORT);
+        int defaultPort = httpConf.getInt(KEY_PORT);
+        Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT, defaultPort);
+        if (port == defaultPort) {
             logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
-        } else {
-            port = Integer.parseInt(propertyPort);
         }
         // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
         // started already and another server start(from same location) will again start new OSGi Framework which may interfere
@@ -265,7 +262,7 @@ public final class UndertowBootstrap {
     }
 
     private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
-        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(OSGI_WEBCONSOLE_URI), initialHandler);
+        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(TOOLS_DASHBOARD_URI), initialHandler);
     }
 
     private static Set<HttpString> allowedMethods(Config cfg) {
@@ -298,7 +295,7 @@ public final class UndertowBootstrap {
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/tools/error/*"));
-        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/tools/*"));
+        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/tools/dashboard"));
         servlets.add(Servlets.servlet(LoginServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI));
         return servlets;
     }
@@ -333,7 +330,7 @@ public final class UndertowBootstrap {
 			return keyStore;
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
 			logger.error("Exception while loading KeyStore!!", ex);
-			throw new InitializationException(ex.getMessage(), ex);
+			throw new InitializationException("Exception while loading KeyStore!!", ex);
 		}
     }
 
@@ -344,7 +341,7 @@ public final class UndertowBootstrap {
 			return sslContext;
 		} catch (NoSuchAlgorithmException | KeyManagementException ex) {
 			logger.error("Exception while initializing SSLContext!!", ex);
-			throw new InitializationException(ex.getMessage(), ex);
+			throw new InitializationException("Exception while initializing SSLContext!!", ex);
 		}
     }
 
@@ -355,7 +352,7 @@ public final class UndertowBootstrap {
 			return kmf.getKeyManagers();
 		} catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
 			logger.error("Exception while initializing KeyManagers!!", ex);
-			throw new InitializationException(ex.getMessage(), ex);
+			throw new InitializationException("Exception while initializing KeyManagers!!", ex);
 		}
     }
 }

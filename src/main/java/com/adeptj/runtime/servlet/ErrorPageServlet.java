@@ -50,7 +50,7 @@ public class ErrorPageServlet extends HttpServlet {
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
         ContextObject ctxObj = new ContextObject();
         TemplateEngine templateEngine = TemplateEngine.instance();
-		if ("/admin/error".equals(requestURI)) {
+		if ("/tools/error".equals(requestURI)) {
         	templateEngine.render(builder.template("error/generic").build());
         } else {
             Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);

@@ -64,7 +64,7 @@ final class TextIdentityManager implements IdentityManager {
     public Account verify(Account account) {
         Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(account.getPrincipal().getName())
                 && entry.getValue().containsAll(account.getRoles());
-        return this.userRolesMapping.entrySet().stream().filter(predicate).findFirst().isPresent() ? account : null;
+        return this.userRolesMapping.entrySet().stream().anyMatch(predicate) ? account : null;
     }
 
     /**

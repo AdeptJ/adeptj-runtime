@@ -19,19 +19,17 @@
 */
 package com.adeptj.runtime.servlet;
 
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.templating.ContextObject;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateEngine;
+import org.osgi.framework.Bundle;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.osgi.framework.Bundle;
-
-import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.templating.ContextObject;
-import com.adeptj.runtime.templating.TemplateContext;
-import com.adeptj.runtime.templating.TemplateEngine;
-
 import java.io.IOException;
 
 /**
@@ -41,7 +39,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "DashboardServlet", urlPatterns = { "/tools/*" })
+@WebServlet(name = "DashboardServlet", urlPatterns = { "/tools/dashboard" })
 public class DashboardServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

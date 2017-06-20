@@ -50,13 +50,13 @@ public final class Constants {
 
     public static final String OSGI_WEBCONSOLE_URI = "/system/console";
 
+    public static final String TOOLS_DASHBOARD_URI = "/tools/dashboard";
+
     public static final String TOOLS_LOGIN_URI = "/tools/login";
 
     public static final String TOOLS_LOGOUT_URI = "/tools/logout";
 
-    public static final String STARTUP_INFO = "/startup-info.txt";
-
-    public static final String SHUTDOWN_INFO = "/shutdown-info.txt";
+    public static final String BANNER_TXT = "/banner.txt";
 
     public static final String REGEX_EQ = "=";
 
@@ -81,6 +81,8 @@ public final class Constants {
     public static final int BUFF_SIZE_1K = 1024;
 
     public static final int BUFF_SIZE_512_BYTES = 512;
+
+    public static final int DEFAULT_SERVER_PORT = 9007;
 
     public static final String SYS_PROP_SERVER_PORT = "adeptj.server.port";
 
@@ -110,7 +112,7 @@ public final class Constants {
 
     public static final String PREFIX_ADMIN = "/admin";
 
-    public static final String OSGI_WEBCONSOLE_ROLE = "OSGiAdmin";
+    public static final String OSGI_ADMIN_ROLE = "OSGiAdmin";
     
     public static final String MODE_DEV = "DEV";
 

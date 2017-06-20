@@ -57,11 +57,13 @@ public class LoginServlet extends HttpServlet {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
         	TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).template("auth/login").build());
-        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_WEBCONSOLE_ROLE)) {
-            this.logout(req, resp);
+        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_ADMIN_ROLE)) {
+            // Invalidate the session and redirect to /tools/login page.
+            req.logout();
+            resp.sendRedirect(Constants.TOOLS_DASHBOARD_URI);
         } else {
             // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
-            resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
+            resp.sendRedirect(Constants.TOOLS_DASHBOARD_URI);
         }
     }
 
@@ -79,11 +81,5 @@ public class LoginServlet extends HttpServlet {
         ctxObj.put("error", "Invalid credentials!!").put("j_username", req.getParameter("j_username"));
         // Render login page again with validation message.
         TemplateEngine.instance().render(builder.template("auth/login").contextObject(ctxObj).build());
-    }
-
-    private void logout(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Invalidate the session and redirect back to /system/console page.
-        req.logout();
-        resp.sendRedirect(Constants.OSGI_WEBCONSOLE_URI);
     }
 }

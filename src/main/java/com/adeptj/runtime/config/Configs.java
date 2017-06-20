@@ -25,7 +25,6 @@ import com.typesafe.config.ConfigFactory;
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.PROVISIONING_FILE;
 import static com.adeptj.runtime.common.Constants.THYMELEAF_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
@@ -42,7 +41,7 @@ public enum Configs {
     private final Config main;
 
     Configs() {
-        this.main = ConfigFactory.load(PROVISIONING_FILE).getConfig(MAIN_CONF_SECTION);
+        this.main = ConfigFactory.load().getConfig(MAIN_CONF_SECTION);
     }
 
     public Config main() {
