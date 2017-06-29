@@ -19,6 +19,7 @@
 */
 package com.adeptj.runtime.logging;
 
+import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -26,8 +27,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
-import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
+import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
@@ -50,7 +51,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  */
 public class LogbackBootstrap {
 
-    private static final String ROOT_LOG_LEVEL = "root-log-level";
+    private static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
 
     private static final String KEY_SERVER_LOG_FILE = "server-log-file";
 
@@ -75,7 +76,13 @@ public class LogbackBootstrap {
     private static final String APPENDER_CONSOLE = "CONSOLE";
 
     private static final String APPENDER_FILE = "FILE";
-    
+
+    private static final String APPENDER_ASYNC = "ASYNC";
+
+    private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
+
+    private static final String SYS_PROP_ASYNC_LOGGING = "async.logging";
+
     // Utility methods only.
     private LogbackBootstrap() {
     }
@@ -85,21 +92,18 @@ public class LogbackBootstrap {
         long startTime = System.nanoTime();
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         Config config = Configs.DEFAULT.logging();
-        // Console Appender
-        ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, config);
         // File Appender
         RollingFileAppender<ILoggingEvent> fileAppender = fileAppender(context, config);
-        // Rolling Policy
-        TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = rollingPolicy(config, context);
-        rollingPolicy.setParent(fileAppender);
-        // Triggering Policy
-        SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy = triggeringPolicy(config);
-        rollingPolicy.setTimeBasedFileNamingAndTriggeringPolicy(triggeringPolicy);
-        rollingPolicy.start();
+        // Triggering & Rolling Policy
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> trigAndRollPolicy = trigAndRollPolicy(context, config);
+        trigAndRollPolicy.setParent(fileAppender);
+        trigAndRollPolicy.start();
         // Set Rolling and Triggering Policy to RollingFileAppender
-        fileAppender.setRollingPolicy(rollingPolicy);
-        fileAppender.setTriggeringPolicy(triggeringPolicy);
+        fileAppender.setRollingPolicy(trigAndRollPolicy);
+        fileAppender.setTriggeringPolicy(trigAndRollPolicy);
         fileAppender.start();
+        // Console Appender
+        ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, config);
         List<Appender<ILoggingEvent>> appenderList = new ArrayList<>();
         appenderList.add(consoleAppender);
         appenderList.add(fileAppender);
@@ -108,8 +112,10 @@ public class LogbackBootstrap {
         config.getObject(KEY_LOGGERS).unwrapped().forEach((String key, Object val) -> {
             addLogger(Map.class.cast(val), context, appenderList);
         });
+        asyncAppender(config, context).ifPresent(asyncAppender -> asyncAppender.addAppender(fileAppender));
+        context.setPackagingDataEnabled(true);
         context.start();
-        context.getLogger(LogbackBootstrap.class).info("Logback initialized in [{}] ms!!", elapsedSinceMillis(startTime));
+        context.getLogger(LogbackBootstrap.class).info(INIT_MSG, elapsedSinceMillis(startTime));
     }
 
     public static void stopLoggerContext() {
@@ -119,7 +125,7 @@ public class LogbackBootstrap {
     private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {
         // initialize ROOT Logger at specified level which just logs to ConsoleAppender.
         Logger root = context.getLogger(ROOT_LOGGER_NAME);
-        root.setLevel(toLevel(config.getString(ROOT_LOG_LEVEL)));
+        root.setLevel(toLevel(config.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(consoleAppender);
     }
 
@@ -130,18 +136,24 @@ public class LogbackBootstrap {
         appenderList.forEach(logger::addAppender);
     }
 
-    private static SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy(Config config) {
-        SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy = new SizeAndTimeBasedFNATP<>();
-        triggeringPolicy.setMaxFileSize(FileSize.valueOf(config.getString(KEY_LOG_MAX_SIZE)));
-        return triggeringPolicy;
+    private static SizeAndTimeBasedRollingPolicy<ILoggingEvent> trigAndRollPolicy(LoggerContext context, Config config) {
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> trigAndRollPolicy = new SizeAndTimeBasedRollingPolicy<>();
+        trigAndRollPolicy.setMaxFileSize(FileSize.valueOf(config.getString(KEY_LOG_MAX_SIZE)));
+        trigAndRollPolicy.setContext(context);
+        trigAndRollPolicy.setFileNamePattern(config.getString(KEY_ROLLOVER_SERVER_LOG_FILE));
+        trigAndRollPolicy.setMaxHistory(config.getInt(KEY_LOG_MAX_HISTORY));
+        return trigAndRollPolicy;
     }
 
-    private static TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy(Config config, LoggerContext context) {
-        TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
-        rollingPolicy.setContext(context);
-        rollingPolicy.setFileNamePattern(config.getString(KEY_ROLLOVER_SERVER_LOG_FILE));
-        rollingPolicy.setMaxHistory(config.getInt(KEY_LOG_MAX_HISTORY));
-        return rollingPolicy;
+    private static Optional<AsyncAppender> asyncAppender(Config config, LoggerContext context) {
+        if (Boolean.getBoolean(SYS_PROP_ASYNC_LOGGING)) {
+            AsyncAppender asyncAppender = new AsyncAppender();
+            asyncAppender.setName(APPENDER_ASYNC);
+            asyncAppender.setQueueSize(config.getInt("async-log-queue-size"));
+            asyncAppender.setContext(context);
+            return Optional.of(asyncAppender);
+        }
+        return Optional.empty();
     }
 
     private static RollingFileAppender<ILoggingEvent> fileAppender(LoggerContext context, Config config) {
@@ -149,6 +161,7 @@ public class LogbackBootstrap {
         fileAppender.setName(APPENDER_FILE);
         fileAppender.setFile(config.getString(KEY_SERVER_LOG_FILE));
         fileAppender.setAppend(true);
+        fileAppender.setImmediateFlush(false);
         fileAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN_FILE)));
         fileAppender.setContext(context);
         return fileAppender;
