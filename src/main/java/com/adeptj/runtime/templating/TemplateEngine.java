@@ -29,8 +29,7 @@ public interface TemplateEngine {
 	/**
 	 * Renders the template contained by the TemplateContext.
 	 * 
-	 * @param context
-	 * @throws RenderException
+	 * @param context the TemplateEngine context
 	 */
 	void render(TemplateContext context);
 	

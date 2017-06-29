@@ -19,7 +19,6 @@
 */
 package com.adeptj.runtime.logging;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -36,40 +35,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
  * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH.
- * But using that approach LOGBACK takes longer to initializes(5+ seconds) which is reduced drastically to under 150 milliseconds
+ * But using that approach LOGBACK takes longer to initializes(5+ seconds) which is reduced drastically to under 200 milliseconds
  * using programmatic approach. This is huge improvement on total startup time.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 public class LogbackBootstrap {
 
-    private static final String ADEPTJ_LOG_LEVEL = "adeptj-log-level";
-
-    private static final String UNDERTOW_LOG_LEVEL = "undertow-log-level";
-
-    private static final String XNIO_LOG_LEVEL = "xnio-log-level";
-
-    private static final String THYMELEAF_LOG_LEVEL = "thymeleaf-log-level";
-
-    private static final String TRIMOU_LOG_LEVEL = "trimou-log-level";
-
     private static final String ROOT_LOG_LEVEL = "root-log-level";
-
-    private static final String LOGGER_XNIO = "org.xnio";
-
-    private static final String LOGGER_UNDERTOW = "io.undertow";
-
-    private static final String LOGGER_ADEPTJ = "com.adeptj";
-
-    private static final String LOGGER_THYMELEAF = "org.thymeleaf";
-
-    private static final String LOGGER_TRIMOU = "org.trimou";
 
     private static final String KEY_SERVER_LOG_FILE = "server-log-file";
 
@@ -83,6 +64,14 @@ public class LogbackBootstrap {
 
     private static final String KEY_LOG_MAX_SIZE = "log-max-size";
 
+    private static final String KEY_LOGGERS = "loggers";
+
+    private static final String KEY_LOG_NAME = "name";
+
+    private static final String KEY_LOG_LEVEL = "level";
+
+    private static final String KEY_LOG_ADDITIVITY = "additivity";
+
     private static final String APPENDER_CONSOLE = "CONSOLE";
 
     private static final String APPENDER_FILE = "FILE";
@@ -91,10 +80,11 @@ public class LogbackBootstrap {
     private LogbackBootstrap() {
     }
 
+    @SuppressWarnings("unchecked")
     public static void startLoggerContext() {
         long startTime = System.nanoTime();
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Config config = Configs.DEFAULT.common();
+        Config config = Configs.DEFAULT.logging();
         // Console Appender
         ConsoleAppender<ILoggingEvent> consoleAppender = consoleAppender(context, config);
         // File Appender
@@ -110,78 +100,34 @@ public class LogbackBootstrap {
         fileAppender.setRollingPolicy(rollingPolicy);
         fileAppender.setTriggeringPolicy(triggeringPolicy);
         fileAppender.start();
-        List<Appender<ILoggingEvent>> appenders = new ArrayList<>();
-        appenders.add(consoleAppender);
-        appenders.add(fileAppender);
+        List<Appender<ILoggingEvent>> appenderList = new ArrayList<>();
+        appenderList.add(consoleAppender);
+        appenderList.add(fileAppender);
         // initialize all the required loggers.
         rootLogger(context, consoleAppender, config);
-        adeptjLogger(context, appenders, config);
-        undertowLogger(context, appenders, config);
-        xnioLogger(context, appenders, config);
-        thymeleafLogger(context, appenders, config);
-        trimouLogger(context, appenders, config);
+        config.getObject(KEY_LOGGERS).unwrapped().forEach((String key, Object val) -> {
+            addLogger(Map.class.cast(val), context, appenderList);
+        });
         context.start();
         context.getLogger(LogbackBootstrap.class).info("Logback initialized in [{}] ms!!", elapsedSinceMillis(startTime));
     }
 
     public static void stopLoggerContext() {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        context.stop();
-    }
-
-    public static void addLogger(String name, String level, boolean additivity) {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger logger = context.getLogger(name);
-        logger.setLevel(toLevel(level));
-        logger.setAdditive(additivity);
-    }
-
-    private static void addAppenders(List<Appender<ILoggingEvent>> appenders, Logger logger) {
-        for (Appender<ILoggingEvent> appender : appenders) {
-            logger.addAppender(appender);
-        }
+        ((LoggerContext) LoggerFactory.getILoggerFactory()).stop();
     }
 
     private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {
         // initialize ROOT Logger at specified level which just logs to ConsoleAppender.
-        Logger root = logger(Logger.ROOT_LOGGER_NAME, toLevel(config.getString(ROOT_LOG_LEVEL)), context);
+        Logger root = context.getLogger(ROOT_LOGGER_NAME);
+        root.setLevel(toLevel(config.getString(ROOT_LOG_LEVEL)));
         root.addAppender(consoleAppender);
     }
 
-    private static void xnioLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger xnioLogger = logger(LOGGER_XNIO, toLevel(config.getString(XNIO_LOG_LEVEL)), context);
-        addAppenders(appenders, xnioLogger);
-        xnioLogger.setAdditive(false);
-    }
-
-    private static void undertowLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger undertowLogger = logger(LOGGER_UNDERTOW, toLevel(config.getString(UNDERTOW_LOG_LEVEL)), context);
-        addAppenders(appenders, undertowLogger);
-        undertowLogger.setAdditive(false);
-    }
-
-    private static void adeptjLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger adeptjLogger = logger(LOGGER_ADEPTJ, toLevel(config.getString(ADEPTJ_LOG_LEVEL)), context);
-        addAppenders(appenders, adeptjLogger);
-        adeptjLogger.setAdditive(false);
-    }
-    
-    private static void thymeleafLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger thymeleafLogger = logger(LOGGER_THYMELEAF, toLevel(config.getString(THYMELEAF_LOG_LEVEL)), context);
-        addAppenders(appenders, thymeleafLogger);
-        thymeleafLogger.setAdditive(false);
-    }
-
-    private static void trimouLogger(LoggerContext context, List<Appender<ILoggingEvent>> appenders, Config config) {
-        Logger thymeleafLogger = logger(LOGGER_TRIMOU, toLevel(config.getString(TRIMOU_LOG_LEVEL)), context);
-        addAppenders(appenders, thymeleafLogger);
-        thymeleafLogger.setAdditive(false);
-    }
-
-    private static Logger logger(String name, Level level, LoggerContext context) {
-        Logger logger = context.getLogger(name);
-        logger.setLevel(level);
-        return logger;
+    private static void addLogger(Map<String, Object> configs, LoggerContext context, List<Appender<ILoggingEvent>> appenderList) {
+        Logger logger = context.getLogger((String) configs.get(KEY_LOG_NAME));
+        logger.setLevel(toLevel((String) configs.get(KEY_LOG_LEVEL)));
+        logger.setAdditive((Boolean) configs.get(KEY_LOG_ADDITIVITY));
+        appenderList.forEach(logger::addAppender);
     }
 
     private static SizeAndTimeBasedFNATP<ILoggingEvent> triggeringPolicy(Config config) {

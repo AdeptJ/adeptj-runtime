@@ -46,6 +46,8 @@ public final class Constants {
 
     public static final String COMMON_CONF_SECTION = "common";
 
+    public static final String LOGGING_CONF_SECTION = "logging";
+
     public static final String CONTEXT_PATH = "/";
 
     public static final String OSGI_WEBCONSOLE_URI = "/system/console";
