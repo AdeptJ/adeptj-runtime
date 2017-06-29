@@ -26,6 +26,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
@@ -83,6 +83,12 @@ public class LogbackBootstrap {
 
     private static final String SYS_PROP_ASYNC_LOGGING = "async.logging";
 
+    private static final String KEY_ASYNC_LOG_QUEUE_SIZE = "async-log-queue-size";
+
+    private static final String KEY_ASYNC_LOG_DISCARD_THRESHOLD = "async-log-discardingThreshold";
+
+    private static final String KEY_IMMEDIATE_FLUSH = "file-appender-immediate-flush";
+
     // Utility methods only.
     private LogbackBootstrap() {
     }
@@ -112,7 +118,7 @@ public class LogbackBootstrap {
         config.getObject(KEY_LOGGERS).unwrapped().forEach((String key, Object val) -> {
             addLogger(Map.class.cast(val), context, appenderList);
         });
-        asyncAppender(config, context).ifPresent(asyncAppender -> asyncAppender.addAppender(fileAppender));
+        asyncAppender(config, context, fileAppender);
         context.setPackagingDataEnabled(true);
         context.start();
         context.getLogger(LogbackBootstrap.class).info(INIT_MSG, elapsedSinceMillis(startTime));
@@ -145,15 +151,16 @@ public class LogbackBootstrap {
         return trigAndRollPolicy;
     }
 
-    private static Optional<AsyncAppender> asyncAppender(Config config, LoggerContext context) {
+    private static void asyncAppender(Config config, LoggerContext context, FileAppender<ILoggingEvent> fileAppender) {
         if (Boolean.getBoolean(SYS_PROP_ASYNC_LOGGING)) {
             AsyncAppender asyncAppender = new AsyncAppender();
             asyncAppender.setName(APPENDER_ASYNC);
-            asyncAppender.setQueueSize(config.getInt("async-log-queue-size"));
+            asyncAppender.setQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE));
+            asyncAppender.setDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD));
             asyncAppender.setContext(context);
-            return Optional.of(asyncAppender);
+            asyncAppender.addAppender(fileAppender);
+            asyncAppender.start();
         }
-        return Optional.empty();
     }
 
     private static RollingFileAppender<ILoggingEvent> fileAppender(LoggerContext context, Config config) {
@@ -161,7 +168,7 @@ public class LogbackBootstrap {
         fileAppender.setName(APPENDER_FILE);
         fileAppender.setFile(config.getString(KEY_SERVER_LOG_FILE));
         fileAppender.setAppend(true);
-        fileAppender.setImmediateFlush(false);
+        fileAppender.setImmediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH));
         fileAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN_FILE)));
         fileAppender.setContext(context);
         return fileAppender;
