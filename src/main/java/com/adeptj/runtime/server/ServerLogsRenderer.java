@@ -1,4 +1,4 @@
-package com.adeptj.runtime.common;
+package com.adeptj.runtime.server;
 
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ServerLogsRenderer {
+class ServerLogsRenderer {
 
     private static final int DELAY_MILLIS = 1000;
 
@@ -23,12 +23,12 @@ public class ServerLogsRenderer {
 
     private Tailer tailer;
 
-    public ServerLogsRenderer(File file, Session session) {
+    ServerLogsRenderer(File file, Session session) {
         this.logFile = file;
         this.session = session;
     }
 
-    public void initRenderer() {
+    void initRenderer() {
         this.tailer = new Tailer(this.logFile, this.createListener(), DELAY_MILLIS, true);
         Thread thread = new Thread(() -> {
             try {
@@ -40,7 +40,7 @@ public class ServerLogsRenderer {
         thread.start();
     }
 
-    public void stopRenderer() {
+    void stopRenderer() {
         this.tailer.stop();
     }
 

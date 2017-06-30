@@ -38,7 +38,7 @@ final class ShutdownHook extends Thread {
 
     private DeploymentManager manager;
 
-    public ShutdownHook(Undertow server, DeploymentManager manager) {
+    ShutdownHook(Undertow server, DeploymentManager manager) {
         super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
         this.server = server;
         this.manager = manager;
