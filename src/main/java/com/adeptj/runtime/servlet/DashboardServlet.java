@@ -64,6 +64,6 @@ public class DashboardServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/tools");
+        resp.sendRedirect("/tools/dashboard");
     }
 }

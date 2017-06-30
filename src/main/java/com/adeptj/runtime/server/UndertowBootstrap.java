@@ -36,6 +36,7 @@ import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
 import io.undertow.Version;
+import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.PredicateHandler;
@@ -49,6 +50,7 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
+import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
@@ -92,9 +94,9 @@ import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
+import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
-import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 
 /**
  * UndertowBootstrap: Provision the Undertow Http Server.
@@ -320,7 +322,11 @@ public final class UndertowBootstrap {
                 .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(cfg))
                 .addServlets(servlets()).addErrorPages(errorPages(cfg))
                 .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
-                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper());
+                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
+                .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, new WebSocketDeploymentInfo()
+                        .setBuffers(new DefaultByteBufferPool(true, 4096))
+                        .addEndpoint(ServerLogsWebSocket.class)
+        );
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {

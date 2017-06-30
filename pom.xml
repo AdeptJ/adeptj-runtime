@@ -42,6 +42,7 @@
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.0</maven-dependency-plugin.version>
         <resteasy.version>3.1.3.Final</resteasy.version>
+        <jansi.version>1.16</jansi.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.4</felix.framework.version>
@@ -351,6 +352,13 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- Needed on Windows OS for generating and interpreting ANSI escape sequences -->
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>${jansi.version}</version>
         </dependency>
 
         <dependency>
