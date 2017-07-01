@@ -52,7 +52,7 @@ public enum FrameworkBootstrap {
 
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
-    private static final String PROXY_SERVLET = "ProxyServlet";
+    private static final String PROXY_SERVLET = "AdeptJ ProxyServlet";
 
     private static final String ROOT_MAPPING = "/*";
 
@@ -153,7 +153,7 @@ public enum FrameworkBootstrap {
         props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> configs.put((String) key, (String) val));
-        logger.info("Framework properties population took [{}] ms.", Times.elapsedSinceMillis(startTime));
+        logger.debug("Framework properties population took [{}] ms.", Times.elapsedSinceMillis(startTime));
         return configs;
     }
 }

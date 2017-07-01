@@ -44,7 +44,7 @@ import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "LoginServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
+@WebServlet(name = "AdeptJ LoginServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
 public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

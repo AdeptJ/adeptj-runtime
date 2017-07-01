@@ -24,13 +24,17 @@ import com.adeptj.runtime.templating.ContextObject;
 import com.adeptj.runtime.templating.TemplateContext;
 import com.adeptj.runtime.templating.TemplateEngine;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
+import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
+import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 
 /**
  * OSGiPerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
@@ -39,7 +43,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "OSGiPerServletContextErrorServlet", asyncSupported = true)
+@WebServlet(name = "AdeptJ OSGiPerServletContextErrorServlet", asyncSupported = true)
 public class OSGiPerServletContextErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -5818850813832379842L;
@@ -55,7 +59,7 @@ public class OSGiPerServletContextErrorServlet extends HttpServlet {
     }
 
     private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Integer statusCode = (Integer) req.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+        Integer statusCode = (Integer) req.getAttribute(ERROR_STATUS_CODE);
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
         ContextObject ctxObj = this.contextObject(req, statusCode);
         builder.contextObject(ctxObj);
@@ -71,8 +75,8 @@ public class OSGiPerServletContextErrorServlet extends HttpServlet {
     }
 
 	private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
-		return new ContextObject().put("statusCode", statusCode).put("errorMsg", req.getAttribute(RequestDispatcher.ERROR_MESSAGE))
-				.put("reqURI", req.getAttribute(RequestDispatcher.ERROR_REQUEST_URI))
-				.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
+		return new ContextObject().put("statusCode", statusCode).put("errorMsg", req.getAttribute(ERROR_MESSAGE))
+				.put("reqURI", req.getAttribute(ERROR_REQUEST_URI))
+				.put("exception", req.getAttribute(ERROR_EXCEPTION));
 	}
 }

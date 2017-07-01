@@ -20,14 +20,17 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
+import com.adeptj.runtime.common.ServletConfigs;
+import com.adeptj.runtime.servlet.ProxyServlet;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
+
+import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 
 /**
  * OSGi ServiceTracker for FELIX DispatcherServlet.
@@ -51,7 +54,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         HttpServlet httpServlet = null;
         try {
             httpServlet = super.addingService(reference);
-            LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+            LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(SERVICE_DESCRIPTION));
             this.handleDispatcherServlet(httpServlet);
         } catch (Exception ex) { // NOSONAR
             // This might be due to the OSGi framework restart from Felix WebConsole.
@@ -62,7 +65,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
-        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(SERVICE_DESCRIPTION));
         // Passing null so that DispatcherServlet.core() won't be called again.
         this.handleDispatcherServlet(null);
         super.removedService(reference, service);
@@ -104,7 +107,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcherServlet != null) {
             try {
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
-                this.dispatcherServlet.init(DispatcherServletTrackerSupport.INSTANCE.getServletConfig());
+                this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(ProxyServlet.class));
                 LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);

@@ -59,9 +59,9 @@ public class FrameworkRestartHandler implements FrameworkListener {
                 break;
             case FrameworkEvent.STOPPED_UPDATE:
                 logger.info("Closing DispatcherServletTracker!!");
-                DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+                DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
                 logger.info("Closing EventDispatcherTracker!!");
-                EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
+                EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
                 break;
             default:
                 // log it and ignore.
@@ -84,11 +84,9 @@ public class FrameworkRestartHandler implements FrameworkListener {
 
 	private void handleDispatcherServletTracker(Logger logger) {
 		try {
-		    DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();
+		    DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
 		    logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-		    // DispatcherServletTrackerSupport already holds a ServletConfig reference
-		    // from first time when ProxyServlet was initialized. Pass a null, which is just fine.
-		    DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(null);
+		    DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
 		} catch (Exception ex) { // NOSONAR
 		    // Note: What shall we do if DispatcherServlet initialization failed.
 		    // Log it as of now, we may need to stop the OSGi Framework, will decide later.

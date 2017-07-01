@@ -24,16 +24,17 @@
 
 **AdeptJ Runtime**
 
-**Highly performant, dynamic, modular(OSGi based) runtime for developing/deploying WebApps and MicroServices.**
+**Highly performant, dynamic, modular(OSGi based) runtime for developing/deploying modern WebApps and MicroServices.**
 
 **Built upon**
 
 1. High performance [Undertow](http://undertow.io/) web server.
 2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix as implementation).
 
-**Lightweight ~25MB footprint(with below mentioned modules), low on memory, starts instantly**
+**Lightweight ~50MB memory footprint(with below mentioned modules), low on memory, starts instantly**
+**Uber Jar is ~30MB in size with below mentioned modules, starts in ~1300ms**
 
-**Minimal runtime(OSGi, Undertow and some supporting bundles) is ~8MB, starts in ~800ms**
+**Minimal runtime(OSGi, Undertow and some supporting bundles) is ~10MB, starts in ~800ms**
 
 **Modules:**
 

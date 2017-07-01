@@ -39,7 +39,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "ErrorPageServlet", urlPatterns = {"/tools/error/*"})
+@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = {"/tools/error/*"})
 public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

@@ -19,23 +19,28 @@
 */
 package com.adeptj.runtime.servlet;
 
+import com.adeptj.runtime.common.Requests;
+import com.adeptj.runtime.common.ServletConfigs;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.osgi.DispatcherServletTrackerSupport;
+import com.adeptj.runtime.osgi.DispatcherServletTrackers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+
 /**
  * ProxyServlet acts as a facade for all of the incoming requests for OSGi resources.
  * Delegates the service request to Felix DispatcherServlet which maintains a registry of HttpServlet/Filter etc.
  * Depending upon the resolution by DispatcherServlet the request is being further dispatched.
- * 
+ * <p>
  * <p>
  * <b>This HttpServlet listens at "/" i.e root.<b>
  *
@@ -43,9 +48,11 @@ import java.io.IOException;
  */
 public class ProxyServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 702778293237417284L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServlet.class);
 
-    private static final long serialVersionUID = 702778293237417284L;
+    private static final String UNAVAILABLE_MSG = "Can't serve request: [{}], DispatcherServlet is unavailable!!";
 
     /**
      * Open the DispatcherServletTracker.
@@ -55,7 +62,8 @@ public class ProxyServlet extends HttpServlet {
         long startTime = System.nanoTime();
         LOGGER.info("Initializing ProxyServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
-        DispatcherServletTrackerSupport.INSTANCE.openDispatcherServletTracker(this.getServletConfig());
+        ServletConfigs.INSTANCE.add(this.getClass(), this.getServletConfig());
+        DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
         LOGGER.info("ProxyServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
@@ -64,36 +72,35 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpServlet dispatcherServlet = DispatcherServletTrackerSupport.INSTANCE.getDispatcherServlet();
+        HttpServlet dispatcherServlet = DispatcherServletTrackers.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
-                LOGGER.error("Can't serve request: [{}], DispatcherServlet is unavailable!!", req.getRequestURI());
-                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
+                resp.sendError(SC_SERVICE_UNAVAILABLE);
             } else {
-            	long startTime = System.nanoTime();
-            	dispatcherServlet.service(req, resp);
-                LOGGER.debug("Request: [{}] took [{}] ms!!", req.getRequestURI(), Times.elapsedSinceMillis(startTime));
-                this.checkAndlogExceptionAttribute(req);
+                dispatcherServlet.service(req, resp);
+                this.checkAndLogException(req);
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request!!", ex);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-	private void checkAndlogExceptionAttribute(HttpServletRequest req) {
-		// Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
-		if (req.getAttribute(RequestDispatcher.ERROR_EXCEPTION) != null) {
-		    LOGGER.error("Exception while handling request!!", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
-		}
-	}
+    private void checkAndLogException(HttpServletRequest req) {
+        // Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
+        if (Requests.hasException(req)) {
+            LOGGER.error("Exception while handling request!!", req.getAttribute(ERROR_EXCEPTION));
+        }
+    }
 
     /**
      * Close the DispatcherServletTracker.
      */
     @Override
     public void destroy() {
-    	LOGGER.info("Destroying ProxyServlet!!");
-    	// closeDispatcherServletTracker in FrameworkShutdownHandler, see - https://github.com/AdeptJ/adeptj-runtime/issues/4
+        LOGGER.info("Destroying ProxyServlet!!");
+        // closeDispatcherServletTracker in FrameworkShutdownHandler
+        // See - https://github.com/AdeptJ/adeptj-runtime/issues/4
     }
 }

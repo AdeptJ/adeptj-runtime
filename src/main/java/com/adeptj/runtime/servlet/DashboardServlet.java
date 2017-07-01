@@ -39,7 +39,7 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "DashboardServlet", urlPatterns = { "/tools/dashboard" })
+@WebServlet(name = "AdeptJ DashboardServlet", urlPatterns = { "/tools/dashboard" })
 public class DashboardServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

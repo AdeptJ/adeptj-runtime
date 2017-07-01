@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -20,31 +20,25 @@
 
 package com.adeptj.runtime.common;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
-import java.util.HashMap;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
+import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 
 /**
- * Maintains a mapping of {@link ServletConfig} instance against the FQCN of the HttpServlet.
+ * Utils for {@link javax.servlet.http.HttpServletRequest}
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServletConfigs {
+public final class Requests {
 
-    INSTANCE;
-
-    private Map<String, ServletConfig> configs = new HashMap<>();
-
-    public void add(Class<? extends HttpServlet> cls, ServletConfig config) {
-        this.configs.put(cls.getName(), config);
+    private Requests() {
     }
 
-    public void remove(Class<? extends HttpServlet> cls) {
-        this.configs.remove(cls.getName());
+    public static boolean hasAttribute(HttpServletRequest req, String attrName) {
+        return req.getAttribute(attrName) != null;
     }
 
-    public ServletConfig get(Class<? extends HttpServlet> cls) {
-        return this.configs.get(cls.getName());
+    public static boolean hasException(HttpServletRequest req) {
+        return req.getAttribute(ERROR_EXCEPTION) != null;
     }
 }

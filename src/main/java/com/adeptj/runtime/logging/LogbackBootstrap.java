@@ -96,8 +96,8 @@ public class LogbackBootstrap {
     @SuppressWarnings("unchecked")
     public static void startLoggerContext() {
         long startTime = System.nanoTime();
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         Config config = Configs.DEFAULT.logging();
+        LoggerContext context = getLoggerContext();
         // File Appender
         RollingFileAppender<ILoggingEvent> fileAppender = fileAppender(context, config);
         // Triggering & Rolling Policy
@@ -118,6 +118,7 @@ public class LogbackBootstrap {
         config.getObject(KEY_LOGGERS).unwrapped().forEach((String key, Object val) -> {
             addLogger(Map.class.cast(val), context, appenderList);
         });
+        // AsyncAppender
         asyncAppender(config, context, fileAppender);
         context.setPackagingDataEnabled(true);
         context.start();
@@ -125,7 +126,11 @@ public class LogbackBootstrap {
     }
 
     public static void stopLoggerContext() {
-        ((LoggerContext) LoggerFactory.getILoggerFactory()).stop();
+        getLoggerContext().stop();
+    }
+
+    private static LoggerContext getLoggerContext() {
+        return (LoggerContext) LoggerFactory.getILoggerFactory();
     }
 
     private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {

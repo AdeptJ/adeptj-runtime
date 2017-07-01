@@ -21,7 +21,6 @@ package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
-import com.adeptj.runtime.common.ServerMode;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
@@ -84,8 +83,8 @@ import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
-import static com.adeptj.runtime.common.Constants.HEADER_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
@@ -99,7 +98,7 @@ import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 
 /**
- * UndertowBootstrap: Provision the Undertow Http Server.
+ * UndertowBootstrap: Provision the Undertow Web Server.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -116,8 +115,6 @@ public final class UndertowBootstrap {
     private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
 
     private static final String KEY_WORKER_OPTIONS = "worker-options";
-
-    private static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
 
     private static final String KEY_KEYSTORE = "keyStore";
 
@@ -186,20 +183,26 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static void optimizeWorkerOptionsForProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-        if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE))) {
+    private static void optimizeWorkerOptionsForProdMode(Builder builder, Config undertowConf, Logger logger) {
+        if (Environment.isProd()) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
-            int coreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
-            int sysTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
-            undertowBuilder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, sysTaskThreads > coreTaskThreads ? sysTaskThreads
-            		: coreTaskThreads);
+            int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
+            int calcCoreTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
+            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, calcCoreTaskThreads > cfgCoreTaskThreads
+                    ? calcCoreTaskThreads : cfgCoreTaskThreads);
             // defaults to double of [worker-task-core-threads] i.e 128
-            int maxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
-            int calcMaxTaskThreads = sysTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
-            undertowBuilder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > maxTaskThreads ? calcMaxTaskThreads
-            		: maxTaskThreads);
-            logger.info("Optimized AdeptJ Runtime for [PROD] mode.");
+            int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            int calcMaxTaskThreads = calcCoreTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
+            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > cfgMaxTaskThreads
+                    ? calcMaxTaskThreads : cfgMaxTaskThreads);
+            // For a 16 core system, number of worker task core and max threads will be.
+            // 1. core task thread: 128 (16[cores] * 8)
+            // 2. max task thread: 128 * 2 = 256
+            // Default settings would have set the following.
+            // 1. core task thread: 128 (16[cores] * 8)
+            // 2. max task thread: 128 (Same as core task thread)
+            logger.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
     }
 
@@ -259,7 +262,9 @@ public final class UndertowBootstrap {
     private static Map<HttpString, String> serverHeaders(Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
-        headers.put(HttpString.tryFromString(HEADER_POWERED_BY), Version.getFullVersionString());
+        if (!Environment.isProd()) {
+            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
+        }
         return headers;
     }
 

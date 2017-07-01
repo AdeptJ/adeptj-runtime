@@ -104,7 +104,7 @@ public enum HttpSessionEvents {
     }
 
     private static EventDispatcherTracker tracker() {
-        return EventDispatcherTrackerSupport.INSTANCE.getEventDispatcherTracker();
+        return EventDispatcherTrackers.INSTANCE.getEventDispatcherTracker();
     }
 
     private static Optional<HttpSessionListener> optionalSessionListener() {

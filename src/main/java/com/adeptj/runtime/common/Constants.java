@@ -86,6 +86,8 @@ public final class Constants {
 
     public static final int DEFAULT_SERVER_PORT = 9007;
 
+    public static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
+
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
     public static final String CMD_LAUNCH_BROWSER = "launchBrowser";
@@ -108,7 +110,7 @@ public final class Constants {
 
     public static final String CURRENT_DIR = System.getProperty("user.dir");
 
-    public static final String HEADER_POWERED_BY = "X-Powered-By";
+    public static final String HEADER_X_POWERED_BY = "X-Powered-By";
 
     public static final String HEADER_SERVER = "Server";
 

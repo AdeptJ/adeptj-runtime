@@ -20,39 +20,36 @@
 package com.adeptj.runtime.osgi;
 
 import org.osgi.framework.BundleContext;
-
-import com.adeptj.runtime.common.Constants;
-
-import javax.servlet.ServletContextAttributeEvent;
-import javax.servlet.ServletContextAttributeListener;
+import org.slf4j.LoggerFactory;
 
 /**
- * BridgeServletContextAttributeListener.
+ * Support for EventDispatcherTracker.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
-public class BridgeServletContextAttributeListener implements ServletContextAttributeListener {
+public enum EventDispatcherTrackers {
 
-    @Override
-    public void attributeAdded(ServletContextAttributeEvent event) {
-        if (this.isAttributeBundleContext(event.getName())) {
-            EventDispatcherTrackers.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
+    INSTANCE;
+
+    private EventDispatcherTracker eventDispatcherTracker;
+
+    protected EventDispatcherTracker getEventDispatcherTracker() {
+        return this.eventDispatcherTracker;
+    }
+
+    protected void openEventDispatcherTracker(BundleContext bundleContext) {
+        if (this.eventDispatcherTracker == null) {
+            LoggerFactory.getLogger(EventDispatcherTrackers.class).info("Opening EventDispatcherTracker!!");
+            this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+            this.eventDispatcherTracker.open();
         }
     }
 
-    @Override
-    public void attributeRemoved(ServletContextAttributeEvent event) {
-        if (this.isAttributeBundleContext(event.getName())) {
-            EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
+    protected void closeEventDispatcherTracker() {
+        if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
+            this.eventDispatcherTracker.close();
+            LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
         }
-    }
-
-    @Override
-    public void attributeReplaced(ServletContextAttributeEvent event) {
-        // Does nothing as of now.
-    }
-
-    private boolean isAttributeBundleContext(String attributeName) {
-        return Constants.BUNDLE_CTX_ATTR.equals(attributeName);
+        this.eventDispatcherTracker = null;
     }
 }

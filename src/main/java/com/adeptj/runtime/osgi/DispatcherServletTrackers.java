@@ -19,37 +19,43 @@
 */
 package com.adeptj.runtime.osgi;
 
+import com.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
-import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServlet;
 
 /**
- * Support for EventDispatcherTracker.
+ * Support for DispatcherServletTracker.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum EventDispatcherTrackerSupport {
+public enum DispatcherServletTrackers {
 
     INSTANCE;
 
-    private EventDispatcherTracker eventDispatcherTracker;
+    private volatile boolean dispatcherServletInitialized;
 
-    protected EventDispatcherTracker getEventDispatcherTracker() {
-        return this.eventDispatcherTracker;
-    }
+    private DispatcherServletTracker servletTracker;
 
-    protected void openEventDispatcherTracker(BundleContext bundleContext) {
-        if (this.eventDispatcherTracker == null) {
-            LoggerFactory.getLogger(EventDispatcherTrackerSupport.class).info("Opening EventDispatcherTracker!!");
-            this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
-            this.eventDispatcherTracker.open();
+    public void openDispatcherServletTracker() {
+        if (!this.dispatcherServletInitialized && this.servletTracker == null) {
+            BundleContext bundleContext = BundleContextHolder.INSTANCE.getBundleContext();
+            DispatcherServletTracker tracker = new DispatcherServletTracker(bundleContext);
+            tracker.open();
+            this.servletTracker = tracker;
+            this.dispatcherServletInitialized = true;
         }
     }
 
-    protected void closeEventDispatcherTracker() {
-        if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
-            this.eventDispatcherTracker.close();
-            LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
+    public HttpServlet getDispatcherServlet() {
+        return this.servletTracker == null ? null : this.servletTracker.getDispatcherServlet();
+    }
+
+    public void closeDispatcherServletTracker() {
+        this.dispatcherServletInitialized = false;
+        if (this.servletTracker != null && !this.servletTracker.isEmpty()) {
+            this.servletTracker.close();
         }
-        this.eventDispatcherTracker = null;
+        this.servletTracker = null;
     }
 }

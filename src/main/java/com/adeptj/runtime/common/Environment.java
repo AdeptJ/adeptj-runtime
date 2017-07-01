@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             #
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
@@ -28,6 +29,7 @@ import static com.adeptj.runtime.common.Constants.EMPTY;
 import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
 import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.runtime.common.Constants.OS;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_MODE;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
 /**
@@ -53,6 +55,10 @@ public class Environment {
     private Environment() {
     }
 
+    public static boolean isProd() {
+        return ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
+    }
+
     public static boolean isMac() {
         return OS.startsWith("Mac");
     }
@@ -62,8 +68,7 @@ public class Environment {
     }
 
     public static boolean isUnix() {
-        String os = OS.toLowerCase();
-        return os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0;
+        return OS.toLowerCase().contains("nix") || OS.toLowerCase().contains("nux");
     }
 
     public static void launchBrowser(URL url) throws IOException {
