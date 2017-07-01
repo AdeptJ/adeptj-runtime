@@ -79,7 +79,7 @@ final class Bundles {
         // First install all the Bundles.
         List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
                 .filter(Objects::nonNull).collect(Collectors.toList());
-        logger.info("Total Bundles installed: [{}]", installedBundles.size());
+        logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
     }
 

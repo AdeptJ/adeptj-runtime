@@ -23,7 +23,7 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.servlet.BridgeServlet;
-import com.adeptj.runtime.servlet.OSGiPerServletContextErrorServlet;
+import com.adeptj.runtime.servlet.osgi.PerServletContextErrorServlet;
 import com.typesafe.config.Config;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -84,7 +84,7 @@ public enum FrameworkBootstrap {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             Bundles.provisionBundles(systemBundleContext);
-            OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new OSGiPerServletContextErrorServlet(),
+            OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             this.registerBridgeListeners(context);

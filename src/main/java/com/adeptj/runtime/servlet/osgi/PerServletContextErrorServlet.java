@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.servlet;
+package com.adeptj.runtime.servlet.osgi;
 
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.templating.ContextObject;
@@ -37,14 +37,14 @@ import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 
 /**
- * OSGiPerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
+ * PerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
  * <p><b>
  * Note: This is independent of UndertowServer and directly managed by OSGi.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ OSGiPerServletContextErrorServlet", asyncSupported = true)
-public class OSGiPerServletContextErrorServlet extends HttpServlet {
+@WebServlet(name = "AdeptJ PerServletContextErrorServlet", asyncSupported = true)
+public class PerServletContextErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -5818850813832379842L;
 
@@ -55,7 +55,7 @@ public class OSGiPerServletContextErrorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.doGet(req, resp);
+        this.handleError(req, resp);
     }
 
     private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
