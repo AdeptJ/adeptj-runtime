@@ -20,7 +20,6 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkBootstrap;
@@ -31,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 
 /**
  * Entry point for launching the AdeptJ Runtime.
@@ -88,7 +89,7 @@ public final class Launcher {
     }
 
     private static Map<String, String> parseCommands(String[] commands) {
-        return Arrays.stream(commands).map(cmd -> cmd.split(Constants.REGEX_EQ)).collect(Collectors.toMap(cmdArray -> cmdArray[0],
+        return Arrays.stream(commands).map(cmd -> cmd.split(REGEX_EQ)).collect(Collectors.toMap(cmdArray -> cmdArray[0],
                 cmdArray -> cmdArray[1]));
     }
 

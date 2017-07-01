@@ -38,14 +38,14 @@
 **Modules:**
 
 1. DI (OSGi Declarative Services)
-2. JAX-RS 2.0 (RESTEasy)
+2. JAX-RS 2.0 (RESTEasy) with JWT support
 3. Web Security Framework
    - Apache Shiro
    - ESAPI and related modules - (Only if template engine is opted)
 4. Persistence(SQL/NOSQL)
    - JPA or MongoDB
 5. Hikari Datasource/JDBC Connection Pool Provider(Only if JPA is opted)
-6. HTML Template Engine - Thymeleaf (Optional)
+6. HTML Template Engine - Trimou/Thymeleaf (Optional)
 7. I18n/ResourceBundle Support
 
 
@@ -59,27 +59,29 @@ The platform embeds OSGi and Undertow with modules described above.
 4. Above step will create AdeptJ Runtime Uber jar.
 4. Now cd target
 5. java -server -jar adeptj-runtime.jar
-6. Go to [AdeptJ Admin Dashboard](http://localhost:9007/admin/dashboard) or [OSGi Console](http://localhost:9007/system/console)
+6. Go to [AdeptJ Tools Dashboard](http://localhost:9007/tools/dashboard) or [AdeptJ OSGi Console](http://localhost:9007/system/console)
 7. System will ask for username/password, provide the default ones [admin/admin]
 
-Debug options:
+**Debug options:**
 
 java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -jar adeptj-runtime.jar
 
 Start Parameters and VM arguments
 
-1. For specifying port: -Dadeptj.server.port=9007
-2. For port check eagerly: -Dcheck.server.port=true
+1. For specifying port: -Dadeptj.rt.port=9007
+2. For checking port eagerly: -Dadeptj.rt.port.check=true
 3. Enable AJP: -Denable.ajp=true
 4. Enable HTTP2: -Denable.http2=true
-5. For providing server mode: -Dadeptj.server.mode=MODE or mode [DEV] is default
-6. Command line argument for launching browser when server starts: launchBrowser=true
+5. Enable Async Logging: -Dasync.logging=true
+6. Felix Logging Level: -Dfelix.log.level=3
+7. For providing server mode: -Dadeptj.rt.mode=PROD or mode [DEV] is default
+8. Command line argument for launching browser when server starts: launchBrowser=true
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
 
 **Sponsors**:
 
-The AdeptJ team uses the [Yourkit Java Profiler](https://www.yourkit.com/) when working on the AdeptJ Runtime project.
+The AdeptJ Team uses the [Yourkit Java Profiler](https://www.yourkit.com/) when working on the AdeptJ Runtime project.
 
 Many thanks to YourKit for sponsoring our Open Source projects with a license!
 
@@ -91,7 +93,7 @@ YourKit supports open source projects with its full-featured Java Profiler. Your
 
 **LICENSE**
 
-   Copyright 2016, AdeptJ (http://adeptj.com)
+   Copyright 2016, AdeptJ (http://www.adeptj.com)
    
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

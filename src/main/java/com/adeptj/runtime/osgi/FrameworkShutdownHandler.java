@@ -39,7 +39,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         // Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
-        // Can't do the Framework initialization here we register EventListener(s) and HttpServlet(s)
+        // Can't do the Framework initialization here because we register EventListener(s) and HttpServlet(s)
         // using the ServletContext passed which results in java.lang.UnsupportedOperationException
         // UT010042: This method cannot be called from a ServletContextListener that has been added programmatically.
     }
@@ -53,7 +53,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         EventDispatcherTrackerSupport.INSTANCE.closeEventDispatcherTracker();
         // see - https://github.com/AdeptJ/adeptj-runtime/issues/4
         // Close the DispatcherServletTracker here rather than in ProxyServlet#destroy method.
-        // As with version 3.0.18 of Felix Http base the way with HttpSessionListern(s) handled
+        // As with version 3.0.18 of Felix Http base the way with HttpSessionListener(s) handled
         // is changed which results in a NPE.
         logger.info("Closing DispatcherServletTracker!!");
         DispatcherServletTrackerSupport.INSTANCE.closeDispatcherServletTracker();

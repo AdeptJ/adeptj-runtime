@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -40,11 +40,11 @@ import java.util.stream.Collectors;
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 /**
- * Bundles utility that handles the installation/activation of required bundles after the system bundle is up and running.
+ * Utility that handles the installation/activation of required bundles after the system bundle is up and running.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class Bundles {
+final class Bundles {
 
     private static final String PREFIX_BUNDLES = "bundles/";
 
@@ -54,7 +54,7 @@ public final class Bundles {
     private Bundles() {
     }
 
-    public static void provisionBundles(BundleContext systemBundleContext) throws IOException {
+    static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         // Start all the Bundles after collection and installation phase.
         startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
@@ -62,7 +62,7 @@ public final class Bundles {
 
     private static void startBundles(List<Bundle> bundles, Logger logger) {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-        bundles.stream().filter(bundle -> bundle.getHeaders().get(Constants.FRAGMENT_HOST) == null)
+        bundles.stream().filter(bundle -> Objects.isNull(bundle.getHeaders().get(Constants.FRAGMENT_HOST)))
                 .forEach(bundle -> startBundle(bundle, logger));
     }
 

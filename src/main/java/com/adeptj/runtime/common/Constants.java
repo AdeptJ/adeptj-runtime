@@ -86,7 +86,7 @@ public final class Constants {
 
     public static final int DEFAULT_SERVER_PORT = 9007;
 
-    public static final String SYS_PROP_SERVER_PORT = "adeptj.server.port";
+    public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
     public static final String CMD_LAUNCH_BROWSER = "launchBrowser";
 

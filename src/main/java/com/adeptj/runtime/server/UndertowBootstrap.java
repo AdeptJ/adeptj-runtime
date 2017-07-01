@@ -117,7 +117,7 @@ public final class UndertowBootstrap {
 
     private static final String KEY_WORKER_OPTIONS = "worker-options";
 
-    private static final String SYS_PROP_SERVER_MODE = "adeptj.server.mode";
+    private static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
 
     private static final String KEY_KEYSTORE = "keyStore";
 
@@ -133,7 +133,7 @@ public final class UndertowBootstrap {
 
     private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
 
-    private static final String SYS_PROP_CHECK_PORT = "check.server.port";
+    private static final String SYS_PROP_CHECK_PORT = "adeptj.rt.port.check";
 
     private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
 
@@ -187,8 +187,7 @@ public final class UndertowBootstrap {
     }
 
     private static void optimizeWorkerOptionsForProdMode(Builder undertowBuilder, Config undertowConf, Logger logger) {
-        String serverMode = System.getProperty(SYS_PROP_SERVER_MODE);
-        if (ServerMode.PROD.toString().equalsIgnoreCase(serverMode)) {
+        if (ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE))) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
             int coreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
@@ -225,16 +224,17 @@ public final class UndertowBootstrap {
 
     private static int handlePortAvailability(Config httpConf, Logger logger) {
         int defaultPort = httpConf.getInt(KEY_PORT);
-        Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT, defaultPort);
-        if (port == defaultPort) {
-            logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
+        Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
+        if (port == null) {
+            logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, defaultPort);
+            port = defaultPort;
         }
         // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
         // started already and another server start(from same location) will again start new OSGi Framework which may interfere
         // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
         // this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-        	logger.error("Port: [{}] unavailable, shutting down JVM!!", port);
+        	logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
             LogbackBootstrap.stopLoggerContext();
             System.exit(-1); // NOSONAR
