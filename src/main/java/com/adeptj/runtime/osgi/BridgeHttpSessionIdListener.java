@@ -22,6 +22,8 @@ package com.adeptj.runtime.osgi;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
 
+import static com.adeptj.runtime.osgi.HttpSessionEvents.SESSION_ID_CHANGED;
+
 /**
  * BridgeHttpSessionIdListener.
  *
@@ -31,7 +33,7 @@ public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
 
     @Override
     public void sessionIdChanged(HttpSessionEvent event, String oldSessionId) {
-        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_ID_CHANGED, event, oldSessionId);
+        HttpSessionEvents.handleEvent(SESSION_ID_CHANGED, event, oldSessionId);
     }
 
 }

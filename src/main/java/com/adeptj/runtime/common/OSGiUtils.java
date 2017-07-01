@@ -20,12 +20,13 @@
 package com.adeptj.runtime.common;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
 
 import java.util.Optional;
+
+import static org.osgi.framework.Constants.OBJECTCLASS;
 
 /**
  * Utility for creating OSGi Filter for tracking/finding Services etc.
@@ -34,14 +35,28 @@ import java.util.Optional;
  */
 public final class OSGiUtils {
 
-    // No instantiation. Utility methods only.
+    private static final String FILTER_AND = "(&(";
+
+    private static final String EQ = "=";
+
+    private static final String ASTERISK = "*";
+
+    private static final String PARENTHESIS_CLOSE = ")";
+
+    // No instantiation. Utility methods only. asterisk
     private OSGiUtils() {
     }
 
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
         try {
-            return context.createFilter(new StringBuilder("(&(").append(Constants.OBJECTCLASS).append("=")
-                    .append(objectClass.getName()).append(")").append(filterExpr).append(")").toString());
+            return context.createFilter(new StringBuilder(FILTER_AND)
+                    .append(OBJECTCLASS)
+                    .append(EQ)
+                    .append(objectClass.getName())
+                    .append(PARENTHESIS_CLOSE)
+                    .append(filterExpr)
+                    .append(PARENTHESIS_CLOSE)
+                    .toString());
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
             throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
@@ -50,8 +65,14 @@ public final class OSGiUtils {
 
     public static Filter anyServiceFilter(BundleContext context, String filterExpr) {
         try {
-            return context.createFilter(new StringBuilder("(&(").append(Constants.OBJECTCLASS).append("=")
-                    .append("*").append(")").append(filterExpr).append(")").toString());
+            return context.createFilter(new StringBuilder(FILTER_AND)
+                    .append(OBJECTCLASS)
+                    .append(EQ)
+                    .append(ASTERISK)
+                    .append(PARENTHESIS_CLOSE)
+                    .append(filterExpr)
+                    .append(PARENTHESIS_CLOSE)
+                    .toString());
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
             throw new IllegalArgumentException("InvalidSyntaxException!!", ex);

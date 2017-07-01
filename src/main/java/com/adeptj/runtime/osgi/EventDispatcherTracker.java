@@ -21,7 +21,6 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
@@ -31,6 +30,8 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 import java.util.EventListener;
+
+import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.
@@ -64,25 +65,34 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     @Override
     public EventListener addingService(ServiceReference<EventListener> reference) {
-        LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
-        EventListener listener = super.addingService(reference);
-        if (listener instanceof HttpSessionListener) {
-            this.sessionListener = (HttpSessionListener) listener;
-        } else if (listener instanceof HttpSessionIdListener) {
-            this.sessionIdListener = (HttpSessionIdListener) listener;
-        } else if (listener instanceof HttpSessionAttributeListener) {
-            this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
-        }
-        return listener;
+        LOGGER.info("Adding OSGi Service: [{}]", this.getServiceDesc(reference));
+        return this.handleListener(super.addingService(reference));
     }
 
     @Override
     public void removedService(ServiceReference<EventListener> reference, EventListener service) {
-        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(Constants.SERVICE_DESCRIPTION));
+        LOGGER.info("Removing OSGi Service: [{}]", this.getServiceDesc(reference));
         super.removedService(reference, service);
         // NOTE: See class header why ServiceTracker is closed here.
         // ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
         ServiceTrackers.INSTANCE.closeQuietly(this);
+    }
+
+    private Object getServiceDesc(ServiceReference<EventListener> reference) {
+        return reference.getProperty(SERVICE_DESCRIPTION);
+    }
+
+    private EventListener handleListener(EventListener listener) {
+        if (listener instanceof HttpSessionListener) {
+            this.sessionListener = (HttpSessionListener) listener;
+        }
+        if (listener instanceof HttpSessionIdListener) {
+            this.sessionIdListener = (HttpSessionIdListener) listener;
+        }
+        if (listener instanceof HttpSessionAttributeListener) {
+            this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
+        }
+        return listener;
     }
 
     HttpSessionListener getHttpSessionListener() {

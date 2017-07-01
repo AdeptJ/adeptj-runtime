@@ -21,10 +21,10 @@ package com.adeptj.runtime.osgi;
 
 import org.osgi.framework.BundleContext;
 
-import com.adeptj.runtime.common.Constants;
-
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
+
+import static com.adeptj.runtime.common.Constants.BUNDLE_CTX_ATTR;
 
 /**
  * BridgeServletContextAttributeListener.
@@ -53,6 +53,6 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
     }
 
     private boolean isAttributeBundleContext(String attributeName) {
-        return Constants.BUNDLE_CTX_ATTR.equals(attributeName);
+        return BUNDLE_CTX_ATTR.equals(attributeName);
     }
 }

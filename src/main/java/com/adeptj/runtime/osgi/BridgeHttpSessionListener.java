@@ -22,6 +22,9 @@ package com.adeptj.runtime.osgi;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import static com.adeptj.runtime.osgi.HttpSessionEvents.SESSION_CREATED;
+import static com.adeptj.runtime.osgi.HttpSessionEvents.SESSION_DESTROYED;
+
 /**
  * BridgeHttpSessionListener.
  *
@@ -31,11 +34,11 @@ public class BridgeHttpSessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_CREATED, se);
+        HttpSessionEvents.handleEvent(SESSION_CREATED, se);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
-        HttpSessionEvents.handleEvent(HttpSessionEvents.SESSION_DESTROYED, se);
+        HttpSessionEvents.handleEvent(SESSION_DESTROYED, se);
     }
 }

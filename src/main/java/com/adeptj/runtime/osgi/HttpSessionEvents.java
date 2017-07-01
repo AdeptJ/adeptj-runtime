@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -19,24 +19,23 @@
 */
 package com.adeptj.runtime.osgi;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.adeptj.runtime.common.Times;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.adeptj.runtime.common.Times;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Optional;
 
 /**
- * HttpSessionEvents. takes care of HttpSession events.
+ * HttpSessionEvents. Propagates the HttpSession events to OSGi registered EventListener(s).
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public enum HttpSessionEvents {
 
@@ -58,16 +57,17 @@ public enum HttpSessionEvents {
         switch (type) {
             case SESSION_CREATED:
             	if (LOGGER.isDebugEnabled()) {
-            	    LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(), LocalDateTime.now());
+            	    LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(),
+                            Date.from(Instant.ofEpochMilli(event.getSession().getCreationTime())));
             	}
-                optionalSessionListener().ifPresent(listener -> listener.sessionCreated(event));
+                sessionListener().ifPresent(listener -> listener.sessionCreated(event));
                 break;
             case SESSION_DESTROYED:
             	if (LOGGER.isDebugEnabled()) {
             	    LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(), 
 			    		    Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
             	}
-                optionalSessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
+                sessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
                 break;
             default:
                 // NO-OP
@@ -78,7 +78,7 @@ public enum HttpSessionEvents {
     public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event, String oldSessionId) {
         switch (type) {
             case SESSION_ID_CHANGED:
-                optionalSessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
+                sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
                 break;
             default:
                 // NO-OP
@@ -89,13 +89,13 @@ public enum HttpSessionEvents {
     public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
         switch (type) {
             case SESSION_ATTRIBUTE_ADDED:
-                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
+                sessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
                 break;
             case SESSION_ATTRIBUTE_REMOVED:
-                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
+                sessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
                 break;
             case SESSION_ATTRIBUTE_REPLACED:
-                optionalSessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
+                sessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
                 break;
             default:
                 // NO-OP
@@ -107,15 +107,15 @@ public enum HttpSessionEvents {
         return EventDispatcherTrackers.INSTANCE.getEventDispatcherTracker();
     }
 
-    private static Optional<HttpSessionListener> optionalSessionListener() {
+    private static Optional<HttpSessionListener> sessionListener() {
         return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionListener());
     }
 
-    private static Optional<HttpSessionIdListener> optionalSessionIdListener() {
+    private static Optional<HttpSessionIdListener> sessionIdListener() {
         return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionIdListener());
     }
 
-    private static Optional<HttpSessionAttributeListener> optionalSessionAttributeListener() {
+    private static Optional<HttpSessionAttributeListener> sessionAttributeListener() {
         return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionAttributeListener());
     }
 }
