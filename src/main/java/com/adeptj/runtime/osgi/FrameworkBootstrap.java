@@ -22,8 +22,8 @@ package com.adeptj.runtime.osgi;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.servlet.BridgeServlet;
 import com.adeptj.runtime.servlet.OSGiPerServletContextErrorServlet;
-import com.adeptj.runtime.servlet.ProxyServlet;
 import com.typesafe.config.Config;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -41,6 +41,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import static java.lang.System.getProperty;
+
 /**
  * FrameworkBootstrap that handles the OSGi Framework(Apache Felix) startup and shutdown.
  *
@@ -52,9 +54,19 @@ public enum FrameworkBootstrap {
 
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
-    private static final String PROXY_SERVLET = "AdeptJ ProxyServlet";
+    private static final String BRIDGE_SERVLET = "AdeptJ BridgeServlet";
 
     private static final String ROOT_MAPPING = "/*";
+
+    private static final String FELIX_CM_DIR = "felix.cm.dir";
+
+    private static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
+
+    private static final String MEM_DUMP_LOC = "felix.memoryusage.dump.location";
+
+    private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
+
+    private static final String FELIX_LOG_LEVEL = "felix.log.level";
 
     private Framework framework;
 
@@ -78,7 +90,7 @@ public enum FrameworkBootstrap {
             this.registerBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-            this.registerProxyServlet(context, logger);
+            this.registerBridgeServlet(context, logger);
         } catch (Exception ex) { // NOSONAR
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
@@ -118,19 +130,19 @@ public enum FrameworkBootstrap {
         servletContext.addListener(new BridgeHttpSessionAttributeListener());
     }
 
-    private void registerProxyServlet(ServletContext context, Logger logger) {
-        // Register the ProxyServlet after the OSGi Framework started successfully.
-        // This will ensure that the Felix {@link DispatcherServlet} is available as an OSGi service and can be tracked.
-        // ProxyServlet delegates all the service calls to the Felix DispatcherServlet.
-        ServletRegistration.Dynamic proxyServlet = context.addServlet(PROXY_SERVLET, new ProxyServlet());
-        proxyServlet.addMapping(ROOT_MAPPING);
+    private void registerBridgeServlet(ServletContext context, Logger logger) {
+        // Register the BridgeServlet after the OSGi Framework started successfully.
+        // This will ensure that the Felix DispatcherServlet is available as an OSGi service and can be tracked.
+        // BridgeServlet delegates all the service calls to the Felix DispatcherServlet.
+        ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET, new BridgeServlet());
+        bridgeServlet.addMapping(ROOT_MAPPING);
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
         // Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026:
         // Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-        proxyServlet.setAsyncSupported(true);
+        bridgeServlet.setAsyncSupported(true);
         // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
-        proxyServlet.setLoadOnStartup(0);
-        logger.info("ProxyServlet registered successfully!!");
+        bridgeServlet.setLoadOnStartup(0);
+        logger.info("BridgeServlet registered successfully!!");
     }
 
     private Framework createFramework(Logger logger) throws IOException  {
@@ -140,20 +152,20 @@ public enum FrameworkBootstrap {
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
         Map<String, String> configs = this.loadFrameworkProperties(logger);
         Config felixConf = Configs.DEFAULT.felix();
-        configs.put("felix.cm.dir", felixConf.getString("felix-cm-dir"));
-        configs.put("felix.memoryusage.dump.location", felixConf.getString("memoryusage-dump-loc"));
-        Optional.ofNullable(System.getProperty("felix.log.level")).ifPresent(logLevel -> configs.put("felix.log.level", logLevel));
-        logger.debug("OSGi Framework Configurations: {}", configs);
+        configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
+        configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
+        Optional.ofNullable(getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
+        if (logger.isDebugEnabled()) {
+            logger.debug("OSGi Framework Configurations: {}", configs);
+        }
         return configs;
     }
 
     private Map<String, String> loadFrameworkProperties(Logger logger) throws IOException {
-        long startTime = System.nanoTime();
         Properties props = new Properties();
         props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
         props.forEach((key, val) -> configs.put((String) key, (String) val));
-        logger.debug("Framework properties population took [{}] ms.", Times.elapsedSinceMillis(startTime));
         return configs;
     }
 }

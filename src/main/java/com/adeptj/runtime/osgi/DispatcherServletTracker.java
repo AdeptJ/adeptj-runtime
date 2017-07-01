@@ -21,7 +21,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
 import com.adeptj.runtime.common.ServletConfigs;
-import com.adeptj.runtime.servlet.ProxyServlet;
+import com.adeptj.runtime.servlet.BridgeServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -54,7 +54,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         HttpServlet httpServlet = null;
         try {
             httpServlet = super.addingService(reference);
-            LOGGER.info("Adding OSGi Service: [{}]", reference.getProperty(SERVICE_DESCRIPTION));
+            LOGGER.info("Adding OSGi Service: [{}]", this.getServiceDesc(reference));
             this.handleDispatcherServlet(httpServlet);
         } catch (Exception ex) { // NOSONAR
             // This might be due to the OSGi framework restart from Felix WebConsole.
@@ -65,7 +65,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
-        LOGGER.info("Removing OSGi Service: [{}]", reference.getProperty(SERVICE_DESCRIPTION));
+        LOGGER.info("Removing OSGi Service: [{}]", this.getServiceDesc(reference));
         // Passing null so that DispatcherServlet.core() won't be called again.
         this.handleDispatcherServlet(null);
         super.removedService(reference, service);
@@ -88,6 +88,10 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         return this.dispatcherServlet;
     }
 
+    private Object getServiceDesc(ServiceReference<HttpServlet> reference) {
+        return reference.getProperty(SERVICE_DESCRIPTION);
+    }
+
     private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
         this.destroyDispatcherServlet();
         this.dispatcherServlet = dispatcherServlet;
@@ -107,7 +111,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcherServlet != null) {
             try {
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
-                this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(ProxyServlet.class));
+                this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(BridgeServlet.class));
                 LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);

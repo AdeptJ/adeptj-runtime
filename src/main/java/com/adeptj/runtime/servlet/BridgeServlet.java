@@ -37,20 +37,24 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
- * ProxyServlet acts as a facade for all of the incoming requests for OSGi resources.
- * Delegates the service request to Felix DispatcherServlet which maintains a registry of HttpServlet/Filter etc.
- * Depending upon the resolution by DispatcherServlet the request is being further dispatched.
- * <p>
- * <p>
+ * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
+ *
+ * All the incoming requests for OSGi resources delegated to the Felix DispatcherServlet which further
+ * delegates to Felix {@link org.apache.felix.http.base.internal.dispatch.Dispatcher} which maintains
+ * a registry of managed HttpServlet/Filter(s) etc.
+ *
+ * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
+ *
+ *
  * <b>This HttpServlet listens at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ProxyServlet extends HttpServlet {
+public class BridgeServlet extends HttpServlet {
 
     private static final long serialVersionUID = 702778293237417284L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServlet.class);
 
     private static final String UNAVAILABLE_MSG = "Can't serve request: [{}], DispatcherServlet is unavailable!!";
 
@@ -60,15 +64,17 @@ public class ProxyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         long startTime = System.nanoTime();
-        LOGGER.info("Initializing ProxyServlet!!");
+        LOGGER.info("Initializing BridgeServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         ServletConfigs.INSTANCE.add(this.getClass(), this.getServletConfig());
         DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
-        LOGGER.info("ProxyServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     /**
-     * Proxy for Felix DispatcherServlet, delegate all the calls to the underlying DispatcherServlet.
+     * Bridge for Felix DispatcherServlet, delegate all the calls to underlying DispatcherServlet.
+     *
+     * @see class header for detailed description.
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -79,7 +85,7 @@ public class ProxyServlet extends HttpServlet {
                 resp.sendError(SC_SERVICE_UNAVAILABLE);
             } else {
                 dispatcherServlet.service(req, resp);
-                this.checkAndLogException(req);
+                this.logExceptionIfExists(req);
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request!!", ex);
@@ -87,7 +93,7 @@ public class ProxyServlet extends HttpServlet {
         }
     }
 
-    private void checkAndLogException(HttpServletRequest req) {
+    private void logExceptionIfExists(HttpServletRequest req) {
         // Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
         if (Requests.hasException(req)) {
             LOGGER.error("Exception while handling request!!", req.getAttribute(ERROR_EXCEPTION));
@@ -99,7 +105,7 @@ public class ProxyServlet extends HttpServlet {
      */
     @Override
     public void destroy() {
-        LOGGER.info("Destroying ProxyServlet!!");
+        LOGGER.info("Destroying BridgeServlet!!");
         // closeDispatcherServletTracker in FrameworkShutdownHandler
         // See - https://github.com/AdeptJ/adeptj-runtime/issues/4
     }

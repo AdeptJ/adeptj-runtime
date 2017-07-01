@@ -52,7 +52,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         logger.info("Closing EventDispatcherTracker!!");
         EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
         // see - https://github.com/AdeptJ/adeptj-runtime/issues/4
-        // Close the DispatcherServletTracker here rather than in ProxyServlet#destroy method.
+        // Close the DispatcherServletTracker here rather than in BridgeServlet#destroy method.
         // As with version 3.0.18 of Felix Http base the way with HttpSessionListener(s) handled
         // is changed which results in a NPE.
         logger.info("Closing DispatcherServletTracker!!");
