@@ -19,8 +19,6 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Requests;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.templating.ContextObject;
 import com.adeptj.runtime.templating.TemplateContext;
 import com.adeptj.runtime.templating.TemplateEngine;
@@ -32,53 +30,67 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static com.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
+import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 
 /**
- * ErrorPageServlet that serves the error page w.r.t status(401, 403, 404, 500 etc.) for admin related operations.
+ * AuthServlet does the following:
+ * <p>
+ * 1. Renders the login page and handles the validation failure on wrong credentials submission.
+ * 2. Logout the currently logged in Admin user and renders the login page again.
  * <p>
  * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = {"/tools/error/*"})
-public class ErrorPageServlet extends HttpServlet {
+@WebServlet(name = "AdeptJ AuthServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
+public class AuthServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
-    private static final String STATUS_500 = "500";
+    private static final String LOGIN_TEMPLATE = "auth/login";
 
+    private static final String J_USERNAME = "j_username";
+
+    private static final String ERROR_MSG_KEY = "error";
+
+    private static final String ERROR_MSG = "Invalid credentials!!";
+
+    /**
+     * Render login page.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
-        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
-        ContextObject ctxObj = new ContextObject();
-        TemplateEngine templateEngine = TemplateEngine.instance();
-        if ("/tools/error".equals(requestURI)) {
-            templateEngine.render(builder.template("error/generic").build());
+        if (TOOLS_LOGIN_URI.equals(requestURI)) {
+        	TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).template(LOGIN_TEMPLATE).build());
+        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
+            // Invalidate the session and redirect to /tools/dashboard page.
+            req.logout();
+            resp.sendRedirect(TOOLS_DASHBOARD_URI);
         } else {
-            String statusCode = this.getStatusCode(requestURI);
-            if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
-                builder.contextObject(ctxObj.put("exception", Requests.attr(req, ERROR_EXCEPTION)));
-                templateEngine.render(builder.template("error/500").build());
-            } else if (STATUS_500.equals(statusCode)) {
-                // Means it's just error code, no exception set in the request.
-                templateEngine.render(builder.template("error/generic").build());
-            } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {
-                templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
-            } else {
-                // if the requested view not found, render 404.
-                templateEngine.render(builder.template("error/404").build());
-            }
+            // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /tools/dashboard.
+            resp.sendRedirect(TOOLS_DASHBOARD_URI);
         }
     }
 
+    /**
+     * Handle "/auth/j_security_check" validation failure.
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.doGet(req, resp);
+        this.handleLoginFailure(req, resp);
     }
 
-    private String getStatusCode(String requestURI) {
-        return requestURI.substring(requestURI.lastIndexOf('/') + 1);
+    private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
+        // Render login page again with validation message.
+        TemplateEngine.instance().render(new TemplateContext.Builder(req, resp)
+                .template(LOGIN_TEMPLATE)
+                .contextObject(new ContextObject()
+                .put(ERROR_MSG_KEY, ERROR_MSG)
+                .put(J_USERNAME, req.getParameter(J_USERNAME)))
+                .build());
     }
 }

@@ -19,10 +19,11 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.templating.ContextObject;
 import com.adeptj.runtime.templating.TemplateContext;
 import com.adeptj.runtime.templating.TemplateEngine;
+import org.osgi.framework.Bundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,55 +32,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
-
 /**
- * LoginServlet does the following:
+ * ToolsServlet renders the admin tools page.
  * <p>
- * 1. Serves the login page and handles the validation failure on wrong credentials submission.
- * 2. Logout the currently logged in Admin user and renders the login page again.
- * <p>
- * Note: This is independent of OSGi and directly managed by Undertow.
+ * Note: This is independent of OSGi and directly managed by UndertowServer.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ LoginServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
-public class LoginServlet extends HttpServlet {
+@WebServlet(name = "AdeptJ ToolsServlet", urlPatterns = { "/tools/dashboard" })
+public class ToolsServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
     /**
-     * Render login page.
+     * Renders tools page.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestURI = req.getRequestURI();
-        if (TOOLS_LOGIN_URI.equals(requestURI)) {
-        	TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).template("auth/login").build());
-        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_ADMIN_ROLE)) {
-            // Invalidate the session and redirect to /tools/login page.
-            req.logout();
-            resp.sendRedirect(Constants.TOOLS_DASHBOARD_URI);
-        } else {
-            // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console.
-            resp.sendRedirect(Constants.TOOLS_DASHBOARD_URI);
-        }
+    	ContextObject ctxObj = new ContextObject();
+    	ctxObj.put("username", req.getRemoteUser()).put("sysProps", System.getProperties().entrySet());
+    	Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
+    	ctxObj.put("totalBundles", bundles.length).put("bundles", bundles);
+    	StringBuilder jreInfo = new StringBuilder(System.getProperty("java.runtime.name"));
+    	jreInfo.append("(build ").append(System.getProperty("java.runtime.version")).append(")");
+    	ctxObj.put("runtime", jreInfo.toString());
+    	StringBuilder jvmInfo = new StringBuilder(System.getProperty("java.vm.name")).append("(build ");
+    	jvmInfo.append(System.getProperty("java.vm.version")).append(", ").append(System.getProperty("java.vm.info")).append(")");
+    	ctxObj.put("jvm", jvmInfo.toString()).put("processors", Runtime.getRuntime().availableProcessors());
+        TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).contextObject(ctxObj).template("auth/tools").build());
     }
 
-    /**
-     * Handle "/auth/j_security_check" validation failure.
-     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.handleLoginFailure(req, resp);
-    }
-
-    private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
-        ContextObject ctxObj = new ContextObject();
-        ctxObj.put("error", "Invalid credentials!!").put("j_username", req.getParameter("j_username"));
-        // Render login page again with validation message.
-        TemplateEngine.instance().render(builder.template("auth/login").contextObject(ctxObj).build());
+        resp.sendRedirect("/tools/dashboard");
     }
 }

@@ -19,6 +19,7 @@
 */
 package com.adeptj.runtime.servlet.osgi;
 
+import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.templating.ContextObject;
 import com.adeptj.runtime.templating.TemplateContext;
@@ -35,6 +36,7 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
 import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * PerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
@@ -59,13 +61,16 @@ public class PerServletContextErrorServlet extends HttpServlet {
     }
 
     private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Integer statusCode = (Integer) req.getAttribute(ERROR_STATUS_CODE);
+        Integer statusCode = (Integer) Requests.attr(req, ERROR_STATUS_CODE);
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
         ContextObject ctxObj = this.contextObject(req, statusCode);
         builder.contextObject(ctxObj);
         TemplateEngine templateEngine = TemplateEngine.instance();
-		if (ctxObj.get("exception") != null && Integer.valueOf(500).equals(statusCode)) {
+		if (ctxObj.get("exception") != null && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
         	templateEngine.render(builder.template("error/500").build());
+        } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
+		    // Means it's just error code, no exception set in the request.
+            templateEngine.render(builder.template("error/generic").build());
         } else if (Configs.DEFAULT.undertow().getIntList("common.status-codes").contains(statusCode)) {
         	templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
         } else {
@@ -77,8 +82,8 @@ public class PerServletContextErrorServlet extends HttpServlet {
 	private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
 		return new ContextObject()
                 .put("statusCode", statusCode)
-                .put("errorMsg", req.getAttribute(ERROR_MESSAGE))
-				.put("reqURI", req.getAttribute(ERROR_REQUEST_URI))
-				.put("exception", req.getAttribute(ERROR_EXCEPTION));
+                .put("errorMsg", Requests.attr(req, ERROR_MESSAGE))
+				.put("reqURI", Requests.attr(req, ERROR_REQUEST_URI))
+				.put("exception", Requests.attr(req, ERROR_EXCEPTION));
 	}
 }

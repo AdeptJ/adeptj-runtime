@@ -27,9 +27,9 @@ import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.servlet.DashboardServlet;
+import com.adeptj.runtime.servlet.ToolsServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
-import com.adeptj.runtime.servlet.LoginServlet;
+import com.adeptj.runtime.servlet.AuthServlet;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -313,8 +313,8 @@ public final class UndertowBootstrap {
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/tools/error/*"));
-        servlets.add(Servlets.servlet(DashboardServlet.class).addMapping("/tools/dashboard"));
-        servlets.add(Servlets.servlet(LoginServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI));
+        servlets.add(Servlets.servlet(ToolsServlet.class).addMapping("/tools/dashboard"));
+        servlets.add(Servlets.servlet(AuthServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI));
         return servlets;
     }
 
