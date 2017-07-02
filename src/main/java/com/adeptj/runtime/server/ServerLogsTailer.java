@@ -28,16 +28,9 @@ class ServerLogsTailer {
         this.session = session;
     }
 
-    void initTailer() {
+    void startTailer() {
         this.tailer = new Tailer(this.logFile, this.createListener(), DELAY_MILLIS, true);
-        Thread thread = new Thread(() -> {
-            try {
-                tailer.run();
-            } catch (Exception ex) {
-                this.session.getAsyncRemote().sendText(ex.toString());
-            }
-        });
-        thread.start();
+        ServerLogsExecutors.INSTANCE.execute(this.tailer);
     }
 
     void stopTailer() {
