@@ -26,7 +26,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
@@ -93,7 +92,6 @@ public class LogbackBootstrap {
     private LogbackBootstrap() {
     }
 
-    @SuppressWarnings("unchecked")
     public static void startLoggerContext() {
         long startTime = System.nanoTime();
         Config config = Configs.DEFAULT.logging();
@@ -115,9 +113,7 @@ public class LogbackBootstrap {
         appenderList.add(fileAppender);
         // initialize all the required loggers.
         rootLogger(context, consoleAppender, config);
-        config.getObject(KEY_LOGGERS).unwrapped().forEach((String key, Object val) -> {
-            addLogger(Map.class.cast(val), context, appenderList);
-        });
+        config.getObject(KEY_LOGGERS).unwrapped().forEach((key, map) -> addLogger(map, context, appenderList));
         // AsyncAppender
         asyncAppender(config, context, fileAppender);
         context.setPackagingDataEnabled(true);
@@ -140,7 +136,9 @@ public class LogbackBootstrap {
         root.addAppender(consoleAppender);
     }
 
-    private static void addLogger(Map<String, Object> configs, LoggerContext context, List<Appender<ILoggingEvent>> appenderList) {
+    @SuppressWarnings("unchecked")
+    private static void addLogger(Object configMap, LoggerContext context, List<Appender<ILoggingEvent>> appenderList) {
+        Map<String, ?> configs = Map.class.cast(configMap);
         Logger logger = context.getLogger((String) configs.get(KEY_LOG_NAME));
         logger.setLevel(toLevel((String) configs.get(KEY_LOG_LEVEL)));
         logger.setAdditive((Boolean) configs.get(KEY_LOG_ADDITIVITY));
@@ -156,14 +154,14 @@ public class LogbackBootstrap {
         return trigAndRollPolicy;
     }
 
-    private static void asyncAppender(Config config, LoggerContext context, FileAppender<ILoggingEvent> fileAppender) {
+    private static void asyncAppender(Config config, LoggerContext context, Appender<ILoggingEvent> appender) {
         if (Boolean.getBoolean(SYS_PROP_ASYNC_LOGGING)) {
             AsyncAppender asyncAppender = new AsyncAppender();
             asyncAppender.setName(APPENDER_ASYNC);
             asyncAppender.setQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE));
             asyncAppender.setDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD));
             asyncAppender.setContext(context);
-            asyncAppender.addAppender(fileAppender);
+            asyncAppender.addAppender(appender);
             asyncAppender.start();
         }
     }

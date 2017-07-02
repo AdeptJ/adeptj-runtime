@@ -325,7 +325,15 @@ public final class UndertowBootstrap {
     }
 
     private static WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
-        Config wsOptions = cfg.getConfig("websocket-options");
+        Config wsOptions = cfg.getConfig("webSocket-options");
+        return new WebSocketDeploymentInfo()
+                .setWorker(webSocketWorker(wsOptions))
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean("use-direct-buffer"),
+                        wsOptions.getInt("buffer-size")))
+                .addEndpoint(ServerLogsWebSocket.class);
+    }
+
+    private static XnioWorker webSocketWorker(Config wsOptions) {
         XnioWorker worker = null;
         try {
             worker = Xnio.getInstance()
@@ -333,16 +341,12 @@ public final class UndertowBootstrap {
                     .set(Options.WORKER_IO_THREADS, wsOptions.getInt("io-threads"))
                     .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt("task-core-threads"))
                     .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt("task-max-threads"))
-                    .set(Options.TCP_NODELAY, true)
+                    .set(Options.TCP_NODELAY, wsOptions.getBoolean("tcp-no-delay"))
                     .getMap());
         } catch (IOException ex) {
             LoggerFactory.getLogger(UndertowBootstrap.class).error("Can't create XnioWorker!!", ex);
         }
-        return new WebSocketDeploymentInfo()
-                .setWorker(worker)
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean("use-direct-buffer"),
-                        wsOptions.getInt("buffer-size")))
-                .addEndpoint(ServerLogsWebSocket.class);
+        return worker;
     }
 
     private static DeploymentInfo deploymentInfo(Config cfg) {
