@@ -50,7 +50,7 @@ final class SimpleIdentityManager implements IdentityManager {
     private CredentialMatcher matcher;
 
     @SuppressWarnings("unchecked")
-    public SimpleIdentityManager(Config undertowCfg) {
+    SimpleIdentityManager(Config undertowCfg) {
         this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
         this.matcher = new CredentialMatcher();
     }

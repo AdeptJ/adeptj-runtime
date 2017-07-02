@@ -13,7 +13,7 @@ import java.io.File;
 import static com.adeptj.runtime.server.ServerLogsWebSocket.SERVER_LOGS_ENDPOINT;
 
 /**
- * WebSocket for displaying server logs.
+ * WebSocket for rendering server logs.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -26,17 +26,22 @@ public class ServerLogsWebSocket {
 
     static final String SERVER_LOGS_ENDPOINT = "/server/logs";
 
-    private ServerLogsRenderer logsRenderer;
+    private ServerLogsTailer logsTailer;
 
+    /**
+     * Creates a ServerLogsTailer for each session.
+     *
+     * @param session the WebSocket Session
+     */
     @OnOpen
     public void onOpen(Session session) {
-        this.logsRenderer = new ServerLogsRenderer(new File(Configs.DEFAULT.logging().getString(SERVER_LOG_FILE)),
+        this.logsTailer = new ServerLogsTailer(new File(Configs.DEFAULT.logging().getString(SERVER_LOG_FILE)),
                 session);
-        this.logsRenderer.initRenderer();
+        this.logsTailer.initTailer();
     }
 
     @OnClose
     public void onClose(Session session) {
-        this.logsRenderer.stopRenderer();
+        this.logsTailer.stopTailer();
     }
 }

@@ -37,7 +37,7 @@ final class SimpleAccount implements Account {
 
     private Set<String> roles;
 
-    public SimpleAccount(SimplePrincipal principal, Set<String> roles) {
+    SimpleAccount(SimplePrincipal principal, Set<String> roles) {
         this.principal = principal;
         this.roles = roles;
     }

@@ -33,7 +33,7 @@ final class SimplePrincipal implements Principal, Serializable {
 	
 	private String name;
 
-    public SimplePrincipal(String name) {
+    SimplePrincipal(String name) {
         this.name = name;
     }
 

@@ -9,11 +9,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 /**
- * Tails server logs.
+ * Tails server log using Apache Commons IO {@link Tailer}.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
-class ServerLogsRenderer {
+class ServerLogsTailer {
 
     private static final int DELAY_MILLIS = 1000;
 
@@ -23,12 +23,12 @@ class ServerLogsRenderer {
 
     private Tailer tailer;
 
-    ServerLogsRenderer(File file, Session session) {
+    ServerLogsTailer(File file, Session session) {
         this.logFile = file;
         this.session = session;
     }
 
-    void initRenderer() {
+    void initTailer() {
         this.tailer = new Tailer(this.logFile, this.createListener(), DELAY_MILLIS, true);
         Thread thread = new Thread(() -> {
             try {
@@ -40,7 +40,7 @@ class ServerLogsRenderer {
         thread.start();
     }
 
-    void stopRenderer() {
+    void stopTailer() {
         this.tailer.stop();
     }
 
