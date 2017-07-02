@@ -20,7 +20,6 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import static com.adeptj.runtime.common.Constants.UTF8;
+import static com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware.getInstance;
 
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
@@ -45,19 +45,20 @@ final class CredentialMatcher {
     boolean match(String id, String pwd) {
         // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
         // default password maintained in provisioning file.
-        return WebConsolePasswordUpdateAware.getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd)
-                : this.fromProvisioningConfig(id, pwd);
+        return getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
     }
 
     private boolean fromProvisioningConfig(String id, String pwd) {
-        return Configs.DEFAULT.undertow().getObject("common.user-credential-mapping").unwrapped().entrySet().stream()
+        return Configs.DEFAULT.undertow().getObject("common.user-credential-mapping").unwrapped()
+                .entrySet()
+                .stream()
                 .filter(entry -> entry.getKey().equals(id))
                 .anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
     }
 
     private boolean fromOSGiManagerConfig(String pwd) {
         try {
-            return Arrays.equals(this.chars(this.hash(pwd)), WebConsolePasswordUpdateAware.getInstance().getPassword());
+            return Arrays.equals(this.chars(this.hash(pwd)), getInstance().getPassword());
         } catch (Exception ex) { // NOSONAR
             // Don't care!!
         }
@@ -71,9 +72,13 @@ final class CredentialMatcher {
     private String hash(String pwd) {
         String hashPassword = pwd;
         try {
-            hashPassword = new StringBuilder().append('{').append(SHA256.toLowerCase()).append('}')
-                    .append(new String(Base64.getEncoder().encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), 
-                    		UTF8)).toString();
+            hashPassword = new StringBuilder()
+                    .append('{')
+                    .append(SHA256.toLowerCase())
+                    .append('}')
+                    .append(new String(Base64.getEncoder()
+                            .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), UTF8))
+                    .toString();
         } catch (Exception ex) { // NOSONAR
             LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
         }

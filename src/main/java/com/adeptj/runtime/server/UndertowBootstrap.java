@@ -155,16 +155,17 @@ public final class UndertowBootstrap {
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         printBanner(logger);
-        Builder undertowBuilder = Undertow.builder();
-        DeploymentManager manager = Servlets.newContainer().addDeployment(deploymentInfo(undertowConf));
+        Builder builder = Undertow.builder();
+        DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
-        optimizeWorkerOptionsForProdMode(undertowBuilder, undertowConf, logger);
-        HttpHandler initialHandler = new SetHeadersHandler(manager.start(), serverHeaders(undertowConf));
-        ServerOptions.build(undertowBuilder, undertowConf);
-        undertowBuilder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-        enableHttp2(undertowConf, undertowBuilder, logger);
-        enableAJP(undertowConf, undertowBuilder, logger);
-        Undertow server = undertowBuilder.setHandler(rootHandler(initialHandler, undertowConf)).build();
+        optimizeWorkerOptions(builder, undertowConf, logger);
+        HttpHandler servletInitialHandler = manager.start();
+        ServerOptions.build(builder, undertowConf);
+        builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
+        enableHttp2(undertowConf, builder, logger);
+        enableAJP(undertowConf, builder, logger);
+        Undertow server = builder.setHandler(rootHandler(new SetHeadersHandler(servletInitialHandler,
+                serverHeaders(undertowConf)), undertowConf)).build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
         launchBrowser(arguments, httpPort, logger);
@@ -190,7 +191,7 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static void optimizeWorkerOptionsForProdMode(Builder builder, Config undertowConf, Logger logger) {
+    private static void optimizeWorkerOptions(Builder builder, Config undertowConf, Logger logger) {
         if (Environment.isProd()) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
@@ -283,9 +284,9 @@ public final class UndertowBootstrap {
         return cfg.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
     }
 
-    private static HttpHandler rootHandler(HttpHandler initialHandler, Config cfg) {
+    private static HttpHandler rootHandler(HttpHandler headersHandler, Config cfg) {
         return Handlers.gracefulShutdown(new RequestLimitingHandler(cfg.getInt(KEY_MAX_CONCURRENT_REQS),
-                new AllowedMethodsHandler(predicateHandler(initialHandler), allowedMethods(cfg))));
+                new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
     }
 
     private static List<ErrorPage> errorPages(Config cfg) {

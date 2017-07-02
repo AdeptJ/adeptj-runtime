@@ -25,7 +25,6 @@ import io.undertow.Handlers;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
-import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.servlet.handlers.ServletInitialHandler;
 
@@ -41,19 +40,26 @@ import io.undertow.servlet.handlers.ServletInitialHandler;
  */
 final class ServletInitialHandlerWrapper implements HandlerWrapper {
 
+    private static final String RESOURCE_PREFIX = "common.static-resource-prefix";
+
+    private static final String RESOURCE_EXTNS = "common.static-resource-extns";
+
+    private static final String RESOURCE_MGR_PREFIX = "common.resource-mgr-prefix";
+
     /**
      * Wraps the passed {@link ServletInitialHandler} with a PredicateHandler for serving static content.
+     *
+     * @param servletInitialHandler the ServletInitialHandler
+     * @return PredicateHandler which decides whether to invoke ResourceHandler or pass on the request to
+     * next handler in the chain which is ServletInitialHandler.
      * @see ServletInitialHandlerWrapper class header for detailed information.
-     * 
-     * @param handler the ServletInitialHandler
-     * @return PredicateHandler
      */
     @Override
-    public HttpHandler wrap(HttpHandler handler) {
-    	Config cfg = Configs.DEFAULT.undertow();
-        return new PredicateHandler(Predicates.and(Predicates.prefix(cfg.getString("common.static-resource-prefix")),
-                Predicates.suffixes(cfg.getStringList("common.static-resource-extns").toArray(new String[0]))),
+    public HttpHandler wrap(HttpHandler servletInitialHandler) {
+        Config cfg = Configs.DEFAULT.undertow();
+        return Handlers.predicate(Predicates.and(Predicates.prefix(cfg.getString(RESOURCE_PREFIX)),
+                Predicates.suffixes(cfg.getStringList(RESOURCE_EXTNS).toArray(new String[0]))),
                 Handlers.resource(new ClassPathResourceManager(this.getClass().getClassLoader(),
-                		cfg.getString("common.resource-mgr-prefix"))), handler);
+                        cfg.getString(RESOURCE_MGR_PREFIX))), servletInitialHandler);
     }
 }

@@ -116,7 +116,6 @@ public class LogbackBootstrap {
         config.getObject(KEY_LOGGERS).unwrapped().forEach((key, map) -> addLogger(map, context, appenderList));
         // AsyncAppender
         asyncAppender(config, context, fileAppender);
-        context.setPackagingDataEnabled(true);
         context.start();
         context.getLogger(LogbackBootstrap.class).info(INIT_MSG, elapsedSinceMillis(startTime));
     }

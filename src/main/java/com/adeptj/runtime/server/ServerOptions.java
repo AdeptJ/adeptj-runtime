@@ -19,17 +19,15 @@
 */
 package com.adeptj.runtime.server;
 
-import java.util.Map;
-
+import com.adeptj.runtime.common.Times;
+import com.typesafe.config.Config;
+import io.undertow.Undertow.Builder;
+import io.undertow.UndertowOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Option;
 
-import com.adeptj.runtime.common.Times;
-import com.typesafe.config.Config;
-
-import io.undertow.Undertow.Builder;
-import io.undertow.UndertowOptions;
+import java.util.Map;
 
 /**
  * UNDERTOW Server Options.
@@ -37,10 +35,22 @@ import io.undertow.UndertowOptions;
  * @author Rakesh.Kumar, AdeptJ
  */
 final class ServerOptions {
-	
-	/** Utility methods only */
-	private ServerOptions() {
-	}
+
+    private static final String SERVER_OPTIONS = "server-options";
+
+    private static final String OPTIONS_TYPE_STRING = "options-type-string";
+
+    private static final String OPTIONS_TYPE_INTEGER = "options-type-integer";
+
+    private static final String OPTIONS_TYPE_LONG = "options-type-long";
+
+    private static final String OPTIONS_TYPE_BOOLEAN = "options-type-boolean";
+
+    /**
+     * Utility methods only
+     */
+    private ServerOptions() {
+    }
 
     /**
      * Configures the server options dynamically.
@@ -51,11 +61,11 @@ final class ServerOptions {
     public static void build(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(ServerOptions.class);
-        Config serverOptionsCfg = undertowConfig.getConfig("server-options");
-        stringOptions(builder, serverOptionsCfg.getObject("options-type-string").unwrapped(), logger);
-        integerOptions(builder, serverOptionsCfg.getObject("options-type-integer").unwrapped(), logger);
-        longOptions(builder, serverOptionsCfg.getObject("options-type-long").unwrapped(), logger);
-        booleanOptions(builder, serverOptionsCfg.getObject("options-type-boolean").unwrapped(), logger);
+        Config serverOptionsCfg = undertowConfig.getConfig(SERVER_OPTIONS);
+        stringOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_STRING).unwrapped(), logger);
+        integerOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped(), logger);
+        longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped(), logger);
+        booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped(), logger);
         logger.info("ServerOptions populated in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
