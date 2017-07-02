@@ -59,7 +59,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     private HttpSessionAttributeListener sessionAttributeListener;
 
-    public EventDispatcherTracker(BundleContext context) {
+    EventDispatcherTracker(BundleContext context) {
         super(context, OSGiUtils.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
     }
 
@@ -78,6 +78,18 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
         ServiceTrackers.INSTANCE.closeQuietly(this);
     }
 
+    HttpSessionListener getHttpSessionListener() {
+        return this.sessionListener;
+    }
+
+    HttpSessionIdListener getHttpSessionIdListener() {
+        return this.sessionIdListener;
+    }
+
+    HttpSessionAttributeListener getHttpSessionAttributeListener() {
+        return this.sessionAttributeListener;
+    }
+
     private Object getServiceDesc(ServiceReference<EventListener> reference) {
         return reference.getProperty(SERVICE_DESCRIPTION);
     }
@@ -93,17 +105,5 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
             this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
         }
         return listener;
-    }
-
-    HttpSessionListener getHttpSessionListener() {
-        return this.sessionListener;
-    }
-
-    HttpSessionIdListener getHttpSessionIdListener() {
-        return this.sessionIdListener;
-    }
-
-    HttpSessionAttributeListener getHttpSessionAttributeListener() {
-        return this.sessionAttributeListener;
     }
 }

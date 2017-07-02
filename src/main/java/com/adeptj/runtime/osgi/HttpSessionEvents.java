@@ -56,17 +56,11 @@ public enum HttpSessionEvents {
     public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
             case SESSION_CREATED:
-            	if (LOGGER.isDebugEnabled()) {
-            	    LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(),
-                            Date.from(Instant.ofEpochMilli(event.getSession().getCreationTime())));
-            	}
+                logSessionCreated(event);
                 sessionListener().ifPresent(listener -> listener.sessionCreated(event));
                 break;
             case SESSION_DESTROYED:
-            	if (LOGGER.isDebugEnabled()) {
-            	    LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(), 
-			    		    Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
-            	}
+                logSessionDestroyed(event);
                 sessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
                 break;
             default:
@@ -100,6 +94,20 @@ public enum HttpSessionEvents {
             default:
                 // NO-OP
                 break;
+        }
+    }
+
+    private static void logSessionCreated(HttpSessionEvent event) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(),
+                    Date.from(Instant.ofEpochMilli(event.getSession().getCreationTime())));
+        }
+    }
+
+    private static void logSessionDestroyed(HttpSessionEvent event) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(),
+                    Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
         }
     }
 

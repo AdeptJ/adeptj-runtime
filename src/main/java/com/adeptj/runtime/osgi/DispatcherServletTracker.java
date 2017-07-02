@@ -45,7 +45,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private HttpServlet dispatcherServlet;
 
-    public DispatcherServletTracker(BundleContext context) {
+    DispatcherServletTracker(BundleContext context) {
         super(context, OSGiUtils.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
     }
 
@@ -102,7 +102,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcherServlet != null) {
             LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
             this.dispatcherServlet.destroy();
-            // Set dispatcherServlet as null, don't want to call dispatcherServlet.core with this reference.
+            // Set dispatcherServlet as null, don't want to call DispatcherServlet.init() with this reference.
             this.dispatcherServlet = null;
         }
     }

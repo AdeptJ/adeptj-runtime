@@ -38,14 +38,14 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
  * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
- *
+ * <p>
  * All the incoming requests for OSGi resources delegated to the Felix DispatcherServlet which further
  * delegates to Felix {@link org.apache.felix.http.base.internal.dispatch.Dispatcher} which maintains
  * a registry of managed HttpServlet/Filter(s) etc.
- *
+ * <p>
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
- *
- *
+ * <p>
+ * <p>
  * <b>This HttpServlet listens at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
@@ -66,7 +66,8 @@ public class BridgeServlet extends HttpServlet {
         long startTime = System.nanoTime();
         LOGGER.info("Initializing BridgeServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
-        ServletConfigs.INSTANCE.add(this.getClass(), this.getServletConfig());
+        // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
+        ServletConfigs.INSTANCE.add(BridgeServlet.class, this.getServletConfig());
         DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
@@ -85,18 +86,14 @@ public class BridgeServlet extends HttpServlet {
                 resp.sendError(SC_SERVICE_UNAVAILABLE);
             } else {
                 dispatcherServlet.service(req, resp);
-                this.logExceptionIfExists(req);
+                // Check if [javax.servlet.error.exception] set by [Felix Dispatcher]
+                if (Requests.hasException(req)) {
+                    LOGGER.error("Exception set by Felix Dispatcher!!", Requests.attr(req, ERROR_EXCEPTION));
+                }
             }
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while handling request!!", ex);
+            LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private void logExceptionIfExists(HttpServletRequest req) {
-        // Check if [javax.servlet.error.exception] set by [org.apache.felix.http.base.internal.dispatch.Dispatcher]
-        if (Requests.hasException(req)) {
-            LOGGER.error("Exception while handling request!!", req.getAttribute(ERROR_EXCEPTION));
         }
     }
 

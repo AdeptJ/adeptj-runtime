@@ -34,8 +34,12 @@ public final class Requests {
     private Requests() {
     }
 
-    public static boolean hasAttribute(HttpServletRequest req, String attrName) {
-        return req.getAttribute(attrName) != null;
+    public static Object attr(HttpServletRequest req, String name) {
+        return req.getAttribute(name);
+    }
+
+    public static boolean hasAttribute(HttpServletRequest req, String name) {
+        return req.getAttribute(name) != null;
     }
 
     public static boolean hasException(HttpServletRequest req) {
