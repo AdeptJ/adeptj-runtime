@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder
+@StartupOrder(0)
 public class FrameworkStartupHandler implements StartupAware {
 
     /**

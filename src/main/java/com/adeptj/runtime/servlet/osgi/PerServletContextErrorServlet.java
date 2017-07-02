@@ -75,7 +75,9 @@ public class PerServletContextErrorServlet extends HttpServlet {
     }
 
 	private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
-		return new ContextObject().put("statusCode", statusCode).put("errorMsg", req.getAttribute(ERROR_MESSAGE))
+		return new ContextObject()
+                .put("statusCode", statusCode)
+                .put("errorMsg", req.getAttribute(ERROR_MESSAGE))
 				.put("reqURI", req.getAttribute(ERROR_REQUEST_URI))
 				.put("exception", req.getAttribute(ERROR_EXCEPTION));
 	}

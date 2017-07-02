@@ -78,14 +78,16 @@ public enum FrameworkBootstrap {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
             this.framework = this.createFramework(logger);
+            long startTimeFramework = System.nanoTime();
             this.framework.start();
+            logger.info("Framework creation took [{}] ms!!", Times.elapsedSinceMillis(startTimeFramework));
             this.frameworkListener = new FrameworkRestartHandler();
             BundleContext systemBundleContext = this.framework.getBundleContext();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             Bundles.provisionBundles(systemBundleContext);
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
-                    Configs.DEFAULT.undertow().getStringList("common.error-pages"));
+                    Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             this.registerBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
@@ -146,7 +148,10 @@ public enum FrameworkBootstrap {
     }
 
     private Framework createFramework(Logger logger) throws IOException  {
-        return ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
+        return ServiceLoader.load(FrameworkFactory.class)
+                .iterator()
+                .next()
+                .newFramework(this.frameworkConfigs(logger));
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {

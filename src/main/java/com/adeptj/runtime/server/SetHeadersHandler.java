@@ -36,7 +36,7 @@ final class SetHeadersHandler implements HttpHandler {
 
     private Map<HttpString, String> headers;
 
-    public SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
+    SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
         this.servletHandler = servletHandler;
         this.headers = headers;
     }

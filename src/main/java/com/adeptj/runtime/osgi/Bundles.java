@@ -20,6 +20,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
+import com.adeptj.runtime.common.Times;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -49,15 +50,17 @@ final class Bundles {
     private static final String PREFIX_BUNDLES = "bundles/";
 
     private static final String EXTN_JAR = ".jar";
-    
+
     // No instantiation.
     private Bundles() {
     }
 
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
+        long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         // Start all the Bundles after collection and installation phase.
         startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
+        logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     private static void startBundles(List<Bundle> bundles, Logger logger) {

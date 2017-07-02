@@ -40,5 +40,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface StartupOrder {
 
-    int value() default 0;
+    int value();
 }

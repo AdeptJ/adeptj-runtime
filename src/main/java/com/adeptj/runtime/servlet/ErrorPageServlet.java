@@ -19,6 +19,7 @@
 */
 package com.adeptj.runtime.servlet;
 
+import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.templating.ContextObject;
 import com.adeptj.runtime.templating.TemplateContext;
@@ -53,9 +54,8 @@ public class ErrorPageServlet extends HttpServlet {
 		if ("/tools/error".equals(requestURI)) {
         	templateEngine.render(builder.template("error/generic").build());
         } else {
-            Object exception = req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
             String statusCode = this.getStatusCode(requestURI);
-            if (exception != null && "500".equals(statusCode)) {
+            if (Requests.hasException(req) && "500".equals(statusCode)) {
                 builder.contextObject(ctxObj.put("exception", req.getAttribute(RequestDispatcher.ERROR_EXCEPTION)));
                 templateEngine.render(builder.template("error/500").build());
             } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {

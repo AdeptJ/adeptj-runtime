@@ -52,15 +52,18 @@ import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.OptionMap;
 import org.xnio.Options;
+import org.xnio.Xnio;
+import org.xnio.XnioWorker;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -96,6 +99,8 @@ import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
+import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
+import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 
 /**
  * UndertowBootstrap: Provision the Undertow Web Server.
@@ -136,11 +141,13 @@ public final class UndertowBootstrap {
 
     private static final String PROTOCOL_TLS = "TLS";
 
+    private static final String REALM = "AdeptJ Realm";
+
     // No instantiation.
     private UndertowBootstrap() {
     }
 
-    public static void bootstrap(Map<String, String> arguments) throws ServletException  {
+    public static void bootstrap(Map<String, String> arguments) throws ServletException {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
@@ -163,23 +170,23 @@ public final class UndertowBootstrap {
         launchBrowser(arguments, httpPort, logger);
     }
 
-	private static void printBanner(Logger logger) {
-		try {
-        	logger.info(IOUtils.toString(UndertowBootstrap.class.getResourceAsStream(BANNER_TXT))); // NOSONAR
-		} catch (IOException ex) {
-			// Just log it, its not critical.
-			logger.error("IOException!!", ex);
-		}
-	}
+    private static void printBanner(Logger logger) {
+        try (InputStream stream = UndertowBootstrap.class.getResourceAsStream(BANNER_TXT)) {
+            logger.info(IOUtils.toString(stream)); // NOSONAR
+        } catch (IOException ex) {
+            // Just log it, its not critical.
+            logger.error("IOException!!", ex);
+        }
+    }
 
     private static void launchBrowser(Map<String, String> arguments, int httpPort, Logger logger) {
         if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
             try {
-				Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
-			} catch (IOException ex) {
-				// Just log it, its okay if browser is not launched.
-				logger.error("IOException!!", ex);
-			}
+                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
+            } catch (IOException ex) {
+                // Just log it, its okay if browser is not launched.
+                logger.error("IOException!!", ex);
+            }
         }
     }
 
@@ -211,7 +218,7 @@ public final class UndertowBootstrap {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
             undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE),
-            		httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger), httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
+                    httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger), httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
@@ -237,7 +244,7 @@ public final class UndertowBootstrap {
         // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
         // this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-        	logger.error("Port: [{}] already used, shutting down JVM!!", port);
+            logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
             LogbackBootstrap.stopLoggerContext();
             System.exit(-1); // NOSONAR
@@ -282,7 +289,9 @@ public final class UndertowBootstrap {
     }
 
     private static List<ErrorPage> errorPages(Config cfg) {
-        return cfg.getObject("error-pages").unwrapped().entrySet().stream()
+        return cfg.getObject("error-pages").unwrapped()
+                .entrySet()
+                .stream()
                 .map(entry -> Servlets.errorPage(String.valueOf(entry.getValue()), Integer.parseInt(entry.getKey())))
                 .collect(Collectors.toList());
     }
@@ -293,7 +302,8 @@ public final class UndertowBootstrap {
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {
-        return Servlets.securityConstraint().addRolesAllowed(cfg.getStringList("common.auth-roles"))
+        return Servlets.securityConstraint()
+                .addRolesAllowed(cfg.getStringList("common.auth-roles"))
                 .addWebResourceCollection(Servlets.webResourceCollection()
                         .addHttpMethods(cfg.getStringList("common.secured-urls-allowed-methods"))
                         .addUrlPatterns(cfg.getStringList("common.secured-urls")));
@@ -314,56 +324,77 @@ public final class UndertowBootstrap {
                 cfg.getInt("common.multipart-file-size-threshold"));
     }
 
+    private static WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
+        Config wsOptions = cfg.getConfig("websocket-options");
+        XnioWorker worker = null;
+        try {
+            worker = Xnio.getInstance()
+                    .createWorker(OptionMap.builder()
+                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt("io-threads"))
+                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt("task-core-threads"))
+                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt("task-max-threads"))
+                    .set(Options.TCP_NODELAY, true)
+                    .getMap());
+        } catch (IOException ex) {
+            LoggerFactory.getLogger(UndertowBootstrap.class).error("Can't create XnioWorker!!", ex);
+        }
+        return new WebSocketDeploymentInfo()
+                .setWorker(worker)
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean("use-direct-buffer"),
+                        wsOptions.getInt("buffer-size")))
+                .addEndpoint(ServerLogsWebSocket.class);
+    }
+
     private static DeploymentInfo deploymentInfo(Config cfg) {
-        return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(CONTEXT_PATH)
+        return Servlets.deployment()
+                .setDeploymentName(DEPLOYMENT_NAME)
+                .setContextPath(CONTEXT_PATH)
                 .setClassLoader(UndertowBootstrap.class.getClassLoader())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(cfg.getInt("common.session-timeout"))
                 .setInvalidateSessionOnLogout(cfg.getBoolean("common.invalidate-session-on-logout"))
-                .setIdentityManager(new TextIdentityManager(cfg))
+                .setIdentityManager(new SimpleIdentityManager(cfg))
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean("common.use-cached-auth-mechanism"))
-                .setLoginConfig(Servlets.loginConfig(HttpServletRequest.FORM_AUTH, "AdeptJ Realm", TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
-                .addServletContainerInitalizer(sciInfo()).addSecurityConstraint(securityConstraint(cfg))
+                .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
+                .addServletContainerInitalizer(sciInfo())
+                .addSecurityConstraint(securityConstraint(cfg))
                 .addServlets(servlets()).addErrorPages(errorPages(cfg))
                 .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
-                .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, new WebSocketDeploymentInfo()
-                        .setBuffers(new DefaultByteBufferPool(true, 4096))
-                        .addEndpoint(ServerLogsWebSocket.class)
-        );
+                .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg));
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {
-		try {
+        try {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-			keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
-			return keyStore;
-		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
-			logger.error("Exception while loading KeyStore!!", ex);
-			throw new InitializationException("Exception while loading KeyStore!!", ex);
-		}
+            keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
+            return keyStore;
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
+            logger.error("Exception while loading KeyStore!!", ex);
+            throw new InitializationException("Exception while loading KeyStore!!", ex);
+        }
     }
 
     private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd, Logger logger) {
-		try {
+        try {
             SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-			sslContext.init(keyManagers(keyStore, keyPwd, logger), null, null);
-			return sslContext;
-		} catch (NoSuchAlgorithmException | KeyManagementException ex) {
-			logger.error("Exception while initializing SSLContext!!", ex);
-			throw new InitializationException("Exception while initializing SSLContext!!", ex);
-		}
+            sslContext.init(keyManagers(keyStore, keyPwd, logger), null, null);
+            return sslContext;
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+            logger.error("Exception while initializing SSLContext!!", ex);
+            throw new InitializationException("Exception while initializing SSLContext!!", ex);
+        }
     }
 
     private static KeyManager[] keyManagers(KeyStore keyStore, char[] keyPwd, Logger logger) {
-		try {
+        try {
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			kmf.init(keyStore, keyPwd);
-			return kmf.getKeyManagers();
-		} catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
-			logger.error("Exception while initializing KeyManagers!!", ex);
-			throw new InitializationException("Exception while initializing KeyManagers!!", ex);
-		}
+            kmf.init(keyStore, keyPwd);
+            return kmf.getKeyManagers();
+        } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
+            logger.error("Exception while initializing KeyManagers!!", ex);
+            throw new InitializationException("Exception while initializing KeyManagers!!", ex);
+        }
     }
 }

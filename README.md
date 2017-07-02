@@ -31,8 +31,7 @@
 1. High performance [Undertow](http://undertow.io/) web server.
 2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix as implementation).
 
-**Lightweight ~50MB memory footprint(with below mentioned modules), low on memory, starts instantly**
-**Uber Jar is ~30MB in size with below mentioned modules, starts in ~1300ms**
+**Uber Jar is ~30MB in size with below mentioned modules, starts in ~1500ms and low on resources**
 
 **Minimal runtime(OSGi, Undertow and some supporting bundles) is ~10MB, starts in ~800ms**
 

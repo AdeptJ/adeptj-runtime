@@ -38,7 +38,7 @@ import java.util.function.Predicate;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class TextIdentityManager implements IdentityManager {
+final class SimpleIdentityManager implements IdentityManager {
 
     private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
 
@@ -50,7 +50,7 @@ final class TextIdentityManager implements IdentityManager {
     private CredentialMatcher matcher;
 
     @SuppressWarnings("unchecked")
-    public TextIdentityManager(Config undertowCfg) {
+    public SimpleIdentityManager(Config undertowCfg) {
         this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
         this.matcher = new CredentialMatcher();
     }

@@ -60,7 +60,8 @@ public class ContainerInitializer implements ServletContainerInitializer {
             	logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
                 try {
                     if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
-                        StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance()).onStartup(context);
+                        StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance())
+                                .onStartup(context);
                     } else {
                         logger.warn("Unknown @HandlesTypes: [{}]", startupAwareClass);
                         throw new IllegalStateException("Only StartupAware types are supported!!");
