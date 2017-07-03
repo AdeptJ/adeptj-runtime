@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Provides {@link ExecutorService} with fixed thread pool for tailing server logs.
@@ -40,7 +41,7 @@ enum ServerLogsExecutors {
 
     private static final String THREAD_POOL_SIZE = "thread-pool-size";
 
-    private static int executionCount;
+    private AtomicInteger useCount;
 
     private ExecutorService executorService;
 
@@ -48,18 +49,17 @@ enum ServerLogsExecutors {
 
     ServerLogsExecutors() {
         this.poolSize = Configs.DEFAULT.undertow().getConfig(WS_OPTIONS).getInt(THREAD_POOL_SIZE);
+        this.useCount = new AtomicInteger(this.poolSize);
     }
 
     void execute(Runnable command) {
         if (this.executorService == null) {
             this.executorService = Executors.newFixedThreadPool(this.poolSize);
-            executionCount = this.poolSize;
         }
-        if (executionCount == 0) {
+        if (this.useCount.getAndDecrement() <= 0) {
             throw new RejectedExecutionException("Can't accept more server logs requests!!");
         }
         this.executorService.execute(command);
-        executionCount--;
     }
 
     void shutdownExecutorService() {
