@@ -60,7 +60,7 @@ public class PerServletContextErrorServlet extends HttpServlet {
         this.handleError(req, resp);
     }
 
-    private void handleError(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void handleError(HttpServletRequest req, HttpServletResponse resp) {
         Integer statusCode = (Integer) Requests.attr(req, ERROR_STATUS_CODE);
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
         ContextObject ctxObj = this.contextObject(req, statusCode);
