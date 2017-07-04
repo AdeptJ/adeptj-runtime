@@ -21,24 +21,22 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.common.Times;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.jar.JarEntry;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
+import static org.osgi.framework.Constants.FRAGMENT_HOST;
 
 /**
  * Utility that handles the installation/activation of required bundles after the system bundle is up and running.
@@ -58,14 +56,18 @@ final class Bundles {
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
-        // Start all the Bundles after collection and installation phase.
-        startBundles(installBundles(collectBundles(logger), systemBundleContext, logger), logger);
+        String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+        // Following happens in order.
+        // 1. Collect Bundles
+        // 2. Install Bundles
+        // 3. Start Bundles
+        startBundles(installBundles(collectBundles(logger, rootPath), systemBundleContext, logger), logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
     private static void startBundles(List<Bundle> bundles, Logger logger) {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-        bundles.stream().filter(bundle -> Objects.isNull(bundle.getHeaders().get(Constants.FRAGMENT_HOST)))
+        bundles.stream().filter(bundle -> Objects.isNull(bundle.getHeaders().get(FRAGMENT_HOST)))
                 .forEach(bundle -> startBundle(bundle, logger));
     }
 
@@ -97,14 +99,14 @@ final class Bundles {
         return bundle;
     }
 
-    private static List<URL> collectBundles(Logger logger) throws IOException {
-        String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-        ClassLoader classLoader = Bundles.class.getClassLoader();
-        Predicate<JarEntry> bundlePredicate = jarEntry -> jarEntry.getName().startsWith(PREFIX_BUNDLES)
-                && jarEntry.getName().endsWith(EXTN_JAR);
-        URLConnection connection = Bundles.class.getResource(rootPath).openConnection();
-        List<URL> bundles = JarURLConnection.class.cast(connection).getJarFile().stream().filter(bundlePredicate)
-                .map(jarEntry -> classLoader.getResource(jarEntry.getName())).collect(Collectors.toList());
+    private static List<URL> collectBundles(Logger logger, String rootPath) throws IOException {
+        List<URL> bundles = JarURLConnection.class.cast(Bundles.class.getResource(rootPath).openConnection())
+                .getJarFile()
+                .stream()
+                .filter(jarEntry -> StringUtils.startsWith(jarEntry.getName(), PREFIX_BUNDLES)
+                        && StringUtils.endsWith(jarEntry.getName(), EXTN_JAR))
+                .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
+                .collect(Collectors.toList());
         logger.debug("Total Bundles collected: [{}]", bundles.size());
         return bundles;
     }

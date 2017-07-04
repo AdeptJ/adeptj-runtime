@@ -21,6 +21,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
 import com.adeptj.runtime.common.ServletConfigs;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.servlet.BridgeServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -100,7 +101,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private void destroyDispatcherServlet() {
         if (this.dispatcherServlet != null) {
-            LOGGER.info("Destroying Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+            LOGGER.info("Destroying Felix DispatcherServlet!!");
             this.dispatcherServlet.destroy();
             // Set dispatcherServlet as null, don't want to call DispatcherServlet.init() with this reference.
             this.dispatcherServlet = null;
@@ -111,8 +112,9 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         if (this.dispatcherServlet != null) {
             try {
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
+                long startTime = System.nanoTime();
                 this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(BridgeServlet.class));
-                LOGGER.info("Felix DispatcherServlet: [{}]", this.dispatcherServlet);
+                LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
             }
