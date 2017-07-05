@@ -20,13 +20,9 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.config.Configs;
-
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Provides {@link ExecutorService} with fixed thread pool for tailing server logs.
@@ -37,29 +33,17 @@ enum ServerLogsExecutors {
 
     INSTANCE;
 
-    private static final String WS_OPTIONS = "webSocket-options";
-
-    private static final String THREAD_POOL_SIZE = "thread-pool-size";
-
-    private AtomicInteger useCount;
-
     private ExecutorService executorService;
 
-    private int poolSize;
-
-    ServerLogsExecutors() {
-        this.poolSize = Configs.DEFAULT.undertow().getConfig(WS_OPTIONS).getInt(THREAD_POOL_SIZE);
-        this.useCount = new AtomicInteger(this.poolSize);
+    void execute(Runnable command) {
+        this.initExecutorService();
+        this.executorService.execute(command);
     }
 
-    void execute(Runnable command) {
+    private void initExecutorService() {
         if (this.executorService == null) {
-            this.executorService = Executors.newFixedThreadPool(this.poolSize);
+            this.executorService = Executors.newCachedThreadPool();
         }
-        if (this.useCount.getAndDecrement() <= 0) {
-            throw new RejectedExecutionException("Can't accept more server logs requests!!");
-        }
-        this.executorService.execute(command);
     }
 
     void shutdownExecutorService() {

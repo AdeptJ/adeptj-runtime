@@ -8,6 +8,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.io.File;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
 import static com.adeptj.runtime.server.ServerLogsWebSocket.SERVER_LOGS_ENDPOINT;
@@ -37,6 +38,7 @@ public class ServerLogsWebSocket {
                 session);
         try {
             this.logsTailer.startTailer();
+            session.getAsyncRemote().sendText("Server logs tailing will be started shortly!!");
         } catch (RejectedExecutionException ex) {
             LoggerFactory.getLogger(ServerLogsWebSocket.class).error(ex.getMessage(), ex);
             session.getAsyncRemote().sendText(ex.getMessage());
@@ -45,6 +47,6 @@ public class ServerLogsWebSocket {
 
     @OnClose
     public void onClose(Session session) {
-        this.logsTailer.stopTailer();
+        Optional.ofNullable(this.logsTailer).ifPresent(ServerLogsTailer::stopTailer);
     }
 }
