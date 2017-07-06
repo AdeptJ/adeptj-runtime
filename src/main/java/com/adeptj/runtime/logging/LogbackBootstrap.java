@@ -135,9 +135,9 @@ public class LogbackBootstrap {
         root.addAppender(consoleAppender);
     }
 
-    @SuppressWarnings("unchecked")
     private static void addLogger(Object configMap, LoggerContext context, List<Appender<ILoggingEvent>> appenderList) {
-        Map<String, ?> configs = Map.class.cast(configMap);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> configs = Map.class.cast(configMap);
         Logger logger = context.getLogger((String) configs.get(KEY_LOG_NAME));
         logger.setLevel(toLevel((String) configs.get(KEY_LOG_LEVEL)));
         logger.setAdditive((Boolean) configs.get(KEY_LOG_ADDITIVITY));
