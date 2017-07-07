@@ -933,6 +933,13 @@
                     <scope>provided</scope>
                 </dependency>
 
+                <dependency>
+                    <groupId>software.amazon.ion</groupId>
+                    <artifactId>ion-java</artifactId>
+                    <version>1.0.2</version>
+                    <scope>provided</scope>
+                </dependency>
+
             </dependencies>
 
         </profile>
