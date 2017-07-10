@@ -934,6 +934,20 @@
                 </dependency>
 
                 <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-commons-aws-messaging</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-commons-aws-s3</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
                     <groupId>software.amazon.ion</groupId>
                     <artifactId>ion-java</artifactId>
                     <version>1.0.2</version>
