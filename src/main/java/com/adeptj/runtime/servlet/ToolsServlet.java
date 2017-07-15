@@ -39,27 +39,38 @@ import java.io.IOException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ToolsServlet", urlPatterns = { "/tools/dashboard" })
+@WebServlet(name = "AdeptJ ToolsServlet", urlPatterns = {"/tools/dashboard"}, asyncSupported = true)
 public class ToolsServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
+
+    private static final String TOOLS_TEMPLATE = "auth/tools";
 
     /**
      * Renders tools page.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    	ContextObject ctxObj = new ContextObject();
-    	ctxObj.put("username", req.getRemoteUser()).put("sysProps", System.getProperties().entrySet());
-    	Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
-    	ctxObj.put("totalBundles", bundles.length).put("bundles", bundles);
-    	StringBuilder jreInfo = new StringBuilder(System.getProperty("java.runtime.name"));
-    	jreInfo.append("(build ").append(System.getProperty("java.runtime.version")).append(")");
-    	ctxObj.put("runtime", jreInfo.toString());
-    	StringBuilder jvmInfo = new StringBuilder(System.getProperty("java.vm.name")).append("(build ");
-    	jvmInfo.append(System.getProperty("java.vm.version")).append(", ").append(System.getProperty("java.vm.info")).append(")");
-    	ctxObj.put("jvm", jvmInfo.toString()).put("processors", Runtime.getRuntime().availableProcessors());
-        TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).contextObject(ctxObj).template("auth/tools").build());
+        ContextObject ctxObj = new ContextObject();
+        Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
+        ctxObj.put("username", req.getRemoteUser())
+                .put("sysProps", System.getProperties().entrySet())
+                .put("totalBundles", bundles.length)
+                .put("bundles", bundles)
+                .put("runtime", new StringBuilder(System.getProperty("java.runtime.name"))
+                        .append("(build ")
+                        .append(System.getProperty("java.runtime.version"))
+                        .append(")").toString())
+                .put("jvm", new StringBuilder(System.getProperty("java.vm.name"))
+                        .append("(build ").append(System.getProperty("java.vm.version"))
+                        .append(", ")
+                        .append(System.getProperty("java.vm.info"))
+                        .append(")").toString())
+                .put("processors", Runtime.getRuntime().availableProcessors());
+        TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp)
+                .contextObject(ctxObj)
+                .template(TOOLS_TEMPLATE)
+                .build());
     }
 
     @Override

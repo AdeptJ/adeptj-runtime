@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -41,34 +41,48 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = {"/tools/error/*"})
+@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = {"/tools/error/*"}, asyncSupported = true)
 public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
     private static final String STATUS_500 = "500";
 
+    private static final String TEMPLATE_ERROR = "/tools/error";
+
+    private static final String KEY_EXCEPTION = "exception";
+
+    private static final String TEMPLATE_404 = "error/404";
+
+    private static final String TEMPLATE_500 = "error/500";
+
+    private static final String TEMPLATE_GENERIC = "error/generic";
+
+    private static final String KEY_STATUS_CODES = "common.status-codes";
+
+    private static final String TEMPLATE_ERROR_RESOLVABLE = "error/%s";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
-        ContextObject ctxObj = new ContextObject();
-        TemplateEngine templateEngine = TemplateEngine.instance();
-        if ("/tools/error".equals(requestURI)) {
-            templateEngine.render(builder.template("error/generic").build());
+        TemplateEngine templateEngine = TemplateEngine.defaultEngine();
+        if (TEMPLATE_ERROR.equals(requestURI)) {
+            templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
         } else {
+            ContextObject ctxObj = new ContextObject();
             String statusCode = this.getStatusCode(requestURI);
             if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
-                builder.contextObject(ctxObj.put("exception", Requests.attr(req, ERROR_EXCEPTION)));
-                templateEngine.render(builder.template("error/500").build());
+                builder.contextObject(ctxObj.put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)));
+                templateEngine.render(builder.template(TEMPLATE_500).build());
             } else if (STATUS_500.equals(statusCode)) {
                 // Means it's just error code, no exception set in the request.
-                templateEngine.render(builder.template("error/generic").build());
-            } else if (Configs.DEFAULT.undertow().getStringList("common.status-codes").contains(statusCode)) {
-                templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
+                templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
+            } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
+                templateEngine.render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
             } else {
                 // if the requested view not found, render 404.
-                templateEngine.render(builder.template("error/404").build());
+                templateEngine.render(builder.template(TEMPLATE_404).build());
             }
         }
     }

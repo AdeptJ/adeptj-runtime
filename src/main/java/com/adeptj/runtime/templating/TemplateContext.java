@@ -40,8 +40,6 @@ public class TemplateContext {
 
     private Locale locale;
 
-    private boolean templateRendered;
-
     private TemplateContext(String template, ContextObject contextObject, HttpServletRequest req, HttpServletResponse resp) {
         this.template = template;
         this.contextObject = contextObject;
@@ -67,14 +65,6 @@ public class TemplateContext {
 
     public Locale getLocale() {
         return locale;
-    }
-
-    public boolean isTemplateRendered() {
-        return templateRendered;
-    }
-
-    public void setTemplateRendered(boolean templateRendered) {
-        this.templateRendered = templateRendered;
     }
 
     /**

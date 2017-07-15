@@ -648,6 +648,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-utils</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- AdeptJ Modules Bundles End-->
 
         <!-- OSGi Bundles End -->
@@ -683,6 +690,23 @@
                     <groupId>org.fusesource.jansi</groupId>
                     <artifactId>jansi</artifactId>
                     <version>${jansi.version}</version>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
+            <id>iText</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.itextpdf</groupId>
+                    <artifactId>itextpdf</artifactId>
+                    <version>5.5.11</version>
+                    <scope>provided</scope>
                 </dependency>
 
             </dependencies>
@@ -905,14 +929,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-base</artifactId>
-                    <version>1.0.1.Final</version>
+                    <version>1.0.2.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.2.Final</version>
+                    <version>1.0.3.Final</version>
                     <scope>provided</scope>
                 </dependency>
 

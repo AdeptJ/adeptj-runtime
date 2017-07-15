@@ -27,9 +27,9 @@ import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
-import com.adeptj.runtime.servlet.ToolsServlet;
-import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.AuthServlet;
+import com.adeptj.runtime.servlet.ErrorPageServlet;
+import com.adeptj.runtime.servlet.ToolsServlet;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -312,9 +312,15 @@ public final class UndertowBootstrap {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(ErrorPageServlet.class).addMapping("/tools/error/*"));
-        servlets.add(Servlets.servlet(ToolsServlet.class).addMapping("/tools/dashboard"));
-        servlets.add(Servlets.servlet(AuthServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI));
+        servlets.add(Servlets.servlet(ErrorPageServlet.class)
+                .addMapping("/tools/error/*")
+                .setAsyncSupported(true));
+        servlets.add(Servlets.servlet(ToolsServlet.class)
+                .addMapping("/tools/dashboard")
+                .setAsyncSupported(true));
+        servlets.add(Servlets.servlet(AuthServlet.class)
+                .addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI)
+                .setAsyncSupported(true));
         return servlets;
     }
 
@@ -339,11 +345,11 @@ public final class UndertowBootstrap {
         try {
             worker = Xnio.getInstance()
                     .createWorker(OptionMap.builder()
-                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt("io-threads"))
-                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt("task-core-threads"))
-                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt("task-max-threads"))
-                    .set(Options.TCP_NODELAY, wsOptions.getBoolean("tcp-no-delay"))
-                    .getMap());
+                            .set(Options.WORKER_IO_THREADS, wsOptions.getInt("io-threads"))
+                            .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt("task-core-threads"))
+                            .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt("task-max-threads"))
+                            .set(Options.TCP_NODELAY, wsOptions.getBoolean("tcp-no-delay"))
+                            .getMap());
         } catch (IOException ex) {
             LoggerFactory.getLogger(UndertowBootstrap.class).error("Can't create XnioWorker!!", ex);
         }
@@ -364,7 +370,8 @@ public final class UndertowBootstrap {
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
                 .addServletContainerInitalizer(sciInfo())
                 .addSecurityConstraint(securityConstraint(cfg))
-                .addServlets(servlets()).addErrorPages(errorPages(cfg))
+                .addServlets(servlets())
+                .addErrorPages(errorPages(cfg))
                 .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
                 .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg));

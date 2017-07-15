@@ -19,15 +19,15 @@
 */
 package com.adeptj.runtime.templating;
 
+import org.trimou.engine.resolver.Mapper;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.trimou.engine.resolver.Mapper;
-
 /**
- * ContextObject for storing variables used in view rendering.
+ * ContextObject for storing variables used in template rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */

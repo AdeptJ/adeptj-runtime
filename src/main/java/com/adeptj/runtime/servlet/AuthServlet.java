@@ -45,7 +45,7 @@ import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ AuthServlet", urlPatterns = { TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI })
+@WebServlet(name = "AdeptJ AuthServlet", urlPatterns = {TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI}, asyncSupported = true)
 public class AuthServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -65,7 +65,7 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-        	TemplateEngine.instance().render(new TemplateContext.Builder(req, resp).template(LOGIN_TEMPLATE).build());
+            TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp).template(LOGIN_TEMPLATE).build());
         } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
             // Invalidate the session and redirect to /tools/dashboard page.
             req.logout();
@@ -86,11 +86,11 @@ public class AuthServlet extends HttpServlet {
 
     private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngine.instance().render(new TemplateContext.Builder(req, resp)
+        TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp)
                 .template(LOGIN_TEMPLATE)
                 .contextObject(new ContextObject()
-                .put(ERROR_MSG_KEY, ERROR_MSG)
-                .put(J_USERNAME, req.getParameter(J_USERNAME)))
+                        .put(ERROR_MSG_KEY, ERROR_MSG)
+                        .put(J_USERNAME, req.getParameter(J_USERNAME)))
                 .build());
     }
 }

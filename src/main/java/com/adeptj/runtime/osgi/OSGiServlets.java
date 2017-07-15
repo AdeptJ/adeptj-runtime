@@ -104,7 +104,8 @@ public enum OSGiServlets {
     }
 
     private WebServlet checkWebServletAnnotation(Class<? extends HttpServlet> klazz) {
-        return Optional.ofNullable(klazz.getAnnotation(WebServlet.class)).orElseThrow(() -> new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
+        return Optional.ofNullable(klazz.getAnnotation(WebServlet.class)).orElseThrow(() ->
+                new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
     }
 
     private void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {

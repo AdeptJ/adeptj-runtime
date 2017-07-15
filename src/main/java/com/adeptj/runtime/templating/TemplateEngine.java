@@ -33,7 +33,7 @@ public interface TemplateEngine {
 	 */
 	void render(TemplateContext context);
 	
-	static TemplateEngine instance() {
+	static TemplateEngine defaultEngine() {
 		return Trimou.INSTANCE;
 	}
 }

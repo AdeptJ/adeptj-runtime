@@ -50,6 +50,24 @@ public class PerServletContextErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -5818850813832379842L;
 
+    private static final String KEY_STATUS_CODE = "statusCode";
+
+    private static final String KEY_ERROR_MSG = "errorMsg";
+
+    private static final String KEY_REQ_URI = "reqURI";
+
+    private static final String KEY_EXCEPTION = "exception";
+
+    private static final String TEMPLATE_404 = "error/404";
+
+    private static final String TEMPLATE_500 = "error/500";
+
+    private static final String TEMPLATE_GENERIC = "error/generic";
+
+    private static final String KEY_STATUS_CODES = "common.status-codes";
+
+    private static final String TEMPLATE_ERROR_RESOLVABLE = "error/%s";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         this.handleError(req, resp);
@@ -65,25 +83,25 @@ public class PerServletContextErrorServlet extends HttpServlet {
         TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
         ContextObject ctxObj = this.contextObject(req, statusCode);
         builder.contextObject(ctxObj);
-        TemplateEngine templateEngine = TemplateEngine.instance();
-		if (ctxObj.get("exception") != null && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-        	templateEngine.render(builder.template("error/500").build());
+        TemplateEngine templateEngine = TemplateEngine.defaultEngine();
+        if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
+            templateEngine.render(builder.template(TEMPLATE_500).build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-		    // Means it's just error code, no exception set in the request.
-            templateEngine.render(builder.template("error/generic").build());
-        } else if (Configs.DEFAULT.undertow().getIntList("common.status-codes").contains(statusCode)) {
-        	templateEngine.render(builder.template(String.format("error/%s", statusCode)).build());
+            // Means it's just error code, no exception set in the request.
+            templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
+        } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
+            templateEngine.render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
         } else {
             // if the requested view not found, render 404.
-        	templateEngine.render(builder.template("error/404").build());
+            templateEngine.render(builder.template(TEMPLATE_404).build());
         }
     }
 
-	private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
-		return new ContextObject()
-                .put("statusCode", statusCode)
-                .put("errorMsg", Requests.attr(req, ERROR_MESSAGE))
-				.put("reqURI", Requests.attr(req, ERROR_REQUEST_URI))
-				.put("exception", Requests.attr(req, ERROR_EXCEPTION));
-	}
+    private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
+        return new ContextObject()
+                .put(KEY_STATUS_CODE, statusCode)
+                .put(KEY_ERROR_MSG, Requests.attr(req, ERROR_MESSAGE))
+                .put(KEY_REQ_URI, Requests.attr(req, ERROR_REQUEST_URI))
+                .put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION));
+    }
 }
