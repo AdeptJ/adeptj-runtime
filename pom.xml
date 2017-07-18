@@ -24,10 +24,10 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.8.Final</version>
+        <version>1.0.9.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10.Final</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
@@ -59,8 +59,8 @@
         <felix.http.sslfilter.version>1.2.0</felix.http.sslfilter.version>
 
         <!-- AdeptJ Modular Web Dependencies Version -->
-        <adeptj-modules-webconsole-branding.version>1.0.1.Final</adeptj-modules-webconsole-branding.version>
-        <adeptj-modules-webconsole-security.version>1.0.2.Final</adeptj-modules-webconsole-security.version>
+        <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
+        <adeptj-modules-webconsole-security.version>1.0.0.Final</adeptj-modules-webconsole-security.version>
     </properties>
 
     <!-- Project Information -->
@@ -636,14 +636,14 @@
 
         <dependency>
             <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-modules-commons-webconsole-branding</artifactId>
+            <artifactId>adeptj-modules-webconsole-branding</artifactId>
             <version>${adeptj-modules-webconsole-branding.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-modules-commons-webconsole-security</artifactId>
+            <artifactId>adeptj-modules-webconsole-security</artifactId>
             <version>${adeptj-modules-webconsole-security.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -922,14 +922,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-jaxrs-base</artifactId>
-                    <version>1.0.2.Final</version>
+                    <artifactId>adeptj-modules-jaxrs-core</artifactId>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -952,21 +952,28 @@
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-aws-base</artifactId>
+                    <artifactId>adeptj-modules-aws-core</artifactId>
                     <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-aws-messaging</artifactId>
+                    <artifactId>adeptj-modules-aws-ses</artifactId>
                     <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-aws-s3</artifactId>
+                    <artifactId>adeptj-modules-aws-sns</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-aws-s3</artifactId>
                     <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
@@ -1280,7 +1287,7 @@
                 <dependency>
                     <groupId>com.zaxxer</groupId>
                     <artifactId>HikariCP</artifactId>
-                    <version>2.6.3</version>
+                    <version>${hikaricp.version}</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -1297,7 +1304,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-commons-datasource</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1358,7 +1365,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
