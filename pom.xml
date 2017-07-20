@@ -27,7 +27,7 @@
         <version>1.0.9.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.10.Final</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
@@ -396,7 +396,7 @@
         <dependency>
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
-            <version>2.2.0.Final</version>
+            <version>2.2.1.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -442,6 +442,12 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -922,21 +928,21 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.1.Final</version>
+                    <version>1.0.2.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.3.Final</version>
+                    <version>1.0.4.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -994,13 +1000,6 @@
             <id>Ehcache</id>
 
             <dependencies>
-
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-collections4</artifactId>
-                    <version>4.1</version>
-                    <scope>provided</scope>
-                </dependency>
 
                 <dependency>
                     <groupId>org.ehcache</groupId>
