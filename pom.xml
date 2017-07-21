@@ -27,7 +27,7 @@
         <version>1.0.9.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.11-SNAPSHOT</version>
+    <version>1.0.10.Final</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
@@ -935,14 +935,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.1.Final</version>
+                    <version>1.0.2.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.4.Final</version>
+                    <version>1.0.5.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
