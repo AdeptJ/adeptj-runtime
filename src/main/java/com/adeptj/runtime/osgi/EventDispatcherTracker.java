@@ -66,7 +66,9 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
     @Override
     public EventListener addingService(ServiceReference<EventListener> reference) {
         LOGGER.info("Adding OSGi Service: [{}]", this.getServiceDesc(reference));
-        return this.handleListener(super.addingService(reference));
+        EventListener listener = super.addingService(reference);
+        this.handleListener(listener);
+        return listener;
     }
 
     @Override
@@ -94,16 +96,27 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
         return reference.getProperty(SERVICE_DESCRIPTION);
     }
 
-    private EventListener handleListener(EventListener listener) {
-        if (listener instanceof HttpSessionListener) {
-            this.sessionListener = (HttpSessionListener) listener;
-        }
-        if (listener instanceof HttpSessionIdListener) {
-            this.sessionIdListener = (HttpSessionIdListener) listener;
-        }
+    private void handleListener(EventListener listener) {
+        this.initHttpSessionListener(listener);
+        this.initHttpSessionIdListener(listener);
+        this.initHttpSessionAttributeListener(listener);
+    }
+
+    private void initHttpSessionAttributeListener(EventListener listener) {
         if (listener instanceof HttpSessionAttributeListener) {
             this.sessionAttributeListener = (HttpSessionAttributeListener) listener;
         }
-        return listener;
+    }
+
+    private void initHttpSessionIdListener(EventListener listener) {
+        if (listener instanceof HttpSessionIdListener) {
+            this.sessionIdListener = (HttpSessionIdListener) listener;
+        }
+    }
+
+    private void initHttpSessionListener(EventListener listener) {
+        if (listener instanceof HttpSessionListener) {
+            this.sessionListener = (HttpSessionListener) listener;
+        }
     }
 }

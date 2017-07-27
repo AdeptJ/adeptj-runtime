@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.9.Final</version>
+        <version>1.0.10.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.11-SNAPSHOT</version>
@@ -928,21 +928,21 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.2.Final</version>
+                    <version>1.0.3.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.2.Final</version>
+                    <version>1.0.3.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.5.Final</version>
+                    <version>1.0.6.Final</version>
                     <scope>provided</scope>
                 </dependency>
 

@@ -90,7 +90,7 @@ public final class Constants {
 
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
-    public static final String CMD_LAUNCH_BROWSER = "launchBrowser";
+    public static final String ARG_OPEN_CONSOLE = "openConsole";
 
     public static final String DATE_FORMAT_LOGGING = "dd.MM.yyyy HH:mm:ss.SSS ";
 

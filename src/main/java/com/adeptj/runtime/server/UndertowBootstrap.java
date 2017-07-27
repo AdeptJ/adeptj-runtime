@@ -83,7 +83,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
-import static com.adeptj.runtime.common.Constants.CMD_LAUNCH_BROWSER;
+import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
@@ -181,7 +181,7 @@ public final class UndertowBootstrap {
     }
 
     private static void launchBrowser(Map<String, String> arguments, int httpPort, Logger logger) {
-        if (Boolean.parseBoolean(arguments.get(CMD_LAUNCH_BROWSER))) {
+        if (Boolean.parseBoolean(arguments.get(ARG_OPEN_CONSOLE))) {
             try {
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
             } catch (IOException ex) {

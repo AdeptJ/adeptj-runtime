@@ -69,7 +69,7 @@ public class AuthServlet extends HttpServlet {
         } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
             // Invalidate the session and redirect to /tools/dashboard page.
             req.logout();
-            resp.sendRedirect(TOOLS_DASHBOARD_URI);
+            resp.sendRedirect(resp.encodeRedirectURL(TOOLS_DASHBOARD_URI));
         } else {
             // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /tools/dashboard.
             resp.sendRedirect(TOOLS_DASHBOARD_URI);
