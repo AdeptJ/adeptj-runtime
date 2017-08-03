@@ -80,7 +80,9 @@ public class LogbackBootstrap {
 
     private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
 
-    private static final String SYS_PROP_ASYNC_LOGGING = "async.logging";
+    private static final String SYS_PROP_ASYNC_LOGGING = "log.async";
+
+    private static final String SYS_PROP_LOG_IMMEDIATE_FLUSH = "log.immediate.flush";
 
     private static final String KEY_ASYNC_LOG_QUEUE_SIZE = "async-log-queue-size";
 
@@ -170,7 +172,12 @@ public class LogbackBootstrap {
         fileAppender.setName(APPENDER_FILE);
         fileAppender.setFile(config.getString(KEY_SERVER_LOG_FILE));
         fileAppender.setAppend(true);
-        fileAppender.setImmediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH));
+        // First check the system property for immediate log flush, if false then use one from config.
+        // Default behaviour is not to flush immediately for performance reasons.
+        fileAppender.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
+        if (!fileAppender.isImmediateFlush()) {
+            fileAppender.setImmediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH));
+        }
         fileAppender.setEncoder(layoutEncoder(context, config.getString(KEY_LOG_PATTERN_FILE)));
         fileAppender.setContext(context);
         return fileAppender;
