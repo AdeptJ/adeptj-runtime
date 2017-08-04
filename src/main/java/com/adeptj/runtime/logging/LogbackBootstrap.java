@@ -80,7 +80,7 @@ public class LogbackBootstrap {
 
     private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
 
-    private static final String SYS_PROP_ASYNC_LOGGING = "log.async";
+    private static final String SYS_PROP_LOG_ASYNC = "log.async";
 
     private static final String SYS_PROP_LOG_IMMEDIATE_FLUSH = "log.immediate.flush";
 
@@ -115,7 +115,9 @@ public class LogbackBootstrap {
         appenderList.add(fileAppender);
         // initialize all the required loggers.
         rootLogger(context, consoleAppender, config);
-        config.getObject(KEY_LOGGERS).unwrapped().forEach((key, map) -> addLogger(map, context, appenderList));
+        config.getObject(KEY_LOGGERS)
+                .unwrapped()
+                .forEach((logCfgName, logCfgMap) -> addLogger(logCfgMap, context, appenderList));
         // AsyncAppender
         asyncAppender(config, context, fileAppender);
         context.start();
@@ -130,11 +132,11 @@ public class LogbackBootstrap {
         return (LoggerContext) LoggerFactory.getILoggerFactory();
     }
 
-    private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> consoleAppender, Config config) {
+    private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> appender, Config config) {
         // initialize ROOT Logger at specified level which just logs to ConsoleAppender.
         Logger root = context.getLogger(ROOT_LOGGER_NAME);
         root.setLevel(toLevel(config.getString(KEY_ROOT_LOG_LEVEL)));
-        root.addAppender(consoleAppender);
+        root.addAppender(appender);
     }
 
     private static void addLogger(Object configMap, LoggerContext context, List<Appender<ILoggingEvent>> appenderList) {
@@ -156,7 +158,7 @@ public class LogbackBootstrap {
     }
 
     private static void asyncAppender(Config config, LoggerContext context, Appender<ILoggingEvent> appender) {
-        if (Boolean.getBoolean(SYS_PROP_ASYNC_LOGGING)) {
+        if (Boolean.getBoolean(SYS_PROP_LOG_ASYNC)) {
             AsyncAppender asyncAppender = new AsyncAppender();
             asyncAppender.setName(APPENDER_ASYNC);
             asyncAppender.setQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE));

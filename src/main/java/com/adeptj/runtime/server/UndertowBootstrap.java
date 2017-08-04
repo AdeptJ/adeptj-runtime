@@ -82,8 +82,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
+import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
@@ -281,7 +281,10 @@ public final class UndertowBootstrap {
     }
 
     private static Set<HttpString> allowedMethods(Config cfg) {
-        return cfg.getStringList(KEY_ALLOWED_METHODS).stream().map(Verb::from).collect(Collectors.toSet());
+        return cfg.getStringList(KEY_ALLOWED_METHODS)
+                .stream()
+                .map(Verb::from)
+                .collect(Collectors.toSet());
     }
 
     private static HttpHandler rootHandler(HttpHandler headersHandler, Config cfg) {
@@ -298,8 +301,8 @@ public final class UndertowBootstrap {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(ContainerInitializer.class,
-                new ImmediateInstanceFactory<>(new ContainerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
+        return new ServletContainerInitializerInfo(ContainerInitializer.class, new ImmediateInstanceFactory<>(
+                new ContainerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {
