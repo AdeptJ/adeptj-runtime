@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.server;
 
 import com.typesafe.config.Config;
@@ -24,6 +25,8 @@ import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,8 +36,8 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 /**
- * Simple IdentityManager implementation that does the authentication from provisioning file or from the OsgiManager.config
- * file if it is created when password is updated from OSGi Web Console.
+ * Simple IdentityManager implementation that does the authentication from provisioning file or from
+ * the OsgiManager.config file if it is created when password is updated from OSGi Web Console.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -50,21 +53,21 @@ final class SimpleIdentityManager implements IdentityManager {
     private CredentialMatcher matcher;
 
     @SuppressWarnings("unchecked")
-    SimpleIdentityManager(Config undertowCfg) {
-        this.userRolesMapping = new HashMap<>(Map.class.cast(undertowCfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
+    SimpleIdentityManager(Config cfg) {
+        this.userRolesMapping = new HashMap<>(Map.class.cast(cfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
         this.matcher = new CredentialMatcher();
     }
 
     /**
      * In our case, this method is called by CachedAuthenticatedSessionMechanism.
      * <p>
-     * This is queried on each request after user is successfully logged in.
+     * This is queried on each request for protected resources after user is successfully logged in.
      */
     @Override
     public Account verify(Account account) {
-        Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(account.getPrincipal().getName())
-                && entry.getValue().containsAll(account.getRoles());
-        return this.userRolesMapping.entrySet().stream().anyMatch(predicate) ? account : null;
+        return this.userRolesMapping.entrySet()
+                .stream()
+                .anyMatch(this.verifyAccountPredicate(account)) ? account : null;
     }
 
     /**
@@ -72,12 +75,11 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        PasswordCredential pwdCredential = (PasswordCredential) credential;
-        Predicate<Entry<String, List<String>>> predicate = entry -> entry.getKey().equals(id) && pwdCredential.getPassword().length != 0;
         return this.userRolesMapping.entrySet().stream()
-                .filter(predicate.and(entry -> this.matcher.match(entry.getKey(), new String(pwdCredential.getPassword()))))
+                .filter(this.credentialMatchPredicate(id, credential))
                 .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -91,5 +93,16 @@ final class SimpleIdentityManager implements IdentityManager {
     @Override
     public Account verify(Credential credential) {
         return null;
+    }
+
+    private Predicate<Entry<String, List<String>>> verifyAccountPredicate(Account account) {
+        return (Entry<String, List<String>> entry) -> entry.getKey()
+                .equals(account.getPrincipal().getName()) && entry.getValue().containsAll(account.getRoles());
+    }
+
+    private Predicate<Entry<String, List<String>>> credentialMatchPredicate(String id, Credential cred) {
+        PasswordCredential credential = (PasswordCredential) cred;
+        return entry -> StringUtils.equals(entry.getKey(), id) && ArrayUtils.isNotEmpty(credential.getPassword())
+                && this.matcher.match(entry.getKey(), new String(credential.getPassword()));
     }
 }
