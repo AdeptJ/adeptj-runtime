@@ -19,10 +19,12 @@
 */
 package com.adeptj.runtime.tools;
 
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.config.ViewEngineConfig;
 import com.typesafe.config.ConfigBeanFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
@@ -35,11 +37,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.adeptj.runtime.common.Constants.UTF8;
-import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.slf4j.LoggerFactory.getLogger;
 import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
 import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
 import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
@@ -48,24 +48,25 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXP
 import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 
 /**
- * Renders Trimou Html Templates
+ * Renders Html Templates using Trimou {@link MustacheEngine}
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-enum Trimou implements TemplateEngine {
+enum DefaultTemplateEngine implements TemplateEngine {
 
     INSTANCE;
 
-    private static final Logger LOGGER = getLogger(Trimou.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
 
     private static final String RB_HELPER_NAME = "msg";
 
     private final MustacheEngine engine;
 
-    Trimou() {
+    DefaultTemplateEngine() {
         long startTime = System.nanoTime();
         this.engine = this.mustacheEngine();
-        getLogger(Trimou.class).info("MustacheEngine initialized in: [{}] ms!!", elapsedSinceMillis(startTime));
+        LoggerFactory.getLogger(DefaultTemplateEngine.class).info("MustacheEngine initialized in: [{}] ms!!",
+                Times.elapsedSinceMillis(startTime));
     }
 
     private MustacheEngine mustacheEngine() {
@@ -82,7 +83,7 @@ enum Trimou implements TemplateEngine {
 
     private TemplateLocator templateLocator(ViewEngineConfig config) {
         return new ClassPathTemplateLocator(config.getTemplateLocatorPriority(), config.getPrefix(),
-                config.getSuffix(), Trimou.class.getClassLoader(), false);
+                config.getSuffix(), DefaultTemplateEngine.class.getClassLoader(), false);
     }
 
     private Helper resourceBundleHelper(ViewEngineConfig config) {

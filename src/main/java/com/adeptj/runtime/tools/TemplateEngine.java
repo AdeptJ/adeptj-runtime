@@ -34,6 +34,6 @@ public interface TemplateEngine {
 	void render(TemplateContext context);
 	
 	static TemplateEngine defaultEngine() {
-		return Trimou.INSTANCE;
+		return DefaultTemplateEngine.INSTANCE;
 	}
 }
