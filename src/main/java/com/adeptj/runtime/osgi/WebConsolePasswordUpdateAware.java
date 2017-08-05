@@ -27,10 +27,12 @@ package com.adeptj.runtime.osgi;
 public final class WebConsolePasswordUpdateAware {
 
     private char[] password;
-    
-    /** Singleton class */
-	private WebConsolePasswordUpdateAware() {
-	}
+
+    /**
+     * Singleton class
+     */
+    private WebConsolePasswordUpdateAware() {
+    }
 
     public static WebConsolePasswordUpdateAware getInstance() {
         return Holder.getInstance();

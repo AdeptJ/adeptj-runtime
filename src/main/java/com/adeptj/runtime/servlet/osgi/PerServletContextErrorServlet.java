@@ -21,9 +21,9 @@ package com.adeptj.runtime.servlet.osgi;
 
 import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.templating.ContextObject;
-import com.adeptj.runtime.templating.TemplateContext;
-import com.adeptj.runtime.templating.TemplateEngine;
+import com.adeptj.runtime.tools.ContextObject;
+import com.adeptj.runtime.tools.TemplateContext;
+import com.adeptj.runtime.tools.TemplateEngine;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -80,9 +80,11 @@ public class PerServletContextErrorServlet extends HttpServlet {
 
     private void handleError(HttpServletRequest req, HttpServletResponse resp) {
         Integer statusCode = (Integer) Requests.attr(req, ERROR_STATUS_CODE);
-        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
-        ContextObject ctxObj = this.contextObject(req, statusCode);
-        builder.contextObject(ctxObj);
+        TemplateContext.Builder builder = TemplateContext.builder()
+                .request(req)
+                .response(resp)
+                .locale(req.getLocale())
+                .contextObject(this.contextObject(req, statusCode));
         TemplateEngine templateEngine = TemplateEngine.defaultEngine();
         if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
             templateEngine.render(builder.template(TEMPLATE_500).build());

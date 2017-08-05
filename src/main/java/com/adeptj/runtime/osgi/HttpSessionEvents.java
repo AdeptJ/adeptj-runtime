@@ -50,8 +50,8 @@ public enum HttpSessionEvents {
     SESSION_ATTRIBUTE_REMOVED,
 
     SESSION_ATTRIBUTE_REPLACED;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
 
     public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {

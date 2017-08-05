@@ -315,13 +315,13 @@ public final class UndertowBootstrap {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(ErrorPageServlet.class)
+        servlets.add(Servlets.servlet("AdeptJ ErrorPageServlet", ErrorPageServlet.class)
                 .addMapping("/tools/error/*")
                 .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(ToolsServlet.class)
+        servlets.add(Servlets.servlet("AdeptJ ToolsServlet", ToolsServlet.class)
                 .addMapping("/tools/dashboard")
                 .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(AuthServlet.class)
+        servlets.add(Servlets.servlet("AdeptJ AuthServlet", AuthServlet.class)
                 .addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI)
                 .setAsyncSupported(true));
         return servlets;

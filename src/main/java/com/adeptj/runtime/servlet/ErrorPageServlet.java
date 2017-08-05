@@ -21,9 +21,9 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.templating.ContextObject;
-import com.adeptj.runtime.templating.TemplateContext;
-import com.adeptj.runtime.templating.TemplateEngine;
+import com.adeptj.runtime.tools.ContextObject;
+import com.adeptj.runtime.tools.TemplateContext;
+import com.adeptj.runtime.tools.TemplateEngine;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -65,7 +65,10 @@ public class ErrorPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
-        TemplateContext.Builder builder = new TemplateContext.Builder(req, resp);
+        TemplateContext.Builder builder = TemplateContext.builder()
+                .request(req)
+                .response(resp)
+                .locale(req.getLocale());
         TemplateEngine templateEngine = TemplateEngine.defaultEngine();
         if (TEMPLATE_ERROR.equals(requestURI)) {
             templateEngine.render(builder.template(TEMPLATE_GENERIC).build());

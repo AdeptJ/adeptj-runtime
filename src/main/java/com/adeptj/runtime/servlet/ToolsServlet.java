@@ -20,9 +20,9 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.templating.ContextObject;
-import com.adeptj.runtime.templating.TemplateContext;
-import com.adeptj.runtime.templating.TemplateEngine;
+import com.adeptj.runtime.tools.ContextObject;
+import com.adeptj.runtime.tools.TemplateContext;
+import com.adeptj.runtime.tools.TemplateEngine;
 import org.osgi.framework.Bundle;
 
 import javax.servlet.ServletException;
@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 
 /**
  * ToolsServlet renders the admin tools page.
@@ -67,14 +69,17 @@ public class ToolsServlet extends HttpServlet {
                         .append(System.getProperty("java.vm.info"))
                         .append(")").toString())
                 .put("processors", Runtime.getRuntime().availableProcessors());
-        TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp)
-                .contextObject(ctxObj)
+        TemplateEngine.defaultEngine().render(TemplateContext.builder()
+                .request(req)
+                .response(resp)
                 .template(TOOLS_TEMPLATE)
+                .locale(req.getLocale())
+                .contextObject(ctxObj)
                 .build());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.sendRedirect("/tools/dashboard");
+        resp.sendRedirect(resp.encodeRedirectURL(TOOLS_DASHBOARD_URI));
     }
 }

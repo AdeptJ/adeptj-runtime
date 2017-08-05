@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.templating;
+package com.adeptj.runtime.tools;
 
 /**
  * TemplateEngine for rendering the HTML templates.

@@ -47,9 +47,9 @@ final class Bundles {
 
     private static final String PREFIX_BUNDLES = "bundles/";
 
-    private static final String EXTN_JAR = ".jar";
+    private static final String JAR_FILE = ".jar";
 
-    // No instantiation.
+    // deny direct instantiation.
     private Bundles() {
     }
 
@@ -67,7 +67,8 @@ final class Bundles {
 
     private static void startBundles(List<Bundle> bundles, Logger logger) {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-        bundles.stream().filter(bundle -> Objects.isNull(bundle.getHeaders().get(FRAGMENT_HOST)))
+        bundles.stream()
+                .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
                 .forEach(bundle -> startBundle(bundle, logger));
     }
 
@@ -82,8 +83,11 @@ final class Bundles {
 
     private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
         // First install all the Bundles.
-        List<Bundle> installedBundles = bundles.stream().map(url -> installBundle(url, context, logger))
-                .filter(Objects::nonNull).collect(Collectors.toList());
+        List<Bundle> installedBundles = bundles
+                .stream()
+                .map(url -> installBundle(url, context, logger))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
     }
@@ -104,7 +108,7 @@ final class Bundles {
                 .getJarFile()
                 .stream()
                 .filter(jarEntry -> StringUtils.startsWith(jarEntry.getName(), PREFIX_BUNDLES)
-                        && StringUtils.endsWith(jarEntry.getName(), EXTN_JAR))
+                        && StringUtils.endsWith(jarEntry.getName(), JAR_FILE))
                 .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
                 .collect(Collectors.toList());
         logger.debug("Total Bundles collected: [{}]", bundles.size());

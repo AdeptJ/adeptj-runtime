@@ -19,9 +19,9 @@
 */
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.templating.ContextObject;
-import com.adeptj.runtime.templating.TemplateContext;
-import com.adeptj.runtime.templating.TemplateEngine;
+import com.adeptj.runtime.tools.ContextObject;
+import com.adeptj.runtime.tools.TemplateContext;
+import com.adeptj.runtime.tools.TemplateEngine;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -65,7 +65,12 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp).template(LOGIN_TEMPLATE).build());
+            TemplateEngine.defaultEngine().render(TemplateContext.builder()
+                    .request(req)
+                    .response(resp)
+                    .template(LOGIN_TEMPLATE)
+                    .locale(req.getLocale())
+                    .build());
         } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
             // Invalidate the session and redirect to /tools/dashboard page.
             req.logout();
@@ -86,8 +91,11 @@ public class AuthServlet extends HttpServlet {
 
     private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngine.defaultEngine().render(new TemplateContext.Builder(req, resp)
+        TemplateEngine.defaultEngine().render(TemplateContext.builder()
+                .request(req)
+                .response(resp)
                 .template(LOGIN_TEMPLATE)
+                .locale(req.getLocale())
                 .contextObject(new ContextObject()
                         .put(ERROR_MSG_KEY, ERROR_MSG)
                         .put(J_USERNAME, req.getParameter(J_USERNAME)))

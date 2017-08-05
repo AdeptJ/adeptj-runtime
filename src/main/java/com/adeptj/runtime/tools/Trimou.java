@@ -17,7 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.templating;
+package com.adeptj.runtime.tools;
 
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.config.ViewEngineConfig;
@@ -48,7 +48,7 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXP
 import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 
 /**
- * Trimou. Rendering Html Templates
+ * Renders Trimou Html Templates
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -98,13 +98,13 @@ enum Trimou implements TemplateEngine {
             Mustache mustache = this.engine.getMustache(context.getTemplate());
             if (mustache == null) {
                 // Template not found, send a 404
-                LOGGER.warn("View not found: [{}]", context.getTemplate());
+                LOGGER.warn("Template not found: [{}]", context.getTemplate());
                 this.sendError(context.getResponse(), SC_NOT_FOUND);
             } else {
-                mustache.render(context.getResponse().getWriter(), context.getContextObject());
+                context.getResponse().getWriter().write(mustache.render(context.getContextObject()));
             }
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while processing view: [{}]", context.getTemplate(), ex);
+            LOGGER.error(ex.getMessage(), ex);
             this.handleException(context, ex);
         }
     }

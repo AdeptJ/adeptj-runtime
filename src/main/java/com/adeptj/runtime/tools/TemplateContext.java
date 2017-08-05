@@ -17,22 +17,22 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.templating;
+package com.adeptj.runtime.tools;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 
 /**
- * TemplateContext.
+ * TemplateContext containing required objects for template rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
 public class TemplateContext {
 
-    private final String template;
+    private String template;
 
-    private final ContextObject contextObject;
+    private ContextObject contextObject;
 
     private final HttpServletRequest request;
 
@@ -40,9 +40,7 @@ public class TemplateContext {
 
     private Locale locale;
 
-    private TemplateContext(String template, ContextObject contextObject, HttpServletRequest req, HttpServletResponse resp) {
-        this.template = template;
-        this.contextObject = contextObject;
+    private TemplateContext(HttpServletRequest req, HttpServletResponse resp) {
         this.request = req;
         this.response = resp;
     }
@@ -67,10 +65,14 @@ public class TemplateContext {
         return locale;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /**
      * Builder for TemplateContext.
      *
-     * @author Rakesh.Kumar, AdeptJ.
+     * @author Rakesh.Kumar, AdeptJ
      */
     public static class Builder {
 
@@ -84,15 +86,17 @@ public class TemplateContext {
 
         private HttpServletResponse response;
 
-        /**
-         * Initialize the Builder with mandatory request and response.
-         *
-         * @param request  the {@link HttpServletRequest}
-         * @param response the {@link HttpServletResponse}
-         */
-        public Builder(HttpServletRequest request, HttpServletResponse response) {
+        private Builder() {
+        }
+
+        public Builder request(HttpServletRequest request) {
             this.request = request;
+            return this;
+        }
+
+        public Builder response(HttpServletResponse response) {
             this.response = response;
+            return this;
         }
 
         public Builder template(String template) {
@@ -111,7 +115,9 @@ public class TemplateContext {
         }
 
         public TemplateContext build() {
-            TemplateContext context = new TemplateContext(this.template, this.contextObject, this.request, this.response);
+            TemplateContext context = new TemplateContext(this.request, this.response);
+            context.template = this.template;
+            context.contextObject = this.contextObject;
             // English is default Locale if no locale set.
             context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
             return context;
