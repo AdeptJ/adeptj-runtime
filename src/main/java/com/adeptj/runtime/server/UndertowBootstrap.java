@@ -47,6 +47,7 @@ import io.undertow.servlet.api.ErrorPage;
 import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.api.ServletSessionConfig;
 import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
@@ -359,6 +360,16 @@ public final class UndertowBootstrap {
         return worker;
     }
 
+    private static int sessionTimeout(Config cfg) {
+        return Integer.getInteger("adeptj.session.timeout", cfg.getInt("common.session-timeout"));
+    }
+
+    private static ServletSessionConfig sessionConfig(Config cfg) {
+        ServletSessionConfig config = new ServletSessionConfig();
+        config.setHttpOnly(cfg.getBoolean("common.session-cookie-httpOnly"));
+        return config;
+    }
+
     private static DeploymentInfo deploymentInfo(Config cfg) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
@@ -366,7 +377,8 @@ public final class UndertowBootstrap {
                 .setClassLoader(UndertowBootstrap.class.getClassLoader())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
-                .setDefaultSessionTimeout(cfg.getInt("common.session-timeout"))
+                .setDefaultSessionTimeout(sessionTimeout(cfg))
+                .setChangeSessionIdOnLogin(cfg.getBoolean("common.change-sessionId-on-login"))
                 .setInvalidateSessionOnLogout(cfg.getBoolean("common.invalidate-session-on-logout"))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean("common.use-cached-auth-mechanism"))
@@ -377,7 +389,8 @@ public final class UndertowBootstrap {
                 .addErrorPages(errorPages(cfg))
                 .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
-                .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg));
+                .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg))
+                .setServletSessionConfig(sessionConfig(cfg));
     }
 
     private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {
