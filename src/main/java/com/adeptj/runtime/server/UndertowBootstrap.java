@@ -144,6 +144,58 @@ public final class UndertowBootstrap {
 
     private static final String REALM = "AdeptJ Realm";
 
+    private static final String SYS_PROP_SESSION_TIMEOUT = "adeptj.session.timeout";
+
+    private static final String KEY_SESSION_TIMEOUT = "common.session-timeout";
+
+    private static final String KEY_HTTP_ONLY = "common.session-cookie-httpOnly";
+
+    private static final String KEY_CHANGE_SESSIONID_ON_LOGIN = "common.change-sessionId-on-login";
+
+    private static final String KEY_INVALIDATE_SESSION_ON_LOGOUT = "common.invalidate-session-on-logout";
+
+    private static final String KEY_USE_CACHED_AUTH_MECHANISM = "common.use-cached-auth-mechanism";
+
+    private static final String KEY_WS_IO_THREADS = "io-threads";
+
+    private static final String KEY_WS_TASK_CORE_THREADS = "task-core-threads";
+
+    private static final String KEY_WS_TASK_MAX_THREADS = "task-max-threads";
+
+    private static final String KEY_WS_TCP_NO_DELAY = "tcp-no-delay";
+
+    private static final String KEY_WS_WEB_SOCKET_OPTIONS = "webSocket-options";
+
+    private static final String KEY_WS_USE_DIRECT_BUFFER = "use-direct-buffer";
+
+    private static final String KEY_WS_BUFFER_SIZE = "buffer-size";
+
+    private static final String KEY_MULTIPART_FILE_LOCATION = "common.multipart-file-location";
+
+    private static final String KEY_MULTIPART_MAX_FILE_SIZE = "common.multipart-max-file-size";
+
+    private static final String KEY_MULTIPART_MAX_REQUEST_SIZE = "common.multipart-max-request-size";
+
+    private static final String KEY_MULTIPART_FILE_SIZE_THRESHOLD = "common.multipart-file-size-threshold";
+
+    private static final String KEY_AUTH_ROLES = "common.auth-roles";
+
+    private static final String KEY_SECURED_URLS_ALLOWED_METHODS = "common.secured-urls-allowed-methods";
+
+    private static final String KEY_SECURED_URLS = "common.secured-urls";
+
+    private static final String KEY_ERROR_PAGES = "error-pages";
+
+    private static final String ERROR_PAGE_SERVLET = "AdeptJ ErrorPageServlet";
+
+    private static final String TOOLS_ERROR_URL = "/tools/error/*";
+
+    private static final String TOOLS_SERVLET = "AdeptJ ToolsServlet";
+
+    private static final String TOOLS_DASHBOARD_URL = "/tools/dashboard";
+
+    private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
+
     // No instantiation.
     private UndertowBootstrap() {
     }
@@ -294,7 +346,7 @@ public final class UndertowBootstrap {
     }
 
     private static List<ErrorPage> errorPages(Config cfg) {
-        return cfg.getObject("error-pages").unwrapped()
+        return cfg.getObject(KEY_ERROR_PAGES).unwrapped()
                 .entrySet()
                 .stream()
                 .map(entry -> Servlets.errorPage(String.valueOf(entry.getValue()), Integer.parseInt(entry.getKey())))
@@ -308,39 +360,39 @@ public final class UndertowBootstrap {
 
     private static SecurityConstraint securityConstraint(Config cfg) {
         return Servlets.securityConstraint()
-                .addRolesAllowed(cfg.getStringList("common.auth-roles"))
+                .addRolesAllowed(cfg.getStringList(KEY_AUTH_ROLES))
                 .addWebResourceCollection(Servlets.webResourceCollection()
-                        .addHttpMethods(cfg.getStringList("common.secured-urls-allowed-methods"))
-                        .addUrlPatterns(cfg.getStringList("common.secured-urls")));
+                        .addHttpMethods(cfg.getStringList(KEY_SECURED_URLS_ALLOWED_METHODS))
+                        .addUrlPatterns(cfg.getStringList(KEY_SECURED_URLS)));
     }
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet("AdeptJ ErrorPageServlet", ErrorPageServlet.class)
-                .addMapping("/tools/error/*")
+        servlets.add(Servlets.servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class)
+                .addMapping(TOOLS_ERROR_URL)
                 .setAsyncSupported(true));
-        servlets.add(Servlets.servlet("AdeptJ ToolsServlet", ToolsServlet.class)
-                .addMapping("/tools/dashboard")
+        servlets.add(Servlets.servlet(TOOLS_SERVLET, ToolsServlet.class)
+                .addMapping(TOOLS_DASHBOARD_URL)
                 .setAsyncSupported(true));
-        servlets.add(Servlets.servlet("AdeptJ AuthServlet", AuthServlet.class)
+        servlets.add(Servlets.servlet(AUTH_SERVLET, AuthServlet.class)
                 .addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI)
                 .setAsyncSupported(true));
         return servlets;
     }
 
     private static MultipartConfigElement defaultMultipartConfig(Config cfg) {
-        return new MultipartConfigElement(cfg.getString("common.multipart-file-location"),
-                cfg.getLong("common.multipart-max-file-size"),
-                cfg.getLong("common.multipart-max-request-size"),
-                cfg.getInt("common.multipart-file-size-threshold"));
+        return new MultipartConfigElement(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
+                cfg.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
+                cfg.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
+                cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
     private static WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
-        Config wsOptions = cfg.getConfig("webSocket-options");
+        Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
                 .setWorker(webSocketWorker(wsOptions))
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean("use-direct-buffer"),
-                        wsOptions.getInt("buffer-size")))
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
+                        wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
                 .addEndpoint(ServerLogsWebSocket.class);
     }
 
@@ -349,10 +401,10 @@ public final class UndertowBootstrap {
         try {
             worker = Xnio.getInstance()
                     .createWorker(OptionMap.builder()
-                            .set(Options.WORKER_IO_THREADS, wsOptions.getInt("io-threads"))
-                            .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt("task-core-threads"))
-                            .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt("task-max-threads"))
-                            .set(Options.TCP_NODELAY, wsOptions.getBoolean("tcp-no-delay"))
+                            .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
+                            .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
+                            .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
+                            .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                             .getMap());
         } catch (IOException ex) {
             LoggerFactory.getLogger(UndertowBootstrap.class).error("Can't create XnioWorker!!", ex);
@@ -361,12 +413,12 @@ public final class UndertowBootstrap {
     }
 
     private static int sessionTimeout(Config cfg) {
-        return Integer.getInteger("adeptj.session.timeout", cfg.getInt("common.session-timeout"));
+        return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, cfg.getInt(KEY_SESSION_TIMEOUT));
     }
 
     private static ServletSessionConfig sessionConfig(Config cfg) {
         ServletSessionConfig config = new ServletSessionConfig();
-        config.setHttpOnly(cfg.getBoolean("common.session-cookie-httpOnly"));
+        config.setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
         return config;
     }
 
@@ -378,10 +430,10 @@ public final class UndertowBootstrap {
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(sessionTimeout(cfg))
-                .setChangeSessionIdOnLogin(cfg.getBoolean("common.change-sessionId-on-login"))
-                .setInvalidateSessionOnLogout(cfg.getBoolean("common.invalidate-session-on-logout"))
+                .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSIONID_ON_LOGIN))
+                .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
-                .setUseCachedAuthenticationMechanism(cfg.getBoolean("common.use-cached-auth-mechanism"))
+                .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
                 .addServletContainerInitalizer(sciInfo())
                 .addSecurityConstraint(securityConstraint(cfg))
