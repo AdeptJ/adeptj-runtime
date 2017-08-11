@@ -99,7 +99,7 @@ public enum OSGiServlets {
     public void unregisterAll() {
         Logger logger = LoggerFactory.getLogger(OSGiServlets.class);
         this.servlets.forEach((servletName, serviceRegistration) -> {
-            logger.info("De-registering OSGi Servlet: [{}]", servletName);
+            logger.info("Unregistering OSGi Servlet: [{}]", servletName);
             serviceRegistration.unregister();
         });
     }
