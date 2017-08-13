@@ -271,8 +271,11 @@ public final class UndertowBootstrap {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
-            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE),
-                    httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger), httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
+            undertowBuilder.addHttpsListener(httpsPort,
+                    httpsConf.getString(KEY_HOST),
+                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE),
+                            httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger),
+                            httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
@@ -290,13 +293,15 @@ public final class UndertowBootstrap {
         int defaultPort = httpConf.getInt(KEY_PORT);
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
-            logger.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, defaultPort);
+            logger.warn("No port specified via system property: [{}], using default port: [{}]",
+                    SYS_PROP_SERVER_PORT, defaultPort);
             port = defaultPort;
         }
-        // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning as it is being
-        // started already and another server start(from same location) will again start new OSGi Framework which may interfere
-        // with already started OSGi Framework as the bundle deployed, heap dump, OSGi configurations directory is common,
-        // this is unknown at this moment but just to be on safer side doing this.
+        // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
+        // as it is being started already and another server start(from same location) will again start new OSGi
+        // Framework which may interfere with already started OSGi Framework as the bundle deployed, heap dump,
+        // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side
+        // doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
@@ -330,7 +335,9 @@ public final class UndertowBootstrap {
     }
 
     private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
-        return Handlers.predicate(new ContextRootPredicate(), Handlers.redirect(TOOLS_DASHBOARD_URI), initialHandler);
+        return Handlers.predicate(new ContextRootPredicate(),
+                Handlers.redirect(TOOLS_DASHBOARD_URI),
+                initialHandler);
     }
 
     private static Set<HttpString> allowedMethods(Config cfg) {
@@ -354,8 +361,9 @@ public final class UndertowBootstrap {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(ContainerInitializer.class, new ImmediateInstanceFactory<>(
-                new ContainerInitializer()), Collections.singleton(FrameworkStartupHandler.class));
+        return new ServletContainerInitializerInfo(ContainerInitializer.class,
+                new ImmediateInstanceFactory<>(new ContainerInitializer()),
+                Collections.singleton(FrameworkStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {
@@ -417,9 +425,7 @@ public final class UndertowBootstrap {
     }
 
     private static ServletSessionConfig sessionConfig(Config cfg) {
-        ServletSessionConfig config = new ServletSessionConfig();
-        config.setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
-        return config;
+        return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
     }
 
     private static DeploymentInfo deploymentInfo(Config cfg) {
