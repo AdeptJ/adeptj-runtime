@@ -63,6 +63,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -271,11 +272,23 @@ public final class UndertowBootstrap {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
-            undertowBuilder.addHttpsListener(httpsPort,
-                    httpsConf.getString(KEY_HOST),
-                    sslContext(keyStore(httpsConf.getString(KEY_KEYSTORE),
-                            httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray(), logger),
-                            httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
+            if (Boolean.getBoolean("use.supplied.keyStore")) {
+                String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
+                String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
+                String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
+                KeyStore keyStore = keyStoreFromLocation(keyStoreLoc, keyStorePwd.toCharArray(), logger);
+                logger.info("KeyStore loaded from location: [{}]", keyStoreLoc);
+                undertowBuilder.addHttpsListener(httpsPort,
+                        httpsConf.getString(KEY_HOST),
+                        sslContext(keyStore, keyPwd.toCharArray(), logger));
+            } else {
+                char[] cfgKeyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
+                KeyStore keyStore = keyStoreDefault(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd, logger);
+                logger.info("Default KeyStore loaded!!");
+                undertowBuilder.addHttpsListener(httpsPort,
+                        httpsConf.getString(KEY_HOST),
+                        sslContext(keyStore, cfgKeyStorePwd, logger));
+            }
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
@@ -449,14 +462,25 @@ public final class UndertowBootstrap {
                 .setServletSessionConfig(sessionConfig(cfg));
     }
 
-    private static KeyStore keyStore(String keyStoreName, char[] keyStorePwd, Logger logger) {
-        try {
+    private static KeyStore keyStoreFromLocation(String keyStoreLoc, char[] keyStorePwd, Logger logger) {
+        try (InputStream is = new FileInputStream(keyStoreLoc)) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(UndertowBootstrap.class.getResourceAsStream(keyStoreName), keyStorePwd);
+            keyStore.load(is, keyStorePwd);
+            return keyStore;
+        } catch (Exception ex) {
+            logger.error("Exception while loading KeyStore!!", ex);
+            throw new InitializationException(ex.getMessage(), ex);
+        }
+    }
+
+    private static KeyStore keyStoreDefault(String defaultKeyStore, char[] keyStorePwd, Logger logger) {
+        try (InputStream is = UndertowBootstrap.class.getResourceAsStream(defaultKeyStore)) {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(is, keyStorePwd);
             return keyStore;
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
             logger.error("Exception while loading KeyStore!!", ex);
-            throw new InitializationException("Exception while loading KeyStore!!", ex);
+            throw new InitializationException(ex.getMessage(), ex);
         }
     }
 

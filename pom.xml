@@ -87,11 +87,13 @@
             <organizationUrl>http://www.adeptj.com</organizationUrl>
             <roles>
                 <role>architect</role>
-                <role>developer</role>
+                <role>lead developer</role>
             </roles>
             <timezone>+5:30</timezone>
             <properties>
-                <picUrl>https://media.licdn.com/media/AAEAAQAAAAAAAAecAAAAJDdjMDcwZjM3LWY0OWYtNDkwYS05Njg4LWU0YWJjNWU5Mzk2Mw.jpg</picUrl>
+                <picUrl>
+                    https://media.licdn.com/media/AAEAAQAAAAAAAAecAAAAJDdjMDcwZjM3LWY0OWYtNDkwYS05Njg4LWU0YWJjNWU5Mzk2Mw.jpg
+                </picUrl>
             </properties>
         </developer>
     </developers>
@@ -745,7 +747,7 @@
 
             <!-- Apache HttpClient OSGi Version -->
 
-            <id>HttpClient</id>
+            <id>Apache-HttpClient</id>
 
             <dependencies>
 
@@ -1300,7 +1302,7 @@
 
         <profile>
 
-            <id>DataSource</id>
+            <id>JDBC-CP-Hikari</id>
 
             <dependencies>
 

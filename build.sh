@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-mvn clean package -P HttpClient,RESTEasy,DataSource,JPA-EclipseLink,MySQL,AWS,iText
+mvn clean package -P Apache-HttpClient,RESTEasy,MySQL,JDBC-CP-Hikari,JPA-EclipseLink
