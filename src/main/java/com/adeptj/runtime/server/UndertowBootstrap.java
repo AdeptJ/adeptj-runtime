@@ -208,9 +208,11 @@ public final class UndertowBootstrap {
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         printBanner(logger);
-        Builder builder = Undertow.builder();
-        DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
+        DeploymentManager manager = Servlets
+                .defaultContainer()
+                .addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
+        Builder builder = Undertow.builder();
         optimizeWorkerOptions(builder, undertowConf, logger);
         HttpHandler servletInitialHandler = manager.start();
         ServerOptions.build(builder, undertowConf);
@@ -218,7 +220,8 @@ public final class UndertowBootstrap {
         enableHttp2(undertowConf, builder, logger);
         enableAJP(undertowConf, builder, logger);
         Undertow server = builder.setHandler(rootHandler(new SetHeadersHandler(servletInitialHandler,
-                serverHeaders(undertowConf)), undertowConf)).build();
+                serverHeaders(undertowConf)), undertowConf))
+                .build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
         launchBrowser(arguments, httpPort, logger);
@@ -335,9 +338,8 @@ public final class UndertowBootstrap {
     }
 
     private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
-        return Handlers.predicate(new ContextRootPredicate(),
-                Handlers.redirect(TOOLS_DASHBOARD_URI),
-                initialHandler);
+        return Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
+                Handlers.redirect(TOOLS_DASHBOARD_URI), initialHandler);
     }
 
     private static Set<HttpString> allowedMethods(Config cfg) {
@@ -356,7 +358,7 @@ public final class UndertowBootstrap {
         return cfg.getObject(KEY_ERROR_PAGES).unwrapped()
                 .entrySet()
                 .stream()
-                .map(entry -> Servlets.errorPage(String.valueOf(entry.getValue()), Integer.parseInt(entry.getKey())))
+                .map(e -> Servlets.errorPage(String.valueOf(e.getValue()), Integer.parseInt(e.getKey())))
                 .collect(Collectors.toList());
     }
 

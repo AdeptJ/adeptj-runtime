@@ -41,7 +41,13 @@ import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ToolsServlet", urlPatterns = {"/tools/dashboard"}, asyncSupported = true)
+@WebServlet(
+        name = "AdeptJ ToolsServlet",
+        urlPatterns = {
+                TOOLS_DASHBOARD_URI
+        },
+        asyncSupported = true
+)
 public class ToolsServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

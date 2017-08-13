@@ -41,7 +41,13 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = {"/tools/error/*"}, asyncSupported = true)
+@WebServlet(
+        name = "AdeptJ ErrorPageServlet",
+        urlPatterns = {
+                "/tools/error/*"
+        },
+        asyncSupported = true
+)
 public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
