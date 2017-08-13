@@ -208,19 +208,16 @@ public final class UndertowBootstrap {
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         printBanner(logger);
-        DeploymentManager manager = Servlets
-                .defaultContainer()
-                .addDeployment(deploymentInfo(undertowConf));
+        DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
         Builder builder = Undertow.builder();
         optimizeWorkerOptions(builder, undertowConf, logger);
-        HttpHandler servletInitialHandler = manager.start();
         ServerOptions.build(builder, undertowConf);
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         enableHttp2(undertowConf, builder, logger);
         enableAJP(undertowConf, builder, logger);
-        Undertow server = builder.setHandler(rootHandler(new SetHeadersHandler(servletInitialHandler,
-                serverHeaders(undertowConf)), undertowConf))
+        Undertow server = builder
+                .setHandler(rootHandler(headersHandler(manager.start(), undertowConf), undertowConf))
                 .build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
@@ -293,12 +290,11 @@ public final class UndertowBootstrap {
     }
 
     private static int handlePortAvailability(Config httpConf, Logger logger) {
-        int defaultPort = httpConf.getInt(KEY_PORT);
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
             logger.warn("No port specified via system property: [{}], using default port: [{}]",
-                    SYS_PROP_SERVER_PORT, defaultPort);
-            port = defaultPort;
+                    SYS_PROP_SERVER_PORT, httpConf.getInt(KEY_PORT));
+            port = httpConf.getInt(KEY_PORT);
         }
         // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
         // as it is being started already and another server start(from same location) will again start new OSGi
@@ -328,13 +324,13 @@ public final class UndertowBootstrap {
         return portAvailable;
     }
 
-    private static Map<HttpString, String> serverHeaders(Config cfg) {
+    private static SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (!Environment.isProd()) {
             headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
         }
-        return headers;
+        return new SetHeadersHandler(servletInitialHandler, headers);
     }
 
     private static PredicateHandler predicateHandler(HttpHandler initialHandler) {

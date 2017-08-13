@@ -43,7 +43,7 @@ final class SetHeadersHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        this.headers.forEach((headerName, headerValue) -> exchange.getResponseHeaders().put(headerName, headerValue));
+        this.headers.forEach((name, value) -> exchange.getResponseHeaders().put(name, value));
         this.servletHandler.handleRequest(exchange);
     }
 
