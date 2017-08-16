@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -87,12 +88,12 @@ public enum FrameworkBootstrap {
             long startTimeFramework = System.nanoTime();
             this.framework.start();
             logger.info("Framework creation took [{}] ms!!", Times.elapsedSinceMillis(startTimeFramework));
-            this.frameworkListener = new FrameworkRestartHandler();
             BundleContext systemBundleContext = this.framework.getBundleContext();
+            this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             if (configDirExists) {
-                logger.info("Bundles already provisioned, this must be a restart!!");
+                logger.info("Bundles already provisioned, this must be a server restart!!");
             } else {
                 logger.info("Provisioning bundles first time!!");
                 Bundles.provisionBundles(systemBundleContext);
@@ -179,9 +180,11 @@ public enum FrameworkBootstrap {
 
     private Map<String, String> loadFrameworkProperties() throws IOException {
         Properties props = new Properties();
-        props.load(FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES));
         Map<String, String> configs = new HashMap<>();
-        props.forEach((key, val) -> configs.put((String) key, (String) val));
+        try (InputStream is = FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
+            props.load(is);
+            props.forEach((key, val) -> configs.put((String) key, (String) val));
+        }
         return configs;
     }
 }
