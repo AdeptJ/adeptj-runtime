@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -77,6 +79,10 @@ public enum FrameworkBootstrap {
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
+            // config directory will not yet be created if framework is being provisioned first time.
+            boolean configDirExists = Files.exists(Paths.get(Configs.DEFAULT
+                    .felix()
+                    .getString(CFG_KEY_FELIX_CM_DIR)));
             this.framework = this.createFramework(logger);
             long startTimeFramework = System.nanoTime();
             this.framework.start();
@@ -85,7 +91,12 @@ public enum FrameworkBootstrap {
             BundleContext systemBundleContext = this.framework.getBundleContext();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            Bundles.provisionBundles(systemBundleContext);
+            if (configDirExists) {
+                logger.info("Bundles already provisioned, this must be a restart!!");
+            } else {
+                logger.info("Provisioning bundles first time!!");
+                Bundles.provisionBundles(systemBundleContext);
+            }
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
@@ -147,7 +158,7 @@ public enum FrameworkBootstrap {
         logger.info("BridgeServlet registered successfully!!");
     }
 
-    private Framework createFramework(Logger logger) throws IOException  {
+    private Framework createFramework(Logger logger) throws IOException {
         return ServiceLoader.load(FrameworkFactory.class)
                 .iterator()
                 .next()

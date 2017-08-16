@@ -49,9 +49,10 @@ final class Bundles {
 
     private static final String JAR_FILE = ".jar";
 
-    // deny direct instantiation.
-    private Bundles() {
-    }
+    /**
+     * Don't let anyone instantiate this class.
+     */
+    private Bundles() {}
 
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
@@ -76,7 +77,7 @@ final class Bundles {
         logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
         try {
             bundle.start();
-        } catch (BundleException | IllegalStateException | SecurityException ex) {
+        } catch (Exception ex) { // NOSONAR
             logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
         }
     }
