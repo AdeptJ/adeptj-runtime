@@ -65,15 +65,16 @@ public class ToolsServlet extends HttpServlet {
                 .put("sysProps", System.getProperties().entrySet())
                 .put("totalBundles", bundles.length)
                 .put("bundles", bundles)
-                .put("runtime", new StringBuilder(System.getProperty("java.runtime.name"))
-                        .append("(build ")
-                        .append(System.getProperty("java.runtime.version"))
-                        .append(")").toString())
-                .put("jvm", new StringBuilder(System.getProperty("java.vm.name"))
-                        .append("(build ").append(System.getProperty("java.vm.version"))
-                        .append(", ")
-                        .append(System.getProperty("java.vm.info"))
-                        .append(")").toString())
+                .put("runtime", System.getProperty("java.runtime.name")
+                        + "(build "
+                        + System.getProperty("java.runtime.version")
+                        + ")")
+                .put("jvm", System.getProperty("java.vm.name")
+                        + "(build "
+                        + System.getProperty("java.vm.version")
+                        + ", "
+                        + System.getProperty("java.vm.info")
+                        + ")")
                 .put("processors", Runtime.getRuntime().availableProcessors());
         TemplateEngine.defaultEngine().render(TemplateContext.builder()
                 .request(req)
