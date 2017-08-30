@@ -36,12 +36,12 @@ public class BundleContextHolderTest {
 	@Test
 	public void testIsBundleContextSetWhenSetBundleContextCalled() {
 		Mockito.when(BundleContextHolder.INSTANCE.getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
-		Assert.assertTrue(BundleContextHolder.INSTANCE.isBundleContextValid());
+		Assert.assertTrue(BundleContextHolder.INSTANCE.isBundleContextAvailable());
 	}
 	
 	@Test
 	public void testIsBundleContextSetWhenSetBundleContextNotCalled() {
 		//Assert.assertFalse(BundleContextHolder.INSTANCE.isBundleContextSet());
-		Mockito.eq(BundleContextHolder.INSTANCE.isBundleContextValid());
+		Mockito.eq(BundleContextHolder.INSTANCE.isBundleContextAvailable());
 	}
 }

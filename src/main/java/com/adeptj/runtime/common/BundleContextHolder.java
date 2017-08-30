@@ -32,18 +32,18 @@ public enum BundleContextHolder {
 
     private BundleContext bundleContext;
     
-    private volatile boolean bundleContextValid;
+    private volatile boolean bundleContextAvailable;
 
     public BundleContext getBundleContext() {
         return this.bundleContext;
     }
 
-    public boolean isBundleContextValid() {
-        return this.bundleContextValid;
+    public boolean isBundleContextAvailable() {
+        return this.bundleContextAvailable;
     }
 
     public void setBundleContext(BundleContext bundleContext) {
         this.bundleContext = bundleContext;
-        this.bundleContextValid = true;
+        this.bundleContextAvailable = true;
     }
 }

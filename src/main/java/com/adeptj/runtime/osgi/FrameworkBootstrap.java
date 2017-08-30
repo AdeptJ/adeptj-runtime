@@ -92,7 +92,7 @@ public enum FrameworkBootstrap {
             this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            if (configDirExists) {
+            if (configDirExists && !Boolean.getBoolean("provision.bundles.explicitly")) {
                 logger.info("Bundles already provisioned, this must be a server restart!!");
             } else {
                 logger.info("Provisioning bundles first time!!");
@@ -131,7 +131,7 @@ public enum FrameworkBootstrap {
     }
 
     private void removeFrameworkListener() {
-        if (BundleContextHolder.INSTANCE.isBundleContextValid()) {
+        if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
             BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
         }
     }
