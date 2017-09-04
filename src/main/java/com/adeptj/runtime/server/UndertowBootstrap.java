@@ -287,7 +287,7 @@ public final class UndertowBootstrap {
                 logger.info("Default KeyStore loaded!!");
                 undertowBuilder.addHttpsListener(httpsPort,
                         httpsConf.getString(KEY_HOST),
-                        sslContext(keyStore, cfgKeyStorePwd, logger));
+                        sslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
             }
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
