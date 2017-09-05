@@ -359,7 +359,9 @@ public final class UndertowBootstrap {
     }
 
     private static HttpHandler rootHandler(HttpHandler headersHandler, Config cfg) {
-        return Handlers.gracefulShutdown(new RequestLimitingHandler(cfg.getInt(KEY_MAX_CONCURRENT_REQS),
+        int maxConcurrentRequests = Integer.getInteger("max.concurrent.requests",
+                cfg.getInt(KEY_MAX_CONCURRENT_REQS));
+        return Handlers.gracefulShutdown(new RequestLimitingHandler(maxConcurrentRequests,
                 new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
     }
 

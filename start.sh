@@ -8,6 +8,7 @@ java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 
  -Dlog.immediate.flush=true \
  -Dfelix.log.level=3 \
  -Dprovision.bundles.explicitly=false \
+ -Dmax.concurrent.requests=10000 \
  -Duse.supplied.keyStore=false \
  -Djavax.net.ssl.keyStore=/Users/rakesh.kumar/AdeptJRuntime.jks \
  -Djavax.net.ssl.keyStorePassword=AdeptJUndertow@Xnio \
