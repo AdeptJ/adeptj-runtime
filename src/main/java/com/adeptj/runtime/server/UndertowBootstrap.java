@@ -38,7 +38,9 @@ import io.undertow.Version;
 import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
+import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.server.handlers.PredicateHandler;
+import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -96,6 +98,7 @@ import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
+import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
@@ -146,6 +149,12 @@ public final class UndertowBootstrap {
     private static final String REALM = "AdeptJ Realm";
 
     private static final String SYS_PROP_SESSION_TIMEOUT = "adeptj.session.timeout";
+
+    private static final String SYS_PROP_ENABLE_REQ_BUFF = "enable.req.buffering";
+
+    private static final String SYS_PROP_REQ_BUFF_MAX_BUFFERS = "req.buff.maxBuffers";
+
+    private static final String SYS_PROP_MAX_CONCUR_REQ = "max.concurrent.requests";
 
     private static final String KEY_SESSION_TIMEOUT = "common.session-timeout";
 
@@ -217,11 +226,10 @@ public final class UndertowBootstrap {
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         enableHttp2(undertowConf, builder, logger);
         enableAJP(undertowConf, builder, logger);
-        Undertow server = builder
-                .setHandler(rootHandler(headersHandler(manager.start(), undertowConf), undertowConf))
-                .build();
+        GracefulShutdownHandler rootHandler = rootHandler(headersHandler(manager.start(), undertowConf), undertowConf);
+        Undertow server = builder.setHandler(rootHandler).build();
         server.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager));
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
         launchBrowser(arguments, httpPort, logger);
     }
 
@@ -337,18 +345,25 @@ public final class UndertowBootstrap {
         return portAvailable;
     }
 
+    private static RequestBufferingHandler reqBufferingHandler(HttpHandler initialHandler, Config cfg) {
+        return new RequestBufferingHandler(initialHandler, Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS,
+                cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
+    }
+
     private static SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (!Environment.isProd()) {
             headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
         }
-        return new SetHeadersHandler(servletInitialHandler, headers);
+        return Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
+                new SetHeadersHandler(reqBufferingHandler(servletInitialHandler, cfg), headers) :
+                new SetHeadersHandler(servletInitialHandler, headers);
     }
 
-    private static PredicateHandler predicateHandler(HttpHandler initialHandler) {
+    private static PredicateHandler predicateHandler(HttpHandler headersHandler) {
         return Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                Handlers.redirect(TOOLS_DASHBOARD_URI), initialHandler);
+                Handlers.redirect(TOOLS_DASHBOARD_URI), headersHandler);
     }
 
     private static Set<HttpString> allowedMethods(Config cfg) {
@@ -358,11 +373,10 @@ public final class UndertowBootstrap {
                 .collect(Collectors.toSet());
     }
 
-    private static HttpHandler rootHandler(HttpHandler headersHandler, Config cfg) {
-        int maxConcurrentRequests = Integer.getInteger("max.concurrent.requests",
-                cfg.getInt(KEY_MAX_CONCURRENT_REQS));
-        return Handlers.gracefulShutdown(new RequestLimitingHandler(maxConcurrentRequests,
-                new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
+    private static GracefulShutdownHandler rootHandler(HttpHandler headersHandler, Config cfg) {
+        return Handlers.gracefulShutdown(
+                new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
+                        new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
     }
 
     private static List<ErrorPage> errorPages(Config cfg) {

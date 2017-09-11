@@ -23,6 +23,7 @@ import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackBootstrap;
 import io.undertow.Undertow;
+import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.servlet.api.DeploymentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,18 +31,26 @@ import org.slf4j.LoggerFactory;
 /**
  * ShutdownHook for graceful server shutdown, this first cleans up the deployment and then stops UNDERTOW server.
  * <p>
+ *
  * @author Rakesh.Kumar, AdeptJ
  */
 final class ShutdownHook extends Thread {
+
+    private static final long DEFAULT_WAIT_TIME = 60 * 1000;
+
+    private static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 
     private Undertow server;
 
     private DeploymentManager manager;
 
-    ShutdownHook(Undertow server, DeploymentManager manager) {
+    private GracefulShutdownHandler shutdownHandler;
+
+    ShutdownHook(Undertow server, DeploymentManager manager, GracefulShutdownHandler shutdownHandler) {
         super(Constants.SHUTDOWN_HOOK_THREAD_NAME);
         this.server = server;
         this.manager = manager;
+        this.shutdownHandler = shutdownHandler;
     }
 
     /**
@@ -53,6 +62,7 @@ final class ShutdownHook extends Thread {
         Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
         logger.info("Stopping AdeptJ Runtime!!");
         try {
+            this.gracefulShutdown(logger);
             this.manager.stop();
             this.manager.undeploy();
             this.server.stop();
@@ -66,4 +76,16 @@ final class ShutdownHook extends Thread {
         }
     }
 
+    private void gracefulShutdown(Logger logger) {
+        try {
+            logger.warn("Completing remaining requests!!");
+            this.shutdownHandler.shutdown();
+            if (this.shutdownHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
+                logger.warn("Completed remaining requests successfully!!");
+            }
+        } catch (InterruptedException ie) {
+            logger.error("Error while waiting for pending request to complete!!", ie);
+            Thread.currentThread().interrupt();
+        }
+    }
 }
