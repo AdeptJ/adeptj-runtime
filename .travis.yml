@@ -8,7 +8,7 @@ addons:
 jdk:
   - oraclejdk8
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P RESTEasy,DS,JPA-EclipseLink,MySQL sonar:sonar
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P Apache-HttpClient,RESTEasy,AWS,MySQL,JDBC-CP-Hikari,JPA-EclipseLink sonar:sonar
 cache:
   directories:
     - '$HOME/.m2/repository'
