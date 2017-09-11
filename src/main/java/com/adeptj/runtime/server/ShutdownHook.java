@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 final class ShutdownHook extends Thread {
 
-    private static final long DEFAULT_WAIT_TIME = 60 * 1000;
+    private static final long DEFAULT_WAIT_TIME = 60000L;
 
     private static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 

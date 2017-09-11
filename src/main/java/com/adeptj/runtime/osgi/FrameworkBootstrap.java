@@ -36,7 +36,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,9 +80,9 @@ public enum FrameworkBootstrap {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
             // config directory will not yet be created if framework is being provisioned first time.
-            boolean configDirExists = Files.exists(Paths.get(Configs.DEFAULT
-                    .felix()
-                    .getString(CFG_KEY_FELIX_CM_DIR)));
+            boolean configDirExists = Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR))
+                    .toFile()
+                    .exists();
             this.framework = this.createFramework(logger);
             long startTimeFramework = System.nanoTime();
             this.framework.start();
