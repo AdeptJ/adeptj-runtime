@@ -78,10 +78,10 @@ final class ShutdownHook extends Thread {
 
     private void gracefulShutdown(Logger logger) {
         try {
-            logger.warn("Completing remaining requests!!");
+            logger.info("Completing remaining requests!!");
             this.shutdownHandler.shutdown();
             if (this.shutdownHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
-                logger.warn("Completed remaining requests successfully!!");
+                logger.info("Completed remaining requests successfully!!");
             }
         } catch (InterruptedException ie) {
             logger.error("Error while waiting for pending request to complete!!", ie);

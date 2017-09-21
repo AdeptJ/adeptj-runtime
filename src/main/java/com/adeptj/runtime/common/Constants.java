@@ -124,6 +124,12 @@ public final class Constants {
 
     public static final String MODE_PROD = "PROD";
 
+    public static final String DIR_ADEPTJ_RUNTIME = "adeptj-runtime";
+
+    public static final String DIR_DEPLOYMENT = "deployment";
+
+    public static final String SERVER_CONF_FILE = "server.conf";
+
     // Configuration Keys constants start.
 
     public static final String KEY_BROWSERS = "browsers";

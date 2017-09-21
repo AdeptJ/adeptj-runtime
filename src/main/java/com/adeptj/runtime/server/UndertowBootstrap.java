@@ -65,6 +65,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +73,8 @@ import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -89,7 +92,10 @@ import java.util.stream.Collectors;
 import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
+import static com.adeptj.runtime.common.Constants.CURRENT_DIR;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
+import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
+import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
@@ -100,6 +106,7 @@ import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
@@ -231,6 +238,7 @@ public final class UndertowBootstrap {
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
         launchBrowser(arguments, httpPort, logger);
+        storeServerConfFile();
     }
 
     private static void printBanner(Logger logger) {
@@ -250,6 +258,20 @@ public final class UndertowBootstrap {
                 // Just log it, its okay if browser is not launched.
                 logger.error("IOException!!", ex);
             }
+        }
+    }
+
+    private static void storeServerConfFile() {
+        try (InputStream stream = UndertowBootstrap.class.getResourceAsStream("/reference.conf")) {
+            Files.write(Paths.get(CURRENT_DIR
+                    + File.separator
+                    + DIR_ADEPTJ_RUNTIME
+                    + File.separator
+                    + DIR_DEPLOYMENT
+                    + File.separator
+                    + SERVER_CONF_FILE), IOUtils.toBytes(stream));
+        } catch (IOException ex) {
+            // ignore it.
         }
     }
 
