@@ -1020,28 +1020,28 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-aws-core</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-aws-ses</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-aws-sns</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-aws-s3</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
