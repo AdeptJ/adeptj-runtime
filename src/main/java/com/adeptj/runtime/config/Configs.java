@@ -49,21 +49,7 @@ public enum Configs {
     private final Config main;
 
     Configs() {
-        File configFile = Paths.get(CURRENT_DIR
-                + File.separator
-                + DIR_ADEPTJ_RUNTIME
-                + File.separator
-                + DIR_DEPLOYMENT
-                + File.separator
-                + SERVER_CONF_FILE).toFile();
-        if (configFile.exists()) {
-            this.main = ConfigFactory.parseFile(configFile)
-                    .withFallback(ConfigFactory.systemProperties())
-                    .resolve()
-                    .getConfig(MAIN_CONF_SECTION);
-        } else {
-            this.main = ConfigFactory.defaultReference().getConfig(MAIN_CONF_SECTION);
-        }
+        this.main = this.loadConf();
     }
 
     public Config main() {
@@ -92,5 +78,23 @@ public enum Configs {
 
     public Config trimou() {
         return this.main.getConfig(TRIMOU_CONF_SECTION);
+    }
+
+    private Config loadConf() {
+        File configFile = Paths.get(CURRENT_DIR
+                + File.separator
+                + DIR_ADEPTJ_RUNTIME
+                + File.separator
+                + DIR_DEPLOYMENT
+                + File.separator
+                + SERVER_CONF_FILE).toFile();
+        if (configFile.exists()) {
+            return ConfigFactory.parseFile(configFile)
+                    .withFallback(ConfigFactory.systemProperties())
+                    .resolve()
+                    .getConfig(MAIN_CONF_SECTION);
+        } else {
+            return ConfigFactory.defaultReference().getConfig(MAIN_CONF_SECTION);
+        }
     }
 }
