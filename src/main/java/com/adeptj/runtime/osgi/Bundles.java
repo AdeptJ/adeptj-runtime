@@ -52,7 +52,8 @@ final class Bundles {
     /**
      * Don't let anyone instantiate this class.
      */
-    private Bundles() {}
+    private Bundles() {
+    }
 
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
@@ -62,7 +63,7 @@ final class Bundles {
         // 1. Collect Bundles
         // 2. Install Bundles
         // 3. Start Bundles
-        startBundles(installBundles(collectBundles(logger, rootPath), systemBundleContext, logger), logger);
+        startBundles(installBundles(collectBundles(rootPath), systemBundleContext, logger), logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedSinceMillis(startTime));
     }
 
@@ -104,15 +105,14 @@ final class Bundles {
         return bundle;
     }
 
-    private static List<URL> collectBundles(Logger logger, String rootPath) throws IOException {
-        List<URL> bundles = JarURLConnection.class.cast(Bundles.class.getResource(rootPath).openConnection())
+    private static List<URL> collectBundles(String rootPath) throws IOException {
+        return JarURLConnection.class.cast(Bundles.class.getResource(rootPath)
+                .openConnection())
                 .getJarFile()
                 .stream()
                 .filter(jarEntry -> StringUtils.startsWith(jarEntry.getName(), PREFIX_BUNDLES)
                         && StringUtils.endsWith(jarEntry.getName(), JAR_FILE))
                 .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
                 .collect(Collectors.toList());
-        logger.debug("Total Bundles collected: [{}]", bundles.size());
-        return bundles;
     }
 }
