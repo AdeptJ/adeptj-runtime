@@ -1377,7 +1377,7 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.6.4 Dependencies -->
+                <!-- EclipseLink 2.7.0 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
@@ -1436,7 +1436,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.0.2.Final</version>
+                    <version>1.0.3.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1453,7 +1453,7 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-core</artifactId>
-                    <version>5.2.10.Final</version>
+                    <version>5.2.11.Final</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
