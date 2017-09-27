@@ -989,21 +989,21 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.4.Final</version>
+                    <version>1.0.6.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.4.Final</version>
+                    <version>1.0.6.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.7.Final</version>
+                    <version>1.0.9.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
