@@ -19,20 +19,16 @@
 */
 package com.adeptj.runtime.config;
 
+import com.adeptj.runtime.common.Environment;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 import java.io.File;
-import java.nio.file.Paths;
 
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.CURRENT_DIR;
-import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
-import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.THYMELEAF_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
@@ -81,13 +77,7 @@ public enum Configs {
     }
 
     private Config loadConf() {
-        File configFile = Paths.get(CURRENT_DIR
-                + File.separator
-                + DIR_ADEPTJ_RUNTIME
-                + File.separator
-                + DIR_DEPLOYMENT
-                + File.separator
-                + SERVER_CONF_FILE).toFile();
+        File configFile = Environment.getServerConfFile();
         if (configFile.exists()) {
             return ConfigFactory.parseFile(configFile)
                     .withFallback(ConfigFactory.systemProperties())

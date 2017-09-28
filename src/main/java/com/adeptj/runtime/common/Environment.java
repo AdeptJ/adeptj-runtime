@@ -22,13 +22,19 @@ package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 
+import static com.adeptj.runtime.common.Constants.CURRENT_DIR;
+import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
+import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.EMPTY;
 import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
 import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.runtime.common.Constants.OS;
+import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_MODE;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
 
@@ -37,7 +43,7 @@ import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class Environment {
+public final class Environment {
 
     private static final int OFFSET = 0;
 
@@ -89,5 +95,19 @@ public class Environment {
             }
             Runtime.getRuntime().exec(new String[]{CMD_SH, CMD_OPT, cmdBuilder.toString()});
         }
+    }
+
+    public static File getServerConfFile() {
+        return Paths.get(CURRENT_DIR
+                + File.separator
+                + DIR_ADEPTJ_RUNTIME
+                + File.separator
+                + DIR_DEPLOYMENT
+                + File.separator
+                + SERVER_CONF_FILE).toFile();
+    }
+
+    public static boolean isServerConfFileExists() {
+        return getServerConfFile().exists();
     }
 }

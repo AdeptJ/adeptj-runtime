@@ -238,7 +238,9 @@ public final class UndertowBootstrap {
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
         launchBrowser(arguments, httpPort, logger);
-        storeServerConfFile();
+        if (!Environment.isServerConfFileExists()) {
+            createServerConfFile(logger);
+        }
     }
 
     private static void printBanner(Logger logger) {
@@ -261,7 +263,7 @@ public final class UndertowBootstrap {
         }
     }
 
-    private static void storeServerConfFile() {
+    private static void createServerConfFile(Logger logger) {
         try (InputStream stream = UndertowBootstrap.class.getResourceAsStream("/reference.conf")) {
             Files.write(Paths.get(CURRENT_DIR
                     + File.separator
@@ -271,7 +273,7 @@ public final class UndertowBootstrap {
                     + File.separator
                     + SERVER_CONF_FILE), IOUtils.toBytes(stream));
         } catch (IOException ex) {
-            // ignore it.
+            logger.error("IOException!!", ex);
         }
     }
 
