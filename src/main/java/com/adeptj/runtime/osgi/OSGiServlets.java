@@ -110,8 +110,9 @@ public enum OSGiServlets {
     }
 
     private void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
-        Arrays.stream(webServlet.initParams()).forEach(initParam ->
-                properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value()));
+        Arrays.stream(webServlet.initParams())
+                .forEach(initParam -> properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(),
+                        initParam.value()));
     }
 
     private void handleName(Class<? extends HttpServlet> cls, String name, Dictionary<String, Object> props) {

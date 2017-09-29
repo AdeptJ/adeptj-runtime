@@ -70,28 +70,27 @@ public class ErrorPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String requestURI = req.getRequestURI();
         TemplateContext.Builder builder = TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale());
-        TemplateEngine templateEngine = TemplateEngine.defaultEngine();
-        if (TEMPLATE_ERROR.equals(requestURI)) {
-            templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
+        if (TEMPLATE_ERROR.equals(req.getRequestURI())) {
+            TemplateEngine.getInstance().render(builder.template(TEMPLATE_GENERIC).build());
         } else {
-            ContextObject ctxObj = new ContextObject();
-            String statusCode = this.getStatusCode(requestURI);
+            String statusCode = this.getStatusCode(req.getRequestURI());
             if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
-                builder.contextObject(ctxObj.put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)));
-                templateEngine.render(builder.template(TEMPLATE_500).build());
+                builder.contextObject(ContextObject.newContextObject().put(KEY_EXCEPTION,
+                        Requests.attr(req, ERROR_EXCEPTION)));
+                TemplateEngine.getInstance().render(builder.template(TEMPLATE_500).build());
             } else if (STATUS_500.equals(statusCode)) {
                 // Means it's just error code, no exception set in the request.
-                templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
+                TemplateEngine.getInstance().render(builder.template(TEMPLATE_GENERIC).build());
             } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
-                templateEngine.render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
+                TemplateEngine.getInstance()
+                        .render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
             } else {
                 // if the requested view not found, render 404.
-                templateEngine.render(builder.template(TEMPLATE_404).build());
+                TemplateEngine.getInstance().render(builder.template(TEMPLATE_404).build());
             }
         }
     }

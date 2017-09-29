@@ -23,7 +23,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Utility for providing time in multiple ranges.
+ * Utility for providing execution time in different {@link java.util.concurrent.TimeUnit}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -39,7 +39,7 @@ public final class Times {
      * @param startTime time in nanoseconds
      * @return elapsed time in milliseconds
      */
-    public static long elapsedSinceMillis(final long startTime) {
+    public static long elapsedMillis(final long startTime) {
         return NANOSECONDS.toMillis(System.nanoTime() - startTime);
     }
     
@@ -49,7 +49,7 @@ public final class Times {
      * @param startTime time in milliseconds
      * @return elapsed time in seconds
      */
-    public static long elapsedSinceSeconds(final long startTime) {
+    public static long elapsedSeconds(final long startTime) {
         return MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
     }
 }

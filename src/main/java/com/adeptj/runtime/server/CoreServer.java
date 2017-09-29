@@ -25,8 +25,8 @@ import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
-import com.adeptj.runtime.logging.LogbackBootstrap;
-import com.adeptj.runtime.osgi.FrameworkStartupHandler;
+import com.adeptj.runtime.logging.LogbackManager;
+import com.adeptj.runtime.osgi.OSGiStartupHandler;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
@@ -92,7 +92,6 @@ import java.util.stream.Collectors;
 import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
-import static com.adeptj.runtime.common.Constants.CURRENT_DIR;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
@@ -113,13 +112,14 @@ import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
+import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
- * UndertowBootstrap: Provision the Undertow Web Server.
+ * CoreServer: Provision the Undertow Web Server, bootstrap OSGi framework and much more.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class UndertowBootstrap {
+public final class CoreServer {
 
     private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
@@ -214,13 +214,13 @@ public final class UndertowBootstrap {
     private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
 
     // No instantiation.
-    private UndertowBootstrap() {
+    private CoreServer() {
     }
 
     public static void bootstrap(Map<String, String> arguments) throws ServletException {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        Logger logger = LoggerFactory.getLogger(UndertowBootstrap.class);
+        Logger logger = LoggerFactory.getLogger(CoreServer.class);
         logger.debug("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
@@ -244,7 +244,7 @@ public final class UndertowBootstrap {
     }
 
     private static void printBanner(Logger logger) {
-        try (InputStream stream = UndertowBootstrap.class.getResourceAsStream(BANNER_TXT)) {
+        try (InputStream stream = CoreServer.class.getResourceAsStream(BANNER_TXT)) {
             logger.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
@@ -264,8 +264,8 @@ public final class UndertowBootstrap {
     }
 
     private static void createServerConfFile(Logger logger) {
-        try (InputStream stream = UndertowBootstrap.class.getResourceAsStream("/reference.conf")) {
-            Files.write(Paths.get(CURRENT_DIR
+        try (InputStream stream = CoreServer.class.getResourceAsStream("/reference.conf")) {
+            Files.write(Paths.get(USER_DIR
                     + File.separator
                     + DIR_ADEPTJ_RUNTIME
                     + File.separator
@@ -349,7 +349,7 @@ public final class UndertowBootstrap {
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            LogbackBootstrap.stopLoggerContext();
+            LogbackManager.stopLogback();
             System.exit(-1); // NOSONAR
         }
         return port;
@@ -414,7 +414,7 @@ public final class UndertowBootstrap {
     private static ServletContainerInitializerInfo sciInfo() {
         return new ServletContainerInitializerInfo(ContainerInitializer.class,
                 new ImmediateInstanceFactory<>(new ContainerInitializer()),
-                Collections.singleton(FrameworkStartupHandler.class));
+                Collections.singleton(OSGiStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {
@@ -466,7 +466,7 @@ public final class UndertowBootstrap {
                             .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                             .getMap());
         } catch (IOException ex) {
-            LoggerFactory.getLogger(UndertowBootstrap.class).error("Can't create XnioWorker!!", ex);
+            LoggerFactory.getLogger(CoreServer.class).error("Can't create XnioWorker!!", ex);
         }
         return worker;
     }
@@ -483,7 +483,7 @@ public final class UndertowBootstrap {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
-                .setClassLoader(UndertowBootstrap.class.getClassLoader())
+                .setClassLoader(CoreServer.class.getClassLoader())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(sessionTimeout(cfg))
@@ -514,7 +514,7 @@ public final class UndertowBootstrap {
     }
 
     private static KeyStore keyStoreDefault(String defaultKeyStore, char[] keyStorePwd, Logger logger) {
-        try (InputStream is = UndertowBootstrap.class.getResourceAsStream(defaultKeyStore)) {
+        try (InputStream is = CoreServer.class.getResourceAsStream(defaultKeyStore)) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;

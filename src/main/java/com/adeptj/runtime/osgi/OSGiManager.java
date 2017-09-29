@@ -46,11 +46,11 @@ import java.util.ServiceLoader;
 import static java.lang.System.getProperty;
 
 /**
- * FrameworkBootstrap that handles the OSGi Framework(Apache Felix) startup and shutdown.
+ * OSGiManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum FrameworkBootstrap {
+public enum OSGiManager {
 
     INSTANCE;
 
@@ -72,10 +72,10 @@ public enum FrameworkBootstrap {
 
     private Framework framework;
 
-    private FrameworkRestartHandler frameworkListener;
+    private OSGiRestartHandler frameworkListener;
 
     public void startFramework(ServletContext context) {
-        Logger logger = LoggerFactory.getLogger(FrameworkBootstrap.class);
+        Logger logger = LoggerFactory.getLogger(OSGiManager.class);
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
@@ -86,9 +86,9 @@ public enum FrameworkBootstrap {
             this.framework = this.createFramework(logger);
             long startTimeFramework = System.nanoTime();
             this.framework.start();
-            logger.info("Framework creation took [{}] ms!!", Times.elapsedSinceMillis(startTimeFramework));
+            logger.info("Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
             BundleContext systemBundleContext = this.framework.getBundleContext();
-            this.frameworkListener = new FrameworkRestartHandler();
+            this.frameworkListener = new OSGiRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             if (configDirExists && !Boolean.getBoolean("provision.bundles.explicitly")) {
@@ -99,7 +99,7 @@ public enum FrameworkBootstrap {
             }
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
-            logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+            logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
             this.registerBridgeListeners(context);
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
             context.setAttribute(BundleContext.class.getName(), systemBundleContext);
@@ -112,7 +112,7 @@ public enum FrameworkBootstrap {
     }
 
     public void stopFramework() {
-        Logger logger = LoggerFactory.getLogger(FrameworkBootstrap.class);
+        Logger logger = LoggerFactory.getLogger(OSGiManager.class);
         try {
             if (this.framework != null) {
                 this.removeFrameworkListener();
@@ -180,7 +180,7 @@ public enum FrameworkBootstrap {
     private Map<String, String> loadFrameworkProperties() throws IOException {
         Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
-        try (InputStream is = FrameworkBootstrap.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
+        try (InputStream is = OSGiManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
             props.load(is);
             props.forEach((key, val) -> configs.put((String) key, (String) val));
         }

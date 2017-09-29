@@ -114,7 +114,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
                 long startTime = System.nanoTime();
                 this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(BridgeServlet.class));
-                LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+                LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
             }

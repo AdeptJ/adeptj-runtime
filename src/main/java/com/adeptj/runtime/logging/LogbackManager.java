@@ -38,17 +38,21 @@ import java.util.List;
 import java.util.Map;
 
 import static ch.qos.logback.classic.Level.toLevel;
-import static com.adeptj.runtime.common.Times.elapsedSinceMillis;
+import static com.adeptj.runtime.common.Times.elapsedMillis;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
- * This Class initializes the LOGBACK logging framework. Usually LOGBACK is initialized via logback.xml file on CLASSPATH.
- * But using that approach LOGBACK takes longer to initializes(5+ seconds) which is reduced drastically to under 200 milliseconds
- * using programmatic approach. This is huge improvement on total startup time.
+ * This Class initializes the Logback logging framework.
+ * <p>
+ * Usually Logback is initialized via logback.xml file on CLASSPATH.
+ * But using that approach Logback takes longer to initializes(5+ seconds) which is reduced drastically
+ * to under 200 milliseconds using programmatic approach.
+ * <p>
+ * This is huge improvement on total startup time.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LogbackBootstrap {
+public class LogbackManager {
 
     private static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
 
@@ -91,10 +95,10 @@ public class LogbackBootstrap {
     private static final String KEY_IMMEDIATE_FLUSH = "file-appender-immediate-flush";
 
     // Utility methods only.
-    private LogbackBootstrap() {
+    private LogbackManager() {
     }
 
-    public static void startLoggerContext() {
+    public static void startLogback() {
         long startTime = System.nanoTime();
         Config config = Configs.DEFAULT.logging();
         LoggerContext context = getLoggerContext();
@@ -121,10 +125,10 @@ public class LogbackBootstrap {
         // AsyncAppender
         asyncAppender(config, context, fileAppender);
         context.start();
-        context.getLogger(LogbackBootstrap.class).info(INIT_MSG, elapsedSinceMillis(startTime));
+        context.getLogger(LogbackManager.class).info(INIT_MSG, elapsedMillis(startTime));
     }
 
-    public static void stopLoggerContext() {
+    public static void stopLogback() {
         getLoggerContext().stop();
     }
 

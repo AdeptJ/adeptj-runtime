@@ -31,11 +31,11 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 
 /**
- * OSGi FrameworkListener.
+ * OSGi FrameworkListener which takes care of OSGi framework restart.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class FrameworkRestartHandler implements FrameworkListener {
+public class OSGiRestartHandler implements FrameworkListener {
 
     /**
      * Handles OSGi Framework restart, does following on System Bundle STARTED event.
@@ -48,7 +48,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
      */
     @Override
     public void frameworkEvent(FrameworkEvent event) {
-        Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
+        Logger logger = LoggerFactory.getLogger(OSGiRestartHandler.class);
         switch (event.getType()) {
             case FrameworkEvent.STARTED:
                 logger.info("Handling OSGi Framework Restart!!");

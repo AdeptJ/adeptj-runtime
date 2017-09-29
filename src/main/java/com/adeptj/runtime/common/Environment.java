@@ -27,19 +27,21 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 
-import static com.adeptj.runtime.common.Constants.CURRENT_DIR;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.EMPTY;
 import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
 import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
-import static com.adeptj.runtime.common.Constants.OS;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_MODE;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_UNIX;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
- * Environment.
+ * Utility methods for getting environment details AdeptJ Runtime is running in.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -65,24 +67,12 @@ public final class Environment {
         return ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
     }
 
-    public static boolean isMac() {
-        return OS.startsWith("Mac");
-    }
-
-    public static boolean isWindows() {
-        return OS.startsWith("Windows");
-    }
-
-    public static boolean isUnix() {
-        return OS.toLowerCase().contains("nix") || OS.toLowerCase().contains("nux");
-    }
-
     public static void launchBrowser(URL url) throws IOException {
-        if (isMac()) {
+        if (IS_OS_MAC) {
             Runtime.getRuntime().exec(MAC_BROWSER_LAUNCH_CMD + url);
-        } else if (isWindows()) {
+        } else if (IS_OS_WINDOWS) {
             Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
-        } else if (isUnix()) {
+        } else if (IS_OS_UNIX) {
             StringBuilder cmdBuilder = new StringBuilder();
             int index = OFFSET;
             for (String browser : Configs.DEFAULT.common().getStringList(KEY_BROWSERS)) {
@@ -98,7 +88,7 @@ public final class Environment {
     }
 
     public static File getServerConfFile() {
-        return Paths.get(CURRENT_DIR
+        return Paths.get(USER_DIR
                 + File.separator
                 + DIR_ADEPTJ_RUNTIME
                 + File.separator

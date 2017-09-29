@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -33,13 +33,21 @@ import java.util.Map.Entry;
  */
 public class ContextObject implements Mapper, Iterable<Entry<String, Object>> {
 
-    private Map<String, Object> variables = new HashMap<>();
-    
+    private Map<String, Object> variables;
+
+    private ContextObject() {
+        this.variables = new HashMap<>();
+    }
+
     public ContextObject put(String key, Object value) {
         this.variables.put(key, value);
         return this;
     }
-    
+
+    public static ContextObject newContextObject() {
+        return new ContextObject();
+    }
+
     @Override
     public Object get(String key) {
         return this.variables.get(key);

@@ -72,7 +72,7 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngine.defaultEngine().render(TemplateContext.builder()
+            TemplateEngine.getInstance().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .template(LOGIN_TEMPLATE)
@@ -98,12 +98,12 @@ public class AuthServlet extends HttpServlet {
 
     private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngine.defaultEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(LOGIN_TEMPLATE)
                 .locale(req.getLocale())
-                .contextObject(new ContextObject()
+                .contextObject(ContextObject.newContextObject()
                         .put(ERROR_MSG_KEY, ERROR_MSG)
                         .put(J_USERNAME, req.getParameter(J_USERNAME)))
                 .build());

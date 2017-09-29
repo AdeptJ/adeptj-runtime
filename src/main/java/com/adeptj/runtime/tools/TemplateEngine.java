@@ -33,7 +33,7 @@ public interface TemplateEngine {
 	 */
 	void render(TemplateContext context);
 	
-	static TemplateEngine defaultEngine() {
+	static TemplateEngine getInstance() {
 		return DefaultTemplateEngine.INSTANCE;
 	}
 }

@@ -21,9 +21,9 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.logging.LogbackBootstrap;
-import com.adeptj.runtime.osgi.FrameworkBootstrap;
-import com.adeptj.runtime.server.UndertowBootstrap;
+import com.adeptj.runtime.logging.LogbackManager;
+import com.adeptj.runtime.osgi.OSGiManager;
+import com.adeptj.runtime.server.CoreServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.REGEX_EQ;
+import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
+import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
 /**
  * Entry point for launching the AdeptJ Runtime.
@@ -40,9 +42,7 @@ import static com.adeptj.runtime.common.Constants.REGEX_EQ;
  */
 public final class Launcher {
 
-    private static final String JAVA_RT_VERSION = "java.runtime.version";
-
-    private static final String JAVA_RT_NAME = "java.runtime.name";
+    private static final String SYS_PROP_ENABLE_SYSTEM_EXIT = "enable.system.exit";
 
     // Deny direct instantiation.
     private Launcher() {
@@ -53,10 +53,10 @@ public final class Launcher {
      * <p>
      * It does the following tasks in order.
      * <p>
-     * 1. Initializes the LOGBACK logging framework.
+     * 1. Initializes the Logback logging framework.
      * 2. Does the deployment to embedded UNDERTOW.
      * 3. Starts the OSGi Framework.
-     * 4. Starts the UNDERTOW server.
+     * 4. Starts the Undertow server.
      * 5. Registers the runtime ShutdownHook.
      *
      * @param args command line arguments for the Launcher.
@@ -64,21 +64,22 @@ public final class Launcher {
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
-        // First of all initialize LOGBACK.
-        LogbackBootstrap.startLoggerContext();
+        // First of all initialize Logback.
+        LogbackManager.startLogback();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
-            logger.info("JRE: [{}], Version: [{}]",
-                    System.getProperty(JAVA_RT_NAME),
-                    System.getProperty(JAVA_RT_VERSION));
-            UndertowBootstrap.bootstrap(parseCommands(args));
-            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+            logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
+            CoreServer.bootstrap(parseCommands(args));
+            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
-            stopOSGiFramework(logger);
-            logger.error("Shutting down JVM!!", th);
-            // Let the LOGBACK cleans up it's state.
-            LogbackBootstrap.stopLoggerContext();
-            System.exit(-1);
+            logger.error("Exception while initializing AdeptJ Runtime!!", th);
+            if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
+                stopOSGiFramework(logger);
+                logger.error("Shutting down JVM!!", th);
+                // Let the LOGBACK cleans up it's state.
+                LogbackManager.stopLogback();
+                System.exit(-1);
+            }
         }
     }
 
@@ -86,7 +87,7 @@ public final class Launcher {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-            FrameworkBootstrap.INSTANCE.stopFramework();
+            OSGiManager.INSTANCE.stopFramework();
         }
     }
 

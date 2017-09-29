@@ -49,7 +49,7 @@ public class TemplateContext {
         return template;
     }
 
-    public ContextObject getContextObject() {
+    ContextObject getContextObject() {
         return contextObject;
     }
 
@@ -57,7 +57,7 @@ public class TemplateContext {
         return request;
     }
 
-    public HttpServletResponse getResponse() {
+    HttpServletResponse getResponse() {
         return response;
     }
 

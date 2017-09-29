@@ -60,16 +60,16 @@ enum DefaultTemplateEngine implements TemplateEngine {
 
     private static final String RB_HELPER_NAME = "msg";
 
-    private final MustacheEngine engine;
+    private final MustacheEngine mustacheEngine;
 
     DefaultTemplateEngine() {
         long startTime = System.nanoTime();
-        this.engine = this.mustacheEngine();
+        this.mustacheEngine = this.buildMustacheEngine();
         LoggerFactory.getLogger(DefaultTemplateEngine.class).info("MustacheEngine initialized in: [{}] ms!!",
-                Times.elapsedSinceMillis(startTime));
+                Times.elapsedMillis(startTime));
     }
 
-    private MustacheEngine mustacheEngine() {
+    private MustacheEngine buildMustacheEngine() {
         ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
         return MustacheEngineBuilder.newBuilder()
                 .registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
@@ -96,7 +96,7 @@ enum DefaultTemplateEngine implements TemplateEngine {
     @Override
     public void render(TemplateContext context) {
         try {
-            Mustache mustache = this.engine.getMustache(context.getTemplate());
+            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
             if (mustache == null) {
                 // Template not found, send a 404
                 LOGGER.warn("Template not found: [{}]", context.getTemplate());

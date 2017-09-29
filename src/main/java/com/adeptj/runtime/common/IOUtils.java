@@ -19,18 +19,20 @@
 */
 package com.adeptj.runtime.common;
 
+import org.xnio.streams.Streams;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.xnio.streams.Streams;
+import static com.adeptj.runtime.common.Constants.UTF8;
 
 /**
  * Common Utilities
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class IOUtils {
+public final class IOUtils {
 
     /**
      * Deny direct instantiation.
@@ -39,7 +41,7 @@ public class IOUtils {
     }
 
     public static String toString(InputStream input) throws IOException {
-        return toByteArrayOutputStream(input).toString(Constants.UTF8);
+        return toByteArrayOutputStream(input).toString(UTF8);
     }
 
     public static byte[] toBytes(InputStream input) throws IOException {

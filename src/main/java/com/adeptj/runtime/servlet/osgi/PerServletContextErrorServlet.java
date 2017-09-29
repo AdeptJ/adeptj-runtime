@@ -85,22 +85,22 @@ public class PerServletContextErrorServlet extends HttpServlet {
                 .response(resp)
                 .locale(req.getLocale())
                 .contextObject(this.contextObject(req, statusCode));
-        TemplateEngine templateEngine = TemplateEngine.defaultEngine();
         if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            templateEngine.render(builder.template(TEMPLATE_500).build());
+            TemplateEngine.getInstance().render(builder.template(TEMPLATE_500).build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
             // Means it's just error code, no exception set in the request.
-            templateEngine.render(builder.template(TEMPLATE_GENERIC).build());
+            TemplateEngine.getInstance().render(builder.template(TEMPLATE_GENERIC).build());
         } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
-            templateEngine.render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
+            TemplateEngine.getInstance()
+                    .render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
         } else {
             // if the requested view not found, render 404.
-            templateEngine.render(builder.template(TEMPLATE_404).build());
+            TemplateEngine.getInstance().render(builder.template(TEMPLATE_404).build());
         }
     }
 
     private ContextObject contextObject(HttpServletRequest req, Integer statusCode) {
-        return new ContextObject()
+        return ContextObject.newContextObject()
                 .put(KEY_STATUS_CODE, statusCode)
                 .put(KEY_ERROR_MSG, Requests.attr(req, ERROR_MESSAGE))
                 .put(KEY_REQ_URI, Requests.attr(req, ERROR_REQUEST_URI))

@@ -33,6 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
+import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
+import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_INFO;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_NAME;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VERSION;
 
 /**
  * ToolsServlet renders the admin tools page.
@@ -59,29 +64,20 @@ public class ToolsServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ContextObject ctxObj = new ContextObject();
         Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
-        ctxObj.put("username", req.getRemoteUser())
-                .put("sysProps", System.getProperties().entrySet())
-                .put("totalBundles", bundles.length)
-                .put("bundles", bundles)
-                .put("runtime", System.getProperty("java.runtime.name")
-                        + "(build "
-                        + System.getProperty("java.runtime.version")
-                        + ")")
-                .put("jvm", System.getProperty("java.vm.name")
-                        + "(build "
-                        + System.getProperty("java.vm.version")
-                        + ", "
-                        + System.getProperty("java.vm.info")
-                        + ")")
-                .put("processors", Runtime.getRuntime().availableProcessors());
-        TemplateEngine.defaultEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(TOOLS_TEMPLATE)
                 .locale(req.getLocale())
-                .contextObject(ctxObj)
+                .contextObject(ContextObject.newContextObject()
+                        .put("username", req.getRemoteUser())
+                        .put("sysProps", System.getProperties().entrySet())
+                        .put("totalBundles", bundles.length)
+                        .put("bundles", bundles)
+                        .put("runtime", JAVA_RUNTIME_NAME + "(build " + JAVA_RUNTIME_VERSION + ")")
+                        .put("jvm", JAVA_VM_NAME + "(build " + JAVA_VM_VERSION + ", " + JAVA_VM_INFO + ")")
+                        .put("processors", Runtime.getRuntime().availableProcessors()))
                 .build());
     }
 

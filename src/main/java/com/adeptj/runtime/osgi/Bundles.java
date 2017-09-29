@@ -64,7 +64,7 @@ final class Bundles {
         // 2. Install Bundles
         // 3. Start Bundles
         startBundles(installBundles(collectBundles(rootPath), systemBundleContext, logger), logger);
-        logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     private static void startBundles(List<Bundle> bundles, Logger logger) {

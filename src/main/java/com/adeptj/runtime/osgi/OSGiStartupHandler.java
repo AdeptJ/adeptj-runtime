@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -26,12 +26,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
- * FrameworkStartupHandler is a {@link com.adeptj.runtime.core.StartupAware} that handles the OSGi Framework startup.
+ * OSGiStartupHandler is a {@link com.adeptj.runtime.core.StartupAware} that initiates the startup of the OSGi Framework.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 @StartupOrder(0)
-public class FrameworkStartupHandler implements StartupAware {
+public class OSGiStartupHandler implements StartupAware {
 
     /**
      * This method will be called by the ServletContainerInitializer while startup is in progress.
@@ -41,6 +41,6 @@ public class FrameworkStartupHandler implements StartupAware {
      */
     @Override
     public void onStartup(ServletContext context) throws ServletException {
-        FrameworkBootstrap.INSTANCE.startFramework(context);
+        OSGiManager.INSTANCE.startFramework(context);
     }
 }

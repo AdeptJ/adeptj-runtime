@@ -107,7 +107,7 @@ public enum HttpSessionEvents {
     private static void logSessionDestroyed(HttpSessionEvent event) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(),
-                    Times.elapsedSinceSeconds(event.getSession().getCreationTime()));
+                    Times.elapsedSeconds(event.getSession().getCreationTime()));
         }
     }
 

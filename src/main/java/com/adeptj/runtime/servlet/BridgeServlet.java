@@ -69,7 +69,7 @@ public class BridgeServlet extends HttpServlet {
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
         ServletConfigs.INSTANCE.add(BridgeServlet.class, this.getServletConfig());
         DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
-        LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     /**
@@ -103,7 +103,7 @@ public class BridgeServlet extends HttpServlet {
     @Override
     public void destroy() {
         LOGGER.info("Destroying BridgeServlet!!");
-        // closeDispatcherServletTracker in FrameworkShutdownHandler
+        // closeDispatcherServletTracker in OSGiShutdownHandler
         // See - https://github.com/AdeptJ/adeptj-runtime/issues/4
     }
 }

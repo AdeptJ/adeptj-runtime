@@ -34,11 +34,11 @@ import javax.servlet.annotation.WebListener;
  * @author Rakesh.Kumar, AdeptJ
  */
 @WebListener("Stops the OSGi Framework when ServletContext is destroyed")
-public class FrameworkShutdownHandler implements ServletContextListener {
+public class OSGiShutdownHandler implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        // Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
+        // Nothing to do here as OSGi Framework is initialized in OSGiStartupHandler.
         // Can't do the Framework initialization here because we register EventListener(s) and HttpServlet(s)
         // using the ServletContext passed which results in java.lang.UnsupportedOperationException
         // UT010042: This method cannot be called from a ServletContextListener that has been added programmatically.
@@ -47,7 +47,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
+        Logger logger = LoggerFactory.getLogger(OSGiShutdownHandler.class);
         logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
         logger.info("Closing EventDispatcherTracker!!");
         EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
@@ -57,9 +57,9 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         // is changed which results in a NPE.
         logger.info("Closing DispatcherServletTracker!!");
         DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
-        FrameworkBootstrap.INSTANCE.stopFramework();
+        OSGiManager.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);
-        logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedSinceMillis(startTime));
+        logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
 }
