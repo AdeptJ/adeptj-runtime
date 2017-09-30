@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.11.Final</version>
+        <version>1.0.12-SNAPSHOT</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.12-SNAPSHOT</version>
@@ -420,7 +420,7 @@
         <dependency>
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
-            <version>2.2.1.Final</version>
+            <version>2.3.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
