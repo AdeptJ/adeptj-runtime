@@ -46,11 +46,11 @@ import java.util.ServiceLoader;
 import static java.lang.System.getProperty;
 
 /**
- * OSGiManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
+ * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum OSGiManager {
+public enum FrameworkManager {
 
     INSTANCE;
 
@@ -72,10 +72,10 @@ public enum OSGiManager {
 
     private Framework framework;
 
-    private OSGiRestartHandler frameworkListener;
+    private FrameworkRestartHandler frameworkListener;
 
     public void startFramework(ServletContext context) {
-        Logger logger = LoggerFactory.getLogger(OSGiManager.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
@@ -88,7 +88,7 @@ public enum OSGiManager {
             this.framework.start();
             logger.info("Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
             BundleContext systemBundleContext = this.framework.getBundleContext();
-            this.frameworkListener = new OSGiRestartHandler();
+            this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             if (configDirExists && !Boolean.getBoolean("provision.bundles.explicitly")) {
@@ -112,7 +112,7 @@ public enum OSGiManager {
     }
 
     public void stopFramework() {
-        Logger logger = LoggerFactory.getLogger(OSGiManager.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
         try {
             if (this.framework != null) {
                 this.removeFrameworkListener();
@@ -180,7 +180,7 @@ public enum OSGiManager {
     private Map<String, String> loadFrameworkProperties() throws IOException {
         Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
-        try (InputStream is = OSGiManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
+        try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
             props.load(is);
             props.forEach((key, val) -> configs.put((String) key, (String) val));
         }

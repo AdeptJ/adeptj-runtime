@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.AsyncAppender;

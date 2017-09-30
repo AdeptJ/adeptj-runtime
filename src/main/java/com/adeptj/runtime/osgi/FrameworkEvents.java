@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,9 +17,10 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
-import javax.annotation.Nonnull;
+import java.util.Arrays;
 
 /**
  * OSGi Framework event code to string mapping.
@@ -38,7 +39,9 @@ public enum FrameworkEvents {
 
     STOPPED_UPDATE(128),
 
-    WAIT_TIMEDOUT(512);
+    WAIT_TIMEDOUT(512),
+
+    UNKNOWN(-1);
 
     private int code;
 
@@ -50,15 +53,11 @@ public enum FrameworkEvents {
         return code;
     }
 
-    @Nonnull
     public static String asString(int code) {
-        String event = "UNKNOWN";
-        for (FrameworkEvents events : values()) {
-            if (code == events.getCode()) {
-                event = events.toString();
-                break;
-            }
-        }
-        return event;
+        return Arrays.stream(values())
+                .filter(fe -> code == fe.getCode())
+                .findFirst()
+                .orElse(UNKNOWN)
+                .toString();
     }
 }

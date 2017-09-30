@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.server;
 
 import java.io.Serializable;
@@ -29,9 +30,9 @@ import java.security.Principal;
  */
 final class SimplePrincipal implements Principal, Serializable {
 
-	private static final long serialVersionUID = 7723547817002486608L;
-	
-	private String name;
+    private static final long serialVersionUID = 7723547817002486608L;
+
+    private String name;
 
     SimplePrincipal(String name) {
         this.name = name;

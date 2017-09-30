@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.common;
 
 /**
@@ -29,7 +30,7 @@ public final class Constants {
     public static final String BUNDLES_ROOT_DIR_KEY = "BundlesRootDir";
 
     public static final String BUNDLES_ROOT_DIR_VALUE = "/bundles/";
-    
+
     public static final String BUNDLE_CTX_ATTR = "org.osgi.framework.BundleContext";
 
     public static final String PROVISIONING_FILE = "provisioning";
@@ -119,7 +120,7 @@ public final class Constants {
     public static final String PREFIX_ADMIN = "/admin";
 
     public static final String OSGI_ADMIN_ROLE = "OSGiAdmin";
-    
+
     public static final String MODE_DEV = "DEV";
 
     public static final String MODE_PROD = "PROD";

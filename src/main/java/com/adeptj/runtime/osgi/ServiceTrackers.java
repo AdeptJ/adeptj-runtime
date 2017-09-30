@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,10 +17,15 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
+import com.adeptj.runtime.common.BundleContextHolder;
+import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServlet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +39,55 @@ public enum ServiceTrackers {
 
     INSTANCE;
 
+    private volatile boolean dispatcherServletInitialized;
+
+    private DispatcherServletTracker servletTracker;
+
+    private EventDispatcherTracker eventDispatcherTracker;
+
     private Map<String, ServiceTracker<?, ?>> trackers = new HashMap<>();
+
+    public void openDispatcherServletTracker() {
+        if (!this.dispatcherServletInitialized && this.servletTracker == null) {
+            BundleContext bundleContext = BundleContextHolder.INSTANCE.getBundleContext();
+            DispatcherServletTracker tracker = new DispatcherServletTracker(bundleContext);
+            tracker.open();
+            this.servletTracker = tracker;
+            this.dispatcherServletInitialized = true;
+        }
+    }
+
+    public HttpServlet getDispatcherServlet() {
+        return this.servletTracker == null ? null : this.servletTracker.getDispatcherServlet();
+    }
+
+    public void closeDispatcherServletTracker() {
+        this.dispatcherServletInitialized = false;
+        if (this.servletTracker != null && !this.servletTracker.isEmpty()) {
+            this.servletTracker.close();
+        }
+        this.servletTracker = null;
+    }
+
+    protected EventDispatcherTracker getEventDispatcherTracker() {
+        return this.eventDispatcherTracker;
+    }
+
+    protected void openEventDispatcherTracker(BundleContext bundleContext) {
+        if (this.eventDispatcherTracker == null) {
+            LoggerFactory.getLogger(this.getClass()).info("Opening EventDispatcherTracker!!");
+            this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
+            this.eventDispatcherTracker.open();
+        }
+    }
+
+    protected void closeEventDispatcherTracker() {
+        if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
+            this.eventDispatcherTracker.close();
+            LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
+        }
+        this.eventDispatcherTracker = null;
+    }
 
     public void track(Class<? extends ServiceTracker<?, ?>> klazz, ServiceTracker<?, ?> tracker) {
         this.trackers.put(klazz.getName(), tracker);

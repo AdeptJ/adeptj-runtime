@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,12 +17,13 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.common.ServletConfigs;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.osgi.DispatcherServletTrackers;
+import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class BridgeServlet extends HttpServlet {
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
         ServletConfigs.INSTANCE.add(BridgeServlet.class, this.getServletConfig());
-        DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
+        ServiceTrackers.INSTANCE.openDispatcherServletTracker();
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
@@ -79,7 +80,7 @@ public class BridgeServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpServlet dispatcherServlet = DispatcherServletTrackers.INSTANCE.getDispatcherServlet();
+        HttpServlet dispatcherServlet = ServiceTrackers.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
@@ -103,7 +104,7 @@ public class BridgeServlet extends HttpServlet {
     @Override
     public void destroy() {
         LOGGER.info("Destroying BridgeServlet!!");
-        // closeDispatcherServletTracker in OSGiShutdownHandler
+        // closeDispatcherServletTracker in FrameworkShutdownHandler
         // See - https://github.com/AdeptJ/adeptj-runtime/issues/4
     }
 }

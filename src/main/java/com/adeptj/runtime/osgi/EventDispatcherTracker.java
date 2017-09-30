@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
@@ -30,8 +31,6 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 import java.util.EventListener;
-
-import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 
 /**
  * This class is a modified version of FELIX EventDispatcherTracker and rectify the Invalid BundleContext issue.
@@ -65,7 +64,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     @Override
     public EventListener addingService(ServiceReference<EventListener> reference) {
-        LOGGER.info("Adding OSGi Service: [{}]", this.getServiceDesc(reference));
+        LOGGER.info("Adding OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
         EventListener listener = super.addingService(reference);
         this.handleListener(listener);
         return listener;
@@ -73,7 +72,7 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     @Override
     public void removedService(ServiceReference<EventListener> reference, EventListener service) {
-        LOGGER.info("Removing OSGi Service: [{}]", this.getServiceDesc(reference));
+        LOGGER.info("Removing OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
         super.removedService(reference, service);
         // NOTE: See class header why ServiceTracker is closed here.
         // ignore exceptions, anyway Framework is managing it as the EventDispatcher is being removed from service registry.
@@ -90,10 +89,6 @@ public class EventDispatcherTracker extends ServiceTracker<EventListener, EventL
 
     HttpSessionAttributeListener getHttpSessionAttributeListener() {
         return this.sessionAttributeListener;
-    }
-
-    private Object getServiceDesc(ServiceReference<EventListener> reference) {
-        return reference.getProperty(SERVICE_DESCRIPTION);
     }
 
     private void handleListener(EventListener listener) {

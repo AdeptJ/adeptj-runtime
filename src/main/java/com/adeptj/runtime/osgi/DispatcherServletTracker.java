@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
@@ -31,10 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 
-import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
-
 /**
- * OSGi ServiceTracker for FELIX DispatcherServlet.
+ * OSGi ServiceTracker for Felix DispatcherServlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -55,7 +54,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
         HttpServlet httpServlet = null;
         try {
             httpServlet = super.addingService(reference);
-            LOGGER.info("Adding OSGi Service: [{}]", this.getServiceDesc(reference));
+            LOGGER.info("Adding OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
             this.handleDispatcherServlet(httpServlet);
         } catch (Exception ex) { // NOSONAR
             // This might be due to the OSGi framework restart from Felix WebConsole.
@@ -66,8 +65,8 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
-        LOGGER.info("Removing OSGi Service: [{}]", this.getServiceDesc(reference));
-        // Passing null so that DispatcherServlet.core() won't be called again.
+        LOGGER.info("Removing OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
+        // Passing null so that DispatcherServlet.init() won't be called again.
         this.handleDispatcherServlet(null);
         super.removedService(reference, service);
         /*
@@ -87,10 +86,6 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     HttpServlet getDispatcherServlet() {
         return this.dispatcherServlet;
-    }
-
-    private Object getServiceDesc(ServiceReference<HttpServlet> reference) {
-        return reference.getProperty(SERVICE_DESCRIPTION);
     }
 
     private void handleDispatcherServlet(HttpServlet dispatcherServlet) {

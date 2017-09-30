@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,10 +17,11 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.common;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Utility for providing execution time in different {@link java.util.concurrent.TimeUnit}.
@@ -42,7 +43,7 @@ public final class Times {
     public static long elapsedMillis(final long startTime) {
         return NANOSECONDS.toMillis(System.nanoTime() - startTime);
     }
-    
+
     /**
      * Returns elapsed time in seconds from the provided time in milliseconds.
      *

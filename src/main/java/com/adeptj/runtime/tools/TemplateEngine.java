@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.tools;
 
 /**
@@ -26,14 +27,14 @@ package com.adeptj.runtime.tools;
  */
 public interface TemplateEngine {
 
-	/**
-	 * Renders the template contained by the TemplateContext.
-	 * 
-	 * @param context the TemplateEngine context
-	 */
-	void render(TemplateContext context);
-	
-	static TemplateEngine getInstance() {
-		return DefaultTemplateEngine.INSTANCE;
-	}
+    /**
+     * Renders the template contained by the TemplateContext.
+     *
+     * @param context the TemplateEngine context
+     */
+    void render(TemplateContext context);
+
+    static TemplateEngine getInstance() {
+        return DefaultTemplateEngine.INSTANCE;
+    }
 }

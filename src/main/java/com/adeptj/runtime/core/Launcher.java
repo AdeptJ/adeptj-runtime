@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,12 +17,13 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackManager;
-import com.adeptj.runtime.osgi.OSGiManager;
+import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.CoreServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public final class Launcher {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-            OSGiManager.INSTANCE.stopFramework();
+            FrameworkManager.INSTANCE.stopFramework();
         }
     }
 

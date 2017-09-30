@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,11 +17,12 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.exception.InitializationException;
-import com.adeptj.runtime.osgi.OSGiShutdownHandler;
+import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +51,14 @@ public class ContainerInitializer implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) throws ServletException {
         Logger logger = LoggerFactory.getLogger(ContainerInitializer.class);
         if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
-            // We can't go ahead if OSGiStartupHandler is not passed by container.
+            // We can't go ahead if FrameworkStartupHandler is not passed by container.
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
             ServletContextHolder.INSTANCE.setServletContext(context);
             context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
             startupAwareClasses.forEach(startupAwareClass -> {
-            	logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
+                logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
                 try {
                     if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
                         StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance())
@@ -71,8 +72,8 @@ public class ContainerInitializer implements ServletContainerInitializer {
                     throw new InitializationException("StartupAware Exception!!", ex);
                 }
             });
-            // If we are here means startup went well above, register OSGiShutdownHandler now.
-            context.addListener(OSGiShutdownHandler.class);
+            // If we are here means startup went well above, register FrameworkShutdownHandler now.
+            context.addListener(FrameworkShutdownHandler.class);
         }
     }
 

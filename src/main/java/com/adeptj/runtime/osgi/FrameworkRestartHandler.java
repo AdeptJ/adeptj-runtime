@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
@@ -35,7 +36,7 @@ import javax.servlet.ServletContext;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class OSGiRestartHandler implements FrameworkListener {
+public class FrameworkRestartHandler implements FrameworkListener {
 
     /**
      * Handles OSGi Framework restart, does following on System Bundle STARTED event.
@@ -48,7 +49,7 @@ public class OSGiRestartHandler implements FrameworkListener {
      */
     @Override
     public void frameworkEvent(FrameworkEvent event) {
-        Logger logger = LoggerFactory.getLogger(OSGiRestartHandler.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
         switch (event.getType()) {
             case FrameworkEvent.STARTED:
                 logger.info("Handling OSGi Framework Restart!!");
@@ -59,9 +60,9 @@ public class OSGiRestartHandler implements FrameworkListener {
                 break;
             case FrameworkEvent.STOPPED_UPDATE:
                 logger.info("Closing DispatcherServletTracker!!");
-                DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
+                ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
                 logger.info("Closing EventDispatcherTracker!!");
-                EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
+                ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
                 break;
             default:
                 // log it and ignore.
@@ -84,9 +85,9 @@ public class OSGiRestartHandler implements FrameworkListener {
 
     private void handleDispatcherServletTracker(Logger logger) {
         try {
-            DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
+            ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
             logger.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-            DispatcherServletTrackers.INSTANCE.openDispatcherServletTracker();
+            ServiceTrackers.INSTANCE.openDispatcherServletTracker();
         } catch (Exception ex) { // NOSONAR
             // Note: What shall we do if DispatcherServlet initialization failed.
             // Log it as of now, we may need to stop the OSGi Framework, will decide later.

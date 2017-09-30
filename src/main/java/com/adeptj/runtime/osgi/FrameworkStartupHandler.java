@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.StartupOrder;
@@ -26,12 +27,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
- * OSGiStartupHandler is a {@link com.adeptj.runtime.core.StartupAware} that initiates the startup of the OSGi Framework.
+ * FrameworkStartupHandler is a {@link com.adeptj.runtime.core.StartupAware} that initiates the startup
+ * of the OSGi Framework.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 @StartupOrder(0)
-public class OSGiStartupHandler implements StartupAware {
+public class FrameworkStartupHandler implements StartupAware {
 
     /**
      * This method will be called by the ServletContainerInitializer while startup is in progress.
@@ -41,6 +43,6 @@ public class OSGiStartupHandler implements StartupAware {
      */
     @Override
     public void onStartup(ServletContext context) throws ServletException {
-        OSGiManager.INSTANCE.startFramework(context);
+        FrameworkManager.INSTANCE.startFramework(context);
     }
 }

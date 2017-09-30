@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.Times;
@@ -112,7 +113,7 @@ public enum HttpSessionEvents {
     }
 
     private static EventDispatcherTracker tracker() {
-        return EventDispatcherTrackers.INSTANCE.getEventDispatcherTracker();
+        return ServiceTrackers.INSTANCE.getEventDispatcherTracker();
     }
 
     private static Optional<HttpSessionListener> sessionListener() {

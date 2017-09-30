@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,16 +17,19 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.common;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import java.util.Optional;
 
 import static org.osgi.framework.Constants.OBJECTCLASS;
+import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 
 /**
  * Utility for creating OSGi Filter for tracking/finding Services etc.
@@ -81,5 +84,9 @@ public final class OSGiUtils {
 
     public static void unregisterService(ServiceRegistration<?> registration) {
         Optional.ofNullable(registration).ifPresent(ServiceRegistration::unregister);
+    }
+
+    public static String getServiceDesc(ServiceReference<?> reference) {
+        return (String) reference.getProperty(SERVICE_DESCRIPTION);
     }
 }

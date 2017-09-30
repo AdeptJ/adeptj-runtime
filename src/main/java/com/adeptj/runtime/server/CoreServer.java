@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Environment;
@@ -26,7 +27,7 @@ import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackManager;
-import com.adeptj.runtime.osgi.OSGiStartupHandler;
+import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
@@ -414,7 +415,7 @@ public final class CoreServer {
     private static ServletContainerInitializerInfo sciInfo() {
         return new ServletContainerInitializerInfo(ContainerInitializer.class,
                 new ImmediateInstanceFactory<>(new ContainerInitializer()),
-                Collections.singleton(OSGiStartupHandler.class));
+                Collections.singleton(FrameworkStartupHandler.class));
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {

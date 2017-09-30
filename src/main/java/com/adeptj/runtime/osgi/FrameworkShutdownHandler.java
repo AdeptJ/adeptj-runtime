@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
@@ -34,11 +35,11 @@ import javax.servlet.annotation.WebListener;
  * @author Rakesh.Kumar, AdeptJ
  */
 @WebListener("Stops the OSGi Framework when ServletContext is destroyed")
-public class OSGiShutdownHandler implements ServletContextListener {
+public class FrameworkShutdownHandler implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        // Nothing to do here as OSGi Framework is initialized in OSGiStartupHandler.
+        // Nothing to do here as OSGi Framework is initialized in FrameworkStartupHandler.
         // Can't do the Framework initialization here because we register EventListener(s) and HttpServlet(s)
         // using the ServletContext passed which results in java.lang.UnsupportedOperationException
         // UT010042: This method cannot be called from a ServletContextListener that has been added programmatically.
@@ -47,17 +48,17 @@ public class OSGiShutdownHandler implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(OSGiShutdownHandler.class);
+        Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
         logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
         logger.info("Closing EventDispatcherTracker!!");
-        EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
+        ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
         // see - https://github.com/AdeptJ/adeptj-runtime/issues/4
         // Close the DispatcherServletTracker here rather than in BridgeServlet#destroy method.
         // As with version 3.0.18 of Felix Http base the way with HttpSessionListener(s) handled
         // is changed which results in a NPE.
         logger.info("Closing DispatcherServletTracker!!");
-        DispatcherServletTrackers.INSTANCE.closeDispatcherServletTracker();
-        OSGiManager.INSTANCE.stopFramework();
+        ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
+        FrameworkManager.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);
         logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedMillis(startTime));
     }

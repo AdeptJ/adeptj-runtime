@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             # 
-#    Copyright 2016, AdeptJ (http://adeptj.com)                               #
+#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,6 +17,7 @@
 #                                                                             #
 ###############################################################################
 */
+
 package com.adeptj.runtime.osgi;
 
 import org.osgi.framework.BundleContext;
@@ -36,14 +37,14 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
     @Override
     public void attributeAdded(ServletContextAttributeEvent event) {
         if (this.isAttributeBundleContext(event.getName())) {
-            EventDispatcherTrackers.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
+            ServiceTrackers.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
         }
     }
 
     @Override
     public void attributeRemoved(ServletContextAttributeEvent event) {
         if (this.isAttributeBundleContext(event.getName())) {
-            EventDispatcherTrackers.INSTANCE.closeEventDispatcherTracker();
+            ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
         }
     }
 
