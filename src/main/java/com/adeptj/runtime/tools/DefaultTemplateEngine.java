@@ -23,7 +23,9 @@ package com.adeptj.runtime.tools;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.config.ViewEngineConfig;
+import com.adeptj.runtime.servlet.ErrorPageUtil;
 import com.typesafe.config.ConfigBeanFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
@@ -33,9 +35,6 @@ import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.engine.locator.TemplateLocator;
 import org.trimou.handlebars.Helper;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static com.adeptj.runtime.common.Constants.UTF8;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -53,7 +52,7 @@ import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-enum DefaultTemplateEngine implements TemplateEngine {
+public enum DefaultTemplateEngine implements TemplateEngine {
 
     INSTANCE;
 
@@ -66,29 +65,8 @@ enum DefaultTemplateEngine implements TemplateEngine {
     DefaultTemplateEngine() {
         long startTime = System.nanoTime();
         this.mustacheEngine = this.buildMustacheEngine();
-        LoggerFactory.getLogger(DefaultTemplateEngine.class).info("MustacheEngine initialized in: [{}] ms!!",
-                Times.elapsedMillis(startTime));
-    }
-
-    private MustacheEngine buildMustacheEngine() {
-        ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
-        return MustacheEngineBuilder.newBuilder()
-                .registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
-                .addTemplateLocator(this.templateLocator(config))
-                .setProperty(START_DELIMITER, config.getStartDelimiter())
-                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
-                .setProperty(END_DELIMITER, config.getEndDelimiter())
-                .setProperty(TEMPLATE_CACHE_ENABLED, config.isCacheEnabled())
-                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getCacheExpiration()).build();
-    }
-
-    private TemplateLocator templateLocator(ViewEngineConfig config) {
-        return new ClassPathTemplateLocator(config.getTemplateLocatorPriority(), config.getPrefix(),
-                config.getSuffix(), DefaultTemplateEngine.class.getClassLoader(), false);
-    }
-
-    private Helper resourceBundleHelper(ViewEngineConfig config) {
-        return new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE);
+        LoggerFactory.getLogger(DefaultTemplateEngine.class)
+                .info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     /**
@@ -98,12 +76,12 @@ enum DefaultTemplateEngine implements TemplateEngine {
     public void render(TemplateContext context) {
         try {
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            if (mustache == null) {
-                // Template not found, send a 404
-                LOGGER.warn("Template not found: [{}]", context.getTemplate());
-                this.sendError(context.getResponse(), SC_NOT_FOUND);
+            String template = mustache == null ? null : mustache.render(context.getContextObject());
+            if (StringUtils.isEmpty(template)) {
+                LOGGER.error("Template not found: [{}]", context.getTemplate());
+                ErrorPageUtil.sendError(context.getResponse(), SC_NOT_FOUND);
             } else {
-                context.getResponse().getWriter().write(mustache.render(context.getContextObject()));
+                context.getResponse().getWriter().write(template);
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
@@ -113,17 +91,33 @@ enum DefaultTemplateEngine implements TemplateEngine {
 
     private void handleException(TemplateContext context, Exception ex) {
         context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-        this.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
+        ErrorPageUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
     }
 
-    private void sendError(HttpServletResponse resp, int errorCode) {
-        LOGGER.info("Sending error: [{}]", errorCode);
-        try {
-            resp.sendError(errorCode);
-        } catch (IOException ex) {
-            // Now what? may be log and re-throw. Let container handle it.
-            LOGGER.error("Exception while sending error!!", ex);
-            throw new RenderException(ex.getMessage(), ex);
-        }
+    private MustacheEngine buildMustacheEngine() {
+        ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
+        return MustacheEngineBuilder.newBuilder()
+                .registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
+                .addTemplateLocator(this.templateLocator(config))
+                .setProperty(START_DELIMITER, config.getStartDelimiter())
+                .setProperty(END_DELIMITER, config.getEndDelimiter())
+                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
+                .setProperty(TEMPLATE_CACHE_ENABLED, config.isCacheEnabled())
+                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getCacheExpiration())
+                .build();
+    }
+
+    private TemplateLocator templateLocator(ViewEngineConfig config) {
+        return ClassPathTemplateLocator.builder()
+                .setPriority(config.getTemplateLocatorPriority())
+                .setRootPath(config.getPrefix())
+                .setSuffix(config.getSuffix())
+                .setScanClasspath(false)
+                .setClassLoader(DefaultTemplateEngine.class.getClassLoader())
+                .build();
+    }
+
+    private Helper resourceBundleHelper(ViewEngineConfig config) {
+        return new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE);
     }
 }

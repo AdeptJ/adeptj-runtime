@@ -29,15 +29,7 @@ public class RenderException extends RuntimeException {
 
     private static final long serialVersionUID = -8077495079692215520L;
 
-    public RenderException(String message) {
-        super(message);
-    }
-
     public RenderException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public RenderException(Throwable cause) {
-        super(cause);
     }
 }

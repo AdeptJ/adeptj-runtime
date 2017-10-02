@@ -22,6 +22,7 @@ package com.adeptj.runtime.servlet.osgi;
 
 import com.adeptj.runtime.common.Requests;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.servlet.ErrorPageUtil;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngine;
@@ -89,11 +90,9 @@ public class PerServletContextErrorServlet extends HttpServlet {
         if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
             TemplateEngine.getInstance().render(builder.template(TEMPLATE_500).build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            // Means it's just error code, no exception set in the request.
-            TemplateEngine.getInstance().render(builder.template(TEMPLATE_GENERIC).build());
+            ErrorPageUtil.renderGenericErrorPage(req, resp);
         } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
-            TemplateEngine.getInstance()
-                    .render(builder.template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode)).build());
+            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
         } else {
             // if the requested view not found, render 404.
             TemplateEngine.getInstance().render(builder.template(TEMPLATE_404).build());

@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
 
 /**
  * Simple IdentityManager implementation that does the authentication from provisioning file or from
@@ -50,12 +48,9 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     private Map<String, List<String>> userRolesMapping;
 
-    private CredentialMatcher matcher;
-
     @SuppressWarnings("unchecked")
     SimpleIdentityManager(Config cfg) {
         this.userRolesMapping = new HashMap<>(Map.class.cast(cfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
-        this.matcher = new CredentialMatcher();
     }
 
     /**
@@ -65,9 +60,14 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(Account account) {
-        return this.userRolesMapping.entrySet()
+        return this.userRolesMapping
+                .entrySet()
                 .stream()
-                .anyMatch(this.verifyAccountPredicate(account)) ? account : null;
+                .filter(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
+                        && entry.getValue().containsAll(account.getRoles()))
+                .map(entry -> account)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -75,8 +75,13 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        return this.userRolesMapping.entrySet().stream()
-                .filter(this.credentialMatchPredicate(id, credential))
+        PasswordCredential pwdCredential = (PasswordCredential) credential;
+        return this.userRolesMapping
+                .entrySet()
+                .stream()
+                .filter(entry -> StringUtils.equals(entry.getKey(), id)
+                        && ArrayUtils.isNotEmpty(pwdCredential.getPassword())
+                        && CredentialMatcher.match(entry.getKey(), new String(pwdCredential.getPassword())))
                 .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
                 .findFirst()
                 .orElse(null);
@@ -93,16 +98,5 @@ final class SimpleIdentityManager implements IdentityManager {
     @Override
     public Account verify(Credential credential) {
         return null;
-    }
-
-    private Predicate<Entry<String, List<String>>> verifyAccountPredicate(Account account) {
-        return (Entry<String, List<String>> entry) -> entry.getKey()
-                .equals(account.getPrincipal().getName()) && entry.getValue().containsAll(account.getRoles());
-    }
-
-    private Predicate<Entry<String, List<String>>> credentialMatchPredicate(String id, Credential cred) {
-        PasswordCredential credential = (PasswordCredential) cred;
-        return entry -> StringUtils.equals(entry.getKey(), id) && ArrayUtils.isNotEmpty(credential.getPassword())
-                && this.matcher.match(entry.getKey(), new String(credential.getPassword()));
     }
 }

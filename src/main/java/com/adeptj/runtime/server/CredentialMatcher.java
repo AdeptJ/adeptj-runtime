@@ -21,6 +21,8 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.tools.OSGiConsolePasswordVault;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
@@ -28,7 +30,6 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import static com.adeptj.runtime.common.Constants.UTF8;
-import static com.adeptj.runtime.osgi.WebConsolePasswordUpdateAware.getInstance;
 
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
@@ -43,43 +44,49 @@ final class CredentialMatcher {
 
     private static final String SHA256 = "SHA-256";
 
-    boolean match(String id, String pwd) {
-        // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console, make use of
-        // default password maintained in provisioning file.
-        return getInstance().isPasswordSet() ? this.fromOSGiManagerConfig(pwd) : this.fromProvisioningConfig(id, pwd);
+    private static final String CURLY_BRACE_OPEN = "{";
+
+    private static final String CURLY_BRACE_CLOSE = "}";
+
+    private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
+
+    private CredentialMatcher() {
     }
 
-    private boolean fromProvisioningConfig(String id, String pwd) {
-        return Configs.DEFAULT.undertow().getObject("common.user-credential-mapping").unwrapped()
+    static boolean match(String id, String pwd) {
+        // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console,
+        // make use of default password maintained in provisioning file.
+        return OSGiConsolePasswordVault.INSTANCE.isPasswordSet() ?
+                fromOSGiManagerConfig(pwd) :
+                fromServerConfig(id, pwd);
+    }
+
+    private static boolean fromServerConfig(String id, String pwd) {
+        return Configs.DEFAULT
+                .undertow()
+                .getObject(KEY_USER_CREDENTIAL_MAPPING)
+                .unwrapped()
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().equals(id))
-                .anyMatch(entry -> Arrays.equals(this.chars(this.hash(pwd)), this.chars((String) entry.getValue())));
+                .anyMatch(entry -> StringUtils.equals(entry.getKey(), id)
+                        && Arrays.equals(toHash(pwd).toCharArray(), ((String) entry.getValue()).toCharArray()));
     }
 
-    private boolean fromOSGiManagerConfig(String pwd) {
+    private static boolean fromOSGiManagerConfig(String pwd) {
         try {
-            return Arrays.equals(this.chars(this.hash(pwd)), getInstance().getPassword());
+            return Arrays.equals(toHash(pwd).toCharArray(), OSGiConsolePasswordVault.INSTANCE.getPassword());
         } catch (Exception ex) { // NOSONAR
-            // Don't care!!
+            LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
         }
         return false;
     }
 
-    private char[] chars(String pwdHash) {
-        return pwdHash.toCharArray();
-    }
-
-    private String hash(String pwd) {
+    private static String toHash(String pwd) {
         String hashPassword = pwd;
         try {
-            hashPassword = new StringBuilder()
-                    .append('{')
-                    .append(SHA256.toLowerCase())
-                    .append('}')
-                    .append(new String(Base64.getEncoder()
-                            .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), UTF8))
-                    .toString();
+            hashPassword = CURLY_BRACE_OPEN + SHA256.toLowerCase() + CURLY_BRACE_CLOSE +
+                    new String(Base64.getEncoder()
+                            .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), UTF8);
         } catch (Exception ex) { // NOSONAR
             LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
         }
