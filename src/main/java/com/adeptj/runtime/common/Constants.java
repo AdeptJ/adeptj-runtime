@@ -133,6 +133,8 @@ public final class Constants {
 
     public static final String SERVER_CONF_FILE = "server.conf";
 
+    public static final String FRAMEWORK_CONF_FILE = "framework.properties";
+
     // Configuration Keys constants start.
 
     public static final String KEY_BROWSERS = "browsers";

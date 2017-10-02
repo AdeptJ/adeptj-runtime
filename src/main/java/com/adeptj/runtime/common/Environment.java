@@ -25,11 +25,13 @@ import com.adeptj.runtime.config.Configs;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.EMPTY;
+import static com.adeptj.runtime.common.Constants.FRAMEWORK_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.KEY_BROWSERS;
 import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
@@ -99,5 +101,19 @@ public final class Environment {
 
     public static boolean isServerConfFileExists() {
         return getServerConfFile().exists();
+    }
+
+    public static Path getFrameworkConfPath() {
+        return Paths.get(USER_DIR
+                + File.separator
+                + DIR_ADEPTJ_RUNTIME
+                + File.separator
+                + DIR_DEPLOYMENT
+                + File.separator
+                + FRAMEWORK_CONF_FILE);
+    }
+
+    public static boolean isFrameworkConfFileExists() {
+        return getFrameworkConfPath().toFile().exists();
     }
 }

@@ -20,11 +20,13 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.servlet.BridgeServlet;
 import com.adeptj.runtime.servlet.osgi.PerServletContextErrorServlet;
 import com.typesafe.config.Config;
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.launch.Framework;
@@ -36,14 +38,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
-import static java.lang.System.getProperty;
+import static java.util.Optional.ofNullable;
 
 /**
  * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
@@ -166,24 +168,50 @@ public enum FrameworkManager {
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
-        Map<String, String> configs = this.loadFrameworkProperties();
+        Map<String, String> configs = this.loadFrameworkProperties(logger);
         Config felixConf = Configs.DEFAULT.felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
-        Optional.ofNullable(getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
+        ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
         if (logger.isDebugEnabled()) {
             logger.debug("OSGi Framework Configurations: {}", configs);
         }
         return configs;
     }
 
-    private Map<String, String> loadFrameworkProperties() throws IOException {
+    private Map<String, String> loadFrameworkProperties(Logger logger) throws IOException {
         Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
+        if (Environment.isFrameworkConfFileExists()) {
+            try (InputStream is = Files.newInputStream(Environment.getFrameworkConfPath())) {
+                props.load(is);
+                props.forEach((key, val) -> configs.put((String) key, (String) val));
+            } catch (IOException ex) {
+                logger.error("IOException while loading framework.properties from file system!!", ex);
+                // Fallback is try to load the classpath framework.properties
+                this.loadClasspathFrameworkProperties(props, configs, logger);
+            }
+        } else {
+            this.loadClasspathFrameworkProperties(props, configs, logger);
+            this.createFrameworkPropertiesFile(logger);
+        }
+        return configs;
+    }
+
+    private void loadClasspathFrameworkProperties(Properties props, Map<String, String> configs, Logger logger) {
         try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
             props.load(is);
             props.forEach((key, val) -> configs.put((String) key, (String) val));
+        } catch (IOException exception) {
+            logger.error("IOException while loading framework.properties from classpath!!", exception);
         }
-        return configs;
+    }
+
+    private void createFrameworkPropertiesFile(Logger logger) {
+        try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
+            Files.write(Environment.getFrameworkConfPath(), IOUtils.toByteArray(is));
+        } catch (IOException ex) {
+            logger.error("IOException!!", ex);
+        }
     }
 }
