@@ -51,6 +51,8 @@ public final class Constants {
 
     public static final String CONTEXT_PATH = "/";
 
+    public static final String SLASH = "/";
+
     public static final String OSGI_WEBCONSOLE_URI = "/system/console";
 
     public static final String TOOLS_DASHBOARD_URI = "/tools/dashboard";

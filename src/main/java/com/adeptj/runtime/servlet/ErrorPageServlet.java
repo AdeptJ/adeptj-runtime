@@ -20,9 +20,6 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Requests;
-import com.adeptj.runtime.config.Configs;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -48,38 +45,8 @@ public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
-    private static final String STATUS_500 = "500";
-
-    private static final String TEMPLATE_ERROR = "/tools/error";
-
-    private static final String KEY_STATUS_CODES = "common.status-codes";
-
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.handleError(req, resp);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.handleError(req, resp);
-    }
-
-    private void handleError(HttpServletRequest req, HttpServletResponse resp) {
-        String statusCode = this.extractStatusCode(req.getRequestURI());
-        if (TEMPLATE_ERROR.equals(req.getRequestURI())) {
-            ErrorPageUtil.renderGenericErrorPage(req, resp);
-        } else if (STATUS_500.equals(statusCode)) {
-            ErrorPageUtil.render500Page(req, resp);
-        } else if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
-            ErrorPageUtil.render500PageWithExceptionTrace(req, resp);
-        } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
-            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, statusCode);
-        } else {
-            ErrorPageUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
-    private String extractStatusCode(String requestURI) {
-        return requestURI.substring(requestURI.lastIndexOf('/') + 1);
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ErrorPageUtil.renderErrorPage(req, resp);
     }
 }

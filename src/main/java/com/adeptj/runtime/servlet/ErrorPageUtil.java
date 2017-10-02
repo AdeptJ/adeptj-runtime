@@ -21,16 +21,23 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.Requests;
+import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.RenderException;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngine;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.adeptj.runtime.common.Constants.SLASH;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
+import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
+import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * ErrorPageUtil
@@ -42,6 +49,12 @@ public final class ErrorPageUtil {
     private static final String STATUS_500 = "500";
 
     private static final String TEMPLATE_ERROR = "/tools/error";
+
+    private static final String KEY_STATUS_CODE = "statusCode";
+
+    private static final String KEY_ERROR_MSG = "errorMsg";
+
+    private static final String KEY_REQ_URI = "reqURI";
 
     private static final String KEY_EXCEPTION = "exception";
 
@@ -56,7 +69,52 @@ public final class ErrorPageUtil {
     private ErrorPageUtil() {
     }
 
-    public static void renderGenericErrorPage(HttpServletRequest req, HttpServletResponse resp) {
+    public static void sendError(HttpServletResponse resp, int errorCode) {
+        try {
+            resp.sendError(errorCode);
+        } catch (IOException ex) {
+            // Now what? may be re-throw. Let the container handle it.
+            throw new RenderException(ex.getMessage(), ex);
+        }
+    }
+
+    public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
+        Integer statusCode = (Integer) Requests.attr(req, ERROR_STATUS_CODE);
+        if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
+            TemplateEngine.getInstance().render(TemplateContext.builder()
+                    .request(req)
+                    .response(resp)
+                    .locale(req.getLocale())
+                    .contextObject(ContextObject.newContextObject()
+                            .put(KEY_STATUS_CODE, statusCode)
+                            .put(KEY_ERROR_MSG, Requests.attr(req, ERROR_MESSAGE))
+                            .put(KEY_REQ_URI, Requests.attr(req, ERROR_REQUEST_URI))
+                            .put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)))
+                    .template(TEMPLATE_500)
+                    .build());
+        } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
+            ErrorPageUtil.render500Page(req, resp);
+        } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
+            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
+        }
+    }
+
+    static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
+        String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), SLASH);
+        if (TEMPLATE_ERROR.equals(req.getRequestURI())) {
+            ErrorPageUtil.renderGenericErrorPage(req, resp);
+        } else if (STATUS_500.equals(statusCode)) {
+            ErrorPageUtil.render500Page(req, resp);
+        } else if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
+            ErrorPageUtil.render500PageWithExceptionTrace(req, resp);
+        } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
+            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, statusCode);
+        } else {
+            ErrorPageUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private static void renderGenericErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
@@ -65,7 +123,7 @@ public final class ErrorPageUtil {
                 .build());
     }
 
-    public static void renderErrorPageForStatusCode(HttpServletRequest req, HttpServletResponse resp, String statusCode) {
+    private static void renderErrorPageForStatusCode(HttpServletRequest req, HttpServletResponse resp, String statusCode) {
         TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
@@ -74,7 +132,7 @@ public final class ErrorPageUtil {
                 .build());
     }
 
-    public static void render500Page(HttpServletRequest req, HttpServletResponse resp) {
+    private static void render500Page(HttpServletRequest req, HttpServletResponse resp) {
         TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
@@ -83,7 +141,7 @@ public final class ErrorPageUtil {
                 .build());
     }
 
-    public static void render500PageWithExceptionTrace(HttpServletRequest req, HttpServletResponse resp) {
+    private static void render500PageWithExceptionTrace(HttpServletRequest req, HttpServletResponse resp) {
         TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
@@ -93,14 +151,4 @@ public final class ErrorPageUtil {
                         .put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)))
                 .build());
     }
-
-    public static void sendError(HttpServletResponse resp, int errorCode) {
-        try {
-            resp.sendError(errorCode);
-        } catch (IOException ex) {
-            // Now what? may be log and re-throw. Let container handle it.
-            throw new RenderException(ex.getMessage(), ex);
-        }
-    }
-
 }

@@ -42,6 +42,8 @@
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
         <jansi.version>1.16</jansi.version>
+        <hikaricp.version>2.7.1</hikaricp.version>
+        <jjwt.version>0.8.0</jjwt.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.8</felix.framework.version>
