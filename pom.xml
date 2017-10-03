@@ -414,7 +414,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-tools</artifactId>
-            <version>1.0.2.Final</version>
+            <version>1.0.3.Final</version>
         </dependency>
 
         <!-- RenderEngine Dependencies -->
@@ -690,6 +690,13 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-utils</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-logging</artifactId>
             <version>1.0.0.Final</version>
             <scope>provided</scope>
         </dependency>

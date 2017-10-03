@@ -26,7 +26,7 @@ import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.exception.InitializationException;
-import com.adeptj.runtime.logging.LogbackManager;
+import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
@@ -350,7 +350,7 @@ public final class CoreServer {
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            LogbackManager.stopLogback();
+            LogbackInitializer.stopLogback();
             System.exit(-1); // NOSONAR
         }
         return port;
