@@ -132,9 +132,7 @@ public class LogbackInitializer {
         // AsyncAppender
         addAsyncAppender(config, fileAppender);
         context.start();
-        LogbackManager.INSTANCE
-                .addAppender(consoleAppender)
-                .addAppender(fileAppender);
+        LogbackManager.INSTANCE.getAppenders().addAll(appenderList);
         context.getLogger(LogbackInitializer.class).info(INIT_MSG, elapsedMillis(startTime));
     }
 
@@ -157,7 +155,7 @@ public class LogbackInitializer {
                     Map<String, Object> configs = (Map<String, Object>) logCfgMap;
                     appenderList.forEach(appender ->
                             LogbackManager.INSTANCE.addLogger(LogbackConfig.builder()
-                                    .loggers((String) configs.get(KEY_LOG_NAME))
+                                    .logger((String) configs.get(KEY_LOG_NAME))
                                     .level((String) configs.get(KEY_LOG_LEVEL))
                                     .additivity((Boolean) configs.get(KEY_LOG_ADDITIVITY))
                                     .appender(appender)
@@ -171,7 +169,7 @@ public class LogbackInitializer {
                     .asyncAppenderName(APPENDER_ASYNC)
                     .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
                     .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
-                    .appender(fileAppender)
+                    .asyncAppender(fileAppender)
                     .build());
         }
     }
