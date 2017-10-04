@@ -26,7 +26,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.tools.logging.LogbackConfig;
 import com.adeptj.runtime.tools.logging.LogbackManager;
@@ -38,6 +37,8 @@ import java.util.Map;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.common.Times.elapsedMillis;
+import static com.adeptj.runtime.tools.logging.LogbackManager.APPENDER_CONSOLE;
+import static com.adeptj.runtime.tools.logging.LogbackManager.APPENDER_FILE;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
@@ -51,7 +52,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LogbackInitializer {
+public final class LogbackInitializer {
 
     private static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
 
@@ -75,10 +76,6 @@ public class LogbackInitializer {
 
     private static final String KEY_LOG_ADDITIVITY = "additivity";
 
-    private static final String APPENDER_CONSOLE = "CONSOLE";
-
-    private static final String APPENDER_FILE = "FILE";
-
     private static final String APPENDER_ASYNC = "ASYNC";
 
     private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
@@ -98,41 +95,20 @@ public class LogbackInitializer {
     public static void startLogback() {
         long startTime = System.nanoTime();
         Config config = Configs.DEFAULT.logging();
-        LoggerContext context = LogbackManager.INSTANCE.getLoggerContext();
-        // File Appender
-        RollingFileAppender<ILoggingEvent> fileAppender = LogbackManager.INSTANCE
-                .getFileAppender(LogbackConfig.builder()
-                        .appenderName(APPENDER_FILE)
-                        .logFile(config.getString(KEY_SERVER_LOG_FILE))
-                        .pattern(config.getString(KEY_LOG_PATTERN_FILE))
-                        .immediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH))
-                        .build());
-        // Triggering & Rolling Policy
-        SizeAndTimeBasedRollingPolicy<ILoggingEvent> trigAndRollPolicy = LogbackManager.INSTANCE
-                .getRollingPolicy(LogbackConfig.builder()
-                        .logMaxSize(config.getString(KEY_LOG_MAX_SIZE))
-                        .rolloverFile(config.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
-                        .logMaxHistory(config.getInt(KEY_LOG_MAX_HISTORY))
-                        .build());
-        trigAndRollPolicy.setParent(fileAppender);
-        trigAndRollPolicy.start();
-        // Set Rolling and Triggering Policy to RollingFileAppender
-        fileAppender.setRollingPolicy(trigAndRollPolicy);
-        fileAppender.setTriggeringPolicy(trigAndRollPolicy);
-        fileAppender.start();
-        // Console Appender
-        ConsoleAppender<ILoggingEvent> consoleAppender = LogbackManager.INSTANCE
-                .getConsoleAppender(APPENDER_CONSOLE, config.getString(KEY_LOG_PATTERN_CONSOLE));
+        LogbackConfig logbackConfig = getLogbackConfig(config);
+        LogbackManager logbackMgr = LogbackManager.INSTANCE;
+        RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.createRollingFileAppender(logbackConfig);
+        ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr
+                .createConsoleAppender(APPENDER_CONSOLE, config.getString(KEY_LOG_PATTERN_CONSOLE));
         List<Appender<ILoggingEvent>> appenderList = new ArrayList<>();
         appenderList.add(consoleAppender);
         appenderList.add(fileAppender);
-        // initialize all the required loggers.
-        rootLogger(context, consoleAppender, config);
-        addAllLoggers(config, appenderList);
-        // AsyncAppender
+        logbackMgr.getAppenders().addAll(appenderList);
+        LoggerContext context = logbackMgr.getLoggerContext();
+        initRootLogger(context, consoleAppender, config);
+        addLoggers(config, appenderList);
         addAsyncAppender(config, fileAppender);
         context.start();
-        LogbackManager.INSTANCE.getAppenders().addAll(appenderList);
         context.getLogger(LogbackInitializer.class).info(INIT_MSG, elapsedMillis(startTime));
     }
 
@@ -140,15 +116,26 @@ public class LogbackInitializer {
         LogbackManager.INSTANCE.getLoggerContext().stop();
     }
 
-    private static void rootLogger(LoggerContext context, ConsoleAppender<ILoggingEvent> appender, Config config) {
-        // initialize ROOT Logger at specified level which just logs to ConsoleAppender.
+    private static LogbackConfig getLogbackConfig(Config config) {
+        return LogbackConfig.builder()
+                .appenderName(APPENDER_FILE)
+                .logFile(config.getString(KEY_SERVER_LOG_FILE))
+                .pattern(config.getString(KEY_LOG_PATTERN_FILE))
+                .immediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH))
+                .logMaxSize(config.getString(KEY_LOG_MAX_SIZE))
+                .rolloverFile(config.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
+                .logMaxHistory(config.getInt(KEY_LOG_MAX_HISTORY))
+                .build();
+    }
+
+    private static void initRootLogger(LoggerContext context, Appender<ILoggingEvent> appender, Config config) {
         Logger root = context.getLogger(ROOT_LOGGER_NAME);
         root.setLevel(toLevel(config.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(appender);
     }
 
     @SuppressWarnings("unchecked")
-    private static void addAllLoggers(Config config, List<Appender<ILoggingEvent>> appenderList) {
+    private static void addLoggers(Config config, List<Appender<ILoggingEvent>> appenderList) {
         config.getObject(KEY_LOGGERS)
                 .unwrapped()
                 .forEach((logCfgName, logCfgMap) -> {
@@ -165,7 +152,7 @@ public class LogbackInitializer {
 
     private static void addAsyncAppender(Config config, RollingFileAppender<ILoggingEvent> fileAppender) {
         if (Boolean.getBoolean(SYS_PROP_LOG_ASYNC)) {
-            LogbackManager.INSTANCE.addAsyncAppender(LogbackConfig.builder()
+            LogbackManager.INSTANCE.createAsyncAppender(LogbackConfig.builder()
                     .asyncAppenderName(APPENDER_ASYNC)
                     .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
                     .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))

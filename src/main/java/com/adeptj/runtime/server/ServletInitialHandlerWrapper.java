@@ -61,6 +61,7 @@ final class ServletInitialHandlerWrapper implements HandlerWrapper {
         return Handlers.predicate(Predicates.and(Predicates.prefix(cfg.getString(RESOURCE_PREFIX)),
                 Predicates.suffixes(cfg.getStringList(RESOURCE_EXTNS).toArray(new String[0]))),
                 Handlers.resource(new ClassPathResourceManager(this.getClass().getClassLoader(),
-                        cfg.getString(RESOURCE_MGR_PREFIX))), servletInitialHandler);
+                        cfg.getString(RESOURCE_MGR_PREFIX))),
+                servletInitialHandler);
     }
 }
