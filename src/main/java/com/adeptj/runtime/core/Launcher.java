@@ -24,15 +24,10 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
-import com.adeptj.runtime.server.CoreServer;
+import com.adeptj.runtime.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -70,7 +65,7 @@ public final class Launcher {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            CoreServer.bootstrap(parseCommands(args));
+            Server.start(args);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
@@ -90,12 +85,6 @@ public final class Launcher {
             logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
             FrameworkManager.INSTANCE.stopFramework();
         }
-    }
-
-    private static Map<String, String> parseCommands(String[] commands) {
-        return Arrays.stream(commands)
-                .map(cmd -> cmd.split(REGEX_EQ))
-                .collect(Collectors.toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
     }
 
 }

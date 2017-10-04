@@ -83,6 +83,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -106,6 +107,7 @@ import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
@@ -116,11 +118,11 @@ import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
- * CoreServer: Provision the Undertow Web Server, bootstrap OSGi framework and much more.
+ * Provisions the Undertow Web Server, start OSGi framework and much more.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class CoreServer {
+public final class Server {
 
     private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
@@ -215,13 +217,14 @@ public final class CoreServer {
     private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
 
     // No instantiation.
-    private CoreServer() {
+    private Server() {
     }
 
-    public static void bootstrap(Map<String, String> arguments) throws ServletException {
+    public static void start(String[] args) throws ServletException {
+        Map<String, String> arguments = parseCommands(args);
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        Logger logger = LoggerFactory.getLogger(CoreServer.class);
+        Logger logger = LoggerFactory.getLogger(Server.class);
         logger.debug("Commands to AdeptJ Runtime: {}", arguments);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
@@ -244,8 +247,14 @@ public final class CoreServer {
         }
     }
 
+    private static Map<String, String> parseCommands(String[] commands) {
+        return Arrays.stream(commands)
+                .map(cmd -> cmd.split(REGEX_EQ))
+                .collect(Collectors.toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
+    }
+
     private static void printBanner(Logger logger) {
-        try (InputStream stream = CoreServer.class.getResourceAsStream(BANNER_TXT)) {
+        try (InputStream stream = Server.class.getResourceAsStream(BANNER_TXT)) {
             logger.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
@@ -265,7 +274,7 @@ public final class CoreServer {
     }
 
     private static void createServerConfFile(Logger logger) {
-        try (InputStream stream = CoreServer.class.getResourceAsStream("/reference.conf")) {
+        try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
             Files.write(Paths.get(USER_DIR
                     + File.separator
                     + DIR_ADEPTJ_RUNTIME
@@ -467,7 +476,7 @@ public final class CoreServer {
                             .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                             .getMap());
         } catch (IOException ex) {
-            LoggerFactory.getLogger(CoreServer.class).error("Can't create XnioWorker!!", ex);
+            LoggerFactory.getLogger(Server.class).error("Can't create XnioWorker!!", ex);
         }
         return worker;
     }
@@ -484,7 +493,7 @@ public final class CoreServer {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
-                .setClassLoader(CoreServer.class.getClassLoader())
+                .setClassLoader(Server.class.getClassLoader())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(sessionTimeout(cfg))
@@ -515,7 +524,7 @@ public final class CoreServer {
     }
 
     private static KeyStore keyStoreDefault(String defaultKeyStore, char[] keyStorePwd, Logger logger) {
-        try (InputStream is = CoreServer.class.getResourceAsStream(defaultKeyStore)) {
+        try (InputStream is = Server.class.getResourceAsStream(defaultKeyStore)) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;

@@ -79,7 +79,6 @@ final class ShutdownHook extends Thread {
 
     private void gracefulShutdown(Logger logger) {
         try {
-            logger.info("Completing remaining requests!!");
             this.shutdownHandler.shutdown();
             if (this.shutdownHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
                 logger.info("Completed remaining requests successfully!!");
