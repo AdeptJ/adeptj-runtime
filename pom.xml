@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.12.Final</version>
+        <version>1.0.13-SNAPSHOT</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.12-SNAPSHOT</version>
@@ -42,8 +42,6 @@
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
         <jansi.version>1.16</jansi.version>
-        <hikaricp.version>2.7.1</hikaricp.version>
-        <jjwt.version>0.8.0</jjwt.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.8</felix.framework.version>
@@ -60,7 +58,7 @@
         <felix.fileinstall.version>3.5.8</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.2</felix.http.sslfilter.version>
 
-        <!-- AdeptJ Modular Web Dependencies Version -->
+        <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.1.Final</adeptj-modules-webconsole-security.version>
     </properties>
@@ -1533,6 +1531,10 @@
                             <groupId>cglib</groupId>
                             <artifactId>cglib-nodep</artifactId>
                         </exclusion>
+                        <exclusion>
+                            <groupId>cglib</groupId>
+                            <artifactId>cglib-nodep</artifactId>
+                        </exclusion>
                     </exclusions>
                 </dependency>
 
@@ -1620,14 +1622,14 @@
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-core</artifactId>
-                    <version>4.1.1</version>
+                    <version>4.2.0</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-apis</artifactId>
-                    <version>4.1.1</version>
+                    <version>4.2.0</version>
                     <scope>provided</scope>
                 </dependency>
 
