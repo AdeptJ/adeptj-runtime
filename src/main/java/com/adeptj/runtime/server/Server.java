@@ -22,10 +22,11 @@ package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
+import com.adeptj.runtime.common.KeyStores;
+import com.adeptj.runtime.common.SslUtil;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
-import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkStartupHandler;
 import com.adeptj.runtime.servlet.AuthServlet;
@@ -61,13 +62,9 @@ import org.xnio.Options;
 import org.xnio.Xnio;
 import org.xnio.XnioWorker;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -76,12 +73,7 @@ import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -114,6 +106,7 @@ import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
+import static java.util.stream.Collectors.toMap;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
@@ -216,16 +209,22 @@ public final class Server {
 
     private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
 
+    private static final int IDX_ZERO = 0;
+
+    private static final int IDX_ONE = 1;
+
     // No instantiation.
     private Server() {
     }
 
     public static void start(String[] args) throws ServletException {
-        Map<String, String> arguments = parseCommands(args);
+        Map<String, String> commands = Arrays.stream(args)
+                .map(cmd -> cmd.split(REGEX_EQ))
+                .collect(toMap(cmdArray -> cmdArray[IDX_ZERO], cmdArray -> cmdArray[IDX_ONE]));
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         Logger logger = LoggerFactory.getLogger(Server.class);
-        logger.debug("Commands to AdeptJ Runtime: {}", arguments);
+        logger.debug("Commands to AdeptJ Runtime: {}", commands);
         int httpPort = handlePortAvailability(httpConf, logger);
         logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         printBanner(logger);
@@ -241,16 +240,10 @@ public final class Server {
         Undertow server = builder.setHandler(rootHandler).build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
-        launchBrowser(arguments, httpPort, logger);
+        launchBrowser(commands, httpPort, logger);
         if (!Environment.isServerConfFileExists()) {
             createServerConfFile(logger);
         }
-    }
-
-    private static Map<String, String> parseCommands(String[] commands) {
-        return Arrays.stream(commands)
-                .map(cmd -> cmd.split(REGEX_EQ))
-                .collect(Collectors.toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
     }
 
     private static void printBanner(Logger logger) {
@@ -318,18 +311,18 @@ public final class Server {
                 String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
                 String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
                 String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
-                KeyStore keyStore = keyStoreFromLocation(keyStoreLoc, keyStorePwd.toCharArray(), logger);
+                KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray());
                 logger.info("KeyStore loaded from location: [{}]", keyStoreLoc);
                 undertowBuilder.addHttpsListener(httpsPort,
                         httpsConf.getString(KEY_HOST),
-                        sslContext(keyStore, keyPwd.toCharArray(), logger));
+                        SslUtil.getSslContext(keyStore, keyPwd.toCharArray()));
             } else {
                 char[] cfgKeyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
-                KeyStore keyStore = keyStoreDefault(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd, logger);
+                KeyStore keyStore = KeyStores.getDefaultKeyStore(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd);
                 logger.info("Default KeyStore loaded!!");
                 undertowBuilder.addHttpsListener(httpsPort,
                         httpsConf.getString(KEY_HOST),
-                        sslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray(), logger));
+                        SslUtil.getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
             }
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
@@ -510,49 +503,5 @@ public final class Server {
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
                 .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg))
                 .setServletSessionConfig(sessionConfig(cfg));
-    }
-
-    private static KeyStore keyStoreFromLocation(String keyStoreLoc, char[] keyStorePwd, Logger logger) {
-        try (InputStream is = new FileInputStream(keyStoreLoc)) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, keyStorePwd);
-            return keyStore;
-        } catch (Exception ex) {
-            logger.error("Exception while loading KeyStore!!", ex);
-            throw new InitializationException(ex.getMessage(), ex);
-        }
-    }
-
-    private static KeyStore keyStoreDefault(String defaultKeyStore, char[] keyStorePwd, Logger logger) {
-        try (InputStream is = Server.class.getResourceAsStream(defaultKeyStore)) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, keyStorePwd);
-            return keyStore;
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
-            logger.error("Exception while loading KeyStore!!", ex);
-            throw new InitializationException(ex.getMessage(), ex);
-        }
-    }
-
-    private static SSLContext sslContext(KeyStore keyStore, char[] keyPwd, Logger logger) {
-        try {
-            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-            sslContext.init(keyManagers(keyStore, keyPwd, logger), null, null);
-            return sslContext;
-        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
-            logger.error("Exception while initializing SSLContext!!", ex);
-            throw new InitializationException("Exception while initializing SSLContext!!", ex);
-        }
-    }
-
-    private static KeyManager[] keyManagers(KeyStore keyStore, char[] keyPwd, Logger logger) {
-        try {
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStore, keyPwd);
-            return kmf.getKeyManagers();
-        } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException ex) {
-            logger.error("Exception while initializing KeyManagers!!", ex);
-            throw new InitializationException("Exception while initializing KeyManagers!!", ex);
-        }
     }
 }
