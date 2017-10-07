@@ -20,8 +20,9 @@
 
 package com.adeptj.runtime.servlet;
 
+import com.adeptj.runtime.common.BridgeServletConfigHolder;
 import com.adeptj.runtime.common.RequestUtil;
-import com.adeptj.runtime.common.ServletConfigs;
+import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
@@ -68,7 +68,7 @@ public class BridgeServlet extends HttpServlet {
         LOGGER.info("Initializing BridgeServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
-        ServletConfigs.INSTANCE.add(BridgeServlet.class, this.getServletConfig());
+        BridgeServletConfigHolder.INSTANCE.setBridgeServletConfig(this.getServletConfig());
         ServiceTrackers.INSTANCE.openDispatcherServletTracker();
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
@@ -79,12 +79,12 @@ public class BridgeServlet extends HttpServlet {
      * @see class header for detailed description.
      */
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         HttpServlet dispatcherServlet = ServiceTrackers.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
-                resp.sendError(SC_SERVICE_UNAVAILABLE);
+                ResponseUtil.sendError(resp, SC_SERVICE_UNAVAILABLE);
             } else {
                 dispatcherServlet.service(req, resp);
                 // Check if [javax.servlet.error.exception] set by [Felix Dispatcher]
@@ -94,7 +94,7 @@ public class BridgeServlet extends HttpServlet {
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);
-            resp.sendError(SC_INTERNAL_SERVER_ERROR);
+            ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
         }
     }
 

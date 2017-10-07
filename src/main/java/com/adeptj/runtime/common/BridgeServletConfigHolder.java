@@ -21,30 +21,23 @@
 package com.adeptj.runtime.common;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Maintains a mapping of {@link ServletConfig} instance against the FQCN of the HttpServlet.
+ * Maintains the BridgeServlet's {@link ServletConfig} instance.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServletConfigs {
+public enum BridgeServletConfigHolder {
 
     INSTANCE;
 
-    private Map<String, ServletConfig> configs = new HashMap<>();
+    private ServletConfig bridgeServletConfig;
 
-    public void add(Class<? extends HttpServlet> cls, ServletConfig config) {
-        this.configs.put(cls.getName(), config);
+    public void setBridgeServletConfig(ServletConfig bridgeServletConfig) {
+        this.bridgeServletConfig = bridgeServletConfig;
     }
 
-    public void remove(Class<? extends HttpServlet> cls) {
-        this.configs.remove(cls.getName());
-    }
-
-    public ServletConfig get(Class<? extends HttpServlet> cls) {
-        return this.configs.get(cls.getName());
+    public ServletConfig getBridgeServletConfig() {
+        return bridgeServletConfig;
     }
 }

@@ -20,10 +20,9 @@
 
 package com.adeptj.runtime.osgi;
 
+import com.adeptj.runtime.common.BridgeServletConfigHolder;
 import com.adeptj.runtime.common.OSGiUtils;
-import com.adeptj.runtime.common.ServletConfigs;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.servlet.BridgeServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -108,7 +107,7 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
             try {
                 LOGGER.info("Initializing Felix DispatcherServlet!!");
                 long startTime = System.nanoTime();
-                this.dispatcherServlet.init(ServletConfigs.INSTANCE.get(BridgeServlet.class));
+                this.dispatcherServlet.init(BridgeServletConfigHolder.INSTANCE.getBridgeServletConfig());
                 LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
