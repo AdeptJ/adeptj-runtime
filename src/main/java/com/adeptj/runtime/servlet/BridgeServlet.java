@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Requests;
+import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ServletConfigs;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.osgi.ServiceTrackers;
@@ -88,8 +88,8 @@ public class BridgeServlet extends HttpServlet {
             } else {
                 dispatcherServlet.service(req, resp);
                 // Check if [javax.servlet.error.exception] set by [Felix Dispatcher]
-                if (Requests.hasException(req)) {
-                    LOGGER.error("Exception set by Felix Dispatcher!!", Requests.attr(req, ERROR_EXCEPTION));
+                if (RequestUtil.hasException(req)) {
+                    LOGGER.error("Exception set by Felix Dispatcher!!", RequestUtil.getAttribute(req, ERROR_EXCEPTION));
                 }
             }
         } catch (Exception ex) { // NOSONAR

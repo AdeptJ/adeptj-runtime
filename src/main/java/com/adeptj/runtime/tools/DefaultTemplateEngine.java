@@ -20,10 +20,10 @@
 
 package com.adeptj.runtime.tools;
 
+import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.config.ViewEngineConfig;
-import com.adeptj.runtime.servlet.ErrorPageUtil;
 import com.typesafe.config.ConfigBeanFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public enum DefaultTemplateEngine implements TemplateEngine {
             String template = mustache == null ? null : mustache.render(context.getContextObject());
             if (StringUtils.isEmpty(template)) {
                 LOGGER.error("Template not found: [{}]", context.getTemplate());
-                ErrorPageUtil.sendError(context.getResponse(), SC_NOT_FOUND);
+                ResponseUtil.sendError(context.getResponse(), SC_NOT_FOUND);
             } else {
                 context.getResponse().getWriter().write(template);
             }
@@ -91,7 +91,7 @@ public enum DefaultTemplateEngine implements TemplateEngine {
 
     private void handleException(TemplateContext context, Exception ex) {
         context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-        ErrorPageUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
+        ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
     }
 
     private MustacheEngine buildMustacheEngine() {

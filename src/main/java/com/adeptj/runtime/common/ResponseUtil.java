@@ -20,29 +20,27 @@
 
 package com.adeptj.runtime.common;
 
-import javax.servlet.http.HttpServletRequest;
+import com.adeptj.runtime.exception.SystemException;
 
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
- * Utils for {@link javax.servlet.http.HttpServletRequest}
+ * Utils for {@link HttpServletResponse}
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class Requests {
+public final class ResponseUtil {
 
-    private Requests() {
+    private ResponseUtil() {
     }
 
-    public static Object attr(HttpServletRequest req, String name) {
-        return req.getAttribute(name);
-    }
-
-    public static boolean hasAttribute(HttpServletRequest req, String name) {
-        return req.getAttribute(name) != null;
-    }
-
-    public static boolean hasException(HttpServletRequest req) {
-        return req.getAttribute(ERROR_EXCEPTION) != null;
+    public static void sendError(HttpServletResponse resp, int errorCode) {
+        try {
+            resp.sendError(errorCode);
+        } catch (IOException ex) {
+            // Now what? may be re-throw. Let the container handle it.
+            throw new SystemException(ex.getMessage(), ex);
+        }
     }
 }

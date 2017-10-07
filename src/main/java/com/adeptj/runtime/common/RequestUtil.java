@@ -18,18 +18,31 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.exception;
+package com.adeptj.runtime.common;
+
+import javax.servlet.http.HttpServletRequest;
+
+import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 
 /**
- * SystemException: Exception thrown by AdeptJ Runtime.
+ * Utils for {@link HttpServletRequest}
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class SystemException extends RuntimeException {
+public final class RequestUtil {
 
-    private static final long serialVersionUID = 2206058386357128479L;
+    private RequestUtil() {
+    }
 
-    public SystemException(String message, Throwable cause) {
-        super(message, cause);
+    public static Object getAttribute(HttpServletRequest req, String name) {
+        return req.getAttribute(name);
+    }
+
+    public static boolean hasAttribute(HttpServletRequest req, String name) {
+        return getAttribute(req, name) != null;
+    }
+
+    public static boolean hasException(HttpServletRequest req) {
+        return req.getAttribute(ERROR_EXCEPTION) != null;
     }
 }

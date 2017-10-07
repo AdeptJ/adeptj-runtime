@@ -20,17 +20,16 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Requests;
+import com.adeptj.runtime.common.RequestUtil;
+import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.tools.ContextObject;
-import com.adeptj.runtime.tools.RenderException;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngine;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static com.adeptj.runtime.common.Constants.SLASH;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -69,27 +68,18 @@ public final class ErrorPageUtil {
     private ErrorPageUtil() {
     }
 
-    public static void sendError(HttpServletResponse resp, int errorCode) {
-        try {
-            resp.sendError(errorCode);
-        } catch (IOException ex) {
-            // Now what? may be re-throw. Let the container handle it.
-            throw new RenderException(ex.getMessage(), ex);
-        }
-    }
-
     public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
-        Integer statusCode = (Integer) Requests.attr(req, ERROR_STATUS_CODE);
-        if (Requests.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
+        Integer statusCode = (Integer) RequestUtil.getAttribute(req, ERROR_STATUS_CODE);
+        if (RequestUtil.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
             TemplateEngine.getInstance().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .locale(req.getLocale())
                     .contextObject(ContextObject.newContextObject()
                             .put(KEY_STATUS_CODE, statusCode)
-                            .put(KEY_ERROR_MSG, Requests.attr(req, ERROR_MESSAGE))
-                            .put(KEY_REQ_URI, Requests.attr(req, ERROR_REQUEST_URI))
-                            .put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)))
+                            .put(KEY_ERROR_MSG, RequestUtil.getAttribute(req, ERROR_MESSAGE))
+                            .put(KEY_REQ_URI, RequestUtil.getAttribute(req, ERROR_REQUEST_URI))
+                            .put(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
                     .template(TEMPLATE_500)
                     .build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
@@ -105,12 +95,12 @@ public final class ErrorPageUtil {
             ErrorPageUtil.renderGenericErrorPage(req, resp);
         } else if (STATUS_500.equals(statusCode)) {
             ErrorPageUtil.render500Page(req, resp);
-        } else if (Requests.hasException(req) && STATUS_500.equals(statusCode)) {
+        } else if (RequestUtil.hasException(req) && STATUS_500.equals(statusCode)) {
             ErrorPageUtil.render500PageWithExceptionTrace(req, resp);
         } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
             ErrorPageUtil.renderErrorPageForStatusCode(req, resp, statusCode);
         } else {
-            ErrorPageUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
+            ResponseUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -148,7 +138,7 @@ public final class ErrorPageUtil {
                 .locale(req.getLocale())
                 .template(TEMPLATE_500)
                 .contextObject(ContextObject.newContextObject()
-                        .put(KEY_EXCEPTION, Requests.attr(req, ERROR_EXCEPTION)))
+                        .put(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
                 .build());
     }
 }
