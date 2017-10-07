@@ -32,6 +32,8 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
+import static com.adeptj.runtime.common.Constants.UTF8;
+
 /**
  * Passwords, utility for password generation and matching.
  *
@@ -42,43 +44,40 @@ public enum Passwords {
     INSTANCE;
 
     /**
-     * Generates the salt for hashing.
+     * Generates the random salt for hashing using SHA1PRNG.
      *
      * @return UTF-8 Base64 encoded hash.
      */
     public String generateSalt() {
-        String salt = null;
         Config config = Configs.DEFAULT.common();
         byte[] saltBytes = new byte[config.getInt("salt-size")];
         try {
-            SecureRandom.getInstance(config.getString("secure-random-algo")).nextBytes(saltBytes);
-            salt = new String(Base64.getEncoder().encode(saltBytes), Constants.UTF8);
+            SecureRandom.getInstance(config.getString("secure-random-algo"))
+                    .nextBytes(saltBytes);
+            return new String(Base64.getEncoder().encode(saltBytes), UTF8);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
             throw new SystemException(ex.getMessage(), ex);
         }
-        return salt;
     }
 
     /**
-     * Generates UTF-8 Base64 encoded hashed password
+     * Generates UTF-8 Base64 encoded hashed password using PBKDF2WithHmacSHA256.
      *
      * @param pwd  the password to hash
      * @param salt the additive for more secure hashing
      * @return Hashed password
      */
-    public String hashPwd(String pwd, String salt) {
-        String hashedStr = null;
+    public String getHashedPassword(String pwd, String salt) {
         try {
             Config config = Configs.DEFAULT.common();
-            hashedStr = new String(
-                    Base64.getEncoder()
-                            .encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
-                                    .generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(Constants.UTF8),
-                                            config.getInt("iteration-count"), config.getInt("derived-key-size")))
-                                    .getEncoded()), Constants.UTF8);
+            return new String(Base64.getEncoder()
+                    .encode(SecretKeyFactory.getInstance(config.getString("secret-key-algo"))
+                            .generateSecret(new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8),
+                                    config.getInt("iteration-count"),
+                                    config.getInt("derived-key-size")))
+                            .getEncoded()), UTF8);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeySpecException ex) {
             throw new SystemException(ex.getMessage(), ex);
         }
-        return hashedStr;
     }
 }
