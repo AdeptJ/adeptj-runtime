@@ -41,7 +41,7 @@ public class BundleContextHolderTest {
 	
 	@Test
 	public void testIsBundleContextSetWhenSetBundleContextNotCalled() {
-		//Assert.assertFalse(BundleContextHolder.INSTANCE.isBundleContextSet());
+		Assert.assertFalse(BundleContextHolder.INSTANCE.isBundleContextAvailable());
 		Mockito.eq(BundleContextHolder.INSTANCE.isBundleContextAvailable());
 	}
 }

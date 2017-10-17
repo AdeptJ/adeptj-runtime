@@ -27,7 +27,7 @@
         <version>1.0.13.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>1.0.12.Final</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
@@ -42,6 +42,7 @@
         <maven-shade-plugin.version>3.0.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.1</maven-dependency-plugin.version>
         <jansi.version>1.16</jansi.version>
+        <hikaricp.version>2.7.2</hikaricp.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.8</felix.framework.version>
@@ -1001,7 +1002,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.6.Final</version>
+                    <version>1.0.7.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1375,7 +1376,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-commons-datasource</artifactId>
-                    <version>1.0.2.Final</version>
+                    <version>1.0.3.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1448,7 +1449,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.0.3.Final</version>
+                    <version>1.0.4.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
