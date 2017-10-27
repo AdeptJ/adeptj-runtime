@@ -1465,7 +1465,7 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-core</artifactId>
-                    <version>5.2.11.Final</version>
+                    <version>5.2.12.Final</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
