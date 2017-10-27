@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-cd target
-java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
+cd ../target
+java --add-modules java.xml.bind \
+ -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
