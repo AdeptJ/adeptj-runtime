@@ -36,26 +36,26 @@
 
     <properties>
         <!-- Common Dependencies -->
-        <undertow.version>1.4.20.Final</undertow.version>
-        <undertow.websockets.version>1.4.20.Final</undertow.websockets.version>
+        <undertow.version>1.4.21.Final</undertow.version>
+        <undertow.websockets.version>1.4.21.Final</undertow.websockets.version>
         <xnio.version>3.5.4.Final</xnio.version>
         <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <jansi.version>1.16</jansi.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
-        <felix.framework.version>5.6.8</felix.framework.version>
+        <felix.framework.version>5.6.10</felix.framework.version>
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
-        <felix.webconsole.plugins.event.version>1.1.6</felix.webconsole.plugins.event.version>
-        <felix.webconsole.plugins.ds.version>2.0.6</felix.webconsole.plugins.ds.version>
+        <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
+        <felix.webconsole.plugins.ds.version>2.0.8</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.6</felix.webconsole.plugins.memoryusage.version>
         <felix.inventory.version>1.0.4</felix.inventory.version>
         <felix.http.bridge.version>3.0.18</felix.http.bridge.version>
         <felix.http.base.version>3.0.18</felix.http.base.version>
         <felix.log.version>1.0.1</felix.log.version>
-        <felix.metatype.version>1.1.2</felix.metatype.version>
+        <felix.metatype.version>1.1.6</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
-        <felix.fileinstall.version>3.5.8</felix.fileinstall.version>
+        <felix.fileinstall.version>3.6.2</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.2</felix.http.sslfilter.version>
 
         <!-- AdeptJ Modules Dependencies -->
