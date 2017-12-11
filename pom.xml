@@ -1541,6 +1541,7 @@
                             <artifactId>cglib-nodep</artifactId>
                         </exclusion>
                     </exclusions>
+                    <scope>provided</scope>
                 </dependency>
 
                 <dependency>
