@@ -56,7 +56,8 @@
         <felix.metatype.version>1.1.6</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.2</felix.fileinstall.version>
-        <felix.http.sslfilter.version>1.2.2</felix.http.sslfilter.version>
+        <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
+        <felix.scr.version>2.0.14</felix.scr.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
