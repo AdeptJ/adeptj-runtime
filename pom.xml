@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.14.Final</version>
+        <version>1.0.15-SNAPSHOT</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.13-SNAPSHOT</version>
@@ -57,7 +57,6 @@
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.2</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
-        <felix.scr.version>2.0.14</felix.scr.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
@@ -849,7 +848,7 @@
                 <dependency>
                     <groupId>org.hibernate.validator</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>6.0.5.Final</version>
+                    <version>6.0.7.Final</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -1390,7 +1389,7 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.0 (JPA 2.2) Dependencies -->
+                <!-- EclipseLink 2.7.1 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>

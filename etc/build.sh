@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 cd ..
-mvn clean package -P Apache-HttpClient,RESTEasy,MySQL,JDBC-CP-Hikari,JPA-EclipseLink,AWS,iText,MongoDB,Thymeleaf,OAuth2,Shiro
+mvn clean package -P Apache-HttpClient,RESTEasy,MySQL,JDBC-CP-Hikari,JPA-EclipseLink,AWS
