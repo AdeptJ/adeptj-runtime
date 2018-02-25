@@ -43,22 +43,17 @@ class ServerLogsTailerListener extends TailerListenerAdapter {
     }
 
     @Override
-    public void fileRotated() {
-        // ignore, just keep tailing
-    }
-
-    @Override
     public void handle(String line) {
         this.session.getAsyncRemote().sendText(line);
     }
 
     @Override
-    public void fileNotFound() {
-        this.session.getAsyncRemote().sendText(new FileNotFoundException(this.logFile.toString()).toString());
+    public void handle(Exception ex) {
+        this.session.getAsyncRemote().sendText(ex.toString());
     }
 
     @Override
-    public void handle(Exception ex) {
-        this.session.getAsyncRemote().sendText(ex.toString());
+    public void fileNotFound() {
+        this.session.getAsyncRemote().sendText(new FileNotFoundException(this.logFile.toString()).toString());
     }
 }

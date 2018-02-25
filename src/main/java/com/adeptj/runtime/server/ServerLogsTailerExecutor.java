@@ -29,21 +29,17 @@ import java.util.concurrent.Executors;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-enum ServerLogsExecutor {
+enum ServerLogsTailerExecutor {
 
     INSTANCE;
 
-    private ExecutorService executorService;
+    private volatile ExecutorService executorService;
 
     void execute(Runnable command) {
-        this.initExecutorService();
-        this.executorService.execute(command);
-    }
-
-    private void initExecutorService() {
         if (this.executorService == null) {
             this.executorService = Executors.newCachedThreadPool();
         }
+        this.executorService.execute(command);
     }
 
     void shutdownExecutorService() {

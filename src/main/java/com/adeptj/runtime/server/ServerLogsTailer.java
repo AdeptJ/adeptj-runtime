@@ -34,20 +34,11 @@ class ServerLogsTailer {
 
     private static final int DELAY_MILLIS = 1000;
 
-    private final File logFile;
-
-    private final Session session;
-
     private Tailer tailer;
 
-    ServerLogsTailer(File file, Session session) {
-        this.logFile = file;
-        this.session = session;
-    }
-
-    void startTailer() {
-        this.tailer = Tailer.create(this.logFile, new ServerLogsTailerListener(this.logFile, this.session), DELAY_MILLIS, true);
-        ServerLogsExecutor.INSTANCE.execute(this.tailer);
+    void startTailer(File logFile, Session session) {
+        this.tailer = Tailer.create(logFile, new ServerLogsTailerListener(logFile, session), DELAY_MILLIS, true);
+        ServerLogsTailerExecutor.INSTANCE.execute(this.tailer);
     }
 
     void stopTailer() {
