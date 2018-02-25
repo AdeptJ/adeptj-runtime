@@ -29,7 +29,7 @@ import java.util.Locale;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class TemplateContext {
+public final class TemplateContext {
 
     private String template;
 

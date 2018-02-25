@@ -58,13 +58,11 @@ public enum DefaultTemplateEngine implements TemplateEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
 
-    private static final String RB_HELPER_NAME = "msg";
-
     private final MustacheEngine mustacheEngine;
 
     DefaultTemplateEngine() {
         long startTime = System.nanoTime();
-        this.mustacheEngine = this.buildMustacheEngine();
+        this.mustacheEngine = TemplateEngineUtil.buildMustacheEngine();
         LoggerFactory.getLogger(DefaultTemplateEngine.class)
                 .info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
     }
@@ -88,28 +86,5 @@ public enum DefaultTemplateEngine implements TemplateEngine {
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
             ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private MustacheEngine buildMustacheEngine() {
-        ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
-        return MustacheEngineBuilder.newBuilder()
-                .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE))
-                .addTemplateLocator(this.templateLocator(config))
-                .setProperty(START_DELIMITER, config.getStartDelimiter())
-                .setProperty(END_DELIMITER, config.getEndDelimiter())
-                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
-                .setProperty(TEMPLATE_CACHE_ENABLED, config.isCacheEnabled())
-                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getCacheExpiration())
-                .build();
-    }
-
-    private TemplateLocator templateLocator(ViewEngineConfig config) {
-        return ClassPathTemplateLocator.builder()
-                .setPriority(config.getTemplateLocatorPriority())
-                .setRootPath(config.getPrefix())
-                .setSuffix(config.getSuffix())
-                .setScanClasspath(false)
-                .setClassLoader(DefaultTemplateEngine.class.getClassLoader())
-                .build();
     }
 }

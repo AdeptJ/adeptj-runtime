@@ -32,7 +32,7 @@ import java.util.Map.Entry;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class ContextObject implements Mapper, Iterable<Entry<String, Object>> {
+public final class ContextObject implements Mapper, Iterable<Entry<String, Object>> {
 
     private Map<String, Object> variables;
 

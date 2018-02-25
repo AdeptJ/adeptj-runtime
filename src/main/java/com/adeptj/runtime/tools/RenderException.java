@@ -25,7 +25,7 @@ package com.adeptj.runtime.tools;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public class RenderException extends RuntimeException {
+public final class RenderException extends RuntimeException {
 
     private static final long serialVersionUID = -8077495079692215520L;
 
