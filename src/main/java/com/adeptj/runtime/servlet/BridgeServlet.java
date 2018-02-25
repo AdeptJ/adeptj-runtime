@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
@@ -87,10 +86,7 @@ public class BridgeServlet extends HttpServlet {
                 ResponseUtil.sendError(resp, SC_SERVICE_UNAVAILABLE);
             } else {
                 dispatcherServlet.service(req, resp);
-                // Check if [javax.servlet.error.exception] set by [Felix Dispatcher]
-                if (RequestUtil.hasException(req)) {
-                    LOGGER.error("Exception set by Felix Dispatcher!!", RequestUtil.getAttribute(req, ERROR_EXCEPTION));
-                }
+                RequestUtil.logException(req, LOGGER, "Exception set by Felix Dispatcher!!");
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);

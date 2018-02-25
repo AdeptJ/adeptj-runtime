@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.common;
 
+import org.slf4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -44,5 +46,11 @@ public final class RequestUtil {
 
     public static boolean hasException(HttpServletRequest req) {
         return req.getAttribute(ERROR_EXCEPTION) != null;
+    }
+
+    public static void logException(HttpServletRequest req, Logger logger, String message) {
+        if (RequestUtil.hasException(req)) {
+            logger.error(message, req.getAttribute(ERROR_EXCEPTION));
+        }
     }
 }
