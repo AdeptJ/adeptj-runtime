@@ -81,10 +81,6 @@ public enum FrameworkManager {
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
-            // config directory will not yet be created if framework is being provisioned first time.
-            boolean configDirExists = Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR))
-                    .toFile()
-                    .exists();
             this.framework = this.createFramework(logger);
             long startTimeFramework = System.nanoTime();
             this.framework.start();
@@ -93,7 +89,9 @@ public enum FrameworkManager {
             this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            if (configDirExists && !Boolean.getBoolean("provision.bundles.explicitly")) {
+            // config directory will not yet be created if framework is being provisioned first time.
+            if (Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()
+                    && !Boolean.getBoolean("provision.bundles.explicitly")) {
                 logger.info("Bundles already provisioned, this must be a server restart!!");
             } else {
                 logger.info("Provisioning bundles first time!!");

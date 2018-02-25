@@ -20,33 +20,45 @@
 
 package com.adeptj.runtime.server;
 
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.apache.commons.io.input.TailerListenerAdapter;
+
+import javax.websocket.Session;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
- * Provides {@link ExecutorService} with fixed thread pool for tailing server logs.
+ * Simple implementation of a {@link org.apache.commons.io.input.TailerListener}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-enum ServerLogsExecutors {
+class ServerLogsTailerListener extends TailerListenerAdapter {
 
-    INSTANCE;
+    private final File logFile;
 
-    private ExecutorService executorService;
+    private final Session session;
 
-    void execute(Runnable command) {
-        this.initExecutorService();
-        this.executorService.execute(command);
+    ServerLogsTailerListener(File logFile, Session session) {
+        this.logFile = logFile;
+        this.session = session;
     }
 
-    private void initExecutorService() {
-        if (this.executorService == null) {
-            this.executorService = Executors.newCachedThreadPool();
-        }
+    @Override
+    public void fileRotated() {
+        // ignore, just keep tailing
     }
 
-    void shutdownExecutorService() {
-        Optional.ofNullable(this.executorService).ifPresent(ExecutorService::shutdown);
+    @Override
+    public void handle(String line) {
+        this.session.getAsyncRemote().sendText(line);
+    }
+
+    @Override
+    public void fileNotFound() {
+        this.session.getAsyncRemote().sendText(new FileNotFoundException(this.logFile.toString()).toString());
+    }
+
+    @Override
+    public void handle(Exception ex) {
+        this.session.getAsyncRemote().sendText(ex.toString());
     }
 }

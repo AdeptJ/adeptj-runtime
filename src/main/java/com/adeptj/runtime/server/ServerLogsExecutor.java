@@ -20,52 +20,33 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.config.Configs;
-import org.slf4j.LoggerFactory;
-
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
-import java.io.File;
 import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
-
-import static com.adeptj.runtime.server.ServerLogsWebSocket.SERVER_LOGS_ENDPOINT;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * WebSocket for rendering server logs.
+ * Provides {@link ExecutorService} with fixed thread pool for tailing server logs.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@ServerEndpoint(SERVER_LOGS_ENDPOINT)
-public class ServerLogsWebSocket {
+enum ServerLogsExecutor {
 
-    private static final String SERVER_LOG_FILE = "server-log-file";
+    INSTANCE;
 
-    static final String SERVER_LOGS_ENDPOINT = "/server/logs";
+    private ExecutorService executorService;
 
-    private ServerLogsTailer logsTailer;
+    void execute(Runnable command) {
+        this.initExecutorService();
+        this.executorService.execute(command);
+    }
 
-    /**
-     * Creates a ServerLogsTailer for each session.
-     *
-     * @param session the WebSocket Session
-     */
-    @OnOpen
-    public void onOpen(Session session) {
-        this.logsTailer = new ServerLogsTailer(new File(Configs.DEFAULT.logging().getString(SERVER_LOG_FILE)), session);
-        try {
-            session.getAsyncRemote().sendText("Server logs tailing will be started shortly!!");
-            this.logsTailer.startTailer();
-        } catch (RejectedExecutionException ex) {
-            LoggerFactory.getLogger(ServerLogsWebSocket.class).error(ex.getMessage(), ex);
-            session.getAsyncRemote().sendText(ex.getMessage());
+    private void initExecutorService() {
+        if (this.executorService == null) {
+            this.executorService = Executors.newCachedThreadPool();
         }
     }
 
-    @OnClose
-    public void onClose(Session session) {
-        Optional.ofNullable(this.logsTailer).ifPresent(ServerLogsTailer::stopTailer);
+    void shutdownExecutorService() {
+        Optional.ofNullable(this.executorService).ifPresent(ExecutorService::shutdown);
     }
 }

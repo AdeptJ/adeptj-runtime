@@ -73,6 +73,7 @@ import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -268,13 +269,8 @@ public final class Server {
 
     private static void createServerConfFile(Logger logger) {
         try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
-            Files.write(Paths.get(USER_DIR
-                    + File.separator
-                    + DIR_ADEPTJ_RUNTIME
-                    + File.separator
-                    + DIR_DEPLOYMENT
-                    + File.separator
-                    + SERVER_CONF_FILE), IOUtils.toBytes(stream));
+            Files.write(Paths.get(USER_DIR ,DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
+                    IOUtils.toBytes(stream), StandardOpenOption.CREATE);
         } catch (IOException ex) {
             logger.error("IOException!!", ex);
         }
@@ -430,20 +426,14 @@ public final class Server {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class)
-                .addMapping(TOOLS_ERROR_URL)
-                .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(TOOLS_SERVLET, ToolsServlet.class)
-                .addMapping(TOOLS_DASHBOARD_URL)
-                .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(AUTH_SERVLET, AuthServlet.class)
-                .addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI)
-                .setAsyncSupported(true));
+        servlets.add(Servlets.servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class).addMapping(TOOLS_ERROR_URL).setAsyncSupported(true));
+        servlets.add(Servlets.servlet(TOOLS_SERVLET, ToolsServlet.class).addMapping(TOOLS_DASHBOARD_URL).setAsyncSupported(true));
+        servlets.add(Servlets.servlet(AUTH_SERVLET, AuthServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI).setAsyncSupported(true));
         return servlets;
     }
 
     private static MultipartConfigElement defaultMultipartConfig(Config cfg) {
-        return new MultipartConfigElement(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
+        return Servlets.multipartConfig(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
                 cfg.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
                 cfg.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
                 cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
@@ -453,16 +443,14 @@ public final class Server {
         Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
                 .setWorker(webSocketWorker(wsOptions))
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
-                        wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER), wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
                 .addEndpoint(ServerLogsWebSocket.class);
     }
 
     private static XnioWorker webSocketWorker(Config wsOptions) {
         XnioWorker worker = null;
         try {
-            worker = Xnio.getInstance()
-                    .createWorker(OptionMap.builder()
+            worker = Xnio.getInstance().createWorker(OptionMap.builder()
                             .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
                             .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
                             .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))

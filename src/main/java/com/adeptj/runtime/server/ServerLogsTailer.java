@@ -21,12 +21,9 @@
 package com.adeptj.runtime.server;
 
 import org.apache.commons.io.input.Tailer;
-import org.apache.commons.io.input.TailerListener;
-import org.apache.commons.io.input.TailerListenerAdapter;
 
 import javax.websocket.Session;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * Tails server log using Apache Commons IO {@link Tailer}.
@@ -49,37 +46,11 @@ class ServerLogsTailer {
     }
 
     void startTailer() {
-        this.tailer = new Tailer(this.logFile, this.createListener(), DELAY_MILLIS, true);
-        ServerLogsExecutors.INSTANCE.execute(this.tailer);
+        this.tailer = Tailer.create(this.logFile, new ServerLogsTailerListener(this.logFile, this.session), DELAY_MILLIS, true);
+        ServerLogsExecutor.INSTANCE.execute(this.tailer);
     }
 
     void stopTailer() {
         this.tailer.stop();
-    }
-
-    private TailerListener createListener() {
-
-        return new TailerListenerAdapter() {
-
-            @Override
-            public void fileRotated() {
-                // ignore, just keep tailing
-            }
-
-            @Override
-            public void handle(String line) {
-                session.getAsyncRemote().sendText(line);
-            }
-
-            @Override
-            public void fileNotFound() {
-                session.getAsyncRemote().sendText(new FileNotFoundException(logFile.toString()).toString());
-            }
-
-            @Override
-            public void handle(Exception ex) {
-                session.getAsyncRemote().sendText(ex.toString());
-            }
-        };
     }
 }
