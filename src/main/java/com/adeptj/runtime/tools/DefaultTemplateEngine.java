@@ -85,19 +85,15 @@ public enum DefaultTemplateEngine implements TemplateEngine {
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
-            this.handleException(context, ex);
+            context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
+            ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    private void handleException(TemplateContext context, Exception ex) {
-        context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-        ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
     }
 
     private MustacheEngine buildMustacheEngine() {
         ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
         return MustacheEngineBuilder.newBuilder()
-                .registerHelper(RB_HELPER_NAME, this.resourceBundleHelper(config))
+                .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE))
                 .addTemplateLocator(this.templateLocator(config))
                 .setProperty(START_DELIMITER, config.getStartDelimiter())
                 .setProperty(END_DELIMITER, config.getEndDelimiter())
@@ -115,9 +111,5 @@ public enum DefaultTemplateEngine implements TemplateEngine {
                 .setScanClasspath(false)
                 .setClassLoader(DefaultTemplateEngine.class.getClassLoader())
                 .build();
-    }
-
-    private Helper resourceBundleHelper(ViewEngineConfig config) {
-        return new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE);
     }
 }
