@@ -46,20 +46,19 @@ public final class OSGiUtils {
 
     private static final String PARENTHESIS_CLOSE = ")";
 
-    // No instantiation. Utility methods only. asterisk
+    // No instantiation. Utility methods only.
     private OSGiUtils() {
     }
 
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
         try {
-            return context.createFilter(new StringBuilder(FILTER_AND)
-                    .append(OBJECTCLASS)
-                    .append(EQ)
-                    .append(objectClass.getName())
-                    .append(PARENTHESIS_CLOSE)
-                    .append(filterExpr)
-                    .append(PARENTHESIS_CLOSE)
-                    .toString());
+            return context.createFilter(FILTER_AND +
+                    OBJECTCLASS +
+                    EQ +
+                    objectClass.getName() +
+                    PARENTHESIS_CLOSE +
+                    filterExpr +
+                    PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
             throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
@@ -68,14 +67,13 @@ public final class OSGiUtils {
 
     public static Filter anyServiceFilter(BundleContext context, String filterExpr) {
         try {
-            return context.createFilter(new StringBuilder(FILTER_AND)
-                    .append(OBJECTCLASS)
-                    .append(EQ)
-                    .append(ASTERISK)
-                    .append(PARENTHESIS_CLOSE)
-                    .append(filterExpr)
-                    .append(PARENTHESIS_CLOSE)
-                    .toString());
+            return context.createFilter(FILTER_AND +
+                    OBJECTCLASS +
+                    EQ +
+                    ASTERISK +
+                    PARENTHESIS_CLOSE +
+                    filterExpr +
+                    PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
             throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
