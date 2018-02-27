@@ -34,9 +34,12 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
+import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
+import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 
 /**
@@ -50,20 +53,29 @@ final class Bundles {
 
     private static final String JAR_FILE = ".jar";
 
+    private static final String BUNDLE_NAME = "Bundle-Name";
+
     /**
      * Don't let anyone instantiate this class.
      */
     private Bundles() {
     }
 
+    /**
+     * Provision the bundles.
+     * <p>
+     * Following happens in order.
+     * 1. Collect Bundles
+     * 2. Install Bundles
+     * 3. Start Bundles
+     *
+     * @param systemBundleContext the {@link BundleContext} of system bundle.
+     * @throws IOException exception thrown by provisioning mechanism.
+     */
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-        // Following happens in order.
-        // 1. Collect Bundles
-        // 2. Install Bundles
-        // 3. Start Bundles
         startBundles(installBundles(collectBundles(rootPath), systemBundleContext, logger), logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
@@ -72,42 +84,48 @@ final class Bundles {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
         bundles.stream()
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
-                .forEach(bundle -> {
-                    logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
-                    try {
-                        bundle.start();
-                    } catch (Exception ex) { // NOSONAR
-                        logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
-                    }
-                });
+                .forEach(bundle -> startBundle(bundle, logger));
+    }
+
+    private static void startBundle(Bundle bundle, Logger logger) {
+        logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
+        try {
+            bundle.start();
+        } catch (Exception ex) { // NOSONAR
+            logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
+        }
     }
 
     private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
         List<Bundle> installedBundles = bundles
                 .stream()
-                .map(url -> {
-                    logger.debug("Installing Bundle from location: [{}]", url);
-                    Bundle bundle = null;
-                    try {
-                        bundle = context.installBundle(url.toExternalForm());
-                    } catch (BundleException | IllegalStateException | SecurityException ex) {
-                        logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
-                    }
-                    return bundle;
-                })
+                .map(url -> installBundle(context, logger, url))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
     }
 
+    private static Bundle installBundle(BundleContext context, Logger logger, URL url) {
+        logger.debug("Installing Bundle from location: [{}]", url);
+        Bundle bundle = null;
+        try (JarInputStream jar = new JarInputStream(url.openStream(), false)) {
+            if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_NAME))) {
+                logger.warn("Not a Bundle: {}", url.toExternalForm());
+            } else {
+                bundle = context.installBundle(url.toExternalForm());
+            }
+        } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
+            logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
+        }
+        return bundle;
+    }
+
     private static List<URL> collectBundles(String rootPath) throws IOException {
-        return JarURLConnection.class.cast(Bundles.class.getResource(rootPath)
-                .openConnection())
+        return JarURLConnection.class.cast(Bundles.class.getResource(rootPath).openConnection())
                 .getJarFile()
                 .stream()
-                .filter(jarEntry -> StringUtils.startsWith(jarEntry.getName(), PREFIX_BUNDLES)
-                        && StringUtils.endsWith(jarEntry.getName(), JAR_FILE))
+                .filter(jarEntry -> startsWith(jarEntry.getName(), PREFIX_BUNDLES) && endsWith(jarEntry.getName(), JAR_FILE))
                 .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
                 .collect(Collectors.toList());
     }
