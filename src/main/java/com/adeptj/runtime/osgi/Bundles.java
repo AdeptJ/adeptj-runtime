@@ -72,38 +72,33 @@ final class Bundles {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
         bundles.stream()
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
-                .forEach(bundle -> startBundle(bundle, logger));
-    }
-
-    private static void startBundle(Bundle bundle, Logger logger) {
-        logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
-        try {
-            bundle.start();
-        } catch (Exception ex) { // NOSONAR
-            logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
-        }
+                .forEach(bundle -> {
+                    logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
+                    try {
+                        bundle.start();
+                    } catch (Exception ex) { // NOSONAR
+                        logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
+                    }
+                });
     }
 
     private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
-        // First install all the Bundles.
         List<Bundle> installedBundles = bundles
                 .stream()
-                .map(url -> installBundle(url, context, logger))
+                .map(url -> {
+                    logger.debug("Installing Bundle from location: [{}]", url);
+                    Bundle bundle = null;
+                    try {
+                        bundle = context.installBundle(url.toExternalForm());
+                    } catch (BundleException | IllegalStateException | SecurityException ex) {
+                        logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
+                    }
+                    return bundle;
+                })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
-    }
-
-    private static Bundle installBundle(URL url, BundleContext context, Logger logger) {
-        logger.debug("Installing Bundle from location: [{}]", url);
-        Bundle bundle = null;
-        try {
-            bundle = context.installBundle(url.toExternalForm());
-        } catch (BundleException | IllegalStateException | SecurityException ex) {
-            logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
-        }
-        return bundle;
     }
 
     private static List<URL> collectBundles(String rootPath) throws IOException {

@@ -76,12 +76,12 @@ public enum FrameworkManager {
 
     private FrameworkRestartHandler frameworkListener;
 
-    public void startFramework(ServletContext context) {
+    public void startFramework(ServletContext servletContext) {
         Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
-            this.framework = this.createFramework(logger);
+            this.framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
             long startTimeFramework = System.nanoTime();
             this.framework.start();
             logger.info("Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
@@ -90,7 +90,7 @@ public enum FrameworkManager {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             // config directory will not yet be created if framework is being provisioned first time.
-            if (Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()
+            if (Files.exists(Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)))
                     && !Boolean.getBoolean("provision.bundles.explicitly")) {
                 logger.info("Bundles already provisioned, this must be a server restart!!");
             } else {
@@ -100,10 +100,15 @@ public enum FrameworkManager {
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
-            this.registerBridgeListeners(context);
+            // register bridge listeners
+            servletContext.addListener(new BridgeServletContextAttributeListener());
+            servletContext.addListener(new BridgeHttpSessionListener());
+            servletContext.addListener(new BridgeHttpSessionIdListener());
+            servletContext.addListener(new BridgeHttpSessionAttributeListener());
             // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
-            context.setAttribute(BundleContext.class.getName(), systemBundleContext);
-            this.registerBridgeServlet(context, logger);
+            servletContext.setAttribute(BundleContext.class.getName(), systemBundleContext);
+            this.registerBridgeServlet(servletContext);
+            logger.info("BridgeServlet registered successfully!!");
         } catch (Exception ex) { // NOSONAR
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
@@ -115,7 +120,9 @@ public enum FrameworkManager {
         Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
         try {
             if (this.framework != null) {
-                this.removeFrameworkListener();
+                if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
+                    BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
+                }
                 OSGiServlets.INSTANCE.unregisterAll();
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
@@ -129,21 +136,7 @@ public enum FrameworkManager {
         }
     }
 
-    private void removeFrameworkListener() {
-        if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
-            BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
-        }
-    }
-
-    private void registerBridgeListeners(ServletContext servletContext) {
-        // add all required listeners
-        servletContext.addListener(new BridgeServletContextAttributeListener());
-        servletContext.addListener(new BridgeHttpSessionListener());
-        servletContext.addListener(new BridgeHttpSessionIdListener());
-        servletContext.addListener(new BridgeHttpSessionAttributeListener());
-    }
-
-    private void registerBridgeServlet(ServletContext context, Logger logger) {
+    private void registerBridgeServlet(ServletContext context) {
         // Register the BridgeServlet after the OSGi Framework started successfully.
         // This will ensure that the Felix DispatcherServlet is available as an OSGi service and can be tracked.
         // BridgeServlet delegates all the service calls to the Felix DispatcherServlet.
@@ -155,14 +148,6 @@ public enum FrameworkManager {
         bridgeServlet.setAsyncSupported(true);
         // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
         bridgeServlet.setLoadOnStartup(0);
-        logger.info("BridgeServlet registered successfully!!");
-    }
-
-    private Framework createFramework(Logger logger) throws IOException {
-        return ServiceLoader.load(FrameworkFactory.class)
-                .iterator()
-                .next()
-                .newFramework(this.frameworkConfigs(logger));
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
@@ -171,9 +156,7 @@ public enum FrameworkManager {
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
         ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
-        if (logger.isDebugEnabled()) {
-            logger.debug("OSGi Framework Configurations: {}", configs);
-        }
+        logger.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
 
