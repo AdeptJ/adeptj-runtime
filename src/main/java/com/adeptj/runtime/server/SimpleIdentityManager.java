@@ -63,11 +63,8 @@ final class SimpleIdentityManager implements IdentityManager {
         return this.userRolesMapping
                 .entrySet()
                 .stream()
-                .filter(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
-                        && entry.getValue().containsAll(account.getRoles()))
-                .map(entry -> account)
-                .findFirst()
-                .orElse(null);
+                .anyMatch(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
+                        && entry.getValue().containsAll(account.getRoles())) ? account : null;
     }
 
     /**
