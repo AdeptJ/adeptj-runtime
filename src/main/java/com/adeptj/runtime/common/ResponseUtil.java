@@ -25,6 +25,8 @@ import com.adeptj.runtime.exception.SystemException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+
 /**
  * Utils for {@link HttpServletResponse}
  *
@@ -39,7 +41,16 @@ public final class ResponseUtil {
         try {
             resp.sendError(errorCode);
         } catch (IOException ex) {
-            // Now what? may be re-throw. Let the container handle it.
+            // Now what? may be wrap and re-throw. Let the container handle it.
+            throw new SystemException(ex.getMessage(), ex);
+        }
+    }
+
+    public static void unavailable(HttpServletResponse resp) {
+        try {
+            resp.sendError(SC_SERVICE_UNAVAILABLE);
+        } catch (IOException ex) {
+            // Now what? may be wrap and re-throw. Let the container handle it.
             throw new SystemException(ex.getMessage(), ex);
         }
     }

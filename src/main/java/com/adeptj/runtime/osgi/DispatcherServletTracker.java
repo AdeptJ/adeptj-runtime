@@ -77,9 +77,9 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
          * from which this ServiceTracker was created and causes the [java.lang.IllegalStateException: Invalid BundleContext].
          * Since a Framework restart creates a new BundleContext and this tracker will again be opened with
          * the new BundleContext therefore closing it here make sense.
-         * 
+         *
          * Ignore exceptions, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
-        */
+         */
         ServiceTrackers.INSTANCE.closeQuietly(this);
     }
 

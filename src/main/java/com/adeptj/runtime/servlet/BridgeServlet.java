@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
  * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
@@ -84,7 +83,7 @@ public class BridgeServlet extends HttpServlet {
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
-                ResponseUtil.sendError(resp, SC_SERVICE_UNAVAILABLE);
+                ResponseUtil.unavailable(resp);
                 return;
             }
             dispatcherServlet.service(req, resp);
@@ -99,7 +98,7 @@ public class BridgeServlet extends HttpServlet {
      * Historically, this method used to close the DispatcherServletTracker but due to a change in Felix Http service
      * which caused NPE, this logic has been moved to FrameworkShutdownHandler.
      * <p>
-     * GitHub issue for the same can be located here: <a href="https://github.com/AdeptJ/adeptj-runtime/issues/4">GitHub Issue</>
+     * GitHub issue for the same can be located here: <a href="https://github.com/AdeptJ/adeptj-runtime/issues/4">GitHub Issues</>
      * <p>
      * Note: This method still exists to convey the order in which shutdown sequence initiates.
      */
