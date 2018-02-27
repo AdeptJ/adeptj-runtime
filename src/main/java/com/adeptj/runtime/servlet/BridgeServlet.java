@@ -28,7 +28,6 @@ import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -58,11 +57,13 @@ public class BridgeServlet extends HttpServlet {
 
     private static final String UNAVAILABLE_MSG = "Can't serve request: [{}], DispatcherServlet is unavailable!!";
 
+    private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
+
     /**
      * Open the DispatcherServletTracker.
      */
     @Override
-    public void init() throws ServletException {
+    public void init() {
         long startTime = System.nanoTime();
         LOGGER.info("Initializing BridgeServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
@@ -84,10 +85,10 @@ public class BridgeServlet extends HttpServlet {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
                 ResponseUtil.sendError(resp, SC_SERVICE_UNAVAILABLE);
-            } else {
-                dispatcherServlet.service(req, resp);
-                RequestUtil.logException(req, LOGGER, "Exception set by Felix Dispatcher!!");
+                return;
             }
+            dispatcherServlet.service(req, resp);
+            RequestUtil.logException(req, LOGGER, FELIX_DISPATCHER_EXCEPTION_MSG);
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);
             ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
@@ -95,12 +96,15 @@ public class BridgeServlet extends HttpServlet {
     }
 
     /**
-     * Close the DispatcherServletTracker.
+     * Historically, this method used to close the DispatcherServletTracker but due to a change in Felix Http service
+     * which caused NPE, this logic has been moved to FrameworkShutdownHandler.
+     * <p>
+     * GitHub issue for the same can be located here: <a href="https://github.com/AdeptJ/adeptj-runtime/issues/4">GitHub Issue</>
+     * <p>
+     * Note: This method still exists to convey the order in which shutdown sequence initiates.
      */
     @Override
     public void destroy() {
         LOGGER.info("Destroying BridgeServlet!!");
-        // closeDispatcherServletTracker in FrameworkShutdownHandler
-        // See - https://github.com/AdeptJ/adeptj-runtime/issues/4
     }
 }
