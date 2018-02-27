@@ -93,11 +93,7 @@ public class AuthServlet extends HttpServlet {
      * Handle "/auth/j_security_check" validation failure.
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.handleLoginFailure(req, resp);
-    }
-
-    private void handleLoginFailure(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
         TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)

@@ -42,7 +42,7 @@ public class PerServletContextErrorServlet extends HttpServlet {
     private static final long serialVersionUID = -5818850813832379842L;
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         ErrorPageUtil.renderOSGiErrorPage(req, resp);
     }
 }

@@ -46,7 +46,7 @@ public class ErrorPageServlet extends HttpServlet {
     private static final long serialVersionUID = -3339904764769823449L;
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         ErrorPageUtil.renderErrorPage(req, resp);
     }
 }

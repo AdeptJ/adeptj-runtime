@@ -70,7 +70,7 @@ public class ToolsServlet extends HttpServlet {
      * Renders tools page.
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -95,7 +95,7 @@ public class ToolsServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.sendRedirect(resp.encodeRedirectURL(TOOLS_DASHBOARD_URI));
     }
 }
