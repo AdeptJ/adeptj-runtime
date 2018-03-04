@@ -64,7 +64,6 @@ import org.xnio.XnioWorker;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
@@ -147,8 +146,6 @@ public final class Server {
     private static final String SYS_PROP_CHECK_PORT = "adeptj.rt.port.check";
 
     private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
-
-    private static final String PROTOCOL_TLS = "TLS";
 
     private static final String REALM = "AdeptJ Realm";
 
@@ -269,7 +266,7 @@ public final class Server {
 
     private static void createServerConfFile(Logger logger) {
         try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
-            Files.write(Paths.get(USER_DIR ,DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
+            Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                     IOUtils.toBytes(stream), StandardOpenOption.CREATE);
         } catch (IOException ex) {
             logger.error("IOException!!", ex);
@@ -411,8 +408,7 @@ public final class Server {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(ContainerInitializer.class,
-                new ImmediateInstanceFactory<>(new ContainerInitializer()),
+        return new ServletContainerInitializerInfo(ContainerInitializer.class, new ImmediateInstanceFactory<>(new ContainerInitializer()),
                 Collections.singleton(FrameworkStartupHandler.class));
     }
 
@@ -451,11 +447,11 @@ public final class Server {
         XnioWorker worker = null;
         try {
             worker = Xnio.getInstance().createWorker(OptionMap.builder()
-                            .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
-                            .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
-                            .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
-                            .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
-                            .getMap());
+                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
+                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
+                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
+                    .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
+                    .getMap());
         } catch (IOException ex) {
             LoggerFactory.getLogger(Server.class).error("Can't create XnioWorker!!", ex);
         }

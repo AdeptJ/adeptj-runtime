@@ -30,7 +30,7 @@
     <version>1.0.13-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
-    <description>AdeptJ Runtime for deploying various modules(OSGi Bundles)</description>
+    <description>High Performance, Dynamic, Modular runtime for modern APIs, MicroServices and WebApps.</description>
     <url>http://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
