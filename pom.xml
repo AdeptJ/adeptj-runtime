@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.16.Final</version>
+        <version>1.0.17.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.13-SNAPSHOT</version>
@@ -39,16 +39,26 @@
         <undertow.version>2.0.1.Final</undertow.version>
         <undertow.websockets.version>2.0.1.Final</undertow.websockets.version>
         <xnio.version>3.6.2.Final</xnio.version>
+        <jboss-logging.version>3.3.2.Final</jboss-logging.version>
+        <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
+        <wildfly-common.version>1.3.0.Final</wildfly-common.version>
+        <jboss-threads.version>2.3.0.Final</jboss-threads.version>
+        <jdeparser.version>2.0.2.Final</jdeparser.version>
+        <jboss-logging-annotations.version>2.1.0.Final</jboss-logging-annotations.version>
+        <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
+        <jboss-classfilewriter.version>1.2.1.Final</jboss-classfilewriter.version>
+        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <jansi.version>1.16</jansi.version>
+        <trimou-core.version>2.4.0.Final</trimou-core.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.10</felix.framework.version>
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
         <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
         <felix.webconsole.plugins.ds.version>2.0.8</felix.webconsole.plugins.ds.version>
-        <felix.webconsole.plugins.memoryusage.version>1.0.6</felix.webconsole.plugins.memoryusage.version>
+        <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
         <felix.inventory.version>1.0.4</felix.inventory.version>
         <felix.http.bridge.version>3.0.18</felix.http.bridge.version>
         <felix.http.base.version>3.0.18</felix.http.base.version>
@@ -61,6 +71,8 @@
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.2.Final</adeptj-modules-webconsole-security.version>
+        <adeptj-modules-commons-utils.version>1.0.0.Final</adeptj-modules-commons-utils.version>
+        <adeptj-runtime-tools.version>1.0.3.Final</adeptj-runtime-tools.version>
     </properties>
 
     <!-- Project Information -->
@@ -187,7 +199,8 @@
                                 </excludes>
                             </artifactSet>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.adeptj.runtime.core.Launcher</mainClass>
                                 </transformer>
                             </transformers>
@@ -236,7 +249,7 @@
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
-            <version>3.3.2.Final</version>
+            <version>${jboss-logging.version}</version>
         </dependency>
 
         <!-- Required by XNIO-API below. -->
@@ -244,13 +257,13 @@
         <dependency>
             <groupId>org.wildfly.client</groupId>
             <artifactId>wildfly-client-config</artifactId>
-            <version>1.0.0.Final</version>
+            <version>${wildfly-client-config.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.wildfly.common</groupId>
             <artifactId>wildfly-common</artifactId>
-            <version>1.3.0.Final</version>
+            <version>${wildfly-common.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
@@ -262,7 +275,7 @@
         <dependency>
             <groupId>org.jboss.threads</groupId>
             <artifactId>jboss-threads</artifactId>
-            <version>2.3.0.Final</version>
+            <version>${jboss-threads.version}</version>
         </dependency>
 
         <dependency>
@@ -290,19 +303,19 @@
         <dependency>
             <groupId>org.jboss.jdeparser</groupId>
             <artifactId>jdeparser</artifactId>
-            <version>2.0.2.Final</version>
+            <version>${jdeparser.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-annotations</artifactId>
-            <version>2.1.0.Final</version>
+            <version>${jboss-logging-annotations.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-processor</artifactId>
-            <version>2.1.0.Final</version>
+            <version>${jboss-logging-processor.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.jdeparser</groupId>
@@ -318,7 +331,7 @@
         <dependency>
             <groupId>org.jboss.classfilewriter</groupId>
             <artifactId>jboss-classfilewriter</artifactId>
-            <version>1.2.1.Final</version>
+            <version>${jboss-classfilewriter.version}</version>
         </dependency>
 
         <dependency>
@@ -336,9 +349,9 @@
         <!-- Undertow core [provided] dependencies end -->
 
         <dependency>
-            <groupId>org.jboss.spec.javax.servlet</groupId>
-            <artifactId>jboss-servlet-api_4.0_spec</artifactId>
-            <version>1.0.0.Final</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet-api.version}</version>
         </dependency>
 
         <dependency>
@@ -362,6 +375,10 @@
                     <groupId>org.jboss.spec.javax.annotation</groupId>
                     <artifactId>jboss-annotations-api_1.2_spec</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.spec.javax.servlet</groupId>
+                    <artifactId>jboss-servlet-api_4.0_spec</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -376,7 +393,7 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.2</version>
+            <version>${javax.annotation-api.version}</version>
         </dependency>
 
         <dependency>
@@ -425,7 +442,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-tools</artifactId>
-            <version>1.0.3.Final</version>
+            <version>${adeptj-runtime-tools.version}</version>
         </dependency>
 
         <!-- RenderEngine Dependencies -->
@@ -433,7 +450,7 @@
         <dependency>
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
-            <version>2.4.0.Final</version>
+            <version>${trimou-core.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -453,21 +470,18 @@
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
-            <version>1.1.2</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.json.bind</groupId>
             <artifactId>javax.json.bind-api</artifactId>
-            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
-            <version>1.1.2</version>
             <scope>provided</scope>
         </dependency>
 
@@ -708,16 +722,9 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-utils</artifactId>
-            <version>1.0.0.Final</version>
+            <version>${adeptj-modules-commons-utils.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.adeptj</groupId>-->
-            <!--<artifactId>adeptj-modules-commons-logging</artifactId>-->
-            <!--<version>1.0.0.Final</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
 
         <!-- AdeptJ Modules Bundles End-->
 
@@ -769,7 +776,7 @@
                 <dependency>
                     <groupId>com.itextpdf</groupId>
                     <artifactId>itextpdf</artifactId>
-                    <version>5.5.11</version>
+                    <version>5.5.13</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -842,7 +849,7 @@
                 <dependency>
                     <groupId>com.sun.mail</groupId>
                     <artifactId>javax.mail</artifactId>
-                    <version>1.6.1</version>
+                    <version>${javax.mail.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -884,14 +891,12 @@
                 <dependency>
                     <groupId>javax.validation</groupId>
                     <artifactId>validation-api</artifactId>
-                    <version>${javax.validation-api.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>javax.ws.rs</groupId>
                     <artifactId>javax.ws.rs-api</artifactId>
-                    <version>${jax-rs.api.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -925,7 +930,6 @@
                 <dependency>
                     <groupId>io.jsonwebtoken</groupId>
                     <artifactId>jjwt</artifactId>
-                    <version>${jjwt.version}</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -1345,20 +1349,6 @@
                     </exclusions>
                 </dependency>
 
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-ehcache</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
             </dependencies>
 
         </profile>
@@ -1373,20 +1363,6 @@
                     <groupId>com.hazelcast</groupId>
                     <artifactId>hazelcast</artifactId>
                     <version>3.8.2</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-hazelcast</artifactId>
-                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1432,27 +1408,6 @@
                     <groupId>org.infinispan</groupId>
                     <artifactId>infinispan-commons</artifactId>
                     <version>9.0.1.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.infinispan</groupId>
-                    <artifactId>infinispan-core</artifactId>
-                    <version>9.0.1.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-api</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-infinispan</artifactId>
-                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
