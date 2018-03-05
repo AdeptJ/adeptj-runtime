@@ -54,19 +54,19 @@ The platform embeds OSGi and Undertow with modules described above.
 **Steps to build and run:**
 
 1. Clone adeptj-runtime
-2. cd adeptj-runtime
-3. mvn clean package
+2. cd adeptj-runtime/etc
+3. run the script build.sh
 4. Above step will create AdeptJ Runtime Uber jar.
-4. Now cd target
-5. java -server -jar adeptj-runtime.jar
+4. Now from /etc directory run the script start.sh
+5. For JDK 9 use the script startjdk9.sh
 6. Go to [AdeptJ Tools Dashboard](http://localhost:9007/tools/dashboard) or [AdeptJ OSGi Console](http://localhost:9007/system/console)
 7. System will ask for username/password, provide the default ones [admin/admin]
 
 **Debug options:**
 
-java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -jar adeptj-runtime.jar
+If the AdeptJ Runtime was started using the script provided then it runs in debug mode by default.
 
-Start Parameters and VM arguments
+Start Parameters and VM arguments. Most of them provided in start script.
 
 1. For specifying port: -Dadeptj.rt.port=9007
 2. For checking port eagerly: -Dadeptj.rt.port.check=true
