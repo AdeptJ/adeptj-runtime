@@ -23,6 +23,7 @@ package com.adeptj.runtime.server;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
+import io.undertow.predicate.Predicate;
 import io.undertow.predicate.Predicates;
 import io.undertow.server.HandlerWrapper;
 import io.undertow.server.HttpHandler;
@@ -58,10 +59,9 @@ final class ServletInitialHandlerWrapper implements HandlerWrapper {
     @Override
     public HttpHandler wrap(HttpHandler servletInitialHandler) {
         Config cfg = Configs.DEFAULT.undertow();
-        return Handlers.predicate(Predicates.and(Predicates.prefix(cfg.getString(RESOURCE_PREFIX)),
-                Predicates.suffixes(cfg.getStringList(RESOURCE_EXTNS).toArray(new String[0]))),
-                Handlers.resource(new ClassPathResourceManager(this.getClass().getClassLoader(),
-                        cfg.getString(RESOURCE_MGR_PREFIX))),
-                servletInitialHandler);
+        Predicate prefix = Predicates.prefix(cfg.getString(RESOURCE_PREFIX));
+        Predicate suffixes = Predicates.suffixes(cfg.getStringList(RESOURCE_EXTNS).toArray(new String[0]));
+        ClassPathResourceManager rm = new ClassPathResourceManager(this.getClass().getClassLoader(), cfg.getString(RESOURCE_MGR_PREFIX));
+        return Handlers.predicate(Predicates.and(prefix, suffixes), Handlers.resource(rm), servletInitialHandler);
     }
 }
