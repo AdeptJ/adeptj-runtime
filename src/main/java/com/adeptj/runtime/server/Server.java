@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
@@ -105,6 +106,7 @@ import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
+import static com.adeptj.runtime.common.SslUtil.getSslContext;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static java.util.stream.Collectors.toMap;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
@@ -306,16 +308,13 @@ public final class Server {
                 String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
                 KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray());
                 logger.info("KeyStore loaded from location: [{}]", keyStoreLoc);
-                undertowBuilder.addHttpsListener(httpsPort,
-                        httpsConf.getString(KEY_HOST),
-                        SslUtil.getSslContext(keyStore, keyPwd.toCharArray()));
+                undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), getSslContext(keyStore, keyPwd.toCharArray()));
             } else {
                 char[] cfgKeyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
                 KeyStore keyStore = KeyStores.getDefaultKeyStore(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd);
                 logger.info("Default KeyStore loaded!!");
-                undertowBuilder.addHttpsListener(httpsPort,
-                        httpsConf.getString(KEY_HOST),
-                        SslUtil.getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
+                undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
+                        getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
             }
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
@@ -337,11 +336,10 @@ public final class Server {
                     SYS_PROP_SERVER_PORT, httpConf.getInt(KEY_PORT));
             port = httpConf.getInt(KEY_PORT);
         }
-        // Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
+        // Note: Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
         // as it is being started already and another server start(from same location) will again start new OSGi
-        // Framework which may interfere with already started OSGi Framework as the bundle deployed, heap dump,
-        // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side
-        // doing this.
+        // Framework which may interfere with already started OSGi Framework as the bundle deployment, heap dump,
+        // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
             logger.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
@@ -354,8 +352,9 @@ public final class Server {
     private static boolean isPortAvailable(int port, Logger logger) {
         boolean portAvailable = false;
         try (ServerSocketChannel channel = ServerSocketChannel.open()) {
-            channel.socket().setReuseAddress(true);
-            channel.socket().bind(new InetSocketAddress(port));
+            ServerSocket socket = channel.socket();
+            socket.setReuseAddress(true);
+            socket.bind(new InetSocketAddress(port));
             portAvailable = true;
         } catch (BindException ex) {
             logger.error("BindException while acquiring port: [{}], cause:", port, ex);
@@ -366,8 +365,8 @@ public final class Server {
     }
 
     private static RequestBufferingHandler reqBufferingHandler(HttpHandler initialHandler, Config cfg) {
-        return new RequestBufferingHandler(initialHandler, Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS,
-                cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
+        return new RequestBufferingHandler(initialHandler,
+                Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
     }
 
     private static SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
