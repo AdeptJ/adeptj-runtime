@@ -76,7 +76,9 @@ final class Bundles {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-        startBundles(installBundles(collectBundles(rootPath), systemBundleContext, logger), logger);
+        List<URL> bundleUrls = collectBundles(rootPath);
+        List<Bundle> bundles = installBundles(bundleUrls, systemBundleContext, logger);
+        startBundles(bundles, logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
@@ -88,35 +90,35 @@ final class Bundles {
     }
 
     private static void startBundle(Bundle bundle, Logger logger) {
-        logger.info("Starting bundle: [{}], version: [{}]", bundle, bundle.getVersion());
         try {
             bundle.start();
+            logger.info("Bundle: [{}, Version: {}] started.", bundle, bundle.getVersion());
         } catch (Exception ex) { // NOSONAR
-            logger.error("Exception while starting bundle: [{}]. Cause:", bundle, ex);
+            logger.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
         }
     }
 
-    private static List<Bundle> installBundles(List<URL> bundles, BundleContext context, Logger logger) {
-        List<Bundle> installedBundles = bundles
+    private static List<Bundle> installBundles(List<URL> bundleUrls, BundleContext systemBundleContext, Logger logger) {
+        List<Bundle> installedBundles = bundleUrls
                 .stream()
-                .map(url -> installBundle(context, logger, url))
+                .map(url -> installBundle(systemBundleContext, logger, url))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
     }
 
-    private static Bundle installBundle(BundleContext context, Logger logger, URL url) {
+    private static Bundle installBundle(BundleContext systemBundleContext, Logger logger, URL url) {
         logger.debug("Installing Bundle from location: [{}]", url);
         Bundle bundle = null;
         try (JarInputStream jar = new JarInputStream(url.openStream(), false)) {
             if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_NAME))) {
                 logger.warn("Not a Bundle: {}", url.toExternalForm());
             } else {
-                bundle = context.installBundle(url.toExternalForm());
+                bundle = systemBundleContext.installBundle(url.toExternalForm());
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-            logger.error("Exception while installing bundle: [{}]. Cause:", url, ex);
+            logger.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
         }
         return bundle;
     }

@@ -81,31 +81,21 @@ public enum FrameworkManager {
         try {
             logger.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
-            this.framework = ServiceLoader.load(FrameworkFactory.class).iterator().next().newFramework(this.frameworkConfigs(logger));
+            FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
+            this.framework = frameworkFactory.newFramework(this.frameworkConfigs(logger));
             long startTimeFramework = System.nanoTime();
             this.framework.start();
-            logger.info("Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
+            logger.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
             BundleContext systemBundleContext = this.framework.getBundleContext();
             this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            // config directory will not yet be created if framework is being provisioned first time.
-            if (Files.exists(Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)))
-                    && !Boolean.getBoolean("provision.bundles.explicitly")) {
-                logger.info("Bundles already provisioned, this must be a server restart!!");
-            } else {
-                logger.info("Provisioning bundles first time!!");
-                Bundles.provisionBundles(systemBundleContext);
-            }
+            this.provisionBundles(systemBundleContext, logger);
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
-            // register bridge listeners
-            servletContext.addListener(new BridgeServletContextAttributeListener());
-            servletContext.addListener(new BridgeHttpSessionListener());
-            servletContext.addListener(new BridgeHttpSessionIdListener());
-            servletContext.addListener(new BridgeHttpSessionAttributeListener());
-            // Set the BundleContext as a ServletContext attribute as per Felix HttpBridge Specification.
+            this.registerBridgeListeners(servletContext);
+            // Set the System Bundle's BundleContext as a ServletContext attribute per the Felix HttpBridge Specification.
             servletContext.setAttribute(BundleContext.class.getName(), systemBundleContext);
             this.registerBridgeServlet(servletContext);
             logger.info("BridgeServlet registered successfully!!");
@@ -134,6 +124,24 @@ public enum FrameworkManager {
         } catch (Exception ex) { // NOSONAR
             logger.error("Error Stopping OSGi Framework!!", ex);
         }
+    }
+
+    private void provisionBundles(BundleContext systemBundleContext, Logger logger) throws IOException {
+        // config directory will not yet be created if framework is being provisioned first time.
+        if (Files.exists(Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)))
+                && !Boolean.getBoolean("provision.bundles.explicitly")) {
+            logger.info("Bundles already provisioned, this must be a server restart!!");
+        } else {
+            logger.info("Provisioning bundles first time!!");
+            Bundles.provisionBundles(systemBundleContext);
+        }
+    }
+
+    private void registerBridgeListeners(ServletContext servletContext) {
+        servletContext.addListener(new BridgeServletContextAttributeListener());
+        servletContext.addListener(new BridgeHttpSessionListener());
+        servletContext.addListener(new BridgeHttpSessionIdListener());
+        servletContext.addListener(new BridgeHttpSessionAttributeListener());
     }
 
     private void registerBridgeServlet(ServletContext context) {

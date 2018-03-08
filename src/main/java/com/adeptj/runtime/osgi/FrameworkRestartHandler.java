@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 
+import static org.osgi.framework.FrameworkEvent.STARTED;
+import static org.osgi.framework.FrameworkEvent.STOPPED_UPDATE;
+
 /**
  * OSGi FrameworkListener which takes care of OSGi framework restart.
  *
@@ -51,14 +54,14 @@ public class FrameworkRestartHandler implements FrameworkListener {
     public void frameworkEvent(FrameworkEvent event) {
         Logger logger = LoggerFactory.getLogger(FrameworkRestartHandler.class);
         switch (event.getType()) {
-            case FrameworkEvent.STARTED:
+            case STARTED:
                 logger.info("Handling OSGi Framework Restart!!");
                 // Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 BundleContext bundleContext = event.getBundle().getBundleContext();
                 this.handleBundleContext(bundleContext);
                 this.handleDispatcherServletTracker(logger);
                 break;
-            case FrameworkEvent.STOPPED_UPDATE:
+            case STOPPED_UPDATE:
                 logger.info("Closing DispatcherServletTracker!!");
                 ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
                 logger.info("Closing EventDispatcherTracker!!");
@@ -66,9 +69,7 @@ public class FrameworkRestartHandler implements FrameworkListener {
                 break;
             default:
                 // log it and ignore.
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
-                }
+                logger.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
                 break;
         }
     }

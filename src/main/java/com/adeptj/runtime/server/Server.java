@@ -23,12 +23,11 @@ package com.adeptj.runtime.server;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.KeyStores;
-import com.adeptj.runtime.common.SslUtil;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.logging.LogbackInitializer;
-import com.adeptj.runtime.osgi.FrameworkStartupHandler;
+import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
@@ -52,7 +51,6 @@ import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSessionConfig;
-import io.undertow.servlet.util.ImmediateInstanceFactory;
 import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.slf4j.Logger;
@@ -407,8 +405,7 @@ public final class Server {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(ContainerInitializer.class, new ImmediateInstanceFactory<>(new ContainerInitializer()),
-                Collections.singleton(FrameworkStartupHandler.class));
+        return new ServletContainerInitializerInfo(ContainerInitializer.class, Collections.singleton(FrameworkLauncher.class));
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {
