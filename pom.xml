@@ -54,7 +54,7 @@
         <trimou-core.version>2.4.0.Final</trimou-core.version>
         <caffeine.version>2.6.2</caffeine.version>
         <itextpdf.version>5.5.13</itextpdf.version>
-        <hibernate-validator.version>6.0.7.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.0.8.Final</hibernate-validator.version>
         <classmate.version>1.3.4</classmate.version>
         <javax.el.version>3.0.0</javax.el.version>
 
