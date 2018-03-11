@@ -22,10 +22,8 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.common.Times;
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +31,10 @@ import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
-import java.util.jar.JarInputStream;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
-import static org.apache.commons.lang3.StringUtils.endsWith;
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 
 /**
@@ -49,14 +44,10 @@ import static org.osgi.framework.Constants.FRAGMENT_HOST;
  */
 final class Bundles {
 
-    private static final String PREFIX_BUNDLES = "bundles/";
-
-    private static final String JAR_FILE = ".jar";
-
-    private static final String BUNDLE_NAME = "Bundle-Name";
+    private static final String PATTERN_BUNDLE = "^bundles.*\\.jar$";
 
     /**
-     * Don't let anyone instantiate this class.
+     * Static utility methods only.
      */
     private Bundles() {
     }
@@ -77,7 +68,7 @@ final class Bundles {
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
         List<URL> bundleUrls = collectBundles(rootPath);
-        List<Bundle> bundles = installBundles(bundleUrls, systemBundleContext, logger);
+        List<Bundle> bundles = new BundleInstaller().installBundles(bundleUrls, systemBundleContext);
         startBundles(bundles, logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
@@ -86,48 +77,22 @@ final class Bundles {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
         bundles.stream()
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
-                .forEach(bundle -> startBundle(bundle, logger));
-    }
-
-    private static void startBundle(Bundle bundle, Logger logger) {
-        try {
-            bundle.start();
-            logger.info("Bundle: [{}, Version: {}] started.", bundle, bundle.getVersion());
-        } catch (Exception ex) { // NOSONAR
-            logger.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
-        }
-    }
-
-    private static List<Bundle> installBundles(List<URL> bundleUrls, BundleContext systemBundleContext, Logger logger) {
-        List<Bundle> installedBundles = bundleUrls
-                .stream()
-                .map(url -> installBundle(systemBundleContext, logger, url))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
-        return installedBundles;
-    }
-
-    private static Bundle installBundle(BundleContext systemBundleContext, Logger logger, URL url) {
-        logger.debug("Installing Bundle from location: [{}]", url);
-        Bundle bundle = null;
-        try (JarInputStream jar = new JarInputStream(url.openStream(), false)) {
-            if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_NAME))) {
-                logger.warn("Not a Bundle: {}", url.toExternalForm());
-            } else {
-                bundle = systemBundleContext.installBundle(url.toExternalForm());
-            }
-        } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-            logger.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
-        }
-        return bundle;
+                .forEach(bundle -> {
+                    try {
+                        bundle.start();
+                        logger.info("Bundle: [{}, Version: {}] started.", bundle, bundle.getVersion());
+                    } catch (Exception ex) { // NOSONAR
+                        logger.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
+                    }
+                });
     }
 
     private static List<URL> collectBundles(String rootPath) throws IOException {
+        Pattern pattern = Pattern.compile(PATTERN_BUNDLE);
         return JarURLConnection.class.cast(Bundles.class.getResource(rootPath).openConnection())
                 .getJarFile()
                 .stream()
-                .filter(jarEntry -> startsWith(jarEntry.getName(), PREFIX_BUNDLES) && endsWith(jarEntry.getName(), JAR_FILE))
+                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
                 .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
                 .collect(Collectors.toList());
     }
