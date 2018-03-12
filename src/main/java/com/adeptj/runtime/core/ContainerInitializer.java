@@ -28,9 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
@@ -48,27 +48,29 @@ public class ContainerInitializer implements ServletContainerInitializer {
      * {@inheritDoc}
      */
     @Override
-    public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) throws ServletException {
+    public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) {
         Logger logger = LoggerFactory.getLogger(ContainerInitializer.class);
         if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
-            // We can't go ahead if FrameworkLauncher is not passed by container.
+            // We can't go ahead if StartupAware implementations is not passed by container.
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
             ServletContextHolder.INSTANCE.setServletContext(context);
             context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
-            startupAwareClasses.forEach(startupAwareClass -> {
-                logger.info("Handling @HandlesTypes: [{}]", startupAwareClass);
+            TreeSet<Class<?>> sortedHandlesTypesSet = new TreeSet<>(new StartupAwareComparator());
+            sortedHandlesTypesSet.addAll(startupAwareClasses);
+            sortedHandlesTypesSet.forEach(handlesTypes -> {
+                logger.info("@HandlesTypes: [{}]", handlesTypes);
                 try {
-                    if (StartupAware.class.isAssignableFrom(startupAwareClass)) {
-                        StartupAware.class.cast(startupAwareClass.getDeclaredConstructor().newInstance()).onStartup(context);
+                    if (StartupAware.class.isAssignableFrom(handlesTypes)) {
+                        StartupAware.class.cast(handlesTypes.getDeclaredConstructor().newInstance()).onStartup(context);
                     } else {
-                        logger.warn("Unknown @HandlesTypes: [{}]", startupAwareClass);
+                        logger.warn("Unknown @HandlesTypes: [{}]", handlesTypes);
                         throw new IllegalStateException("Only StartupAware types are supported!!");
                     }
                 } catch (Exception ex) {
-                    logger.error("StartupAware Exception!!", ex);
-                    throw new InitializationException("StartupAware Exception!!", ex);
+                    logger.error("Exception while executing StartupAware#onStartup!!", ex);
+                    throw new InitializationException("Exception while executing StartupAware#onStartup!!", ex);
                 }
             });
             // If we are here means startup went well above, register FrameworkShutdownHandler now.

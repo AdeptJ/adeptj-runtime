@@ -28,14 +28,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarInputStream;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Install the Bundles from given location using the System Bundle's BundleContext.
+ * Find and Install the Bundles from given location using the System Bundle's BundleContext.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -43,7 +45,20 @@ class BundleInstaller {
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
+    private static final String PATTERN_BUNDLE = "^bundles.*\\.jar$";
+
     private final Logger logger = LoggerFactory.getLogger(BundleInstaller.class);
+
+    List<URL> findBundles(String bundlesDir) throws IOException {
+        Pattern pattern = Pattern.compile(PATTERN_BUNDLE);
+        ClassLoader classLoader = Bundles.class.getClassLoader();
+        return JarURLConnection.class.cast(Bundles.class.getResource(bundlesDir).openConnection())
+                .getJarFile()
+                .stream()
+                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
+                .map(jarEntry -> classLoader.getResource(jarEntry.getName()))
+                .collect(Collectors.toList());
+    }
 
     List<Bundle> installBundles(List<URL> bundleUrls, BundleContext systemBundleContext) {
         List<Bundle> installedBundles = bundleUrls

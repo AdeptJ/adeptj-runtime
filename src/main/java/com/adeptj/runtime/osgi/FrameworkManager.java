@@ -23,7 +23,6 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.servlet.BridgeServlet;
 import com.adeptj.runtime.servlet.osgi.PerServletContextErrorServlet;
 import com.typesafe.config.Config;
 import org.apache.commons.io.IOUtils;
@@ -35,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -57,10 +55,6 @@ public enum FrameworkManager {
     INSTANCE;
 
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
-
-    private static final String BRIDGE_SERVLET = "AdeptJ BridgeServlet";
-
-    private static final String ROOT_MAPPING = "/*";
 
     private static final String FELIX_CM_DIR = "felix.cm.dir";
 
@@ -94,11 +88,6 @@ public enum FrameworkManager {
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
-            this.registerBridgeListeners(servletContext);
-            // Set the System Bundle's BundleContext as a ServletContext attribute per the Felix HttpBridge Specification.
-            servletContext.setAttribute(BundleContext.class.getName(), systemBundleContext);
-            this.registerBridgeServlet(servletContext);
-            logger.info("BridgeServlet registered successfully!!");
         } catch (Exception ex) { // NOSONAR
             logger.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
@@ -132,30 +121,9 @@ public enum FrameworkManager {
                 && !Boolean.getBoolean("provision.bundles.explicitly")) {
             logger.info("Bundles already provisioned, this must be a server restart!!");
         } else {
-            logger.info("Provisioning bundles first time!!");
+            logger.info("Provisioning Bundles first time!!");
             Bundles.provisionBundles(systemBundleContext);
         }
-    }
-
-    private void registerBridgeListeners(ServletContext servletContext) {
-        servletContext.addListener(new BridgeServletContextAttributeListener());
-        servletContext.addListener(new BridgeHttpSessionListener());
-        servletContext.addListener(new BridgeHttpSessionIdListener());
-        servletContext.addListener(new BridgeHttpSessionAttributeListener());
-    }
-
-    private void registerBridgeServlet(ServletContext context) {
-        // Register the BridgeServlet after the OSGi Framework started successfully.
-        // This will ensure that the Felix DispatcherServlet is available as an OSGi service and can be tracked.
-        // BridgeServlet delegates all the service calls to the Felix DispatcherServlet.
-        ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET, new BridgeServlet());
-        bridgeServlet.addMapping(ROOT_MAPPING);
-        // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
-        // Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026:
-        // Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
-        bridgeServlet.setAsyncSupported(true);
-        // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
-        bridgeServlet.setLoadOnStartup(0);
     }
 
     private Map<String, String> frameworkConfigs(Logger logger) throws IOException {

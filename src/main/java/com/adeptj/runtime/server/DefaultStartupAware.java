@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -18,28 +18,37 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.osgi;
+package com.adeptj.runtime.server;
 
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.core.StartupAware;
+import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 
 /**
- * FrameworkLauncher is a {@link com.adeptj.runtime.core.StartupAware} that launches the OSGi Framework.
+ * DefaultStartupAware is a {@link com.adeptj.runtime.core.StartupAware} that registers the bridge listeners and servlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(0)
-public class FrameworkLauncher implements StartupAware {
+@StartupOrder(1)
+public class DefaultStartupAware implements StartupAware {
 
     /**
-     * This method will be called by the ServletContainerInitializer while startup is in progress.
-     *
-     * @param servletContext the {@link ServletContext}
+     * {@inheritDoc}
      */
     @Override
     public void onStartup(ServletContext servletContext) {
-        FrameworkManager.INSTANCE.startFramework(servletContext);
+        Logger logger = LoggerFactory.getLogger(DefaultStartupAware.class);
+        Servlets.registerBridgeListeners(servletContext);
+        logger.info("OSGi bridge listeners registered successfully!!");
+        // Set the System Bundle's BundleContext as a ServletContext attribute per the Felix HttpBridge Specification.
+        servletContext.setAttribute(BundleContext.class.getName(), BundleContextHolder.INSTANCE.getBundleContext());
+        Servlets.registerBridgeServlet(servletContext);
+        logger.info("BridgeServlet registered successfully!!");
     }
 }

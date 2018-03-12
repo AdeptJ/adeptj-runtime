@@ -35,8 +35,8 @@ public interface StartupAware {
     /**
      * This method will be called by the ServletContainerInitializer while startup is in progress.
      *
-     * @param context the {@link ServletContext} in which this StartupAware runs in.
+     * @param servletContext the {@link ServletContext} in which this StartupAware runs in.
      * @throws ServletException exception thrown by startup code
      */
-    void onStartup(ServletContext context) throws ServletException;
+    void onStartup(ServletContext servletContext) throws ServletException;
 }

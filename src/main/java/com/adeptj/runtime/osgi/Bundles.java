@@ -28,11 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
@@ -44,8 +41,6 @@ import static org.osgi.framework.Constants.FRAGMENT_HOST;
  */
 final class Bundles {
 
-    private static final String PATTERN_BUNDLE = "^bundles.*\\.jar$";
-
     /**
      * Static utility methods only.
      */
@@ -56,7 +51,7 @@ final class Bundles {
      * Provision the bundles.
      * <p>
      * Following happens in order.
-     * 1. Collect Bundles
+     * 1. Find Bundles
      * 2. Install Bundles
      * 3. Start Bundles
      *
@@ -66,9 +61,10 @@ final class Bundles {
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
-        String rootPath = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
-        List<URL> bundleUrls = collectBundles(rootPath);
-        List<Bundle> bundles = new BundleInstaller().installBundles(bundleUrls, systemBundleContext);
+        String bundlesDir = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+        BundleInstaller bundleInstaller = new BundleInstaller();
+        List<URL> bundleUrls = bundleInstaller.findBundles(bundlesDir);
+        List<Bundle> bundles = bundleInstaller.installBundles(bundleUrls, systemBundleContext);
         startBundles(bundles, logger);
         logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
@@ -85,15 +81,5 @@ final class Bundles {
                         logger.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
                     }
                 });
-    }
-
-    private static List<URL> collectBundles(String rootPath) throws IOException {
-        Pattern pattern = Pattern.compile(PATTERN_BUNDLE);
-        return JarURLConnection.class.cast(Bundles.class.getResource(rootPath).openConnection())
-                .getJarFile()
-                .stream()
-                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
-                .map(jarEntry -> Bundles.class.getClassLoader().getResource(jarEntry.getName()))
-                .collect(Collectors.toList());
     }
 }

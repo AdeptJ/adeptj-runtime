@@ -75,8 +75,9 @@ import java.nio.file.StandardOpenOption;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -405,7 +406,10 @@ public final class Server {
     }
 
     private static ServletContainerInitializerInfo sciInfo() {
-        return new ServletContainerInitializerInfo(ContainerInitializer.class, Collections.singleton(FrameworkLauncher.class));
+        Set<Class<?>> handlesTypes = new HashSet<>();
+        handlesTypes.add(FrameworkLauncher.class);
+        handlesTypes.add(DefaultStartupAware.class);
+        return new ServletContainerInitializerInfo(ContainerInitializer.class, handlesTypes);
     }
 
     private static SecurityConstraint securityConstraint(Config cfg) {

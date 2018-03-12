@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -18,28 +18,30 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.osgi;
+package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.StartupOrder;
-import com.adeptj.runtime.core.StartupAware;
 
-import javax.servlet.ServletContext;
+import java.util.Comparator;
 
 /**
- * FrameworkLauncher is a {@link com.adeptj.runtime.core.StartupAware} that launches the OSGi Framework.
+ * Comparator that compares the StartupAware instances on the basis of the annotation {@link StartupOrder}
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(0)
-public class FrameworkLauncher implements StartupAware {
+public class StartupAwareComparator implements Comparator<Class<?>> {
 
-    /**
-     * This method will be called by the ServletContainerInitializer while startup is in progress.
-     *
-     * @param servletContext the {@link ServletContext}
-     */
     @Override
-    public void onStartup(ServletContext servletContext) {
-        FrameworkManager.INSTANCE.startFramework(servletContext);
+    public int compare(Class<?> o1, Class<?> o2) {
+        StartupOrder startupOrder1 = o1.getDeclaredAnnotation(StartupOrder.class);
+        StartupOrder startupOrder2 = o2.getDeclaredAnnotation(StartupOrder.class);
+        if (startupOrder1 == null && startupOrder2 == null) {
+            return 0;
+        } else if (startupOrder1 != null && startupOrder2 == null) {
+            return 1;
+        } else if (startupOrder1 == null) {
+            return -1;
+        }
+        return Integer.compare(startupOrder1.value(), startupOrder2.value());
     }
 }
