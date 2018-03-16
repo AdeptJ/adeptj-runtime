@@ -109,7 +109,7 @@ import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
- * Provisions the Undertow Web Server, start OSGi framework and much more. AdeptJRuntime
+ * Provisions the Undertow Web Server, start OSGi framework and much more.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

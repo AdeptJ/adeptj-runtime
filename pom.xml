@@ -76,8 +76,8 @@
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.2.Final</adeptj-modules-webconsole-security.version>
-        <adeptj-modules-commons-utils.version>1.0.0.Final</adeptj-modules-commons-utils.version>
-        <adeptj-runtime-tools.version>1.0.3.Final</adeptj-runtime-tools.version>
+        <adeptj-modules-commons-utils.version>1.0.1.Final</adeptj-modules-commons-utils.version>
+        <adeptj-runtime-tools.version>1.0.4.Final</adeptj-runtime-tools.version>
     </properties>
 
     <!-- Project Information -->
@@ -1099,21 +1099,21 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.7.Final</version>
+                    <version>1.0.8.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.7.Final</version>
+                    <version>1.0.8.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.10.Final</version>
+                    <version>1.0.11.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
