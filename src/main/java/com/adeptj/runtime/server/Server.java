@@ -77,7 +77,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -301,19 +300,19 @@ public final class Server {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
+            String host = httpsConf.getString(KEY_HOST);
             if (Boolean.getBoolean("use.supplied.keyStore")) {
                 String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
                 String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
                 String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
                 KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray());
                 logger.info("KeyStore loaded from location: [{}]", keyStoreLoc);
-                undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), getSslContext(keyStore, keyPwd.toCharArray()));
+                undertowBuilder.addHttpsListener(httpsPort, host, getSslContext(keyStore, keyPwd.toCharArray()));
             } else {
                 char[] cfgKeyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
                 KeyStore keyStore = KeyStores.getDefaultKeyStore(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd);
                 logger.info("Default KeyStore loaded!!");
-                undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST),
-                        getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
+                undertowBuilder.addHttpsListener(httpsPort, host, getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
             }
             logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
@@ -355,6 +354,7 @@ public final class Server {
             socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress(port));
             portAvailable = true;
+            //socket.close();
         } catch (BindException ex) {
             logger.error("BindException while acquiring port: [{}], cause:", port, ex);
         } catch (IOException ex) {

@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -39,7 +41,7 @@ import java.security.cert.CertificateException;
 public final class KeyStores {
 
     public static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
-        try (InputStream is = new FileInputStream(keyStoreLoc)) {
+        try (InputStream is = Files.newInputStream(Paths.get(keyStoreLoc))) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;
