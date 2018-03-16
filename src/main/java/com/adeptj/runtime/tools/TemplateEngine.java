@@ -33,8 +33,4 @@ public interface TemplateEngine {
      * @param context the TemplateEngine context
      */
     void render(TemplateContext context);
-
-    static TemplateEngine getInstance() {
-        return DefaultTemplateEngine.INSTANCE;
-    }
 }

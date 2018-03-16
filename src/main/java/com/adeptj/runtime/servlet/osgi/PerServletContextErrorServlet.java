@@ -20,14 +20,12 @@
 
 package com.adeptj.runtime.servlet.osgi;
 
-import com.adeptj.runtime.servlet.ErrorPageUtil;
+import com.adeptj.runtime.servlet.ErrorPages;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * PerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
@@ -43,6 +41,6 @@ public class PerServletContextErrorServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        ErrorPageUtil.renderOSGiErrorPage(req, resp);
+        ErrorPages.renderOSGiErrorPage(req, resp);
     }
 }

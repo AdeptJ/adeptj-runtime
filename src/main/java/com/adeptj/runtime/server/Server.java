@@ -109,11 +109,13 @@ import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
- * Provisions the Undertow Web Server, start OSGi framework and much more.
+ * Provisions the Undertow Web Server, start OSGi framework and much more. AdeptJRuntime
  *
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class Server {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
     private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
 
@@ -219,59 +221,58 @@ public final class Server {
                 .collect(toMap(cmdArray -> cmdArray[IDX_ZERO], cmdArray -> cmdArray[IDX_ONE]));
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        Logger logger = LoggerFactory.getLogger(Server.class);
-        logger.debug("Commands to AdeptJ Runtime: {}", commands);
-        int httpPort = handlePortAvailability(httpConf, logger);
-        logger.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
-        printBanner(logger);
+        LOGGER.debug("Commands to AdeptJ Runtime: {}", commands);
+        int httpPort = handlePortAvailability(httpConf);
+        LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
+        printBanner();
         DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
         manager.deploy();
         Builder builder = Undertow.builder();
-        optimizeWorkerOptions(builder, undertowConf, logger);
+        optimizeWorkerOptions(builder, undertowConf);
         ServerOptions.build(builder, undertowConf);
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-        enableHttp2(undertowConf, builder, logger);
-        enableAJP(undertowConf, builder, logger);
+        enableHttp2(undertowConf, builder);
+        enableAJP(undertowConf, builder);
         GracefulShutdownHandler rootHandler = rootHandler(headersHandler(manager.start(), undertowConf), undertowConf);
         Undertow server = builder.setHandler(rootHandler).build();
         server.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
-        launchBrowser(commands, httpPort, logger);
+        launchBrowser(commands, httpPort);
         if (!Environment.isServerConfFileExists()) {
-            createServerConfFile(logger);
+            createServerConfFile();
         }
     }
 
-    private static void printBanner(Logger logger) {
+    private static void printBanner() {
         try (InputStream stream = Server.class.getResourceAsStream(BANNER_TXT)) {
-            logger.info(IOUtils.toString(stream)); // NOSONAR
+            LOGGER.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
-            logger.error("IOException!!", ex);
+            LOGGER.error("IOException!!", ex);
         }
     }
 
-    private static void launchBrowser(Map<String, String> arguments, int httpPort, Logger logger) {
+    private static void launchBrowser(Map<String, String> arguments, int httpPort) {
         if (Boolean.parseBoolean(arguments.get(ARG_OPEN_CONSOLE))) {
             try {
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
             } catch (IOException ex) {
                 // Just log it, its okay if browser is not launched.
-                logger.error("IOException!!", ex);
+                LOGGER.error("IOException!!", ex);
             }
         }
     }
 
-    private static void createServerConfFile(Logger logger) {
+    private static void createServerConfFile() {
         try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
             Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                     IOUtils.toBytes(stream), StandardOpenOption.CREATE);
         } catch (IOException ex) {
-            logger.error("IOException!!", ex);
+            LOGGER.error("IOException!!", ex);
         }
     }
 
-    private static void optimizeWorkerOptions(Builder builder, Config undertowConf, Logger logger) {
+    private static void optimizeWorkerOptions(Builder builder, Config undertowConf) {
         if (Environment.isProd()) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
@@ -290,41 +291,37 @@ public final class Server {
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
-            logger.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
+            LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
     }
 
-    private static void enableHttp2(Config undertowConf, Builder undertowBuilder, Logger logger) {
+    private static void enableHttp2(Config undertowConf, Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
-            String host = httpsConf.getString(KEY_HOST);
-            if (Boolean.getBoolean("use.supplied.keyStore")) {
-                undertowBuilder.addHttpsListener(httpsPort, host, SslContextFactory.createSslContext(false));
-                logger.info("HTTP2 enabled @ port: [{}] using supplied KeyStore.", httpsPort);
-            } else {
+            if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
                 System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString(KEY_KEYSTORE_PWD));
                 System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString(KEY_KEYPWD));
-                undertowBuilder.addHttpsListener(httpsPort, host, SslContextFactory.createSslContext(true));
-                logger.info("HTTP2 enabled @ port: [{}] using default KeyStore.", httpsPort);
+                LOGGER.info("HTTP2 will be enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
+            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.createSslContext());
         }
     }
 
-    private static void enableAJP(Config undertowConf, Builder undertowBuilder, Logger logger) {
+    private static void enableAJP(Config undertowConf, Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
             Config ajpConf = undertowConf.getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
             undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
-            logger.info("AJP enabled @ port: [{}]", ajpPort);
+            LOGGER.info("AJP enabled @ port: [{}]", ajpPort);
         }
     }
 
-    private static int handlePortAvailability(Config httpConf, Logger logger) {
+    private static int handlePortAvailability(Config httpConf) {
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
-            logger.warn("No port specified via system property: [{}], using default port: [{}]",
+            LOGGER.warn("No port specified via system property: [{}], using default port: [{}]",
                     SYS_PROP_SERVER_PORT, httpConf.getInt(KEY_PORT));
             port = httpConf.getInt(KEY_PORT);
         }
@@ -332,8 +329,8 @@ public final class Server {
         // as it is being started already and another server start(from same location) will again start new OSGi
         // Framework which may interfere with already started OSGi Framework as the bundle deployment, heap dump,
         // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side doing this.
-        if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port, logger)) {
-            logger.error("Port: [{}] already used, shutting down JVM!!", port);
+        if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
+            LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
             LogbackInitializer.stopLogback();
             System.exit(-1); // NOSONAR
@@ -341,7 +338,7 @@ public final class Server {
         return port;
     }
 
-    private static boolean isPortAvailable(int port, Logger logger) {
+    private static boolean isPortAvailable(int port) {
         boolean portAvailable = false;
         ServerSocket socket = null;
         try (ServerSocketChannel socketChannel = ServerSocketChannel.open()) {
@@ -350,15 +347,15 @@ public final class Server {
             socket.bind(new InetSocketAddress(port));
             portAvailable = true;
         } catch (BindException ex) {
-            logger.error("BindException while acquiring port: [{}], cause:", port, ex);
+            LOGGER.error("BindException while acquiring port: [{}], cause:", port, ex);
         } catch (IOException ex) {
-            logger.error("IOException while acquiring port: [{}], cause:", port, ex);
+            LOGGER.error("IOException while acquiring port: [{}], cause:", port, ex);
         } finally {
             if (socket != null) {
                 try {
                     socket.close();
                 } catch (IOException ex) {
-                    logger.error("IOException while closing socket!!", ex);
+                    LOGGER.error("IOException while closing socket!!", ex);
                 }
             }
         }
@@ -455,7 +452,7 @@ public final class Server {
                     .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                     .getMap());
         } catch (IOException ex) {
-            LoggerFactory.getLogger(Server.class).error("Can't create XnioWorker!!", ex);
+            LOGGER.error("Can't create XnioWorker!!", ex);
         }
         return worker;
     }

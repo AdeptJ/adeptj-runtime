@@ -25,11 +25,8 @@ import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +57,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(Account account) {
-        return this.userRolesMapping
-                .entrySet()
-                .stream()
-                .anyMatch(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
-                        && entry.getValue().containsAll(account.getRoles())) ? account : null;
+        return IdmUtil.verifyAccount(this.userRolesMapping, account);
     }
 
     /**
@@ -72,16 +65,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        PasswordCredential pwdCredential = (PasswordCredential) credential;
-        return this.userRolesMapping
-                .entrySet()
-                .stream()
-                .filter(entry -> StringUtils.equals(entry.getKey(), id)
-                        && ArrayUtils.isNotEmpty(pwdCredential.getPassword())
-                        && CredentialMatcher.match(entry.getKey(), new String(pwdCredential.getPassword())))
-                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
-                .findFirst()
-                .orElse(null);
+        return IdmUtil.verifyCredentials(this.userRolesMapping, id, (PasswordCredential) credential);
     }
 
     /**

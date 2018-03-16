@@ -36,8 +36,11 @@ class ServerLogsTailer {
 
     private Tailer tailer;
 
-    void startTailer(File logFile, Session session) {
+    ServerLogsTailer(File logFile, Session session) {
         this.tailer = Tailer.create(logFile, new ServerLogsTailerListener(logFile, session), DELAY_MILLIS, true);
+    }
+
+    void startTailer() {
         ServerLogsTailerExecutor.INSTANCE.execute(this.tailer);
     }
 

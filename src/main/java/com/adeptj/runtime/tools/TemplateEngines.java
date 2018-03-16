@@ -39,9 +39,14 @@ import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-final class TemplateEngineUtil {
+public final class TemplateEngines {
 
     private static final String RB_HELPER_NAME = "msg";
+
+
+    public static TemplateEngine getDefault() {
+        return DefaultTemplateEngine.INSTANCE;
+    }
 
     static MustacheEngine buildMustacheEngine() {
         ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);

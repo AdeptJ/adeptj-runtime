@@ -51,7 +51,7 @@ public class ContainerInitializer implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) {
         Logger logger = LoggerFactory.getLogger(ContainerInitializer.class);
         if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
-            // We can't go ahead if StartupAware implementations is not passed by container.
+            // We can't go ahead if StartupAware implementations are not passed by container.
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {

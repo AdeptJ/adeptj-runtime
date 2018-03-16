@@ -49,7 +49,7 @@ public final class IOUtils {
         return toByteArrayOutputStream(input).toByteArray();
     }
 
-    public static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
+    private static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Streams.copyStream(source, out);
         return out;

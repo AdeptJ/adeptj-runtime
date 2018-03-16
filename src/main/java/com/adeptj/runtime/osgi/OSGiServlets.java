@@ -53,6 +53,8 @@ public enum OSGiServlets {
 
     INSTANCE;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OSGiServlets.class);
+
     private static final String ALL_CONTEXT_SELECT_FILTER = "(osgi.http.whiteboard.context.name=*)";
 
     /**
@@ -74,7 +76,7 @@ public enum OSGiServlets {
         this.handleInitParams(webServlet, properties);
         this.handleName(cls, webServlet.name(), properties);
         String servletFQCN = cls.getName();
-        LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi Servlet: [{}]", servletFQCN);
+        LOGGER.info("Registering OSGi Servlet: [{}]", servletFQCN);
         this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, servlet, properties));
     }
 
@@ -89,7 +91,7 @@ public enum OSGiServlets {
         this.handleInitParams(webServlet, properties);
         this.handleName(cls, webServlet.name(), properties);
         String servletFQCN = cls.getName();
-        LoggerFactory.getLogger(OSGiServlets.class).info("Registering OSGi ErrorServlet: [{}]", servletFQCN);
+        LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletFQCN);
         this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, errorServlet, properties));
     }
 
@@ -98,9 +100,8 @@ public enum OSGiServlets {
     }
 
     public void unregisterAll() {
-        Logger logger = LoggerFactory.getLogger(OSGiServlets.class);
         this.servlets.forEach((servletName, serviceRegistration) -> {
-            logger.info("Unregistering OSGi Servlet: [{}]", servletName);
+            LOGGER.info("Unregistering OSGi Servlet: [{}]", servletName);
             serviceRegistration.unregister();
         });
     }

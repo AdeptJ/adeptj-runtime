@@ -23,6 +23,7 @@ package com.adeptj.runtime.server;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.tools.OSGiConsolePasswordVault;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
@@ -41,6 +42,8 @@ import static com.adeptj.runtime.common.Constants.UTF8;
  * @author Rakesh.Kumar, AdeptJ
  */
 final class CredentialMatcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CredentialMatcher.class);
 
     private static final String SHA256 = "SHA-256";
 
@@ -76,7 +79,7 @@ final class CredentialMatcher {
         try {
             return Arrays.equals(toHash(pwd).toCharArray(), OSGiConsolePasswordVault.INSTANCE.getPassword());
         } catch (Exception ex) { // NOSONAR
-            LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
+            LOGGER.error("Exception!!", ex);
         }
         return false;
     }
@@ -88,7 +91,7 @@ final class CredentialMatcher {
                     new String(Base64.getEncoder()
                             .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), UTF8);
         } catch (Exception ex) { // NOSONAR
-            LoggerFactory.getLogger(CredentialMatcher.class).error("Exception!!", ex);
+            LOGGER.error("Exception!!", ex);
         }
         return hashPassword;
     }

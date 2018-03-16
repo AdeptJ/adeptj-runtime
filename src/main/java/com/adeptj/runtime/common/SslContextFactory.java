@@ -40,15 +40,14 @@ public final class SslContextFactory {
 
     private static final String PROTOCOL_TLS = "TLS";
 
-    public static SSLContext createSslContext(boolean useDefaultKeyStore) {
+    public static SSLContext createSslContext() {
         try {
             String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
             String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
             String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
-            KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray(), useDefaultKeyStore);
-            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStore, keyPwd.toCharArray());
+            kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
+            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
             sslContext.init(kmf.getKeyManagers(), null, null);
             return sslContext;
         } catch (NoSuchAlgorithmException | KeyManagementException | UnrecoverableKeyException | KeyStoreException ex) {

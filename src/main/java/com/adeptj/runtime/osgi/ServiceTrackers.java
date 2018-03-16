@@ -23,6 +23,7 @@ package com.adeptj.runtime.osgi;
 import com.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
@@ -38,6 +39,8 @@ import java.util.Optional;
 public enum ServiceTrackers {
 
     INSTANCE;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTrackers.class);
 
     private volatile boolean dispatcherServletInitialized;
 
@@ -75,7 +78,7 @@ public enum ServiceTrackers {
 
     protected void openEventDispatcherTracker(BundleContext bundleContext) {
         if (this.eventDispatcherTracker == null) {
-            LoggerFactory.getLogger(this.getClass()).info("Opening EventDispatcherTracker!!");
+            LOGGER.info("Opening EventDispatcherTracker!!");
             this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
             this.eventDispatcherTracker.open();
         }
@@ -84,7 +87,7 @@ public enum ServiceTrackers {
     protected void closeEventDispatcherTracker() {
         if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
             this.eventDispatcherTracker.close();
-            LoggerFactory.getLogger(this.getClass()).info("EventDispatcherTracker Closed!!");
+            LOGGER.info("EventDispatcherTracker Closed!!");
         }
         this.eventDispatcherTracker = null;
     }

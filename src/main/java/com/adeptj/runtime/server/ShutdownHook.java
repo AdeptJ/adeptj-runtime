@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
  */
 final class ShutdownHook extends Thread {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShutdownHook.class);
+
     private static final long DEFAULT_WAIT_TIME = 60000L;
 
     private static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
@@ -60,31 +62,30 @@ final class ShutdownHook extends Thread {
     @Override
     public void run() {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
-        logger.info("Stopping AdeptJ Runtime!!");
+        LOGGER.info("Stopping AdeptJ Runtime!!");
         try {
-            this.gracefulShutdown(logger);
+            this.gracefulShutdown();
             this.manager.stop();
             this.manager.undeploy();
             this.server.stop();
-            logger.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
+            LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
             ServerLogsTailerExecutor.INSTANCE.shutdownExecutorService();
         } catch (Exception ex) { // NOSONAR
-            logger.error("Exception while stopping AdeptJ Runtime!!", ex);
+            LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the Logback cleans up it's state.
             LogbackInitializer.stopLogback();
         }
     }
 
-    private void gracefulShutdown(Logger logger) {
+    private void gracefulShutdown() {
         try {
             this.shutdownHandler.shutdown();
             if (this.shutdownHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
-                logger.info("Completed remaining requests successfully!!");
+                LOGGER.info("Completed remaining requests successfully!!");
             }
         } catch (InterruptedException ie) {
-            logger.error("Error while waiting for pending request to complete!!", ie);
+            LOGGER.error("Error while waiting for pending request to complete!!", ie);
             Thread.currentThread().interrupt();
         }
     }

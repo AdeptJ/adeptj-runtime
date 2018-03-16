@@ -66,6 +66,10 @@ public final class Environment {
     private Environment() {
     }
 
+    public static boolean useProvidedKeyStore() {
+        return Boolean.getBoolean("use.provided.keyStore");
+    }
+
     public static boolean isProd() {
         return ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
     }

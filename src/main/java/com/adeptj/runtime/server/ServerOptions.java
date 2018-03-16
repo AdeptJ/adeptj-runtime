@@ -37,6 +37,8 @@ import java.util.Map;
  */
 final class ServerOptions {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerOptions.class);
+
     private static final String SERVER_OPTIONS = "server-options";
 
     private static final String OPTIONS_TYPE_STRING = "options-type-string";
@@ -61,42 +63,41 @@ final class ServerOptions {
      */
     public static void build(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(ServerOptions.class);
         Config serverOptionsCfg = undertowConfig.getConfig(SERVER_OPTIONS);
-        stringOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_STRING).unwrapped(), logger);
-        integerOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped(), logger);
-        longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped(), logger);
-        booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped(), logger);
-        logger.info("ServerOptions populated in [{}] ms!!", Times.elapsedMillis(startTime));
+        stringOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_STRING).unwrapped());
+        integerOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped());
+        longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped());
+        booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
+        LOGGER.info("ServerOptions populated in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
-    private static void buildServerOptions(Builder builder, Map<String, ?> options, Logger logger) {
-        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), optVal));
+    private static void buildServerOptions(Builder builder, Map<String, ?> options) {
+        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), optVal));
     }
 
-    private static void stringOptions(Builder builder, Map<String, ?> options, Logger logger) {
-        buildServerOptions(builder, options, logger);
+    private static void stringOptions(Builder builder, Map<String, ?> options) {
+        buildServerOptions(builder, options);
     }
 
-    private static void integerOptions(Builder builder, Map<String, ?> options, Logger logger) {
-        buildServerOptions(builder, options, logger);
+    private static void integerOptions(Builder builder, Map<String, ?> options) {
+        buildServerOptions(builder, options);
     }
 
-    private static void booleanOptions(Builder builder, Map<String, ?> options, Logger logger) {
-        buildServerOptions(builder, options, logger);
+    private static void booleanOptions(Builder builder, Map<String, ?> options) {
+        buildServerOptions(builder, options);
     }
 
-    private static void longOptions(Builder builder, Map<String, ?> options, Logger logger) {
-        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey, logger), Long.valueOf((String) optVal)));
+    private static void longOptions(Builder builder, Map<String, ?> options) {
+        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), Long.valueOf((String) optVal)));
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> Option<T> toOption(String name, Logger logger) {
+    private static <T> Option<T> toOption(String name) {
         Option<T> option = null;
         try {
             option = Option.class.cast(UndertowOptions.class.getField(name).get(null));
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            logger.error("Exception while accessing field: [{}]", name, ex);
+            LOGGER.error("Exception while accessing field: [{}]", name, ex);
         }
         return option;
     }

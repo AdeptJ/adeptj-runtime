@@ -22,30 +22,15 @@ package com.adeptj.runtime.tools;
 
 import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.config.ViewEngineConfig;
-import com.typesafe.config.ConfigBeanFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
-import org.trimou.engine.MustacheEngineBuilder;
-import org.trimou.engine.locator.ClassPathTemplateLocator;
-import org.trimou.engine.locator.TemplateLocator;
-import org.trimou.handlebars.Helper;
-import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
-import static com.adeptj.runtime.common.Constants.UTF8;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
-import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENABLED;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
-import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 
 /**
  * Renders Html Templates using Trimou {@link MustacheEngine}
@@ -56,15 +41,15 @@ public enum DefaultTemplateEngine implements TemplateEngine {
 
     INSTANCE;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
+    private final Logger LOGGER;
 
     private final MustacheEngine mustacheEngine;
 
     DefaultTemplateEngine() {
         long startTime = System.nanoTime();
-        this.mustacheEngine = TemplateEngineUtil.buildMustacheEngine();
-        LoggerFactory.getLogger(DefaultTemplateEngine.class)
-                .info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
+        this.mustacheEngine = TemplateEngines.buildMustacheEngine();
+        LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
+        LOGGER.info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     /**

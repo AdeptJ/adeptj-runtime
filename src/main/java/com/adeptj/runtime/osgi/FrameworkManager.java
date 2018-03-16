@@ -33,7 +33,6 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -54,6 +53,8 @@ public enum FrameworkManager {
 
     INSTANCE;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkManager.class);
+
     private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
 
     private static final String FELIX_CM_DIR = "felix.cm.dir";
@@ -70,33 +71,31 @@ public enum FrameworkManager {
 
     private FrameworkRestartHandler frameworkListener;
 
-    public void startFramework(ServletContext servletContext) {
-        Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
+    public void startFramework() {
         try {
-            logger.info("Starting the OSGi Framework!!");
+            LOGGER.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
-            this.framework = frameworkFactory.newFramework(this.frameworkConfigs(logger));
+            this.framework = frameworkFactory.newFramework(this.frameworkConfigs());
             long startTimeFramework = System.nanoTime();
             this.framework.start();
-            logger.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
+            LOGGER.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
             BundleContext systemBundleContext = this.framework.getBundleContext();
             this.frameworkListener = new FrameworkRestartHandler();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
-            this.provisionBundles(systemBundleContext, logger);
+            this.provisionBundles(systemBundleContext);
             OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
-            logger.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
+            LOGGER.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
-            logger.error("Failed to start OSGi Framework!!", ex);
+            LOGGER.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
             this.stopFramework();
         }
     }
 
     public void stopFramework() {
-        Logger logger = LoggerFactory.getLogger(FrameworkManager.class);
         try {
             if (this.framework != null) {
                 if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
@@ -106,37 +105,37 @@ public enum FrameworkManager {
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
-                logger.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType())); // NOSONAR
+                LOGGER.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType())); // NOSONAR
             } else {
-                logger.info("OSGi Framework not started yet, nothing to stop!!");
+                LOGGER.info("OSGi Framework not started yet, nothing to stop!!");
             }
         } catch (Exception ex) { // NOSONAR
-            logger.error("Error Stopping OSGi Framework!!", ex);
+            LOGGER.error("Error Stopping OSGi Framework!!", ex);
         }
     }
 
-    private void provisionBundles(BundleContext systemBundleContext, Logger logger) throws IOException {
+    private void provisionBundles(BundleContext systemBundleContext) throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
         if (Files.exists(Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)))
                 && !Boolean.getBoolean("provision.bundles.explicitly")) {
-            logger.info("Bundles already provisioned, this must be a server restart!!");
+            LOGGER.info("Bundles already provisioned, this must be a server restart!!");
         } else {
-            logger.info("Provisioning Bundles first time!!");
+            LOGGER.info("Provisioning Bundles first time!!");
             Bundles.provisionBundles(systemBundleContext);
         }
     }
 
-    private Map<String, String> frameworkConfigs(Logger logger) throws IOException {
-        Map<String, String> configs = this.loadFrameworkProperties(logger);
+    private Map<String, String> frameworkConfigs() throws IOException {
+        Map<String, String> configs = this.loadFrameworkProperties();
         Config felixConf = Configs.DEFAULT.felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
         ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
-        logger.debug("OSGi Framework Configurations: {}", configs);
+        LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
 
-    private Map<String, String> loadFrameworkProperties(Logger logger) throws IOException {
+    private Map<String, String> loadFrameworkProperties() {
         Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
         if (Environment.isFrameworkConfFileExists()) {
@@ -144,31 +143,31 @@ public enum FrameworkManager {
                 props.load(is);
                 props.forEach((key, val) -> configs.put((String) key, (String) val));
             } catch (IOException ex) {
-                logger.error("IOException while loading framework.properties from file system!!", ex);
+                LOGGER.error("IOException while loading framework.properties from file system!!", ex);
                 // Fallback is try to load the classpath framework.properties
-                this.loadClasspathFrameworkProperties(props, configs, logger);
+                this.loadClasspathFrameworkProperties(props, configs);
             }
         } else {
-            this.loadClasspathFrameworkProperties(props, configs, logger);
-            this.createFrameworkPropertiesFile(logger);
+            this.loadClasspathFrameworkProperties(props, configs);
+            this.createFrameworkPropertiesFile();
         }
         return configs;
     }
 
-    private void loadClasspathFrameworkProperties(Properties props, Map<String, String> configs, Logger logger) {
+    private void loadClasspathFrameworkProperties(Properties props, Map<String, String> configs) {
         try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
             props.load(is);
             props.forEach((key, val) -> configs.put((String) key, (String) val));
         } catch (IOException exception) {
-            logger.error("IOException while loading framework.properties from classpath!!", exception);
+            LOGGER.error("IOException while loading framework.properties from classpath!!", exception);
         }
     }
 
-    private void createFrameworkPropertiesFile(Logger logger) {
+    private void createFrameworkPropertiesFile() {
         try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
             Files.write(Environment.getFrameworkConfPath(), IOUtils.toByteArray(is));
         } catch (IOException ex) {
-            logger.error("IOException!!", ex);
+            LOGGER.error("IOException!!", ex);
         }
     }
 }

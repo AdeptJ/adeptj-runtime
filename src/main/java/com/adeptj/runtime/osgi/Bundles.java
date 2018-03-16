@@ -41,6 +41,8 @@ import static org.osgi.framework.Constants.FRAGMENT_HOST;
  */
 final class Bundles {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Bundles.class);
+
     /**
      * Static utility methods only.
      */
@@ -60,25 +62,24 @@ final class Bundles {
      */
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(Bundles.class);
         String bundlesDir = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
         BundleInstaller bundleInstaller = new BundleInstaller();
         List<URL> bundleUrls = bundleInstaller.findBundles(bundlesDir);
         List<Bundle> bundles = bundleInstaller.installBundles(bundleUrls, systemBundleContext);
-        startBundles(bundles, logger);
-        logger.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
+        startBundles(bundles);
+        LOGGER.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
-    private static void startBundles(List<Bundle> bundles, Logger logger) {
+    private static void startBundles(List<Bundle> bundles) {
         // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
         bundles.stream()
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
                 .forEach(bundle -> {
                     try {
                         bundle.start();
-                        logger.info("Bundle: [{}, Version: {}] started.", bundle, bundle.getVersion());
+                        LOGGER.info("Bundle: [{}, Version: {}] started.", bundle, bundle.getVersion());
                     } catch (Exception ex) { // NOSONAR
-                        logger.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
+                        LOGGER.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
                     }
                 });
     }

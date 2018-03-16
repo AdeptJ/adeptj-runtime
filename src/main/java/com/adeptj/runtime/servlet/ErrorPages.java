@@ -25,7 +25,7 @@ import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
-import com.adeptj.runtime.tools.TemplateEngine;
+import com.adeptj.runtime.tools.TemplateEngines;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,11 +39,11 @@ import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
- * ErrorPageUtil
+ * ErrorPages
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class ErrorPageUtil {
+public final class ErrorPages {
 
     private static final String STATUS_500 = "500";
 
@@ -65,13 +65,13 @@ public final class ErrorPageUtil {
 
     private static final String TEMPLATE_ERROR_RESOLVABLE = "error/%s";
 
-    private ErrorPageUtil() {
+    private ErrorPages() {
     }
 
     public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         Integer statusCode = (Integer) RequestUtil.getAttribute(req, ERROR_STATUS_CODE);
         if (RequestUtil.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            TemplateEngine.getInstance().render(TemplateContext.builder()
+            TemplateEngines.getDefault().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .locale(req.getLocale())
@@ -83,29 +83,29 @@ public final class ErrorPageUtil {
                     .template(TEMPLATE_500)
                     .build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            ErrorPageUtil.render500Page(req, resp);
+            ErrorPages.render500Page(req, resp);
         } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
-            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
+            ErrorPages.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
         }
     }
 
     static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), SLASH);
         if (TEMPLATE_ERROR.equals(req.getRequestURI())) {
-            ErrorPageUtil.renderGenericErrorPage(req, resp);
+            ErrorPages.renderGenericErrorPage(req, resp);
         } else if (STATUS_500.equals(statusCode)) {
-            ErrorPageUtil.render500Page(req, resp);
+            ErrorPages.render500Page(req, resp);
         } else if (RequestUtil.hasException(req) && STATUS_500.equals(statusCode)) {
-            ErrorPageUtil.render500PageWithExceptionTrace(req, resp);
+            ErrorPages.render500PageWithExceptionTrace(req, resp);
         } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
-            ErrorPageUtil.renderErrorPageForStatusCode(req, resp, statusCode);
+            ErrorPages.renderErrorPageForStatusCode(req, resp, statusCode);
         } else {
             ResponseUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
     private static void renderGenericErrorPage(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -114,7 +114,7 @@ public final class ErrorPageUtil {
     }
 
     private static void renderErrorPageForStatusCode(HttpServletRequest req, HttpServletResponse resp, String statusCode) {
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -123,7 +123,7 @@ public final class ErrorPageUtil {
     }
 
     private static void render500Page(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -132,7 +132,7 @@ public final class ErrorPageUtil {
     }
 
     private static void render500PageWithExceptionTrace(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())

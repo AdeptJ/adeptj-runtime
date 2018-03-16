@@ -23,11 +23,10 @@ package com.adeptj.runtime.servlet;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
-import com.adeptj.runtime.tools.TemplateEngine;
+import com.adeptj.runtime.tools.TemplateEngines;
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.Bundle;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +73,7 @@ public class ToolsServlet extends HttpServlet {
         Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(TOOLS_TEMPLATE)

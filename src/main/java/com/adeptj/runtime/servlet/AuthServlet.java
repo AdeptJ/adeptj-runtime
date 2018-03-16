@@ -22,7 +22,7 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
-import com.adeptj.runtime.tools.TemplateEngine;
+import com.adeptj.runtime.tools.TemplateEngines;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -73,7 +73,7 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngine.getInstance().render(TemplateContext.builder()
+            TemplateEngines.getDefault().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .template(LOGIN_TEMPLATE)
@@ -95,7 +95,7 @@ public class AuthServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngine.getInstance().render(TemplateContext.builder()
+        TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(LOGIN_TEMPLATE)

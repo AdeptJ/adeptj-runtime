@@ -2,6 +2,7 @@
 cd ../target
 java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
  -Dadeptj.rt.port=9007 \
+ -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
  -Dlog.async=true \
@@ -13,7 +14,7 @@ java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 
  -Dmax.concurrent.requests=5000 \
  -Denable.req.buffering=true \
  -Dreq.buff.maxBuffers=200 \
- -Duse.supplied.keyStore=false \
+ -Duse.provided.keyStore=false \
  -Djavax.net.ssl.keyStore=/Users/rakesh.kumar/AdeptJRuntime.jks \
  -Djavax.net.ssl.keyStorePassword=AdeptJUndertow@Xnio \
  -Djavax.net.ssl.keyPassword=AdeptJUndertow@Xnio \
