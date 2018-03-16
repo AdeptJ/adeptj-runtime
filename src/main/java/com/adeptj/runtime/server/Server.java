@@ -22,7 +22,7 @@ package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
-import com.adeptj.runtime.common.KeyStores;
+import com.adeptj.runtime.common.SslContextFactory;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
@@ -72,7 +72,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -104,7 +103,6 @@ import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
-import static com.adeptj.runtime.common.SslUtil.getSslContext;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static java.util.stream.Collectors.toMap;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
@@ -302,19 +300,15 @@ public final class Server {
             int httpsPort = httpsConf.getInt(KEY_PORT);
             String host = httpsConf.getString(KEY_HOST);
             if (Boolean.getBoolean("use.supplied.keyStore")) {
-                String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
-                String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
-                String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
-                KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray());
-                logger.info("KeyStore loaded from location: [{}]", keyStoreLoc);
-                undertowBuilder.addHttpsListener(httpsPort, host, getSslContext(keyStore, keyPwd.toCharArray()));
+                undertowBuilder.addHttpsListener(httpsPort, host, SslContextFactory.createSslContext(false));
+                logger.info("HTTP2 enabled @ port: [{}] using supplied KeyStore.", httpsPort);
             } else {
-                char[] cfgKeyStorePwd = httpsConf.getString(KEY_KEYSTORE_PWD).toCharArray();
-                KeyStore keyStore = KeyStores.getDefaultKeyStore(httpsConf.getString(KEY_KEYSTORE), cfgKeyStorePwd);
-                logger.info("Default KeyStore loaded!!");
-                undertowBuilder.addHttpsListener(httpsPort, host, getSslContext(keyStore, httpsConf.getString(KEY_KEYPWD).toCharArray()));
+                System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
+                System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString(KEY_KEYSTORE_PWD));
+                System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString(KEY_KEYPWD));
+                undertowBuilder.addHttpsListener(httpsPort, host, SslContextFactory.createSslContext(true));
+                logger.info("HTTP2 enabled @ port: [{}] using default KeyStore.", httpsPort);
             }
-            logger.info("HTTP2 enabled @ port: [{}]", httpsPort);
         }
     }
 
@@ -349,16 +343,24 @@ public final class Server {
 
     private static boolean isPortAvailable(int port, Logger logger) {
         boolean portAvailable = false;
-        try (ServerSocketChannel channel = ServerSocketChannel.open()) {
-            ServerSocket socket = channel.socket();
+        ServerSocket socket = null;
+        try (ServerSocketChannel socketChannel = ServerSocketChannel.open()) {
+            socket = socketChannel.socket();
             socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress(port));
             portAvailable = true;
-            //socket.close();
         } catch (BindException ex) {
             logger.error("BindException while acquiring port: [{}], cause:", port, ex);
         } catch (IOException ex) {
             logger.error("IOException while acquiring port: [{}], cause:", port, ex);
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException ex) {
+                    logger.error("IOException while closing socket!!", ex);
+                }
+            }
         }
         return portAvailable;
     }

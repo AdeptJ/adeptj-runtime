@@ -23,7 +23,6 @@ package com.adeptj.runtime.common;
 import com.adeptj.runtime.exception.InitializationException;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -40,24 +39,14 @@ import java.security.cert.CertificateException;
  */
 public final class KeyStores {
 
-    public static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
-        try (InputStream is = Files.newInputStream(Paths.get(keyStoreLoc))) {
+    public static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd, boolean defaultKeyStore) {
+        try (InputStream is = defaultKeyStore ? KeyStores.class.getResourceAsStream(keyStoreLoc)
+                : Files.newInputStream(Paths.get(keyStoreLoc))) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
-            LoggerFactory.getLogger(SslUtil.class).error("Exception while loading KeyStore!!", ex);
-            throw new InitializationException(ex.getMessage(), ex);
-        }
-    }
-
-    public static KeyStore getDefaultKeyStore(String defaultKeyStore, char[] keyStorePwd) {
-        try (InputStream is = KeyStores.class.getResourceAsStream(defaultKeyStore)) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, keyStorePwd);
-            return keyStore;
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
-            LoggerFactory.getLogger(SslUtil.class).error("Exception while loading KeyStore!!", ex);
+            LoggerFactory.getLogger(SslContextFactory.class).error("Exception while loading KeyStore!!", ex);
             throw new InitializationException(ex.getMessage(), ex);
         }
     }

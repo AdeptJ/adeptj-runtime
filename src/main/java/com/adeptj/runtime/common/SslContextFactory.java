@@ -36,19 +36,23 @@ import java.security.UnrecoverableKeyException;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class SslUtil {
+public final class SslContextFactory {
 
     private static final String PROTOCOL_TLS = "TLS";
 
-    public static SSLContext getSslContext(KeyStore keyStore, char[] keyPwd) {
+    public static SSLContext createSslContext(boolean useDefaultKeyStore) {
         try {
+            String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
+            String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
+            String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
+            KeyStore keyStore = KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray(), useDefaultKeyStore);
             SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keyStore, keyPwd);
+            kmf.init(keyStore, keyPwd.toCharArray());
             sslContext.init(kmf.getKeyManagers(), null, null);
             return sslContext;
         } catch (NoSuchAlgorithmException | KeyManagementException | UnrecoverableKeyException | KeyStoreException ex) {
-            LoggerFactory.getLogger(SslUtil.class).error("Exception while initializing SSLContext!!", ex);
+            LoggerFactory.getLogger(SslContextFactory.class).error("Exception while initializing SSLContext!!", ex);
             throw new InitializationException("Exception while initializing SSLContext!!", ex);
         }
     }
