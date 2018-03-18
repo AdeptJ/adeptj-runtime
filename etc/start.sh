@@ -8,6 +8,7 @@ java -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 
  -Dlog.async=true \
  -Dlog.immediate.flush=true \
  -Dfelix.log.level=3 \
+ -Dbenchmark.bundle.start=true \
  -Dprovision.bundles.explicitly=false \
  -Dshutdown.wait.time=60000 \
  -Dadeptj.session.timeout=3600 \
