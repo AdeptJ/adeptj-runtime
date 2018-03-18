@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static com.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
 
@@ -50,6 +49,8 @@ public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;
 
+    private static final String RESP_JSON_FORMAT = "{\n" + "  \"salt\" : \"%s\",\n" + "  \"hash\" : \"%s\"\n" + "}";
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String text = req.getParameter("text");
@@ -59,20 +60,7 @@ public class CryptoServlet extends HttpServlet {
             return;
         }
         String salt = CryptoSupport.INSTANCE.salt();
-        PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
-        writer.append("{\n")
-                .append("  \"salt\" : ")
-                .append("\"")
-                .append(salt)
-                .append("\"")
-                .append(",")
-                .append("\n")
-                .append("  \"hash\" : ")
-                .append("\"")
-                .append(CryptoSupport.INSTANCE.hash(text, salt))
-                .append("\"")
-                .append("\n")
-                .append("}");
+        resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.INSTANCE.hash(text, salt)));
     }
 }
