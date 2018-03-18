@@ -20,11 +20,8 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Passwords;
-import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.common.CryptoSupport;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -53,8 +50,6 @@ public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoServlet.class);
-
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String text = req.getParameter("text");
@@ -63,8 +58,7 @@ public class CryptoServlet extends HttpServlet {
             resp.getWriter().write("request parameter [text] can't be null!!");
             return;
         }
-        long startTime = System.nanoTime();
-        String salt = Passwords.INSTANCE.generateSalt();
+        String salt = CryptoSupport.INSTANCE.salt();
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
         writer.append("{\n")
@@ -76,10 +70,9 @@ public class CryptoServlet extends HttpServlet {
                 .append("\n")
                 .append("  \"hash\" : ")
                 .append("\"")
-                .append(Passwords.INSTANCE.getHashedPassword(text, salt))
+                .append(CryptoSupport.INSTANCE.hash(text, salt))
                 .append("\"")
                 .append("\n")
                 .append("}");
-        LOGGER.info("salt/password generation took [{}] ms!!", Times.elapsedMillis(startTime));
     }
 }

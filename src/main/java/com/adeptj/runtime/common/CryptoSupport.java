@@ -37,17 +37,17 @@ import java.util.Base64;
 import static com.adeptj.runtime.common.Constants.UTF8;
 
 /**
- * Passwords, utility for password generation and matching.
+ * CryptoSupport, utility for salt and hashed text generation and matching.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum Passwords {
+public enum CryptoSupport {
 
     INSTANCE;
 
     private Config config = Configs.DEFAULT.common();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Passwords.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoSupport.class);
 
     private static final SecureRandom DEFAULT_SECURE_RANDOM;
 
@@ -61,7 +61,7 @@ public enum Passwords {
      *
      * @return UTF-8 Base64 encoded hash.
      */
-    public String generateSalt() {
+    public String salt() {
         byte[] saltBytes = new byte[this.config.getInt("salt-size")];
         try {
             DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
@@ -73,16 +73,16 @@ public enum Passwords {
     }
 
     /**
-     * Generates UTF-8 Base64 encoded hashed password using PBKDF2WithHmacSHA256.
+     * Generates UTF-8 Base64 encoded hashed text using PBKDF2WithHmacSHA256.
      *
-     * @param pwd  the password to hash
-     * @param salt the additive for more secure hashing
-     * @return Hashed password
+     * @param plainText the text to hash
+     * @param salt      the additive for more secure hashing
+     * @return Hashed text
      */
-    public String getHashedPassword(String pwd, String salt) {
+    public String hash(String plainText, String salt) {
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(this.config.getString("secret-key-algo"));
-            PBEKeySpec keySpec = new PBEKeySpec(pwd.toCharArray(), salt.getBytes(UTF8),
+            PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF8),
                     this.config.getInt("iteration-count"),
                     this.config.getInt("derived-key-size"));
             return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF8);
