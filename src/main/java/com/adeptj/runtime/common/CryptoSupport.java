@@ -54,6 +54,9 @@ public final class CryptoSupport {
         DEFAULT_SECURE_RANDOM.setSeed(new byte[SEED_SIZE]);
     }
 
+    private CryptoSupport() {
+    }
+
     /**
      * Generates the random salt for hashing using SHA1PRNG.
      *
