@@ -94,20 +94,20 @@ public final class LogbackInitializer {
 
     public static void startLogback() {
         long startTime = System.nanoTime();
-        Config config = Configs.DEFAULT.logging();
-        LogbackConfig logbackConfig = getLogbackConfig(config);
+        Config loggingCfg = Configs.DEFAULT.logging();
+        LogbackConfig logbackConfig = getLogbackConfig(loggingCfg);
         LogbackManager logbackMgr = LogbackManager.INSTANCE;
         RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.createRollingFileAppender(logbackConfig);
         ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr
-                .createConsoleAppender(APPENDER_CONSOLE, config.getString(KEY_LOG_PATTERN_CONSOLE));
+                .createConsoleAppender(APPENDER_CONSOLE, loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE));
         List<Appender<ILoggingEvent>> appenderList = new ArrayList<>();
         appenderList.add(consoleAppender);
         appenderList.add(fileAppender);
         logbackMgr.getAppenders().addAll(appenderList);
         LoggerContext context = logbackMgr.getLoggerContext();
-        initRootLogger(context, consoleAppender, config);
-        addLoggers(config, appenderList);
-        addAsyncAppender(config, fileAppender);
+        initRootLogger(context, consoleAppender, loggingCfg);
+        addLoggers(loggingCfg, appenderList);
+        addAsyncAppender(loggingCfg, fileAppender);
         context.start();
         context.getLogger(LogbackInitializer.class).info(INIT_MSG, elapsedMillis(startTime));
     }
@@ -116,27 +116,27 @@ public final class LogbackInitializer {
         LogbackManager.INSTANCE.getLoggerContext().stop();
     }
 
-    private static LogbackConfig getLogbackConfig(Config config) {
+    private static LogbackConfig getLogbackConfig(Config loggingCfg) {
         return LogbackConfig.builder()
                 .appenderName(APPENDER_FILE)
-                .logFile(config.getString(KEY_SERVER_LOG_FILE))
-                .pattern(config.getString(KEY_LOG_PATTERN_FILE))
-                .immediateFlush(config.getBoolean(KEY_IMMEDIATE_FLUSH))
-                .logMaxSize(config.getString(KEY_LOG_MAX_SIZE))
-                .rolloverFile(config.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
-                .logMaxHistory(config.getInt(KEY_LOG_MAX_HISTORY))
+                .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
+                .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
+                .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
+                .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
+                .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
+                .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
                 .build();
     }
 
-    private static void initRootLogger(LoggerContext context, Appender<ILoggingEvent> appender, Config config) {
+    private static void initRootLogger(LoggerContext context, Appender<ILoggingEvent> appender, Config loggingCfg) {
         Logger root = context.getLogger(ROOT_LOGGER_NAME);
-        root.setLevel(toLevel(config.getString(KEY_ROOT_LOG_LEVEL)));
+        root.setLevel(toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(appender);
     }
 
     @SuppressWarnings("unchecked")
-    private static void addLoggers(Config config, List<Appender<ILoggingEvent>> appenderList) {
-        config.getObject(KEY_LOGGERS)
+    private static void addLoggers(Config loggingCfg, List<Appender<ILoggingEvent>> appenderList) {
+        loggingCfg.getObject(KEY_LOGGERS)
                 .unwrapped()
                 .forEach((logCfgName, logCfgMap) -> {
                     Map<String, Object> configs = (Map<String, Object>) logCfgMap;
