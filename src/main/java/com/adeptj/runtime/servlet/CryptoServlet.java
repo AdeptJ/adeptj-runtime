@@ -59,8 +59,8 @@ public class CryptoServlet extends HttpServlet {
             resp.getWriter().write("request parameter [text] can't be null!!");
             return;
         }
-        String salt = CryptoSupport.INSTANCE.salt();
+        String salt = CryptoSupport.saltBase64();
         resp.setContentType("application/json");
-        resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.INSTANCE.hash(text, salt)));
+        resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
     }
 }

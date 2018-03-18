@@ -41,19 +41,33 @@ import static com.adeptj.runtime.common.Constants.UTF8;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum CryptoSupport {
-
-    INSTANCE;
-
-    private Config config = Configs.DEFAULT.common();
+public final class CryptoSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CryptoSupport.class);
+
+    private static final int SEED_SIZE = 64;
 
     private static final SecureRandom DEFAULT_SECURE_RANDOM;
 
     static {
         DEFAULT_SECURE_RANDOM = new SecureRandom();
-        DEFAULT_SECURE_RANDOM.setSeed(new byte[64]);
+        DEFAULT_SECURE_RANDOM.setSeed(new byte[SEED_SIZE]);
+    }
+
+    /**
+     * Generates the random salt for hashing using SHA1PRNG.
+     *
+     * @return salt as bytes.
+     */
+    public static byte[] saltBytes() {
+        byte[] saltBytes = new byte[Configs.DEFAULT.common().getInt("salt-size")];
+        try {
+            DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
+            return saltBytes;
+        } catch (Exception ex) {
+            LOGGER.error("Exception while generating salt!!", ex);
+            throw new SystemException(ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -61,13 +75,33 @@ public enum CryptoSupport {
      *
      * @return UTF-8 Base64 encoded hash.
      */
-    public String salt() {
-        byte[] saltBytes = new byte[this.config.getInt("salt-size")];
+    public static String saltBase64() {
+        byte[] saltBytes = saltBytes();
         try {
             DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
             return new String(Base64.getEncoder().encode(saltBytes), UTF8);
-        } catch (UnsupportedEncodingException ex) {
+        } catch (UnsupportedEncodingException | SystemException ex) {
             LOGGER.error("Exception while generating salt!!", ex);
+            throw new SystemException(ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Generates UTF-8 Base64 encoded hashed text using PBKDF2WithHmacSHA256.
+     *
+     * @param plainText the char array of text to hash
+     * @param salt      the additive for more secure hashing as bytes
+     * @return hashed text as byte array
+     */
+    public static byte[] hashBytes(char[] plainText, byte[] salt) {
+        Config config = Configs.DEFAULT.common();
+        try {
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(config.getString("secret-key-algo"));
+            PBEKeySpec keySpec = new PBEKeySpec(plainText, salt, config.getInt("iteration-count"),
+                    config.getInt("derived-key-size"));
+            return secretKeyFactory.generateSecret(keySpec).getEncoded();
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            LOGGER.error("Exception while generating hashed text!!", ex);
             throw new SystemException(ex.getMessage(), ex);
         }
     }
@@ -79,14 +113,10 @@ public enum CryptoSupport {
      * @param salt      the additive for more secure hashing
      * @return Hashed text
      */
-    public String hash(String plainText, String salt) {
+    public static String hashBase64(String plainText, String salt) {
         try {
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(this.config.getString("secret-key-algo"));
-            PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF8),
-                    this.config.getInt("iteration-count"),
-                    this.config.getInt("derived-key-size"));
-            return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF8);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException | InvalidKeySpecException ex) {
+            return new String(Base64.getEncoder().encode(hashBytes(plainText.toCharArray(), salt.getBytes(UTF8))), UTF8);
+        } catch (UnsupportedEncodingException | SystemException ex) {
             LOGGER.error("Exception while generating hashed text!!", ex);
             throw new SystemException(ex.getMessage(), ex);
         }
