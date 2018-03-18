@@ -57,6 +57,8 @@ public final class Constants {
 
     public static final String TOOLS_DASHBOARD_URI = "/tools/dashboard";
 
+    public static final String TOOLS_CRYPTO_URI = "/tools/crypto";
+
     public static final String TOOLS_LOGIN_URI = "/tools/login";
 
     public static final String TOOLS_LOGOUT_URI = "/tools/logout";

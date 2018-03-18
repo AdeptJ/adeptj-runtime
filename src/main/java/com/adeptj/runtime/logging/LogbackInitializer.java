@@ -45,7 +45,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  * This Class initializes the Logback logging framework.
  * <p>
  * Usually Logback is initialized via logback.xml logFile on CLASSPATH.
- * But using that approach Logback takes longer to initializes(5+ seconds) which is reduced drastically
+ * But using that approach Logback takes longer to initialize(5+ seconds) which is reduced drastically
  * to ~ 200 milliseconds using programmatic approach.
  * <p>
  * This is huge improvement on total startup time.

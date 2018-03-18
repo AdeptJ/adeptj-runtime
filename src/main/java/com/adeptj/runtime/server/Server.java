@@ -29,6 +29,7 @@ import com.adeptj.runtime.core.ContainerInitializer;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AuthServlet;
+import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
 import com.typesafe.config.Config;
@@ -100,6 +101,7 @@ import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
+import static com.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
@@ -206,6 +208,8 @@ public final class Server {
     private static final String TOOLS_DASHBOARD_URL = "/tools/dashboard";
 
     private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
+
+    private static final String CRYPTO_SERVLET = "AdeptJ CryptoServlet";
 
     private static final int IDX_ZERO = 0;
 
@@ -424,6 +428,7 @@ public final class Server {
         servlets.add(Servlets.servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class).addMapping(TOOLS_ERROR_URL).setAsyncSupported(true));
         servlets.add(Servlets.servlet(TOOLS_SERVLET, ToolsServlet.class).addMapping(TOOLS_DASHBOARD_URL).setAsyncSupported(true));
         servlets.add(Servlets.servlet(AUTH_SERVLET, AuthServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI).setAsyncSupported(true));
+        servlets.add(Servlets.servlet(CRYPTO_SERVLET, CryptoServlet.class).addMappings(TOOLS_CRYPTO_URI).setAsyncSupported(true));
         return servlets;
     }
 

@@ -30,7 +30,6 @@ import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.THYMELEAF_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
 
@@ -67,10 +66,6 @@ public enum Configs {
 
     public Config logging() {
         return this.main.getConfig(LOGGING_CONF_SECTION);
-    }
-
-    public Config thymeleaf() {
-        return this.main.getConfig(THYMELEAF_CONF_SECTION);
     }
 
     public Config trimou() {
