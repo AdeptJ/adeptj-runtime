@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# show help text and exit
+help_and_exit() {
+    echo ""
+    echo "Usage $0 <command> arg1 arg2 ..."
+    echo "Use -h or help for more instructions."
+    echo ""
+    exit 1
+}
+
+case $1 in
+
+    start)
+        echo "starting"
+        ;;
+
+    stop)
+        echo "stopping"
+        ;;
+
+     -h)
+        echo "show full help"
+        ;;
+
+     help)
+        echo "show full help"
+        ;;
+
+     *)
+        if [ "$1" == "" ]
+        then
+            echo ""
+            echo "Command not found to execute."
+        else
+            echo ""
+            echo "Invalid command '$1'"
+        fi
+
+        # syntax and helper for instructions.
+        help_and_exit
+
+esac
