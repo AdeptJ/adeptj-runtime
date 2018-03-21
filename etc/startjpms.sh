@@ -9,6 +9,7 @@ java --add-modules java.xml.bind \
  -Dlog.async=true \
  -Dlog.immediate.flush=true \
  -Dfelix.log.level=3 \
+ -Dbenchmark.bundle.start=true \
  -Dprovision.bundles.explicitly=false \
  -Dshutdown.wait.time=60000 \
  -Dadeptj.session.timeout=3600 \
