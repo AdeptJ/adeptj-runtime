@@ -28,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
@@ -43,7 +41,9 @@ final class Bundles {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bundles.class);
 
-    private static final String BUNDLE_STARTED_MSG = "Bundle: [{}, Version: {}] started in [{}] ms!";
+    private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
+
+    private static final String BENCHMARK_BUNDLE_START = "benchmark.bundle.start";
 
     /**
      * Static utility methods only.
@@ -66,42 +66,26 @@ final class Bundles {
         long startTime = System.nanoTime();
         String bundlesDir = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
         BundleInstaller bundleInstaller = new BundleInstaller();
-        List<URL> bundleUrls = bundleInstaller.findBundles(bundlesDir);
-        List<Bundle> installedBundles = bundleInstaller.installBundles(bundleUrls, systemBundleContext);
-        startBundles(installedBundles);
-        LOGGER.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
-    }
-
-    private static void startBundles(List<Bundle> bundles) {
-        // Fragment Bundles can't be started so put a check for [Fragment-Host] header.
-        boolean benchmarkBundleStart = Boolean.getBoolean("benchmark.bundle.start");
-        bundles.stream()
+        bundleInstaller
+                .installBundles(bundleInstaller.findBundles(bundlesDir), systemBundleContext)
+                .stream()
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
-                .forEach(bundle -> {
-                    if (benchmarkBundleStart) {
-                        benchmarkBundleStart(bundle);
-                    } else {
-                        startBundle(bundle);
-                    }
-                });
+                .forEach(Bundles::startBundle);
+        LOGGER.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {
         try {
-            bundle.start();
-            LOGGER.info("Bundle: [{}, Version: {}] started!", bundle, bundle.getVersion());
+            if (Boolean.getBoolean(BENCHMARK_BUNDLE_START)) {
+                long startTime = System.nanoTime();
+                bundle.start();
+                LOGGER.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
+            } else {
+                bundle.start();
+                LOGGER.info("Started Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
+            }
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
-        }
-    }
-
-    private static void benchmarkBundleStart(Bundle bundle) {
-        try {
-            long startTime = System.nanoTime();
-            bundle.start();
-            LOGGER.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
-        } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while starting Bundle: [{}]. Cause:", bundle, ex);
+            LOGGER.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
         }
     }
 }
