@@ -16,7 +16,7 @@ case $1 in
         ;;
 
     stop)
-        echo "stopping"
+        ./stop
         ;;
 
      -h)
