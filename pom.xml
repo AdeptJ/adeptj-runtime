@@ -37,16 +37,16 @@
     <properties>
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.1.Final</undertow.version>
-        <undertow.websockets.version>2.0.1.Final</undertow.websockets.version>
+        <undertow.version>2.0.3.Final</undertow.version>
+        <undertow.websockets.version>2.0.3.Final</undertow.websockets.version>
         <xnio.version>3.6.2.Final</xnio.version>
-        <jboss-logging.version>3.3.2.Final</jboss-logging.version>
         <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
-        <wildfly-common.version>1.3.0.Final</wildfly-common.version>
-        <jboss-threads.version>2.3.0.Final</jboss-threads.version>
-        <jdeparser.version>2.0.2.Final</jdeparser.version>
+        <wildfly-common.version>1.3.1.Final</wildfly-common.version>
+        <jboss-threads.version>2.3.2.Final</jboss-threads.version>
+        <jboss-logging.version>3.3.2.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.1.0.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
+        <jdeparser.version>2.0.2.Final</jdeparser.version>
         <jboss-classfilewriter.version>1.2.1.Final</jboss-classfilewriter.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
