@@ -17,7 +17,7 @@ DEBUG=true
 
 DEBUG_PORT=8000
 
-if [ ${DEBUG} ]; then
+if [ ${DEBUG} = true ]; then
 	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
 fi
 
