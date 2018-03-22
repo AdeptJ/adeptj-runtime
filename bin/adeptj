@@ -12,7 +12,7 @@ help_and_exit() {
 case $1 in
 
     start)
-        echo "starting"
+        ./start
         ;;
 
     stop)
