@@ -28,7 +28,7 @@ if [ ${JAVA_VERSION} -gt 8 ]; then
   JVM_OPTS="--add-modules java.xml.bind "${JVM_OPTS}
 fi
 
-ADEPTJ_RUNTIME_OPTS=" ${JVM_OPTS}
+ADEPTJ_RUNTIME_OPTS="${JVM_OPTS}
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
