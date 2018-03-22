@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+function jdkVersion() {
+   local ver=$(java -version 2>&1 | grep -i version | cut -d'"' -f2 | cut -d'.' -f1-2)
+   if [[ ${ver} = "1."* ]]
+       then
+           ver=$(echo ${ver} | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
+       else
+           ver=$(echo ${ver} | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
+   fi
+   echo ${ver}
+}
+
+JAVA_VERSION=$(jdkVersion)
+
 JAVA_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.port.check=false \
@@ -16,12 +29,11 @@ JAVA_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address
  -Denable.req.buffering=true \
  -Dreq.buff.maxBuffers=200 \
  -Duse.provided.keyStore=false \
- -Djavax.net.ssl.keyStore=/Users/rakesh.kumar/AdeptJRuntime.jks \
- -Djavax.net.ssl.keyStorePassword=AdeptJUndertow@Xnio \
- -Djavax.net.ssl.keyPassword=AdeptJUndertow@Xnio"
+ -Djavax.net.ssl.keyStore=path-to-local-java-keystore \
+ -Djavax.net.ssl.keyStorePassword=java-keystore-password \
+ -Djavax.net.ssl.keyPassword=key-password"
 
-JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f2)
-
+# Add the [java.xml.bind] module if Java version is greater than 8, otherwise some of the bundles will not start.
 if [ ${JAVA_VERSION} -gt 8 ]; then
   JAVA_OPTS="--add-modules java.xml.bind "${JAVA_OPTS}
 fi

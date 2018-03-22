@@ -53,12 +53,13 @@ The platform embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Clone adeptj-runtime
-2. cd adeptj-runtime/etc
-3. run the script build.sh
+1. Make sure you have JDK 8+ and Apache Maven 3.2.5+ installed
+2. Now clone adeptj-runtime
+2. cd adeptj-runtime
+3. From adeptj-runtime directory itself execute - ./etc/build
 4. Above step will create AdeptJ Runtime Uber jar.
-4. Now from /etc directory run the script start.sh
-5. For JDK 9 use the script startjdk9.sh
+4. Now from adeptj-runtime directory itself execute - ./bin/start
+5. Start script will work on Jdk8, 9, 10 and so on.
 6. Go to [AdeptJ Tools Dashboard](http://localhost:9007/tools/dashboard) or [AdeptJ OSGi Console](http://localhost:9007/system/console)
 7. System will ask for username/password, provide the default ones [admin/admin]
 
