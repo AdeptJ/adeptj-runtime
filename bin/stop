@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+java -jar adeptj-runtime.jar stop

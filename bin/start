@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-cd ../target
-java --add-modules java.xml.bind \
- -server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
+
+JAVA_OPTS="-server -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 \
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
@@ -19,5 +18,14 @@ java --add-modules java.xml.bind \
  -Duse.provided.keyStore=false \
  -Djavax.net.ssl.keyStore=/Users/rakesh.kumar/AdeptJRuntime.jks \
  -Djavax.net.ssl.keyStorePassword=AdeptJUndertow@Xnio \
- -Djavax.net.ssl.keyPassword=AdeptJUndertow@Xnio \
- -jar adeptj-runtime.jar
+ -Djavax.net.ssl.keyPassword=AdeptJUndertow@Xnio"
+
+JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f2)
+
+if [ ${JAVA_VERSION} -gt 8 ]; then
+  JAVA_OPTS="--add-modules java.xml.bind "${JAVA_OPTS}
+fi
+
+cd target
+
+java ${JAVA_OPTS} -jar adeptj-runtime.jar
