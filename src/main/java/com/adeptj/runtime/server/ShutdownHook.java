@@ -86,7 +86,6 @@ final class ShutdownHook extends Thread {
             }
         } catch (InterruptedException ie) {
             LOGGER.error("Error while waiting for pending request to complete!!", ie);
-            Thread.currentThread().interrupt();
         }
     }
 }
