@@ -24,7 +24,7 @@ import com.adeptj.runtime.common.Environment;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
@@ -73,9 +73,9 @@ public enum Configs {
     }
 
     private Config loadConf() {
-        File configFile = Environment.getServerConfFile();
-        if (configFile.exists()) {
-            return ConfigFactory.parseFile(configFile)
+        Path configFile = Environment.getServerConfFile();
+        if (configFile.toFile().exists()) {
+            return ConfigFactory.parseFile(configFile.toFile())
                     .withFallback(ConfigFactory.systemProperties())
                     .resolve()
                     .getConfig(MAIN_CONF_SECTION);

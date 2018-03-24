@@ -252,7 +252,7 @@ public final class Server {
             LOGGER.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
-            LOGGER.error("IOException!!", ex);
+            LOGGER.error("Exception while printing server banner!!", ex);
         }
     }
 
@@ -262,7 +262,7 @@ public final class Server {
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
             } catch (IOException ex) {
                 // Just log it, its okay if browser is not launched.
-                LOGGER.error("IOException!!", ex);
+                LOGGER.error("Exception while launching browser!!", ex);
             }
         }
     }
@@ -272,7 +272,7 @@ public final class Server {
             Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                     IOUtils.toBytes(stream), StandardOpenOption.CREATE);
         } catch (IOException ex) {
-            LOGGER.error("IOException!!", ex);
+            LOGGER.error("Exception while creating server conf file!!", ex);
         }
     }
 

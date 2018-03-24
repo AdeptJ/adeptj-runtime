@@ -41,15 +41,16 @@ public enum DefaultTemplateEngine implements TemplateEngine {
 
     INSTANCE;
 
-    private final Logger LOGGER;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
 
     private final MustacheEngine mustacheEngine;
 
     DefaultTemplateEngine() {
         long startTime = System.nanoTime();
         this.mustacheEngine = TemplateEngines.buildMustacheEngine();
-        LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
-        LOGGER.info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
+        // Can't use the static LOGGER due to enum restriction.
+        LoggerFactory.getLogger(DefaultTemplateEngine.class).info("MustacheEngine initialized in: [{}] ms!!",
+                Times.elapsedMillis(startTime));
     }
 
     /**

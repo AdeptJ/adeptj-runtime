@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -39,6 +38,9 @@ import java.security.UnrecoverableKeyException;
 public final class SslContextFactory {
 
     private static final String PROTOCOL_TLS = "TLS";
+
+    private SslContextFactory() {
+    }
 
     public static SSLContext createSslContext() {
         try {

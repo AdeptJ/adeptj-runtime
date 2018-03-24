@@ -91,11 +91,11 @@ public final class ErrorPages {
 
     static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), SLASH);
-        if (TEMPLATE_ERROR.equals(req.getRequestURI())) {
+        if (StringUtils.equals(TEMPLATE_ERROR, req.getRequestURI())) {
             ErrorPages.renderGenericErrorPage(req, resp);
-        } else if (STATUS_500.equals(statusCode)) {
+        } else if (StringUtils.equals(STATUS_500, statusCode)) {
             ErrorPages.render500Page(req, resp);
-        } else if (RequestUtil.hasException(req) && STATUS_500.equals(statusCode)) {
+        } else if (RequestUtil.hasException(req) && StringUtils.equals(STATUS_500, statusCode)) {
             ErrorPages.render500PageWithExceptionTrace(req, resp);
         } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
             ErrorPages.renderErrorPageForStatusCode(req, resp, statusCode);

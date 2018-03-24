@@ -22,10 +22,8 @@ package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -94,12 +92,12 @@ public final class Environment {
         }
     }
 
-    public static File getServerConfFile() {
-        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE).toFile();
+    public static Path getServerConfFile() {
+        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
     }
 
     public static boolean isServerConfFileExists() {
-        return getServerConfFile().exists();
+        return getServerConfFile().toFile().exists();
     }
 
     public static Path getFrameworkConfPath() {
@@ -107,6 +105,6 @@ public final class Environment {
     }
 
     public static boolean isFrameworkConfFileExists() {
-        return Files.exists(getFrameworkConfPath());
+        return getFrameworkConfPath().toFile().exists();
     }
 }

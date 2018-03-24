@@ -116,7 +116,7 @@ public enum FrameworkManager {
 
     private void provisionBundles(BundleContext systemBundleContext) throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
-        if (Files.exists(Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)))
+        if (Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()
                 && !Boolean.getBoolean("provision.bundles.explicitly")) {
             LOGGER.info("Bundles already provisioned, this must be a server restart!!");
         } else {
@@ -125,7 +125,7 @@ public enum FrameworkManager {
         }
     }
 
-    private Map<String, String> frameworkConfigs() throws IOException {
+    private Map<String, String> frameworkConfigs() {
         Map<String, String> configs = this.loadFrameworkProperties();
         Config felixConf = Configs.DEFAULT.felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));

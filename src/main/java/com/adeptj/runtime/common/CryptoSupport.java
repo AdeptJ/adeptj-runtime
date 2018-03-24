@@ -45,13 +45,10 @@ public final class CryptoSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CryptoSupport.class);
 
-    private static final int SEED_SIZE = 64;
-
     private static final SecureRandom DEFAULT_SECURE_RANDOM;
 
     static {
         DEFAULT_SECURE_RANDOM = new SecureRandom();
-        DEFAULT_SECURE_RANDOM.setSeed(new byte[SEED_SIZE]);
     }
 
     private CryptoSupport() {

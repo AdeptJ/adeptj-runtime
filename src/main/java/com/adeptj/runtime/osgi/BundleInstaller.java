@@ -75,7 +75,7 @@ class BundleInstaller {
         Bundle bundle = null;
         try (JarInputStream jar = new JarInputStream(bundleUrl.openStream(), false)) {
             if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                this.logger.warn("Not an OSGi Bundle: {}", bundleUrl.toExternalForm());
+                this.logger.warn("Not an OSGi Bundle: {}", bundleUrl);
             } else {
                 bundle = systemBundleContext.installBundle(bundleUrl.toExternalForm());
             }

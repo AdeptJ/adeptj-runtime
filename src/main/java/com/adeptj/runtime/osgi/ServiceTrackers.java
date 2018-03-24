@@ -48,7 +48,7 @@ public enum ServiceTrackers {
 
     private EventDispatcherTracker eventDispatcherTracker;
 
-    private Map<String, ServiceTracker<?, ?>> trackers = new HashMap<>();
+    private Map<String, ServiceTracker<Object, Object>> trackers = new HashMap<>();
 
     public void openDispatcherServletTracker() {
         if (!this.dispatcherServletInitialized && this.servletTracker == null) {
@@ -92,30 +92,46 @@ public enum ServiceTrackers {
         this.eventDispatcherTracker = null;
     }
 
-    public void track(Class<? extends ServiceTracker<?, ?>> klazz, ServiceTracker<?, ?> tracker) {
+    public void track(Class<? extends ServiceTracker<Object, Object>> klazz, ServiceTracker<Object, Object> tracker) {
         this.trackers.put(klazz.getName(), tracker);
         tracker.open();
     }
 
-    public void close(Class<? extends ServiceTracker<?, ?>> klazz) {
-        Optional.ofNullable(this.trackers.remove(klazz.getName())).ifPresent(ServiceTracker::close);
+    public void close(Class<? extends ServiceTracker<Object, Object>> trackerClass) {
+        Optional.ofNullable(this.trackers.remove(trackerClass.getName())).ifPresent(ServiceTracker::close);
     }
 
     public void closeAll() {
-        this.trackers.forEach((klazz, tracker) -> tracker.close());
+        this.trackers.forEach((trackerClass, tracker) -> tracker.close());
     }
 
-    public ServiceTracker<?, ?> getTracker(Class<? extends ServiceTracker<?, ?>> klazz) {
-        return this.trackers.get(klazz.getName());
+    public ServiceTracker<Object, Object> getTracker(Class<? extends ServiceTracker<Object, Object>> trackerClass) {
+        return this.trackers.get(trackerClass.getName());
     }
 
-    public void close(ServiceTracker<?, ?> tracker) {
+    public void close(ServiceTracker<Object, Object> tracker) {
         tracker.close();
     }
 
-    public void closeQuietly(ServiceTracker<?, ?> tracker) {
+    public void closeQuietly(ServiceTracker<Object, Object> tracker) {
         try {
             tracker.close();
+        } catch (Exception ex) { // NOSONAR
+            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
+        }
+    }
+
+    public void closeQuietly(DispatcherServletTracker dispatcherServletTracker) {
+        try {
+            dispatcherServletTracker.close();
+        } catch (Exception ex) { // NOSONAR
+            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
+        }
+    }
+
+    public void closeQuietly(EventDispatcherTracker eventDispatcherTracker) {
+        try {
+            eventDispatcherTracker.close();
         } catch (Exception ex) { // NOSONAR
             // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
         }

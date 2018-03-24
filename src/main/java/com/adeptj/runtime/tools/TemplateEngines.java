@@ -43,6 +43,9 @@ public final class TemplateEngines {
 
     private static final String RB_HELPER_NAME = "msg";
 
+    // static utility methods only
+    private TemplateEngines() {
+    }
 
     public static TemplateEngine getDefault() {
         return DefaultTemplateEngine.INSTANCE;

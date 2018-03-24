@@ -21,7 +21,6 @@
 package com.adeptj.runtime.server;
 
 import io.undertow.security.idm.Account;
-import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.PasswordCredential;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +37,9 @@ import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
  * @author Rakesh.Kumar, AdeptJ
  */
 final class IdmUtil {
+
+    private IdmUtil() {
+    }
 
     static Account verifyAccount(Map<String, List<String>> userRolesMapping, Account account) {
         return userRolesMapping

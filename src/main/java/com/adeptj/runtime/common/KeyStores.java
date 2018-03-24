@@ -39,6 +39,9 @@ import java.security.cert.CertificateException;
  */
 public final class KeyStores {
 
+    private KeyStores() {
+    }
+
     public static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
         try (InputStream is = Environment.useProvidedKeyStore() ? Files.newInputStream(Paths.get(keyStoreLoc))
                 : KeyStores.class.getResourceAsStream(keyStoreLoc)) {
