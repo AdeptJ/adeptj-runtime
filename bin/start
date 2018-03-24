@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+# debug flag
+DEBUG=false
+
+# port for debug
+DEBUG_PORT=8000
+
+# reading option provided with start command.
+case $2 in
+    # use debug port provided in start options.
+    -d)
+        DEBUG=true
+        DEBUG_PORT=$3
+        ;;
+esac
+
 function javaVersion() {
    local ver=$(java -version 2>&1 | grep -i version | cut -d'"' -f2 | cut -d'.' -f1-2)
    if [[ ${ver} = "1."* ]]
@@ -12,10 +27,6 @@ function javaVersion() {
 }
 
 JAVA_VERSION=$(javaVersion)
-
-DEBUG=true
-
-DEBUG_PORT=8000
 
 if [ ${DEBUG} = true ]; then
 	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
