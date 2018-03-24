@@ -41,7 +41,7 @@ public enum BundleContextHolder {
         return this.bundleContext != null;
     }
 
-    public void setBundleContext(BundleContext bundleContext) {
+    public void setBundleContext(BundleContext bundleContext) { // NOSONAR
         this.bundleContext = bundleContext;
     }
 }

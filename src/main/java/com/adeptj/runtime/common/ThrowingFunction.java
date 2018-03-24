@@ -35,9 +35,9 @@ public interface ThrowingFunction<T, R> extends Function<T, R> {
         try {
             return applyThatThrowsException(e);
         } catch (Exception ex) { // NOSONAR
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex); // NOSONAR
         }
     }
 
-    R applyThatThrowsException(T t) throws Exception;
+    R applyThatThrowsException(T t) throws Exception; // NOSONAR
 }

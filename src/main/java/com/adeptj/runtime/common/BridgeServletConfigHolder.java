@@ -33,7 +33,7 @@ public enum BridgeServletConfigHolder {
 
     private ServletConfig bridgeServletConfig;
 
-    public void setBridgeServletConfig(ServletConfig bridgeServletConfig) {
+    public void setBridgeServletConfig(ServletConfig bridgeServletConfig) { // NOSONAR
         this.bridgeServletConfig = bridgeServletConfig;
     }
 

@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.common;
 
+import com.adeptj.runtime.exception.SystemException;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +59,7 @@ public final class RequestUtil {
         try {
             req.logout();
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new SystemException(ex.getMessage(), ex);
         }
     }
 }
