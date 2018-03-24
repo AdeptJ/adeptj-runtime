@@ -35,9 +35,9 @@ public interface ThrowingConsumer<T> extends Consumer<T> {
         try {
             acceptThatThrowsException(e);
         } catch (Exception ex) { // NOSONAR
-            throw new RuntimeException(ex);
+            throw new RuntimeException(ex); // NOSONAR
         }
     }
 
-    void acceptThatThrowsException(T e) throws Exception;
+    void acceptThatThrowsException(T e) throws Exception; // NOSONAR
 }

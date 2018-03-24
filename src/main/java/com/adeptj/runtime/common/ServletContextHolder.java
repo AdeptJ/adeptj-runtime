@@ -33,7 +33,7 @@ public enum ServletContextHolder {
 
     private ServletContext context;
 
-    public void setServletContext(ServletContext context) {
+    public void setServletContext(ServletContext context) { // NOSONAR
         this.context = context;
     }
 
