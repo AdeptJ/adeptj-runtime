@@ -21,6 +21,7 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngines;
@@ -95,6 +96,6 @@ public class ToolsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.sendRedirect(resp.encodeRedirectURL(TOOLS_DASHBOARD_URI));
+        ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
     }
 }

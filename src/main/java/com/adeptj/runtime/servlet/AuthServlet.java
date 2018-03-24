@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.servlet;
 
+import com.adeptj.runtime.common.RequestUtil;
+import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngines;
@@ -81,11 +83,11 @@ public class AuthServlet extends HttpServlet {
                     .build());
         } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
             // Invalidate the session and redirect to /tools/dashboard page.
-            req.logout();
-            resp.sendRedirect(resp.encodeRedirectURL(TOOLS_DASHBOARD_URI));
+            RequestUtil.logout(req);
+            ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
         } else {
             // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /tools/dashboard.
-            resp.sendRedirect(TOOLS_DASHBOARD_URI);
+            ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
         }
     }
 

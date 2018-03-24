@@ -23,7 +23,7 @@ package com.adeptj.runtime.common;
 import io.undertow.util.HttpString;
 
 /**
- * ENUM for denoting HTTP methods.
+ * Enum for denoting HTTP methods.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

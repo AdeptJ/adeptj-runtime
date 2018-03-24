@@ -54,4 +54,13 @@ public final class ResponseUtil {
             throw new SystemException(ex.getMessage(), ex);
         }
     }
+
+    public static void redirect(HttpServletResponse resp, String redirectUrl) {
+        try {
+            resp.sendRedirect(resp.encodeRedirectURL(redirectUrl));
+        } catch (Exception ex) {
+            // Now what? may be wrap and re-throw. Let the container handle it.
+            throw new SystemException(ex.getMessage(), ex);
+        }
+    }
 }

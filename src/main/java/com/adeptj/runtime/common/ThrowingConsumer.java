@@ -20,45 +20,24 @@
 
 package com.adeptj.runtime.common;
 
-import org.slf4j.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import java.util.function.Consumer;
 
 /**
- * Utils for {@link HttpServletRequest}
+ * Handles exceptions in lambda expressions wherever a {@link Consumer} is needed..
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class RequestUtil {
+@FunctionalInterface
+public interface ThrowingConsumer<T> extends Consumer<T> {
 
-    private RequestUtil() {
-    }
-
-    public static Object getAttribute(HttpServletRequest req, String name) {
-        return req.getAttribute(name);
-    }
-
-    public static boolean hasAttribute(HttpServletRequest req, String name) {
-        return getAttribute(req, name) != null;
-    }
-
-    public static boolean hasException(HttpServletRequest req) {
-        return req.getAttribute(ERROR_EXCEPTION) != null;
-    }
-
-    public static void logException(HttpServletRequest req, Logger logger, String message) {
-        if (RequestUtil.hasException(req)) {
-            logger.error(message, req.getAttribute(ERROR_EXCEPTION));
-        }
-    }
-
-    public static void logout(HttpServletRequest req) {
+    @Override
+    default void accept(final T e) {
         try {
-            req.logout();
-        } catch (Exception ex) {
+            acceptThatThrowsException(e);
+        } catch (Exception ex) { // NOSONAR
             throw new RuntimeException(ex);
         }
     }
+
+    void acceptThatThrowsException(T e) throws Exception;
 }
