@@ -133,10 +133,6 @@ public final class Server {
 
     private static final String KEY_KEYSTORE = "keyStore";
 
-    private static final String KEY_KEYPWD = "keyPwd";
-
-    private static final String KEY_KEYSTORE_PWD = "keyStorePwd";
-
     private static final String KEY_HTTPS = "https";
 
     private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
@@ -305,8 +301,8 @@ public final class Server {
             int httpsPort = httpsConf.getInt(KEY_PORT);
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
-                System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString(KEY_KEYSTORE_PWD));
-                System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString(KEY_KEYPWD));
+                System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString("keyStorePwd"));
+                System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString("keyPwd"));
                 LOGGER.info("HTTP2 will be enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
             undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.createSslContext());
