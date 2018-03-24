@@ -23,6 +23,7 @@ package com.adeptj.runtime.osgi;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.ServletContextHolder;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
@@ -70,7 +71,10 @@ public class FrameworkRestartHandler implements FrameworkListener {
                 break;
             default:
                 // log it and ignore.
-                LOGGER.debug("Ignoring the OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType()));
+                String eventType = FrameworkEvents.asString(event.getType());
+                if (!StringUtils.equals(FrameworkEvents.UNKNOWN.toString(), eventType)) {
+                    LOGGER.debug("Ignoring the OSGi FrameworkEvent: [{}]", eventType);
+                }
                 break;
         }
     }
