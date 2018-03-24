@@ -1101,21 +1101,21 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.8.Final</version>
+                    <version>1.0.9.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.8.Final</version>
+                    <version>1.0.9.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.11.Final</version>
+                    <version>1.0.12.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1426,7 +1426,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-commons-datasource</artifactId>
-                    <version>1.0.3.Final</version>
+                    <version>1.0.4.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1499,7 +1499,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.0.4.Final</version>
+                    <version>1.0.5.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
