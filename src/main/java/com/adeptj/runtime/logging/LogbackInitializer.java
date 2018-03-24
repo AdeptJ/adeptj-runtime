@@ -92,7 +92,7 @@ public final class LogbackInitializer {
     private LogbackInitializer() {
     }
 
-    public static void startLogback() {
+    public static void init() {
         long startTime = System.nanoTime();
         Config loggingCfg = Configs.DEFAULT.logging();
         LogbackConfig logbackConfig = getLogbackConfig(loggingCfg);
@@ -110,10 +110,6 @@ public final class LogbackInitializer {
         addAsyncAppender(loggingCfg, fileAppender);
         context.start();
         context.getLogger(LogbackInitializer.class).info(INIT_MSG, elapsedMillis(startTime));
-    }
-
-    public static void stopLogback() {
-        LogbackManager.INSTANCE.getLoggerContext().stop();
     }
 
     private static LogbackConfig getLogbackConfig(Config loggingCfg) {

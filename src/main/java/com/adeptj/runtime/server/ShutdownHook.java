@@ -22,7 +22,7 @@ package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.logging.LogbackInitializer;
+import com.adeptj.runtime.tools.logging.LogbackManager;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.servlet.api.DeploymentManager;
@@ -74,7 +74,7 @@ final class ShutdownHook extends Thread {
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the Logback cleans up it's state.
-            LogbackInitializer.stopLogback();
+            LogbackManager.INSTANCE.getLoggerContext().stop();
         }
     }
 

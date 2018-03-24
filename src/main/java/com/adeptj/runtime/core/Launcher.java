@@ -25,6 +25,7 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.Server;
+import com.adeptj.runtime.tools.logging.LogbackManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public final class Launcher {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
         // First of all initialize Logback.
-        LogbackInitializer.startLogback();
+        LogbackInitializer.init();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
@@ -73,7 +74,7 @@ public final class Launcher {
                 stopOSGiFramework(logger);
                 logger.error("Shutting down JVM!!", th);
                 // Let the LOGBACK cleans up it's state.
-                LogbackInitializer.stopLogback();
+                LogbackManager.INSTANCE.getLoggerContext().stop();
                 System.exit(-1);
             }
         }

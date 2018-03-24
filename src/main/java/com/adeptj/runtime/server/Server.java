@@ -26,12 +26,12 @@ import com.adeptj.runtime.common.SslContextFactory;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
-import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
+import com.adeptj.runtime.tools.logging.LogbackManager;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -336,7 +336,7 @@ public final class Server {
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            LogbackInitializer.stopLogback();
+            LogbackManager.INSTANCE.getLoggerContext().stop();
             System.exit(-1); // NOSONAR
         }
         return port;
