@@ -12,6 +12,10 @@
      <img src="https://api.travis-ci.org/AdeptJ/adeptj-runtime.svg?branch=master&style=flat">
   </a>
   
+  <a href="https://sonarcloud.io/api/project_badges/measure?project=com.adeptj%3Aadeptj-runtime&metric=alert_status">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=com.adeptj%3Aadeptj-runtime&metric=alert_status">
+  </a>
+  
   <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
     <img src="https://camo.githubusercontent.com/64af58db769a4ad81ae61fac30422b835f495326/68747470733a2f2f6261646765732e6769747465722e696d2f41646570744a2f61646570746a2d72756e74696d652e737667" alt="Join the chat at https://gitter.im/AdeptJ/adeptj-runtime" data-canonical-src="https://badges.gitter.im/AdeptJ/adeptj-runtime.svg" style="max-width:100%;">
   </a>
