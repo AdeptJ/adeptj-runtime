@@ -86,6 +86,10 @@ final class ShutdownHook extends Thread {
             }
         } catch (InterruptedException ie) {
             LOGGER.error("Error while waiting for pending request to complete!!", ie);
+            // SONAR - "InterruptedException" should not be ignored
+            // Can't really rethrow it as we are yet to stop the server and anyway it's a shutdown hook
+            // and JVM itself will be shutting down shortly.
+            Thread.currentThread().interrupt();
         }
     }
 }
