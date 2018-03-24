@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.osgi;
 
-import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * OSGi Framework event code to string mapping.
@@ -54,7 +54,7 @@ public enum FrameworkEvents {
     }
 
     public static String asString(int code) {
-        return Arrays.stream(values())
+        return Stream.of(values())
                 .filter(fe -> code == fe.getCode())
                 .findFirst()
                 .orElse(UNKNOWN)

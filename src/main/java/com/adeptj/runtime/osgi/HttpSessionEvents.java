@@ -70,15 +70,8 @@ public enum HttpSessionEvents {
         }
     }
 
-    public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event, String oldSessionId) {
-        switch (type) {
-            case SESSION_ID_CHANGED:
-                sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
-                break;
-            default:
-                // NO-OP
-                break;
-        }
+    public static void handleSessionIdChangedEvent(HttpSessionEvent event, String oldSessionId) {
+        sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
     }
 
     public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
