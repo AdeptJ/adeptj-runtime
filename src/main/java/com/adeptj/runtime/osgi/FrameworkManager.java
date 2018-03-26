@@ -73,8 +73,8 @@ public enum FrameworkManager {
 
     public void startFramework() {
         try {
-            LOGGER.info("Starting the OSGi Framework!!");
             long startTime = System.nanoTime();
+            LOGGER.info("Starting the OSGi Framework!!");
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
             this.framework = frameworkFactory.newFramework(this.frameworkConfigs());
             long startTimeFramework = System.nanoTime();

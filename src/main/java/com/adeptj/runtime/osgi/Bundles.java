@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
@@ -65,13 +66,15 @@ final class Bundles {
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
         String bundlesDir = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+        AtomicInteger installCount = new AtomicInteger();
         BundleInstaller bundleInstaller = new BundleInstaller();
         bundleInstaller
                 .installBundles(bundleInstaller.findBundles(bundlesDir), systemBundleContext)
-                .stream()
+                .peek(bundle -> installCount.incrementAndGet())
                 .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
                 .forEach(Bundles::startBundle);
-        LOGGER.info("Provisioning of Bundles took: [{}] ms!!", Times.elapsedMillis(startTime));
+        LOGGER.info("Provisioning of [{}] Bundles(excluding system) took: [{}] ms!!", installCount.get(),
+                Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {

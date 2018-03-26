@@ -30,11 +30,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Find and Install the Bundles from given location using the System Bundle's BundleContext.
@@ -49,23 +50,19 @@ class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
-    List<URL> findBundles(String bundlesDir) throws IOException {
+    Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
         return JarURLConnection.class.cast(Bundles.class.getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
-                .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches())
-                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
-                .collect(Collectors.toList());
+                .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches());
     }
 
-    List<Bundle> installBundles(List<URL> bundleUrls, BundleContext systemBundleContext) {
-        List<Bundle> installedBundles = bundleUrls
-                .stream()
+    Stream<Bundle> installBundles(Stream<JarEntry> jarEntryStream, BundleContext systemBundleContext) {
+        return jarEntryStream
+                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
                 .map(url -> this.installBundle(url, systemBundleContext))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        LOGGER.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
-        return installedBundles;
+                .sorted(Comparator.comparing(Bundle::getBundleId));
     }
 
     private Bundle installBundle(URL bundleUrl, BundleContext systemBundleContext) {
