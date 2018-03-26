@@ -37,15 +37,20 @@ case $1 in
         ./stop
         ;;
 
-     -h)
+    restart)
+        ./stop
+        ./start
+        ;;
+
+    -h)
         echo "show full help"
         ;;
 
-     help)
+    help)
         echo "show full help"
         ;;
 
-     *)
+    *)
         if [ "$1" == "" ]
         then
             echo ""

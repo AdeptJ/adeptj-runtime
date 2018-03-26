@@ -45,18 +45,16 @@ class BundleInstaller {
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    private static final String PATTERN_BUNDLE = "^bundles.*\\.jar$";
+    private static final Pattern PATTERN_BUNDLE = Pattern.compile("^bundles.*\\.jar$");
 
-    private final Logger logger = LoggerFactory.getLogger(BundleInstaller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
     List<URL> findBundles(String bundlesDir) throws IOException {
-        Pattern pattern = Pattern.compile(PATTERN_BUNDLE);
-        ClassLoader classLoader = Bundles.class.getClassLoader();
         return JarURLConnection.class.cast(Bundles.class.getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
-                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
-                .map(jarEntry -> classLoader.getResource(jarEntry.getName()))
+                .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches())
+                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -66,21 +64,21 @@ class BundleInstaller {
                 .map(url -> this.installBundle(url, systemBundleContext))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        this.logger.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
+        LOGGER.info("Total Bundles installed, excluding System Bundle: [{}]", installedBundles.size());
         return installedBundles;
     }
 
     private Bundle installBundle(URL bundleUrl, BundleContext systemBundleContext) {
-        this.logger.debug("Installing Bundle from location: [{}]", bundleUrl);
+        LOGGER.debug("Installing Bundle from location: [{}]", bundleUrl);
         Bundle bundle = null;
         try (JarInputStream jar = new JarInputStream(bundleUrl.openStream(), false)) {
             if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                this.logger.warn("Not an OSGi Bundle: {}", bundleUrl);
+                LOGGER.warn("Not an OSGi Bundle: {}", bundleUrl);
             } else {
                 bundle = systemBundleContext.installBundle(bundleUrl.toExternalForm());
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-            this.logger.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);
+            LOGGER.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);
         }
         return bundle;
     }

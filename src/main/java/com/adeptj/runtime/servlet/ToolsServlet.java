@@ -49,7 +49,7 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VERSION;
 /**
  * ToolsServlet renders the admin tools page.
  * <p>
- * Note: This is independent of OSGi and directly managed by UndertowServer.
+ * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

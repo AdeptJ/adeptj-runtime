@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * PerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
  * <p><b>
- * Note: This is independent of UndertowServer and directly managed by OSGi.
+ * Note: This is independent of Undertow and directly managed by OSGi.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
