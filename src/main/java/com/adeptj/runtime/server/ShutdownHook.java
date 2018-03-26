@@ -21,6 +21,7 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.tools.logging.LogbackManager;
 import io.undertow.Undertow;
@@ -69,7 +70,7 @@ final class ShutdownHook extends Thread {
             this.manager.undeploy();
             this.server.stop();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
-            ServerLogsTailerExecutor.INSTANCE.shutdownExecutorService();
+            DefaultExecutorService.INSTANCE.shutdown();
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {

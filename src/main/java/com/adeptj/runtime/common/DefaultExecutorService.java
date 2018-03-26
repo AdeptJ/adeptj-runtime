@@ -18,31 +18,31 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.server;
+package com.adeptj.runtime.common;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Provides {@link ExecutorService} with fixed thread pool for tailing server logs.
+ * Provides {@link ExecutorService} with fixed thread pool for general purpose task execution.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-enum ServerLogsTailerExecutor {
+public enum DefaultExecutorService {
 
     INSTANCE;
 
     private volatile ExecutorService executorService;
 
-    void execute(Runnable command) {
+    public void execute(Runnable command) {
         if (this.executorService == null) {
             this.executorService = Executors.newCachedThreadPool();
         }
         this.executorService.execute(command);
     }
 
-    void shutdownExecutorService() {
+    public void shutdown() {
         Optional.ofNullable(this.executorService).ifPresent(ExecutorService::shutdown);
     }
 }

@@ -18,42 +18,34 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.server;
+package com.adeptj.runtime.websocket;
 
-import org.apache.commons.io.input.TailerListenerAdapter;
+import com.adeptj.runtime.common.DefaultExecutorService;
+import org.apache.commons.io.input.Tailer;
 
 import javax.websocket.Session;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
- * Simple implementation of a {@link org.apache.commons.io.input.TailerListener}.
+ * Tails server log using Apache Commons IO {@link Tailer}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-class ServerLogsTailerListener extends TailerListenerAdapter {
+class ServerLogsTailer {
 
-    private final File logFile;
+    private static final int DELAY_MILLIS = 1000;
 
-    private final Session session;
+    private Tailer tailer;
 
-    ServerLogsTailerListener(File logFile, Session session) {
-        this.logFile = logFile;
-        this.session = session;
+    ServerLogsTailer(File logFile, Session session) {
+        this.tailer = Tailer.create(logFile, new ServerLogsTailerListener(logFile, session), DELAY_MILLIS, true);
     }
 
-    @Override
-    public void handle(String line) {
-        this.session.getAsyncRemote().sendText(line);
+    void startTailer() {
+        DefaultExecutorService.INSTANCE.execute(this.tailer);
     }
 
-    @Override
-    public void handle(Exception ex) {
-        this.session.getAsyncRemote().sendText(ex.toString());
-    }
-
-    @Override
-    public void fileNotFound() {
-        this.session.getAsyncRemote().sendText(new FileNotFoundException(this.logFile.toString()).toString());
+    void stopTailer() {
+        this.tailer.stop();
     }
 }

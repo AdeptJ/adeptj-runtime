@@ -32,6 +32,7 @@ import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
 import com.adeptj.runtime.tools.logging.LogbackManager;
+import com.adeptj.runtime.websocket.ServerLogsWebSocket;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
@@ -421,10 +422,21 @@ public final class Server {
 
     private static List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
-        servlets.add(Servlets.servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class).addMapping(TOOLS_ERROR_URL).setAsyncSupported(true));
-        servlets.add(Servlets.servlet(TOOLS_SERVLET, ToolsServlet.class).addMapping(TOOLS_DASHBOARD_URL).setAsyncSupported(true));
-        servlets.add(Servlets.servlet(AUTH_SERVLET, AuthServlet.class).addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI).setAsyncSupported(true));
-        servlets.add(Servlets.servlet(CRYPTO_SERVLET, CryptoServlet.class).addMappings(TOOLS_CRYPTO_URI).setAsyncSupported(true));
+        servlets.add(Servlets
+                .servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class)
+                .addMapping(TOOLS_ERROR_URL)
+                .setAsyncSupported(true));
+        servlets.add(Servlets
+                .servlet(TOOLS_SERVLET, ToolsServlet.class)
+                .addMapping(TOOLS_DASHBOARD_URL)
+                .setAsyncSupported(true));
+        servlets.add(Servlets
+                .servlet(AUTH_SERVLET, AuthServlet.class)
+                .addMappings(TOOLS_LOGIN_URI, TOOLS_LOGOUT_URI)
+                .setAsyncSupported(true));
+        servlets.add(Servlets.servlet(CRYPTO_SERVLET, CryptoServlet.class)
+                .addMappings(TOOLS_CRYPTO_URI)
+                .setAsyncSupported(true));
         return servlets;
     }
 
@@ -439,7 +451,8 @@ public final class Server {
         Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
                 .setWorker(webSocketWorker(wsOptions))
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER), wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
+                        wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
                 .addEndpoint(ServerLogsWebSocket.class);
     }
 

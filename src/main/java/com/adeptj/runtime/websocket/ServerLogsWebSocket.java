@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.server;
+package com.adeptj.runtime.websocket;
 
 import com.adeptj.runtime.config.Configs;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
-import static com.adeptj.runtime.server.ServerLogsWebSocket.SERVER_LOGS_ENDPOINT;
+import static com.adeptj.runtime.websocket.ServerLogsWebSocket.SERVER_LOGS_ENDPOINT;
 
 /**
  * WebSocket for rendering server logs.
@@ -58,9 +58,9 @@ public class ServerLogsWebSocket {
     @OnOpen
     public void onOpen(Session session) {
         try {
-            session.getAsyncRemote().sendText("Server logs tailing will be started shortly!!");
             this.logsTailer = new ServerLogsTailer(new File(Configs.DEFAULT.logging().getString(SERVER_LOG_FILE)), session);
             this.logsTailer.startTailer();
+            session.getAsyncRemote().sendText("Server logs tailing will be started shortly!!");
         } catch (RejectedExecutionException ex) {
             LOGGER.error(ex.getMessage(), ex);
             session.getAsyncRemote().sendText(ex.getMessage());
