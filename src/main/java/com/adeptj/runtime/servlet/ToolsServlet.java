@@ -36,8 +36,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
+import java.text.MessageFormat;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
@@ -87,7 +87,7 @@ public class ToolsServlet extends HttpServlet {
                         .put("runtime", JAVA_RUNTIME_NAME + "(build " + JAVA_RUNTIME_VERSION + ")")
                         .put("jvm", JAVA_VM_NAME + "(build " + JAVA_VM_VERSION + ", " + JAVA_VM_INFO + ")")
                         .put("startTime", new Date(runtimeMXBean.getStartTime()))
-                        .put("upTime", TimeUnit.MILLISECONDS.toMinutes(runtimeMXBean.getUptime()))
+                        .put("upTime", formatPeriod(runtimeMXBean.getUptime()))
                         .put("maxMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getMax()))
                         .put("usedMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getUsed()))
                         .put("processors", Runtime.getRuntime().availableProcessors()))
@@ -97,5 +97,15 @@ public class ToolsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
+    }
+
+    private String formatPeriod(final long period) {
+        final long millis = period % 1000;
+        final long seconds = period / 1000 % 60;
+        final long minutes = period / 1000 / 60 % 60;
+        final long hours = period / 1000 / 60 / 60 % 24;
+        final long days = period / 1000 / 60 / 60 / 24;
+        return MessageFormat.format("{0,number} 'days' {1,number,00}:{2,number,00}:{3,number,00}.{4,number,000}",
+                days, hours, minutes, seconds, millis);
     }
 }
