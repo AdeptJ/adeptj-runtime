@@ -174,12 +174,11 @@ public final class Server implements Stoppable {
 
     private GracefulShutdownHandler rootHandler;
 
-    private WeakReference<Config> reference;
+    private WeakReference<Config> cfgReference;
 
     public void start(Map<String, String> commands) throws ServletException {
-        this.reference = new WeakReference<>(Configs.DEFAULT.undertow());
-        //Config undertowConf = Configs.DEFAULT.undertow();
-        Config httpConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_HTTP);
+        this.cfgReference = new WeakReference<>(Configs.DEFAULT.undertow());
+        Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
         int httpPort = handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
@@ -187,7 +186,7 @@ public final class Server implements Stoppable {
         this.manager.deploy();
         Builder builder = Undertow.builder();
         optimizeWorkerOptions(builder);
-        ServerOptions.build(builder, Objects.requireNonNull(this.reference.get()));
+        ServerOptions.build(builder, Objects.requireNonNull(this.cfgReference.get()));
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         enableHttp2(builder);
         enableAJP(builder);
@@ -268,7 +267,7 @@ public final class Server implements Stoppable {
 
     private void optimizeWorkerOptions(Builder builder) {
         if (Environment.isProd()) {
-            Config workerOptions = Objects.requireNonNull(this.reference.get()).getConfig(KEY_WORKER_OPTIONS);
+            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
             int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             int calcCoreTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
@@ -291,7 +290,7 @@ public final class Server implements Stoppable {
 
     private void enableHttp2(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_HTTPS);
+            Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
@@ -305,7 +304,7 @@ public final class Server implements Stoppable {
 
     private void enableAJP(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
-            Config ajpConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_AJP);
+            Config ajpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
             undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
             LOGGER.info("AJP enabled @ port: [{}]", ajpPort);
@@ -362,7 +361,7 @@ public final class Server implements Stoppable {
     }
 
     private SetHeadersHandler headersHandler(HttpHandler servletInitialHandler) {
-        Config cfg = Objects.requireNonNull(this.reference.get());
+        Config cfg = Objects.requireNonNull(this.cfgReference.get());
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (!Environment.isProd()) {
@@ -386,7 +385,7 @@ public final class Server implements Stoppable {
     }
 
     private GracefulShutdownHandler rootHandler(HttpHandler headersHandler) {
-        Config cfg = Objects.requireNonNull(this.reference.get());
+        Config cfg = Objects.requireNonNull(this.cfgReference.get());
         return Handlers.gracefulShutdown(
                 new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
                         new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
@@ -475,7 +474,7 @@ public final class Server implements Stoppable {
     }
 
     private DeploymentInfo deploymentInfo() {
-        Config cfg = Objects.requireNonNull(this.reference.get());
+        Config cfg = Objects.requireNonNull(this.cfgReference.get());
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
