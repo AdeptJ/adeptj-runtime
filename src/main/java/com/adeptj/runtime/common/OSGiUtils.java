@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.common;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
@@ -28,6 +29,7 @@ import org.osgi.framework.ServiceRegistration;
 
 import java.util.Optional;
 
+import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
 
@@ -48,6 +50,10 @@ public final class OSGiUtils {
 
     // No instantiation. Utility methods only.
     private OSGiUtils() {
+    }
+
+    public static boolean isNotFragment(Bundle bundle) {
+        return bundle.getHeaders().get(FRAGMENT_HOST) == null;
     }
 
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {

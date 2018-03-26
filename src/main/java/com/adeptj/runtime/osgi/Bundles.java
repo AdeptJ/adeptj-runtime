@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.osgi;
 
+import com.adeptj.runtime.common.OSGiUtils;
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.common.Times;
 import org.osgi.framework.Bundle;
@@ -31,7 +32,6 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
-import static org.osgi.framework.Constants.FRAGMENT_HOST;
 
 /**
  * Utility that handles the installation/activation of required bundles after the system bundle is up and running.
@@ -44,6 +44,8 @@ final class Bundles {
 
     private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
 
+    private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
+
     private static final String BENCHMARK_BUNDLE_START = "benchmark.bundle.start";
 
     /**
@@ -53,7 +55,7 @@ final class Bundles {
     }
 
     /**
-     * Provision the bundles.
+     * Provision the Bundles.
      * <p>
      * Following happens in order.
      * 1. Find Bundles
@@ -71,10 +73,9 @@ final class Bundles {
         bundleInstaller
                 .installBundles(bundleInstaller.findBundles(bundlesDir), systemBundleContext)
                 .peek(bundle -> installCount.incrementAndGet())
-                .filter(bundle -> bundle.getHeaders().get(FRAGMENT_HOST) == null)
+                .filter(OSGiUtils::isNotFragment)
                 .forEach(Bundles::startBundle);
-        LOGGER.info("Provisioning of [{}] Bundles(excluding system) took: [{}] ms!!", installCount.get(),
-                Times.elapsedMillis(startTime));
+        LOGGER.info(BUNDLE_PROVISIONED_MSG, installCount.get(), Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {
