@@ -21,6 +21,8 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
@@ -29,6 +31,11 @@ import com.adeptj.runtime.tools.logging.LogbackManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static com.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -66,7 +73,13 @@ public final class Launcher {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            Server.start(args);
+            Map<String, String> commands = Stream.of(args)
+                    .map(cmd -> cmd.split(Constants.REGEX_EQ))
+                    .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
+            logger.debug("Commands to AdeptJ Runtime: {}", commands);
+            Server server = new Server();
+            server.start(commands);
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, SERVER_STOP_THREAD_NAME));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);

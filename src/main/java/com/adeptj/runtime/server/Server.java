@@ -20,9 +20,12 @@
 
 package com.adeptj.runtime.server;
 
+import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.SslContextFactory;
+import com.adeptj.runtime.common.Stoppable;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.ContainerInitializer;
@@ -75,7 +78,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -99,15 +101,59 @@ import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
-import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
+import static com.adeptj.runtime.server.ServerConstants.AUTH_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.CRYPTO_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
+import static com.adeptj.runtime.server.ServerConstants.ERROR_PAGE_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.KEY_AJP;
+import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
+import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
+import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
+import static com.adeptj.runtime.server.ServerConstants.KEY_ERROR_PAGES;
+import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
+import static com.adeptj.runtime.server.ServerConstants.KEY_IGNORE_FLUSH;
+import static com.adeptj.runtime.server.ServerConstants.KEY_INVALIDATE_SESSION_ON_LOGOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_KEYSTORE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_LOCATION;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_SIZE_THRESHOLD;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_FILE_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUEST_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_CORE_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_MAX_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_BUFFER_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_IO_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_CORE_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_MAX_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TCP_NO_DELAY;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.REALM;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_AJP;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
+import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
+import static com.adeptj.runtime.server.ServerConstants.TOOLS_DASHBOARD_URL;
+import static com.adeptj.runtime.server.ServerConstants.TOOLS_ERROR_URL;
+import static com.adeptj.runtime.server.ServerConstants.TOOLS_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
-import static java.util.stream.Collectors.toMap;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
@@ -116,135 +162,77 @@ import static org.apache.commons.lang3.SystemUtils.USER_DIR;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class Server {
+public final class Server implements Stoppable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private static final String KEY_IGNORE_FLUSH = "common.ignore-flush";
+    private Undertow server;
 
-    private static final int SYS_TASK_THREAD_MULTIPLIER = 2;
+    private DeploymentManager manager;
 
-    private static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
+    private GracefulShutdownHandler rootHandler;
 
-    private static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
-
-    private static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
-
-    private static final String KEY_WORKER_OPTIONS = "worker-options";
-
-    private static final String KEY_KEYSTORE = "keyStore";
-
-    private static final String KEY_HTTPS = "https";
-
-    private static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
-
-    private static final String KEY_AJP = "ajp";
-
-    private static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
-
-    private static final String SYS_PROP_CHECK_PORT = "adeptj.rt.port.check";
-
-    private static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
-
-    private static final String REALM = "AdeptJ Realm";
-
-    private static final String SYS_PROP_SESSION_TIMEOUT = "adeptj.session.timeout";
-
-    private static final String SYS_PROP_ENABLE_REQ_BUFF = "enable.req.buffering";
-
-    private static final String SYS_PROP_REQ_BUFF_MAX_BUFFERS = "req.buff.maxBuffers";
-
-    private static final String SYS_PROP_MAX_CONCUR_REQ = "max.concurrent.requests";
-
-    private static final String KEY_SESSION_TIMEOUT = "common.session-timeout";
-
-    private static final String KEY_HTTP_ONLY = "common.session-cookie-httpOnly";
-
-    private static final String KEY_CHANGE_SESSIONID_ON_LOGIN = "common.change-sessionId-on-login";
-
-    private static final String KEY_INVALIDATE_SESSION_ON_LOGOUT = "common.invalidate-session-on-logout";
-
-    private static final String KEY_USE_CACHED_AUTH_MECHANISM = "common.use-cached-auth-mechanism";
-
-    private static final String KEY_WS_IO_THREADS = "io-threads";
-
-    private static final String KEY_WS_TASK_CORE_THREADS = "task-core-threads";
-
-    private static final String KEY_WS_TASK_MAX_THREADS = "task-max-threads";
-
-    private static final String KEY_WS_TCP_NO_DELAY = "tcp-no-delay";
-
-    private static final String KEY_WS_WEB_SOCKET_OPTIONS = "webSocket-options";
-
-    private static final String KEY_WS_USE_DIRECT_BUFFER = "use-direct-buffer";
-
-    private static final String KEY_WS_BUFFER_SIZE = "buffer-size";
-
-    private static final String KEY_MULTIPART_FILE_LOCATION = "common.multipart-file-location";
-
-    private static final String KEY_MULTIPART_MAX_FILE_SIZE = "common.multipart-max-file-size";
-
-    private static final String KEY_MULTIPART_MAX_REQUEST_SIZE = "common.multipart-max-request-size";
-
-    private static final String KEY_MULTIPART_FILE_SIZE_THRESHOLD = "common.multipart-file-size-threshold";
-
-    private static final String KEY_AUTH_ROLES = "common.auth-roles";
-
-    private static final String KEY_SECURED_URLS_ALLOWED_METHODS = "common.secured-urls-allowed-methods";
-
-    private static final String KEY_SECURED_URLS = "common.secured-urls";
-
-    private static final String KEY_ERROR_PAGES = "error-pages";
-
-    private static final String ERROR_PAGE_SERVLET = "AdeptJ ErrorPageServlet";
-
-    private static final String TOOLS_ERROR_URL = "/tools/error/*";
-
-    private static final String TOOLS_SERVLET = "AdeptJ ToolsServlet";
-
-    private static final String TOOLS_DASHBOARD_URL = "/tools/dashboard";
-
-    private static final String AUTH_SERVLET = "AdeptJ AuthServlet";
-
-    private static final String CRYPTO_SERVLET = "AdeptJ CryptoServlet";
-
-    private static final int IDX_ZERO = 0;
-
-    private static final int IDX_ONE = 1;
-
-    // No instantiation.
-    private Server() {
-    }
-
-    public static void start(String[] args) throws ServletException {
-        Map<String, String> commands = Arrays.stream(args)
-                .map(cmd -> cmd.split(REGEX_EQ))
-                .collect(toMap(cmdArray -> cmdArray[IDX_ZERO], cmdArray -> cmdArray[IDX_ONE]));
+    public void start(Map<String, String> commands) throws ServletException {
         Config undertowConf = Configs.DEFAULT.undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        LOGGER.debug("Commands to AdeptJ Runtime: {}", commands);
         int httpPort = handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
-        printBanner();
-        DeploymentManager manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
-        manager.deploy();
+        this.printBanner();
+        this.manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
+        this.manager.deploy();
         Builder builder = Undertow.builder();
         optimizeWorkerOptions(builder, undertowConf);
         ServerOptions.build(builder, undertowConf);
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         enableHttp2(undertowConf, builder);
         enableAJP(undertowConf, builder);
-        GracefulShutdownHandler rootHandler = rootHandler(headersHandler(manager.start(), undertowConf), undertowConf);
-        Undertow server = builder.setHandler(rootHandler).build();
-        server.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, manager, rootHandler));
+        this.rootHandler = rootHandler(headersHandler(this.manager.start(), undertowConf), undertowConf);
+        this.server = builder.setHandler(this.rootHandler).build();
+        this.server.start();
         launchBrowser(commands, httpPort);
         if (!Environment.isServerConfFileExists()) {
             createServerConfFile();
         }
     }
 
-    private static void printBanner() {
+    /**
+     * Does graceful server shutdown, this first cleans up the deployment and then stops Undertow server.
+     */
+    @Override
+    public void stop() {
+        long startTime = System.nanoTime();
+        LOGGER.info("Stopping AdeptJ Runtime!!");
+        try {
+            this.gracefulShutdown();
+            this.manager.stop();
+            this.manager.undeploy();
+            this.server.stop();
+            LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
+            DefaultExecutorService.INSTANCE.shutdown();
+        } catch (Throwable ex) { // NOSONAR
+            LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
+        } finally {
+            // Let the Logback cleans up it's state.
+            LogbackManager.INSTANCE.getLoggerContext().stop();
+        }
+    }
+
+    private void gracefulShutdown() {
+        try {
+            this.rootHandler.shutdown();
+            if (this.rootHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
+                LOGGER.info("Completed remaining requests successfully!!");
+            }
+        } catch (InterruptedException ie) {
+            LOGGER.error("Error while waiting for pending request to complete!!", ie);
+            // SONAR - "InterruptedException" should not be ignored
+            // Can't really rethrow it as we are yet to stop the server and anyway it's a shutdown hook
+            // and JVM itself will be shutting down shortly.
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void printBanner() {
         try (InputStream stream = Server.class.getResourceAsStream(BANNER_TXT)) {
             LOGGER.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
@@ -253,7 +241,7 @@ public final class Server {
         }
     }
 
-    private static void launchBrowser(Map<String, String> arguments, int httpPort) {
+    private void launchBrowser(Map<String, String> arguments, int httpPort) {
         if (Boolean.parseBoolean(arguments.get(ARG_OPEN_CONSOLE))) {
             try {
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
@@ -264,7 +252,7 @@ public final class Server {
         }
     }
 
-    private static void createServerConfFile() {
+    private void createServerConfFile() {
         try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
             Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                     IOUtils.toBytes(stream), StandardOpenOption.CREATE);
@@ -273,7 +261,7 @@ public final class Server {
         }
     }
 
-    private static void optimizeWorkerOptions(Builder builder, Config undertowConf) {
+    private void optimizeWorkerOptions(Builder builder, Config undertowConf) {
         if (Environment.isProd()) {
             Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
@@ -296,7 +284,7 @@ public final class Server {
         }
     }
 
-    private static void enableHttp2(Config undertowConf, Builder undertowBuilder) {
+    private void enableHttp2(Config undertowConf, Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
@@ -310,7 +298,7 @@ public final class Server {
         }
     }
 
-    private static void enableAJP(Config undertowConf, Builder undertowBuilder) {
+    private void enableAJP(Config undertowConf, Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
             Config ajpConf = undertowConf.getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
@@ -319,7 +307,7 @@ public final class Server {
         }
     }
 
-    private static int handlePortAvailability(Config httpConf) {
+    private int handlePortAvailability(Config httpConf) {
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
             LOGGER.warn("No port specified via system property: [{}], using default port: [{}]",
@@ -339,7 +327,7 @@ public final class Server {
         return port;
     }
 
-    private static boolean isPortAvailable(int port) {
+    private boolean isPortAvailable(int port) {
         boolean portAvailable = false;
         ServerSocket socket = null;
         try (ServerSocketChannel socketChannel = ServerSocketChannel.open()) {
@@ -363,12 +351,12 @@ public final class Server {
         return portAvailable;
     }
 
-    private static RequestBufferingHandler reqBufferingHandler(HttpHandler initialHandler, Config cfg) {
+    private RequestBufferingHandler reqBufferingHandler(HttpHandler initialHandler, Config cfg) {
         return new RequestBufferingHandler(initialHandler,
                 Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
     }
 
-    private static SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
+    private SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (!Environment.isProd()) {
@@ -379,25 +367,25 @@ public final class Server {
                 new SetHeadersHandler(servletInitialHandler, headers);
     }
 
-    private static PredicateHandler predicateHandler(HttpHandler headersHandler) {
+    private PredicateHandler predicateHandler(HttpHandler headersHandler) {
         return Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
                 Handlers.redirect(TOOLS_DASHBOARD_URI), headersHandler);
     }
 
-    private static Set<HttpString> allowedMethods(Config cfg) {
+    private Set<HttpString> allowedMethods(Config cfg) {
         return cfg.getStringList(KEY_ALLOWED_METHODS)
                 .stream()
                 .map(Verb::from)
                 .collect(Collectors.toSet());
     }
 
-    private static GracefulShutdownHandler rootHandler(HttpHandler headersHandler, Config cfg) {
+    private GracefulShutdownHandler rootHandler(HttpHandler headersHandler, Config cfg) {
         return Handlers.gracefulShutdown(
                 new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
                         new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
     }
 
-    private static List<ErrorPage> errorPages(Config cfg) {
+    private List<ErrorPage> errorPages(Config cfg) {
         return cfg.getObject(KEY_ERROR_PAGES).unwrapped()
                 .entrySet()
                 .stream()
@@ -405,14 +393,14 @@ public final class Server {
                 .collect(Collectors.toList());
     }
 
-    private static ServletContainerInitializerInfo sciInfo() {
+    private ServletContainerInitializerInfo sciInfo() {
         Set<Class<?>> handlesTypes = new HashSet<>();
         handlesTypes.add(FrameworkLauncher.class);
         handlesTypes.add(DefaultStartupAware.class);
         return new ServletContainerInitializerInfo(ContainerInitializer.class, handlesTypes);
     }
 
-    private static SecurityConstraint securityConstraint(Config cfg) {
+    private SecurityConstraint securityConstraint(Config cfg) {
         return Servlets.securityConstraint()
                 .addRolesAllowed(cfg.getStringList(KEY_AUTH_ROLES))
                 .addWebResourceCollection(Servlets.webResourceCollection()
@@ -420,7 +408,7 @@ public final class Server {
                         .addUrlPatterns(cfg.getStringList(KEY_SECURED_URLS)));
     }
 
-    private static List<ServletInfo> servlets() {
+    private List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets
                 .servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class)
@@ -440,14 +428,14 @@ public final class Server {
         return servlets;
     }
 
-    private static MultipartConfigElement defaultMultipartConfig(Config cfg) {
+    private MultipartConfigElement defaultMultipartConfig(Config cfg) {
         return Servlets.multipartConfig(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
                 cfg.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
                 cfg.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
                 cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
-    private static WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
+    private WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
         Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
                 .setWorker(webSocketWorker(wsOptions))
@@ -456,7 +444,7 @@ public final class Server {
                 .addEndpoint(ServerLogsWebSocket.class);
     }
 
-    private static XnioWorker webSocketWorker(Config wsOptions) {
+    private XnioWorker webSocketWorker(Config wsOptions) {
         XnioWorker worker = null;
         try {
             worker = Xnio.getInstance().createWorker(OptionMap.builder()
@@ -471,15 +459,15 @@ public final class Server {
         return worker;
     }
 
-    private static int sessionTimeout(Config cfg) {
+    private int sessionTimeout(Config cfg) {
         return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, cfg.getInt(KEY_SESSION_TIMEOUT));
     }
 
-    private static ServletSessionConfig sessionConfig(Config cfg) {
+    private ServletSessionConfig sessionConfig(Config cfg) {
         return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
     }
 
-    private static DeploymentInfo deploymentInfo(Config cfg) {
+    private DeploymentInfo deploymentInfo(Config cfg) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)

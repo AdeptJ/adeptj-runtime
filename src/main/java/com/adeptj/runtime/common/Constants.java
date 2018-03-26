@@ -69,7 +69,7 @@ public final class Constants {
 
     public static final String COMMA = ",";
 
-    public static final String EMPTY = "";
+    static final String EMPTY = "";
 
     public static final String UTF8 = "UTF-8";
 
@@ -93,27 +93,25 @@ public final class Constants {
 
     public static final int DEFAULT_SERVER_PORT = 9007;
 
-    public static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
-
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
     public static final String ARG_OPEN_CONSOLE = "openConsole";
 
     public static final String DATE_FORMAT_LOGGING = "dd.MM.yyyy HH:mm:ss.SSS ";
 
-    public static final String SHUTDOWN_HOOK_THREAD_NAME = "AdeptJ Terminator";
+    public static final String SERVER_STOP_THREAD_NAME = "AdeptJ Terminator";
 
     public static final String DEPLOYMENT_NAME = "AdeptJ Runtime Deployment";
 
     public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
 
-    public static final String WIN_BROWSER_LAUNCH_CMD = "rundll32 url.dll,FileProtocolHandler ";
+    static final String WIN_BROWSER_LAUNCH_CMD = "rundll32 url.dll,FileProtocolHandler ";
 
-    public static final String MAC_BROWSER_LAUNCH_CMD = "open ";
+    static final String MAC_BROWSER_LAUNCH_CMD = "open ";
 
-    public static final String OS_NAME_PROP = "os.name";
+    static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
 
-    public static final String OS = System.getProperty(OS_NAME_PROP);
+    public static final String OS = System.getProperty("os.name");
 
     public static final String CURRENT_DIR = System.getProperty("user.dir");
 
@@ -135,11 +133,11 @@ public final class Constants {
 
     public static final String SERVER_CONF_FILE = "server.conf";
 
-    public static final String FRAMEWORK_CONF_FILE = "framework.properties";
+    static final String FRAMEWORK_CONF_FILE = "framework.properties";
 
     // Configuration Keys constants start.
 
-    public static final String KEY_BROWSERS = "browsers";
+    static final String KEY_BROWSERS = "browsers";
 
     public static final String KEY_HOST = "host";
 
