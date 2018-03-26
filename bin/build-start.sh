@@ -76,7 +76,10 @@ start_runtime() {
     fi
 
 #    starting java process from base directory
-    java ${ADEPTJ_RUNTIME_OPTS} -jar $JAR_PATH
+    if [ -e "$JAR_PATH" ]
+    then
+        $(java ${ADEPTJ_RUNTIME_OPTS} -jar $JAR_PATH && echo $! > runtime.pid)
+    fi
 }
 
 # Initializing default runtime jar file from target directory
