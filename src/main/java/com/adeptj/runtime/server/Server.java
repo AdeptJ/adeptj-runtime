@@ -166,7 +166,7 @@ public final class Server implements Stoppable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private Undertow server;
+    private Undertow undertow;
 
     private DeploymentManager manager;
 
@@ -187,8 +187,8 @@ public final class Server implements Stoppable {
         enableHttp2(undertowConf, builder);
         enableAJP(undertowConf, builder);
         this.rootHandler = rootHandler(headersHandler(this.manager.start(), undertowConf), undertowConf);
-        this.server = builder.setHandler(this.rootHandler).build();
-        this.server.start();
+        this.undertow = builder.setHandler(this.rootHandler).build();
+        this.undertow.start();
         launchBrowser(commands, httpPort);
         if (!Environment.isServerConfFileExists()) {
             createServerConfFile();
@@ -206,7 +206,7 @@ public final class Server implements Stoppable {
             this.gracefulShutdown();
             this.manager.stop();
             this.manager.undeploy();
-            this.server.stop();
+            this.undertow.stop();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
             DefaultExecutorService.INSTANCE.shutdown();
         } catch (Throwable ex) { // NOSONAR

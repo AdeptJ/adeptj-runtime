@@ -69,8 +69,6 @@ public final class Constants {
 
     public static final String COMMA = ",";
 
-    static final String EMPTY = "";
-
     public static final String UTF8 = "UTF-8";
 
     public static final String TRUE = "true";
@@ -105,12 +103,6 @@ public final class Constants {
 
     public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
 
-    static final String WIN_BROWSER_LAUNCH_CMD = "rundll32 url.dll,FileProtocolHandler ";
-
-    static final String MAC_BROWSER_LAUNCH_CMD = "open ";
-
-    static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
-
     public static final String OS = System.getProperty("os.name");
 
     public static final String CURRENT_DIR = System.getProperty("user.dir");
@@ -132,12 +124,6 @@ public final class Constants {
     public static final String DIR_DEPLOYMENT = "deployment";
 
     public static final String SERVER_CONF_FILE = "server.conf";
-
-    static final String FRAMEWORK_CONF_FILE = "framework.properties";
-
-    // Configuration Keys constants start.
-
-    static final String KEY_BROWSERS = "browsers";
 
     public static final String KEY_HOST = "host";
 
@@ -162,6 +148,20 @@ public final class Constants {
     public static final String KEY_HEADER_POWERED_BY = "common.header-x-powered-by";
 
     public static final String KEY_HEADER_SERVER = "common.header-server";
+
+    static final String FRAMEWORK_CONF_FILE = "framework.properties";
+
+    // Configuration Keys constants start.
+
+    static final String KEY_BROWSERS = "browsers";
+
+    static final String WIN_BROWSER_LAUNCH_CMD = "rundll32 url.dll,FileProtocolHandler ";
+
+    static final String MAC_BROWSER_LAUNCH_CMD = "open ";
+
+    static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
+
+    static final String EMPTY = "";
 
     // Configuration Keys constants ends.
 
