@@ -69,6 +69,7 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -82,6 +83,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -172,21 +174,24 @@ public final class Server implements Stoppable {
 
     private GracefulShutdownHandler rootHandler;
 
+    private WeakReference<Config> reference;
+
     public void start(Map<String, String> commands) throws ServletException {
-        Config undertowConf = Configs.DEFAULT.undertow();
-        Config httpConf = undertowConf.getConfig(KEY_HTTP);
+        this.reference = new WeakReference<>(Configs.DEFAULT.undertow());
+        //Config undertowConf = Configs.DEFAULT.undertow();
+        Config httpConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_HTTP);
         int httpPort = handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.manager = Servlets.defaultContainer().addDeployment(deploymentInfo(undertowConf));
+        this.manager = Servlets.defaultContainer().addDeployment(deploymentInfo());
         this.manager.deploy();
         Builder builder = Undertow.builder();
-        optimizeWorkerOptions(builder, undertowConf);
-        ServerOptions.build(builder, undertowConf);
+        optimizeWorkerOptions(builder);
+        ServerOptions.build(builder, Objects.requireNonNull(this.reference.get()));
         builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-        enableHttp2(undertowConf, builder);
-        enableAJP(undertowConf, builder);
-        this.rootHandler = rootHandler(headersHandler(this.manager.start(), undertowConf), undertowConf);
+        enableHttp2(builder);
+        enableAJP(builder);
+        this.rootHandler = rootHandler(headersHandler(this.manager.start()));
         this.undertow = builder.setHandler(this.rootHandler).build();
         this.undertow.start();
         launchBrowser(commands, httpPort);
@@ -261,9 +266,9 @@ public final class Server implements Stoppable {
         }
     }
 
-    private void optimizeWorkerOptions(Builder builder, Config undertowConf) {
+    private void optimizeWorkerOptions(Builder builder) {
         if (Environment.isProd()) {
-            Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
+            Config workerOptions = Objects.requireNonNull(this.reference.get()).getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
             int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             int calcCoreTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
@@ -284,9 +289,9 @@ public final class Server implements Stoppable {
         }
     }
 
-    private void enableHttp2(Config undertowConf, Builder undertowBuilder) {
+    private void enableHttp2(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
+            Config httpsConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
@@ -298,9 +303,9 @@ public final class Server implements Stoppable {
         }
     }
 
-    private void enableAJP(Config undertowConf, Builder undertowBuilder) {
+    private void enableAJP(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
-            Config ajpConf = undertowConf.getConfig(KEY_AJP);
+            Config ajpConf = Objects.requireNonNull(this.reference.get()).getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
             undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
             LOGGER.info("AJP enabled @ port: [{}]", ajpPort);
@@ -356,7 +361,8 @@ public final class Server implements Stoppable {
                 Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
     }
 
-    private SetHeadersHandler headersHandler(HttpHandler servletInitialHandler, Config cfg) {
+    private SetHeadersHandler headersHandler(HttpHandler servletInitialHandler) {
+        Config cfg = Objects.requireNonNull(this.reference.get());
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (!Environment.isProd()) {
@@ -379,7 +385,8 @@ public final class Server implements Stoppable {
                 .collect(Collectors.toSet());
     }
 
-    private GracefulShutdownHandler rootHandler(HttpHandler headersHandler, Config cfg) {
+    private GracefulShutdownHandler rootHandler(HttpHandler headersHandler) {
+        Config cfg = Objects.requireNonNull(this.reference.get());
         return Handlers.gracefulShutdown(
                 new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
                         new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
@@ -467,7 +474,8 @@ public final class Server implements Stoppable {
         return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
     }
 
-    private DeploymentInfo deploymentInfo(Config cfg) {
+    private DeploymentInfo deploymentInfo() {
+        Config cfg = Objects.requireNonNull(this.reference.get());
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
