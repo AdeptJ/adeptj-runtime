@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.17.Final</version>
+        <version>1.0.18.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.13-SNAPSHOT</version>
@@ -48,14 +48,12 @@
         <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
         <jdeparser.version>2.0.2.Final</jdeparser.version>
         <jboss-classfilewriter.version>1.2.1.Final</jboss-classfilewriter.version>
-        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <jansi.version>1.17</jansi.version>
         <trimou-core.version>2.4.0.Final</trimou-core.version>
         <caffeine.version>2.6.2</caffeine.version>
         <itextpdf.version>5.5.13</itextpdf.version>
-        <hibernate-validator.version>6.0.8.Final</hibernate-validator.version>
         <classmate.version>1.3.4</classmate.version>
         <javax.el.version>3.0.0</javax.el.version>
 
@@ -402,35 +400,43 @@
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>failsafe</artifactId>
-            <version>1.0.5</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.reactivestreams</groupId>
             <artifactId>reactive-streams</artifactId>
-            <version>1.0.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.1.5.RELEASE</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>${javax.annotation-api.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -442,32 +448,36 @@
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
             <scope>provided</scope>
         </dependency>
 
@@ -935,21 +945,18 @@
                 <dependency>
                     <groupId>com.fasterxml.jackson.module</groupId>
                     <artifactId>jackson-module-parameter-names</artifactId>
-                    <version>2.9.4</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jdk8</artifactId>
-                    <version>2.9.4</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr310</artifactId>
-                    <version>2.9.4</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -962,14 +969,12 @@
                 <dependency>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jaxrs</artifactId>
-                    <version>2.9.4</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr353</artifactId>
-                    <version>2.9.4</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
@@ -1495,7 +1500,7 @@
                 <dependency>
                     <groupId>com.zaxxer</groupId>
                     <artifactId>HikariCP</artifactId>
-                    <version>2.7.8</version>
+                    <version>${hikaricp.version}</version>
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
