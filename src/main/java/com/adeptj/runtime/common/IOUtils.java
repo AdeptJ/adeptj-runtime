@@ -51,7 +51,7 @@ public final class IOUtils {
 
     private static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Streams.copyStream(source, out);
+        Streams.copyStream(source, out, false);
         return out;
     }
 }
