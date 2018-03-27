@@ -170,7 +170,7 @@ public final class Server implements Stoppable {
 
     private Undertow undertow;
 
-    private DeploymentManager manager;
+    private DeploymentManager deploymentManager;
 
     private GracefulShutdownHandler rootHandler;
 
@@ -179,23 +179,23 @@ public final class Server implements Stoppable {
     public void start(Map<String, String> commands) throws ServletException {
         this.cfgReference = new WeakReference<>(Configs.DEFAULT.undertow());
         Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
-        int httpPort = handlePortAvailability(httpConf);
+        int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.manager = Servlets.defaultContainer().addDeployment(deploymentInfo());
-        this.manager.deploy();
+        this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
+        this.deploymentManager.deploy();
         Builder builder = Undertow.builder();
-        optimizeWorkerOptions(builder);
-        ServerOptions.build(builder, Objects.requireNonNull(this.cfgReference.get()));
-        builder.addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-        enableHttp2(builder);
-        enableAJP(builder);
-        this.rootHandler = rootHandler(headersHandler(this.manager.start()));
+        this.optimizeWorkerOptions(builder);
+        ServerOptions.build(builder, Objects.requireNonNull(this.cfgReference.get()))
+                .addHttpListener(httpPort, httpConf.getString(KEY_HOST));
+        this.enableHttp2(builder);
+        this.enableAJP(builder);
+        this.rootHandler = this.rootHandler(this.headersHandler(this.deploymentManager.start()));
         this.undertow = builder.setHandler(this.rootHandler).build();
         this.undertow.start();
-        launchBrowser(commands, httpPort);
+        this.launchBrowser(commands, httpPort);
         if (!Environment.isServerConfFileExists()) {
-            createServerConfFile();
+            this.createServerConfFile();
         }
     }
 
@@ -208,8 +208,8 @@ public final class Server implements Stoppable {
         LOGGER.info("Stopping AdeptJ Runtime!!");
         try {
             this.gracefulShutdown();
-            this.manager.stop();
-            this.manager.undeploy();
+            this.deploymentManager.stop();
+            this.deploymentManager.undeploy();
             this.undertow.stop();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
             DefaultExecutorService.INSTANCE.shutdown();

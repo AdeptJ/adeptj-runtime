@@ -61,7 +61,7 @@ final class ServerOptions {
      * @param builder        Undertow.Builder
      * @param undertowConfig Undertow Typesafe Config
      */
-    public static void build(Builder builder, Config undertowConfig) {
+    public static Builder build(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
         Config serverOptionsCfg = undertowConfig.getConfig(SERVER_OPTIONS);
         stringOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_STRING).unwrapped());
@@ -69,6 +69,7 @@ final class ServerOptions {
         longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped());
         booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
         LOGGER.info("ServerOptions populated in [{}] ms!!", Times.elapsedMillis(startTime));
+        return builder;
     }
 
     private static void buildServerOptions(Builder builder, Map<String, ?> options) {
