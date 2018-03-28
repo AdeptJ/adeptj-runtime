@@ -1,15 +1,19 @@
 language: java
 sudo: false
 install: true
+
 addons:
   sonarcloud:
+    organization: "adeptj"
     token:
       secure: ${SONAR_TOKEN}
-    organization: "adeptj"
+
 jdk:
   - oraclejdk8
+
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P Apache-HttpClient,RESTEasy,Jackson,MySQL,JDBC-CP-Hikari,JPA-EclipseLink,AWS sonar:sonar
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P Apache-HttpClient,RESTEasy,Jackson,MySQL,JDBC-CP-Hikari,JPA-EclipseLink,AWS
+  - sonar-scanner -X -Dsonar.projectKey=adeptj-runtime
 cache:
   directories:
     - '$HOME/.m2/repository'
