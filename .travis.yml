@@ -3,7 +3,10 @@ sudo: false
 install: true
 addons:
   sonarcloud:
+    token:
+      secure: ${SONAR_TOKEN}
   organization: "adeptj"
+
 jdk:
   - oraclejdk8
 script:
