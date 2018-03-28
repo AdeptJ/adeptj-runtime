@@ -50,6 +50,8 @@ public final class OSGiUtils {
 
     private static final String PARENTHESIS_CLOSE = ")";
 
+    private static final String EXCEPTION_MSG = "InvalidSyntaxException!!";
+
     // No instantiation. Utility methods only.
     private OSGiUtils() {
     }
@@ -67,7 +69,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
+            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
         }
     }
 
@@ -82,7 +84,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
+            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
         }
     }
 
@@ -97,7 +99,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
+            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
         }
     }
 
