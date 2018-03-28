@@ -33,7 +33,10 @@ import java.io.File;
  */
 class ServerLogsTailer {
 
-    private static final int DELAY_MILLIS = 1000;
+    /**
+     * The delay between checks of the file for new content in milliseconds.
+     */
+    private static final int DELAY_MILLIS = Integer.getInteger("websocket.logs.tailing.delay", 1000);
 
     private Tailer tailer;
 

@@ -53,6 +53,7 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS}${RESTEASY_OPTS}
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
+ -Dwebsocket.logs.tailing.delay=5000 \
  -Dlog.async=true \
  -Dlog.immediate.flush=true \
  -Dfelix.log.level=3 \
