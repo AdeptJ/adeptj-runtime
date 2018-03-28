@@ -82,15 +82,13 @@ start_runtime() {
     fi
 }
 
+BIN_PATH=$(cd $(dirname "$0") && pwd)
+BASE=$(dirname "$BIN_PATH")
+
 # Initializing default runtime jar file from target directory
 # building runtime jar if target does not exist already
 init_default_jar() {
-    local CURRENT_DIR="$PWD"
-    if [[ $CURRENT_DIR == *"adeptj-runtime/bin" ]]
-    then
-        local BASE=$(dirname "$PWD")
-        local TARGET=$BASE"/target"
-    fi
+    local TARGET=$BASE"/target"
 
     if [[ -d "$TARGET" ]]
     then
