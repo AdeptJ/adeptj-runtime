@@ -46,6 +46,8 @@ public final class OSGiUtils {
 
     private static final String ASTERISK = "*";
 
+    private static final String PARENTHESIS_OPEN = "(";
+
     private static final String PARENTHESIS_CLOSE = ")";
 
     // No instantiation. Utility methods only.
@@ -54,6 +56,19 @@ public final class OSGiUtils {
 
     public static boolean isNotFragment(Bundle bundle) {
         return bundle.getHeaders().get(FRAGMENT_HOST) == null;
+    }
+
+    public static Filter filter(BundleContext context, String objectClassFQN) {
+        try {
+            return context.createFilter(PARENTHESIS_OPEN +
+                    OBJECTCLASS +
+                    EQ +
+                    objectClassFQN +
+                    PARENTHESIS_CLOSE);
+        } catch (InvalidSyntaxException ex) {
+            // Filter expression is malformed, not RFC-1960 based Filter.
+            throw new IllegalArgumentException("InvalidSyntaxException!!", ex);
+        }
     }
 
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
