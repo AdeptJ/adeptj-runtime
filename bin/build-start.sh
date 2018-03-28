@@ -78,7 +78,7 @@ start_runtime() {
 #    starting java process from base directory
     if [ -e "$JAR_PATH" ]
     then
-        $(java ${ADEPTJ_RUNTIME_OPTS} -jar $JAR_PATH && echo $! > runtime.pid)
+        java ${ADEPTJ_RUNTIME_OPTS} -jar $JAR_PATH & echo $! > runtime.pid
     fi
 }
 
