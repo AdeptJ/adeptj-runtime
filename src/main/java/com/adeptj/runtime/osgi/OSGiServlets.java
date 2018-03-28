@@ -63,10 +63,10 @@ public enum OSGiServlets {
     private Map<String, ServiceRegistration<? extends Servlet>> servlets = new HashMap<>();
 
     public void registerAll(BundleContext ctx, List<HttpServlet> servlets) {
-        servlets.forEach(servlet -> this.register(ctx, servlet));
+        servlets.forEach(servlet -> this.registerServlet(ctx, servlet));
     }
 
-    public void register(BundleContext ctx, HttpServlet servlet) {
+    public void registerServlet(BundleContext ctx, HttpServlet servlet) {
         Class<? extends HttpServlet> cls = servlet.getClass();
         WebServlet webServlet = this.checkWebServletAnnotation(cls);
         Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
