@@ -6,7 +6,6 @@ addons:
     token:
       secure: ${SONAR_TOKEN}
     organization: "adeptj"
-
 jdk:
   - oraclejdk8
 script:
