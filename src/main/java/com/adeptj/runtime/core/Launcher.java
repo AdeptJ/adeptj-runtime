@@ -75,7 +75,7 @@ public final class Launcher {
         LogbackInitializer.init();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
-            // Useful for attaching the debugger when needed in development mode.
+            // Useful for debugging the server startup in development mode.
             if (Environment.isDev()) {
                 Integer waitTime = Integer.getInteger("wait.time.for.debug.attach", 10);
                 logger.info("Waiting [{}] seconds for debugger to attach!", waitTime);

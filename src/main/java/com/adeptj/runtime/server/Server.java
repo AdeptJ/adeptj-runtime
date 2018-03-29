@@ -45,7 +45,6 @@ import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
-import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
@@ -183,16 +182,14 @@ public final class Server implements Stoppable {
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        Builder builder = Undertow.builder();
-        this.optimizeWorkerOptions(builder);
-        ServerOptions.build(builder, Objects.requireNonNull(this.cfgReference.get()))
-                .addHttpListener(httpPort, httpConf.getString(KEY_HOST));
-        this.enableHttp2(builder);
-        this.enableAJP(builder);
         this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
         this.deploymentManager.deploy();
-        this.rootHandler = this.rootHandler(this.headersHandler(this.deploymentManager.start()));
-        this.undertow = builder.setHandler(this.rootHandler).build();
+        this.rootHandler = this.rootHandler(this.deploymentManager.start());
+        this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()),
+                Objects.requireNonNull(this.cfgReference.get()))))
+                .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
+                .setHandler(this.rootHandler)
+                .build();
         this.undertow.start();
         this.launchBrowser(commands, httpPort);
         if (!Environment.isServerConfFileExists()) {
@@ -266,7 +263,7 @@ public final class Server implements Stoppable {
         }
     }
 
-    private void optimizeWorkerOptions(Builder builder) {
+    private Builder workerOptions(Builder builder) {
         if (Environment.isProd()) {
             Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
@@ -287,9 +284,10 @@ public final class Server implements Stoppable {
             // 2. max task thread: 128 (Same as core task thread)
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
+        return builder;
     }
 
-    private void enableHttp2(Builder undertowBuilder) {
+    private Builder enableHttp2(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
@@ -297,19 +295,21 @@ public final class Server implements Stoppable {
                 System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
                 System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString("keyStorePwd"));
                 System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString("keyPwd"));
-                LOGGER.info("HTTP2 will be enabled @ port: [{}] using bundled KeyStore.", httpsPort);
+                LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
             undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.createSslContext());
         }
+        return undertowBuilder;
     }
 
-    private void enableAJP(Builder undertowBuilder) {
+    private Builder enableAJP(Builder undertowBuilder) {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
             Config ajpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_AJP);
             int ajpPort = ajpConf.getInt(KEY_PORT);
             undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
             LOGGER.info("AJP enabled @ port: [{}]", ajpPort);
         }
+        return undertowBuilder;
     }
 
     private int handlePortAvailability(Config httpConf) {
@@ -356,28 +356,6 @@ public final class Server implements Stoppable {
         return portAvailable;
     }
 
-    private RequestBufferingHandler reqBufferingHandler(HttpHandler initialHandler, Config cfg) {
-        return new RequestBufferingHandler(initialHandler,
-                Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
-    }
-
-    private SetHeadersHandler headersHandler(HttpHandler servletInitialHandler) {
-        Config cfg = Objects.requireNonNull(this.cfgReference.get());
-        Map<HttpString, String> headers = new HashMap<>();
-        headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
-        if (!Environment.isProd()) {
-            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
-        }
-        return Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
-                new SetHeadersHandler(reqBufferingHandler(servletInitialHandler, cfg), headers) :
-                new SetHeadersHandler(servletInitialHandler, headers);
-    }
-
-    private PredicateHandler predicateHandler(HttpHandler headersHandler) {
-        return Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                Handlers.redirect(TOOLS_DASHBOARD_URI), headersHandler);
-    }
-
     private Set<HttpString> allowedMethods(Config cfg) {
         return cfg.getStringList(KEY_ALLOWED_METHODS)
                 .stream()
@@ -385,11 +363,34 @@ public final class Server implements Stoppable {
                 .collect(Collectors.toSet());
     }
 
-    private GracefulShutdownHandler rootHandler(HttpHandler headersHandler) {
+    /**
+     * Chaining of Undertow {@link HttpHandler} instances as follows.
+     * <p>
+     * 1. GracefulShutdownHandler
+     * 2. RequestLimitingHandler
+     * 3. AllowedMethodsHandler
+     * 4. PredicateHandler which resolves to either RedirectHandler or SetHeadersHandler
+     * 5. RequestBufferingHandler if request buffering is enabled, wrapped in SetHeadersHandler
+     * 5. And Finally ServletInitialHandler
+     *
+     * @param servletInitialHandler the {@link io.undertow.servlet.handlers.ServletInitialHandler}
+     * @return GracefulShutdownHandler as the root handler
+     */
+    private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler) {
         Config cfg = Objects.requireNonNull(this.cfgReference.get());
+        Map<HttpString, String> headers = new HashMap<>();
+        headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
+        if (Environment.isDev()) {
+            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
+        }
+        HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
+                new SetHeadersHandler(new RequestBufferingHandler(servletInitialHandler,
+                        Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
+                new SetHeadersHandler(servletInitialHandler, headers);
         return Handlers.gracefulShutdown(
                 new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
-                        new AllowedMethodsHandler(predicateHandler(headersHandler), allowedMethods(cfg))));
+                        new AllowedMethodsHandler(Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
+                                Handlers.redirect(TOOLS_DASHBOARD_URI), headersHandler), this.allowedMethods(cfg))));
     }
 
     private List<ErrorPage> errorPages(Config cfg) {

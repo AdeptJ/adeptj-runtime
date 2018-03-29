@@ -68,7 +68,7 @@ final class ServerOptions {
         integerOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped());
         longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped());
         booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
-        LOGGER.info("ServerOptions populated in [{}] ms!!", Times.elapsedMillis(startTime));
+        LOGGER.info("Undertow ServerOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
         return builder;
     }
 
