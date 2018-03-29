@@ -37,6 +37,16 @@ import io.undertow.servlet.handlers.ServletInitialHandler;
  * If the Predicate grouping is true then it invokes the non blocking ResourceHandler
  * completely bypassing security handler chain, which is desirable as we don't need security
  * and blocking I/O to kick in while serving static content.
+ * <p>
+ * Undertow order of precedence to invoke HandlerChainWrapper(s).
+ * <p>
+ * 1. OuterHandlerChainWrapper - Run after the servlet initial handler, but before any other handlers.
+ * These are only run on REQUEST invocations, they are not invoked on a FORWARD or INCLUDE.
+ * <p>
+ * 2. InnerHandlerChainWrapper - This handler will be run after the security handler,
+ * but before any other servlet handlers, and will be run for every request.
+ * <p>
+ * 3. InitialHandlerChainWrapper - Run before security and servlet initial handler.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -61,7 +71,8 @@ final class ServletInitialHandlerWrapper implements HandlerWrapper {
         Config cfg = Configs.DEFAULT.undertow();
         Predicate prefix = Predicates.prefix(cfg.getString(RESOURCE_PREFIX));
         Predicate suffixes = Predicates.suffixes(cfg.getStringList(RESOURCE_EXTNS).toArray(new String[0]));
-        ClassPathResourceManager rm = new ClassPathResourceManager(this.getClass().getClassLoader(), cfg.getString(RESOURCE_MGR_PREFIX));
+        ClassPathResourceManager rm = new ClassPathResourceManager(this.getClass().getClassLoader(),
+                cfg.getString(RESOURCE_MGR_PREFIX));
         return Handlers.predicate(Predicates.and(prefix, suffixes), Handlers.resource(rm), servletInitialHandler);
     }
 }

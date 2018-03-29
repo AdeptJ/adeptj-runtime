@@ -72,6 +72,10 @@ public final class Environment {
         return ServerMode.PROD.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
     }
 
+    public static boolean isDev() {
+        return ServerMode.DEV.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
+    }
+
     public static void launchBrowser(URL url) throws IOException {
         if (IS_OS_MAC) {
             Runtime.getRuntime().exec(MAC_BROWSER_LAUNCH_CMD + url);

@@ -22,6 +22,7 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
+import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackInitializer;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
@@ -42,7 +44,8 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 /**
  * Entry point for launching the AdeptJ Runtime.
  * <p>
- * Rakesh.Kumar, AdeptJ
+ *
+ * @author Rakesh.Kumar, AdeptJ
  */
 public final class Launcher {
 
@@ -72,6 +75,12 @@ public final class Launcher {
         LogbackInitializer.init();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
+            // Useful for attaching the debugger when needed in development mode.
+            if (Environment.isDev()) {
+                Integer waitTime = Integer.getInteger("wait.time.for.debug.attach", 10);
+                logger.info("Waiting [{}] seconds for debugger to attach!", waitTime);
+                TimeUnit.SECONDS.sleep(waitTime);
+            }
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             Map<String, String> commands = Stream.of(args)
                     .map(cmd -> cmd.split(Constants.REGEX_EQ))
@@ -84,20 +93,16 @@ public final class Launcher {
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
-                stopOSGiFramework(logger);
+                // Check if OSGi Framework was already started, try to stop the framework gracefully.
+                if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
+                    logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
+                    FrameworkManager.INSTANCE.stopFramework();
+                }
                 logger.error("Shutting down JVM!!", th);
                 // Let the LOGBACK cleans up it's state.
                 LogbackManager.INSTANCE.getLoggerContext().stop();
                 System.exit(-1);
             }
-        }
-    }
-
-    private static void stopOSGiFramework(Logger logger) {
-        // Check if OSGi Framework was already started, try to stop the framework gracefully.
-        if (BundleContextHolder.INSTANCE.isBundleContextAvailable()) {
-            logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-            FrameworkManager.INSTANCE.stopFramework();
         }
     }
 

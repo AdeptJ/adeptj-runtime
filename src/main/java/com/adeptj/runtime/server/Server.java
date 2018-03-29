@@ -49,6 +49,7 @@ import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.CrawlerSessionManagerConfig;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ErrorPage;
@@ -182,14 +183,14 @@ public final class Server implements Stoppable {
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
-        this.deploymentManager.deploy();
         Builder builder = Undertow.builder();
         this.optimizeWorkerOptions(builder);
         ServerOptions.build(builder, Objects.requireNonNull(this.cfgReference.get()))
                 .addHttpListener(httpPort, httpConf.getString(KEY_HOST));
         this.enableHttp2(builder);
         this.enableAJP(builder);
+        this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
+        this.deploymentManager.deploy();
         this.rootHandler = this.rootHandler(this.headersHandler(this.deploymentManager.start()));
         this.undertow = builder.setHandler(this.rootHandler).build();
         this.undertow.start();
@@ -444,7 +445,7 @@ public final class Server implements Stoppable {
     private WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
         Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
-                .setWorker(webSocketWorker(wsOptions))
+                .setWorker(this.webSocketWorker(wsOptions))
                 .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
                         wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
                 .addEndpoint(ServerLogsWebSocket.class);
@@ -481,19 +482,20 @@ public final class Server implements Stoppable {
                 .setClassLoader(Server.class.getClassLoader())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
-                .setDefaultSessionTimeout(sessionTimeout(cfg))
+                .setDefaultSessionTimeout(this.sessionTimeout(cfg))
                 .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSIONID_ON_LOGIN))
                 .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
-                .addServletContainerInitalizer(sciInfo())
-                .addSecurityConstraint(securityConstraint(cfg))
-                .addServlets(servlets())
-                .addErrorPages(errorPages(cfg))
-                .setDefaultMultipartConfig(defaultMultipartConfig(cfg))
+                .addServletContainerInitalizer(this.sciInfo())
+                .addSecurityConstraint(this.securityConstraint(cfg))
+                .addServlets(this.servlets())
+                .addErrorPages(this.errorPages(cfg))
+                .setDefaultMultipartConfig(this.defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
-                .addServletContextAttribute(ATTRIBUTE_NAME, webSocketDeploymentInfo(cfg))
-                .setServletSessionConfig(sessionConfig(cfg));
+                .addServletContextAttribute(ATTRIBUTE_NAME, this.webSocketDeploymentInfo(cfg))
+                .setServletSessionConfig(this.sessionConfig(cfg))
+                .setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
     }
 }

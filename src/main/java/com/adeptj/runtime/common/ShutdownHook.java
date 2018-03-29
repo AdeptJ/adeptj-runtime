@@ -35,7 +35,7 @@ public final class ShutdownHook extends Thread {
     }
 
     /**
-     * Handles graceful resource cleanup.
+     * Calls the {@link Stoppable#stop()} in run method.
      */
     @Override
     public void run() {
