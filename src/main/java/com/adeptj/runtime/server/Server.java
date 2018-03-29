@@ -356,13 +356,6 @@ public final class Server implements Stoppable {
         return portAvailable;
     }
 
-    private Set<HttpString> allowedMethods(Config cfg) {
-        return cfg.getStringList(KEY_ALLOWED_METHODS)
-                .stream()
-                .map(Verb::from)
-                .collect(Collectors.toSet());
-    }
-
     /**
      * Chaining of Undertow {@link HttpHandler} instances as follows.
      * <p>
@@ -391,6 +384,13 @@ public final class Server implements Stoppable {
                 new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
                         new AllowedMethodsHandler(Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
                                 Handlers.redirect(TOOLS_DASHBOARD_URI), headersHandler), this.allowedMethods(cfg))));
+    }
+
+    private Set<HttpString> allowedMethods(Config cfg) {
+        return cfg.getStringList(KEY_ALLOWED_METHODS)
+                .stream()
+                .map(Verb::from)
+                .collect(Collectors.toSet());
     }
 
     private List<ErrorPage> errorPages(Config cfg) {
@@ -481,6 +481,7 @@ public final class Server implements Stoppable {
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
                 .setClassLoader(Server.class.getClassLoader())
+                .addServletContainerInitalizer(this.sciInfo())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(this.sessionTimeout(cfg))
@@ -489,7 +490,6 @@ public final class Server implements Stoppable {
                 .setIdentityManager(new SimpleIdentityManager(cfg))
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, TOOLS_LOGIN_URI, TOOLS_LOGIN_URI))
-                .addServletContainerInitalizer(this.sciInfo())
                 .addSecurityConstraint(this.securityConstraint(cfg))
                 .addServlets(this.servlets())
                 .addErrorPages(this.errorPages(cfg))
