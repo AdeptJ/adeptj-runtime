@@ -51,7 +51,7 @@ fi
 ADEPTJ_RUNTIME_OPTS="${JVM_OPTS}${RESTEASY_OPTS}
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.port.check=false \
- -Dadeptj.rt.mode=DEV \
+ -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
  -Dwebsocket.logs.tailing.delay=5000 \
  -Dwait.time.for.debug.attach=5

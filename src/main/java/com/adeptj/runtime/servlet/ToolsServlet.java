@@ -21,7 +21,7 @@
 package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.ResponseUtil;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.tools.ContextObject;
 import com.adeptj.runtime.tools.TemplateContext;
 import com.adeptj.runtime.tools.TemplateEngines;
@@ -32,11 +32,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
-import java.lang.management.RuntimeMXBean;
-import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.Date;
 
 import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
@@ -72,7 +70,7 @@ public class ToolsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         TemplateEngines.getDefault().render(TemplateContext.builder()
                 .request(req)
@@ -86,26 +84,11 @@ public class ToolsServlet extends HttpServlet {
                         .put("bundles", bundles)
                         .put("runtime", JAVA_RUNTIME_NAME + "(build " + JAVA_RUNTIME_VERSION + ")")
                         .put("jvm", JAVA_VM_NAME + "(build " + JAVA_VM_VERSION + ", " + JAVA_VM_INFO + ")")
-                        .put("startTime", new Date(runtimeMXBean.getStartTime()))
-                        .put("upTime", formatPeriod(runtimeMXBean.getUptime()))
+                        .put("startTime", Date.from(Instant.ofEpochMilli(startTime)))
+                        .put("upTime", Times.format(startTime))
                         .put("maxMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getMax()))
                         .put("usedMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getUsed()))
                         .put("processors", Runtime.getRuntime().availableProcessors()))
                 .build());
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
-    }
-
-    private String formatPeriod(final long period) {
-        final long millis = period % 1000;
-        final long seconds = period / 1000 % 60;
-        final long minutes = period / 1000 / 60 % 60;
-        final long hours = period / 1000 / 60 / 60 % 24;
-        final long days = period / 1000 / 60 / 60 / 24;
-        return MessageFormat.format("{0,number} 'days' {1,number,00}:{2,number,00}:{3,number,00}.{4,number,000}",
-                days, hours, minutes, seconds, millis);
     }
 }

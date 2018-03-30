@@ -46,7 +46,7 @@ public final class TemplateContext {
         this.response = resp;
     }
 
-    public String getTemplate() {
+    String getTemplate() {
         return template;
     }
 

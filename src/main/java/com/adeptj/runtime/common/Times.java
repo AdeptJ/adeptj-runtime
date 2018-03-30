@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.common;
 
+import java.text.MessageFormat;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -29,6 +31,8 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class Times {
+
+    private static final String FMT_PATTERN = "{0,number} 'days' {1,number,00}:{2,number,00}:{3,number,00}.{4,number,000}";
 
     // No instances, just utility methods.
     private Times() {
@@ -52,5 +56,23 @@ public final class Times {
      */
     public static long elapsedSeconds(final long startTime) {
         return MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+    }
+
+    /**
+     * Formats the given start time in below format.
+     * <p>
+     * {0,number} 'days' {1,number,00}:{2,number,00}:{3,number,00}.{4,number,000}
+     *
+     * @param startTime the start time.
+     * @return formatted time.
+     */
+    public static String format(final long startTime) {
+        long period = System.currentTimeMillis() - startTime;
+        final long millis = period % 1000;
+        final long seconds = period / 1000 % 60;
+        final long minutes = period / 1000 / 60 % 60;
+        final long hours = period / 1000 / 60 / 60 % 24;
+        final long days = period / 1000 / 60 / 60 / 24;
+        return MessageFormat.format(FMT_PATTERN, days, hours, minutes, seconds, millis);
     }
 }
