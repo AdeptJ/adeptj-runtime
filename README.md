@@ -13,7 +13,15 @@
   </a>
   
   <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
-     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=alert_status">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=reliability_rating">
+  </a>
+  
+  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=security_rating">
+  </a>
+  
+  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=vulnerabilities">
   </a>
   
   <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
