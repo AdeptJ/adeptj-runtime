@@ -80,7 +80,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -402,7 +402,9 @@ public final class Server implements Stoppable {
     }
 
     private ServletContainerInitializerInfo sciInfo() {
-        Set<Class<?>> handlesTypes = new HashSet<>();
+        // Since the execution order of StartupAware instances matter that's why a LinkedHashSet.
+        // FrameworkLauncher must always be executed first.
+        Set<Class<?>> handlesTypes = new LinkedHashSet<>();
         handlesTypes.add(FrameworkLauncher.class);
         handlesTypes.add(DefaultStartupAware.class);
         return new ServletContainerInitializerInfo(ContainerInitializer.class, handlesTypes);

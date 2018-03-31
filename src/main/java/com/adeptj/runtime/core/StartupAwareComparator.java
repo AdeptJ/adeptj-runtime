@@ -32,16 +32,10 @@ import java.util.Comparator;
 public class StartupAwareComparator implements Comparator<Class<?>> {
 
     @Override
-    public int compare(Class<?> handlesTypesFirst, Class<?> handlesTypesSecond) {
-        StartupOrder first = handlesTypesFirst.getDeclaredAnnotation(StartupOrder.class);
-        StartupOrder second = handlesTypesSecond.getDeclaredAnnotation(StartupOrder.class);
-        if (first == null && second == null) {
-            return 0;
-        } else if (first != null && second == null) {
-            return 1;
-        } else if (first == null) {
-            return -1;
-        }
-        return Integer.compare(first.value(), second.value());
+    public int compare(Class<?> startupAwareFirst, Class<?> startupAwareSecond) {
+        StartupOrder startupOrderFirst = startupAwareFirst.getDeclaredAnnotation(StartupOrder.class);
+        StartupOrder startupOrderSecond = startupAwareSecond.getDeclaredAnnotation(StartupOrder.class);
+        return Integer.compare(startupOrderFirst == null ? 0 : startupOrderFirst.value(),
+                startupOrderSecond == null ? 0 : startupOrderSecond.value());
     }
 }

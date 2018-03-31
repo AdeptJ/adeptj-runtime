@@ -30,14 +30,10 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.HandlesTypes;
 import java.util.Set;
-import java.util.TreeSet;
-
-import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
-import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_VALUE;
 
 /**
  * An ServletContainerInitializer that is called by the Container while startup is in progress.
- * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this ContainerInitializer.
+ * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this SCI.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -56,26 +52,23 @@ public class ContainerInitializer implements ServletContainerInitializer {
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
             ServletContextHolder.INSTANCE.setServletContext(context);
-            context.setInitParameter(BUNDLES_ROOT_DIR_KEY, BUNDLES_ROOT_DIR_VALUE);
-            TreeSet<Class<?>> sortedHandlesTypesSet = new TreeSet<>(new StartupAwareComparator());
-            sortedHandlesTypesSet.addAll(startupAwareClasses);
-            sortedHandlesTypesSet.forEach(handlesTypes -> {
-                logger.info("@HandlesTypes: [{}]", handlesTypes);
-                try {
-                    if (StartupAware.class.isAssignableFrom(handlesTypes)) {
-                        StartupAware.class.cast(handlesTypes.getDeclaredConstructor().newInstance()).onStartup(context);
-                    } else {
-                        logger.warn("Unknown @HandlesTypes: [{}]", handlesTypes);
-                        throw new IllegalStateException("Only StartupAware types are supported!!");
-                    }
-                } catch (Exception ex) {
-                    logger.error("Exception while executing StartupAware#onStartup!!", ex);
-                    throw new InitializationException("Exception while executing StartupAware#onStartup!!", ex);
-                }
-            });
+            startupAwareClasses
+                    .stream()
+                    .sorted(new StartupAwareComparator())
+                    .peek(startupAwareClass -> logger.info("@HandlesTypes: [{}]", startupAwareClass))
+                    .forEach(startupAwareClass -> {
+                        try {
+                            startupAwareClass.asSubclass(StartupAware.class)
+                                    .getDeclaredConstructor()
+                                    .newInstance()
+                                    .onStartup(context);
+                        } catch (Exception ex) { // NOSONAR
+                            logger.error("Exception while executing StartupAware#onStartup!!", ex);
+                            throw new InitializationException("Exception while executing StartupAware#onStartup!!", ex);
+                        }
+                    });
             // If we are here means startup went well above, register FrameworkShutdownHandler now.
             context.addListener(FrameworkShutdownHandler.class);
         }
     }
-
 }

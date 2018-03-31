@@ -21,8 +21,8 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtils;
-import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.config.Configs;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ final class Bundles {
      */
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
-        String bundlesDir = ServletContextHolder.INSTANCE.getServletContext().getInitParameter(BUNDLES_ROOT_DIR_KEY);
+        String bundlesDir = Configs.DEFAULT.common().getString(BUNDLES_ROOT_DIR_KEY);
         AtomicInteger installCount = new AtomicInteger();
         BundleInstaller bundleInstaller = new BundleInstaller();
         bundleInstaller
