@@ -12,8 +12,8 @@
      <img src="https://api.travis-ci.org/AdeptJ/adeptj-runtime.svg?branch=master&style=flat">
   </a>
   
-  <a href="https://sonarcloud.io/dashboard?id=com.adeptj%3Aadeptj-runtime">
-     <img src="https://sonarcloud.io/api/project_badges/measure?project=com.adeptj%3Aadeptj-runtime&metric=alert_status">
+  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=alert_status">
   </a>
   
   <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
