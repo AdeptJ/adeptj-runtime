@@ -27,7 +27,7 @@
         <version>1.0.18.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.13-SNAPSHOT</version>
+    <version>1.0.13.Final</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>High Performance, Dynamic, Modular runtime for modern APIs, MicroServices and WebApps.</description>
@@ -75,8 +75,8 @@
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.2.Final</adeptj-modules-webconsole-security.version>
-        <adeptj-modules-commons-utils.version>1.0.1.Final</adeptj-modules-commons-utils.version>
-        <adeptj-runtime-tools.version>1.0.4.Final</adeptj-runtime-tools.version>
+        <adeptj-modules-commons-utils.version>1.0.2.Final</adeptj-modules-commons-utils.version>
+        <adeptj-runtime-tools.version>1.0.5.Final</adeptj-runtime-tools.version>
     </properties>
 
     <!-- Project Information -->
@@ -108,7 +108,7 @@
             <timezone>+5:30</timezone>
             <properties>
                 <picUrl>
-                    https://media.licdn.com/media/AAEAAQAAAAAAAAecAAAAJDdjMDcwZjM3LWY0OWYtNDkwYS05Njg4LWU0YWJjNWU5Mzk2Mw.jpg
+                    https://pbs.twimg.com/profile_images/946630807312928770/E18eB0ng.jpg
                 </picUrl>
             </properties>
         </developer>
@@ -1202,7 +1202,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-commons-validator</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.1.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1216,14 +1216,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.0.9.Final</version>
+                    <version>1.1.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.0.12.Final</version>
+                    <version>1.1.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
