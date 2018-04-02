@@ -27,7 +27,7 @@
         <version>1.0.18.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.13.Final</version>
+    <version>1.0.14-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>High Performance, Dynamic, Modular runtime for modern APIs, MicroServices and WebApps.</description>
