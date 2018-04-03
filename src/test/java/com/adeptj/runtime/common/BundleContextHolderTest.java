@@ -19,9 +19,9 @@
 */
 package com.adeptj.runtime.common;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.osgi.framework.BundleContext;
 
@@ -30,18 +30,18 @@ import org.osgi.framework.BundleContext;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-@Ignore
-public class BundleContextHolderTest {
+@Disabled
+class BundleContextHolderTest {
 
-	@Test
-	public void testIsBundleContextSetWhenSetBundleContextCalled() {
-		Mockito.when(BundleContextHolder.INSTANCE.getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
-		Assert.assertTrue(BundleContextHolder.INSTANCE.isBundleContextAvailable());
-	}
-	
-	@Test
-	public void testIsBundleContextSetWhenSetBundleContextNotCalled() {
-		Assert.assertFalse(BundleContextHolder.INSTANCE.isBundleContextAvailable());
-		Mockito.eq(BundleContextHolder.INSTANCE.isBundleContextAvailable());
-	}
+    @Test
+    void testIsBundleContextSetWhenSetBundleContextCalled() {
+        Mockito.when(BundleContextHolder.INSTANCE.getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
+        Assertions.assertTrue(BundleContextHolder.INSTANCE.isBundleContextAvailable());
+    }
+
+    @Test
+    void testIsBundleContextSetWhenSetBundleContextNotCalled() {
+        Assertions.assertFalse(BundleContextHolder.INSTANCE.isBundleContextAvailable());
+        Mockito.eq(BundleContextHolder.INSTANCE.isBundleContextAvailable());
+    }
 }
