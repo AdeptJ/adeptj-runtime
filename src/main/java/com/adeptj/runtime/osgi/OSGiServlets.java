@@ -76,7 +76,7 @@ public enum OSGiServlets {
         this.handleInitParams(webServlet, properties);
         this.handleName(cls, webServlet.name(), properties);
         String servletFQCN = cls.getName();
-        LOGGER.info("Registering OSGi Servlet: [{}]", servletFQCN);
+        LOGGER.info("OSGi Servlet: [{}] registered!!", servletFQCN);
         this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, servlet, properties));
     }
 
@@ -91,7 +91,7 @@ public enum OSGiServlets {
         this.handleInitParams(webServlet, properties);
         this.handleName(cls, webServlet.name(), properties);
         String servletFQCN = cls.getName();
-        LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletFQCN);
+        LOGGER.info("OSGi ErrorServlet: [{}] registered!!", servletFQCN);
         this.servlets.put(servletFQCN, ctx.registerService(Servlet.class, errorServlet, properties));
     }
 
@@ -101,8 +101,8 @@ public enum OSGiServlets {
 
     public void unregisterAll() {
         this.servlets.forEach((servletName, serviceRegistration) -> {
-            LOGGER.info("Deregister OSGi Servlet: [{}]", servletName);
             serviceRegistration.unregister();
+            LOGGER.info("OSGi Servlet: [{}] removed!!", servletName);
         });
     }
 
