@@ -33,7 +33,7 @@ import javax.servlet.annotation.HandlesTypes;
 import java.util.Set;
 
 /**
- * An ServletContainerInitializer that is called by the Container while startup is in progress.
+ * An SCI(ServletContainerInitializer) that is called by the Container while startup is in progress.
  * This will further call onStartup method of all of the {@link HandlesTypes} classes registered with this SCI.
  *
  * @author Rakesh.Kumar, AdeptJ
@@ -48,7 +48,6 @@ public class RuntimeInitializer implements ServletContainerInitializer {
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) {
         Logger logger = LoggerFactory.getLogger(RuntimeInitializer.class);
         if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
-            // We can't go ahead if StartupAware implementations are not passed by container.
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
@@ -59,15 +58,13 @@ public class RuntimeInitializer implements ServletContainerInitializer {
                     .forEach(clazz -> {
                         logger.info("@HandlesTypes: [{}]", clazz);
                         try {
-                            StartupAware.class
-                                    .cast(ConstructorUtils.invokeConstructor(clazz))
+                            StartupAware.class.cast(ConstructorUtils.invokeConstructor(clazz))
                                     .onStartup(context);
                         } catch (Exception ex) { // NOSONAR
                             logger.error("Exception while executing StartupAware#onStartup!!", ex);
-                            throw new InitializationException("Exception while executing StartupAware#onStartup!!", ex);
+                            throw new InitializationException(ex);
                         }
                     });
-            // If we are here means startup went well above, register FrameworkShutdownHandler now.
             context.addListener(FrameworkShutdownHandler.class);
         }
     }

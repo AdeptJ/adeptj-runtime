@@ -25,12 +25,13 @@ import com.typesafe.config.Config;
 import io.adeptj.runtime.common.DefaultExecutorService;
 import io.adeptj.runtime.common.Environment;
 import io.adeptj.runtime.common.IOUtils;
+import io.adeptj.runtime.common.Lifecycle;
 import io.adeptj.runtime.common.SslContextFactory;
-import io.adeptj.runtime.common.Stoppable;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.common.Verb;
 import io.adeptj.runtime.config.Configs;
 import io.adeptj.runtime.core.RuntimeInitializer;
+import io.adeptj.runtime.exception.InitializationException;
 import io.adeptj.runtime.osgi.FrameworkLauncher;
 import io.adeptj.runtime.servlet.AuthServlet;
 import io.adeptj.runtime.servlet.CryptoServlet;
@@ -73,7 +74,6 @@ import java.lang.ref.WeakReference;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.net.URL;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -87,7 +87,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static io.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
 import static io.adeptj.runtime.common.Constants.BANNER_TXT;
 import static io.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static io.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
@@ -102,7 +101,6 @@ import static io.adeptj.runtime.common.Constants.KEY_HTTP;
 import static io.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static io.adeptj.runtime.common.Constants.KEY_PORT;
 import static io.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
-import static io.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static io.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static io.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static io.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
@@ -164,7 +162,7 @@ import static org.apache.commons.lang3.SystemUtils.USER_DIR;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class Server implements Stoppable {
+public final class Server implements Lifecycle {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
@@ -176,7 +174,8 @@ public final class Server implements Stoppable {
 
     private WeakReference<Config> cfgReference;
 
-    public void start(Map<String, String> commands) throws ServletException {
+    @Override
+    public void start() {
         this.cfgReference = new WeakReference<>(Configs.DEFAULT.undertow());
         Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
@@ -184,14 +183,17 @@ public final class Server implements Stoppable {
         this.printBanner();
         this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
         this.deploymentManager.deploy();
-        this.rootHandler = this.rootHandler(this.deploymentManager.start());
-        this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()),
-                Objects.requireNonNull(this.cfgReference.get()))))
-                .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
-                .setHandler(this.rootHandler)
-                .build();
-        this.undertow.start();
-        this.launchBrowser(commands, httpPort);
+        try {
+            this.rootHandler = this.rootHandler(this.deploymentManager.start());
+            this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()),
+                    Objects.requireNonNull(this.cfgReference.get()))))
+                    .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
+                    .setHandler(this.rootHandler)
+                    .build();
+            this.undertow.start();
+        } catch (ServletException ex) {
+            throw new InitializationException(ex.getMessage(), ex);
+        }
         if (!Environment.isServerConfFileExists()) {
             this.createServerConfFile();
         }
@@ -240,17 +242,6 @@ public final class Server implements Stoppable {
         } catch (IOException ex) {
             // Just log it, its not critical.
             LOGGER.error("Exception while printing server banner!!", ex);
-        }
-    }
-
-    private void launchBrowser(Map<String, String> arguments, int httpPort) {
-        if (Boolean.parseBoolean(arguments.get(ARG_OPEN_CONSOLE))) {
-            try {
-                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, httpPort)));
-            } catch (IOException ex) {
-                // Just log it, its okay if browser is not launched.
-                LOGGER.error("Exception while launching browser!!", ex);
-            }
         }
     }
 

@@ -19,30 +19,35 @@
 */
 package io.adeptj.runtime.osgi;
 
+import com.typesafe.config.Config;
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Environment;
+import io.adeptj.runtime.common.Servlets;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
-import io.adeptj.runtime.servlet.osgi.PerServletContextErrorServlet;
-import com.typesafe.config.Config;
+import io.adeptj.runtime.servlet.osgi.DefaultErrorHandler;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.Servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static java.util.Optional.ofNullable;
+import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME;
 
 /**
  * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
@@ -67,6 +72,8 @@ public enum FrameworkManager {
 
     private static final String FELIX_LOG_LEVEL = "felix.log.level";
 
+    private ServiceRegistration<Servlet> errorHandler;
+
     private Framework framework;
 
     private FrameworkLifecycleListener frameworkListener;
@@ -85,7 +92,7 @@ public enum FrameworkManager {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             this.provisionBundles(systemBundleContext);
-            OSGiServlets.INSTANCE.registerErrorServlet(systemBundleContext, new PerServletContextErrorServlet(),
+            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(),
                     Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
             LOGGER.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -98,10 +105,17 @@ public enum FrameworkManager {
     public void stopFramework() {
         try {
             if (this.framework != null) {
-                if (BundleContextHolder.INSTANCE.isBundleContextNonNull()) {
-                    BundleContextHolder.INSTANCE.getBundleContext().removeFrameworkListener(this.frameworkListener);
-                }
-                OSGiServlets.INSTANCE.unregisterAll();
+                Optional.ofNullable(this.errorHandler).ifPresent(svc -> {
+                    Object property = svc.getReference().getProperty(HTTP_WHITEBOARD_SERVLET_NAME);
+                    LOGGER.info("Removing OSGi ErrorHandler: [{}]", property);
+                    try {
+                        svc.unregister();
+                    } catch (Exception ex) { // NOSONAR
+                        LOGGER.error(ex.getMessage(), ex);
+                    }
+                });
+                Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext())
+                        .ifPresent(context -> context.removeFrameworkListener(this.frameworkListener));
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);

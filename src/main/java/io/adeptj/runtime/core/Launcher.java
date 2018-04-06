@@ -21,21 +21,30 @@
 package io.adeptj.runtime.core;
 
 import com.adeptj.runtime.tools.logging.LogbackManager;
+import com.typesafe.config.Config;
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Constants;
 import io.adeptj.runtime.common.Environment;
 import io.adeptj.runtime.common.ShutdownHook;
 import io.adeptj.runtime.common.Times;
+import io.adeptj.runtime.config.Configs;
 import io.adeptj.runtime.logging.LogbackInitializer;
 import io.adeptj.runtime.osgi.FrameworkManager;
 import io.adeptj.runtime.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static io.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
+import static io.adeptj.runtime.common.Constants.KEY_HTTP;
+import static io.adeptj.runtime.common.Constants.KEY_PORT;
+import static io.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
 import static io.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
@@ -87,17 +96,27 @@ public final class Launcher {
                     .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
             logger.debug("Commands to AdeptJ Runtime: {}", commands);
             Server server = new Server();
-            server.start(commands);
+            server.start();
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, SERVER_STOP_THREAD_NAME));
+            if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
+                try {
+                    Config config = Configs.DEFAULT.undertow().getConfig(KEY_HTTP);
+                    Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, config.getInt(KEY_PORT))));
+                } catch (IOException ex) {
+                    // Just log it, its okay if browser is not launched.
+                    logger.error("Exception while launching browser!!", ex);
+                }
+            }
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
                 // Check if OSGi Framework was already started, try to stop the framework gracefully.
-                if (BundleContextHolder.INSTANCE.isBundleContextNonNull()) {
-                    logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
-                    FrameworkManager.INSTANCE.stopFramework();
-                }
+                Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext())
+                        .ifPresent(context -> {
+                            logger.warn("Server startup failed but OSGi Framework was started already, stopping it gracefully!!");
+                            FrameworkManager.INSTANCE.stopFramework();
+                        });
                 logger.error("Shutting down JVM!!", th);
                 // Let the LOGBACK cleans up it's state.
                 LogbackManager.INSTANCE.getLoggerContext().stop();
@@ -105,5 +124,4 @@ public final class Launcher {
             }
         }
     }
-
 }

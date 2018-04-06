@@ -27,18 +27,18 @@ package io.adeptj.runtime.common;
  */
 public final class ShutdownHook extends Thread {
 
-    private Stoppable stoppable;
+    private Lifecycle lifecycle;
 
-    public ShutdownHook(Stoppable stoppable, String threadName) {
+    public ShutdownHook(Lifecycle lifecycle, String threadName) {
         super(threadName);
-        this.stoppable = stoppable;
+        this.lifecycle = lifecycle;
     }
 
     /**
-     * Calls the {@link Stoppable#stop()} in run method.
+     * Calls the {@link Lifecycle#stop()} in run method.
      */
     @Override
     public void run() {
-        this.stoppable.stop();
+        this.lifecycle.stop();
     }
 }

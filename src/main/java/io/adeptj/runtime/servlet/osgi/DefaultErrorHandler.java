@@ -28,14 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * PerServletContextErrorServlet handles the error codes and exceptions for each ServletContext registered with OSGi.
+ * DefaultErrorHandler handles the error codes and exceptions for each ServletContext registered with OSGi.
  * <p><b>
  * Note: This is independent of Undertow and directly managed by OSGi.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ PerServletContextErrorServlet", asyncSupported = true)
-public class PerServletContextErrorServlet extends HttpServlet {
+@WebServlet(name = "AdeptJ OSGi DefaultErrorHandler", asyncSupported = true)
+public class DefaultErrorHandler extends HttpServlet {
 
     private static final long serialVersionUID = -5818850813832379842L;
 

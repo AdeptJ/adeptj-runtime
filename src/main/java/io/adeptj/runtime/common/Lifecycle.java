@@ -25,7 +25,9 @@ package io.adeptj.runtime.common;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public interface Stoppable {
+public interface Lifecycle {
+
+    void start();
 
     void stop();
 }
