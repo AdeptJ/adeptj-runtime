@@ -22,9 +22,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.adeptj</groupId>
+        <groupId>io.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.18.Final</version>
+        <version>1.0.19.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.14-SNAPSHOT</version>
@@ -35,10 +35,10 @@
     <inceptionYear>2016</inceptionYear>
 
     <properties>
-        <main.class>com.adeptj.runtime.core.Launcher</main.class>
+        <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.3.Final</undertow.version>
-        <undertow.websockets.version>2.0.3.Final</undertow.websockets.version>
+        <undertow.version>2.0.4.Final</undertow.version>
+        <undertow.websockets.version>2.0.4.Final</undertow.websockets.version>
         <xnio.version>3.6.2.Final</xnio.version>
         <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
         <wildfly-common.version>1.3.1.Final</wildfly-common.version>
@@ -56,8 +56,6 @@
         <itextpdf.version>5.5.13</itextpdf.version>
         <classmate.version>1.3.4</classmate.version>
         <javax.el.version>3.0.0</javax.el.version>
-        <hikaricp.version>3.0.0</hikaricp.version>
-        <unbescape.version>1.1.6.RELEASE</unbescape.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.10</felix.framework.version>
@@ -201,11 +199,6 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>org.apache.felix:org.apache.felix.http.base:*:jar</exclude>
-                                </excludes>
-                            </artifactSet>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -229,8 +222,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <excludeScope>runtime</excludeScope>
-                            <excludeScope>compile</excludeScope>
+                            <!-- Bundle jars must be in provided scope -->
                             <includeScope>provided</includeScope>
                             <excludeTransitive>true</excludeTransitive>
                             <excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
@@ -1289,7 +1281,7 @@
                 <dependency>
                     <groupId>software.amazon.ion</groupId>
                     <artifactId>ion-java</artifactId>
-                    <version>1.1.0</version>
+                    <version>1.1.2</version>
                     <scope>provided</scope>
                 </dependency>
 
