@@ -38,7 +38,7 @@ import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class OSGiUtils {
+public final class OSGiUtil {
 
     private static final String FILTER_AND = "(&(";
 
@@ -50,10 +50,8 @@ public final class OSGiUtils {
 
     private static final String PARENTHESIS_CLOSE = ")";
 
-    private static final String EXCEPTION_MSG = "InvalidSyntaxException!!";
-
     // No instantiation. Utility methods only.
-    private OSGiUtils() {
+    private OSGiUtil() {
     }
 
     public static boolean isNotFragment(Bundle bundle) {
@@ -69,7 +67,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -84,7 +82,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -99,7 +97,7 @@ public final class OSGiUtils {
                     PARENTHESIS_CLOSE);
         } catch (InvalidSyntaxException ex) {
             // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException(EXCEPTION_MSG, ex);
+            throw new IllegalArgumentException(ex);
         }
     }
 

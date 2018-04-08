@@ -28,9 +28,10 @@ import static io.adeptj.runtime.osgi.HttpSessionEvents.SESSION_ATTRIBUTE_REMOVED
 import static io.adeptj.runtime.osgi.HttpSessionEvents.SESSION_ATTRIBUTE_REPLACED;
 
 /**
- * BridgeHttpSessionAttributeListener.
+ * An {@link HttpSessionAttributeListener} which propagates the {@link javax.servlet.http.HttpSession} attribute
+ * events like add, remove and replace to OSGi registered {@link HttpSessionAttributeListener} services.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeListener {
 

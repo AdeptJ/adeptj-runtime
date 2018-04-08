@@ -22,19 +22,16 @@ package io.adeptj.runtime.osgi;
 
 import io.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 /**
- * ServiceTrackers. Utility for performing operations on OSGi ServiceTracker instances.
+ * ServiceTrackers. Utility for performing operations on OSGi {@link org.osgi.util.tracker.ServiceTracker} instances.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public enum ServiceTrackers {
 
@@ -42,38 +39,25 @@ public enum ServiceTrackers {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTrackers.class);
 
-    private volatile boolean dispatcherServletInitialized;
+    private volatile DispatcherServletTracker dispatcherServletTracker;
 
-    private DispatcherServletTracker servletTracker;
-
-    private EventDispatcherTracker eventDispatcherTracker;
-
-    private Map<String, ServiceTracker<Object, Object>> trackers = new HashMap<>();
+    private volatile EventDispatcherTracker eventDispatcherTracker;
 
     public void openDispatcherServletTracker() {
-        if (!this.dispatcherServletInitialized && this.servletTracker == null) {
-            BundleContext bundleContext = BundleContextHolder.INSTANCE.getBundleContext();
-            DispatcherServletTracker tracker = new DispatcherServletTracker(bundleContext);
-            tracker.open();
-            this.servletTracker = tracker;
-            this.dispatcherServletInitialized = true;
+        if (this.dispatcherServletTracker == null) {
+            this.dispatcherServletTracker = new DispatcherServletTracker(BundleContextHolder.INSTANCE.getBundleContext());
+            this.dispatcherServletTracker.open();
         }
     }
 
     public HttpServlet getDispatcherServlet() {
-        return this.servletTracker == null ? null : this.servletTracker.getDispatcherServlet();
+        return this.dispatcherServletTracker == null ? null : this.dispatcherServletTracker.getDispatcherServlet();
     }
 
     public void closeDispatcherServletTracker() {
-        this.dispatcherServletInitialized = false;
-        if (this.servletTracker != null && !this.servletTracker.isEmpty()) {
-            this.servletTracker.close();
-        }
-        this.servletTracker = null;
-    }
-
-    protected EventDispatcherTracker getEventDispatcherTracker() {
-        return this.eventDispatcherTracker;
+        LOGGER.info("Closing DispatcherServletTracker!!");
+        Optional.ofNullable(this.dispatcherServletTracker).ifPresent(DispatcherServletTracker::close);
+        this.dispatcherServletTracker = null;
     }
 
     protected void openEventDispatcherTracker(BundleContext bundleContext) {
@@ -84,56 +68,13 @@ public enum ServiceTrackers {
         }
     }
 
+    protected EventDispatcherTracker getEventDispatcherTracker() {
+        return this.eventDispatcherTracker;
+    }
+
     protected void closeEventDispatcherTracker() {
-        if (this.eventDispatcherTracker != null && !this.eventDispatcherTracker.isEmpty()) {
-            this.eventDispatcherTracker.close();
-            LOGGER.info("EventDispatcherTracker Closed!!");
-        }
+        LOGGER.info("Closing EventDispatcherTracker!!");
+        Optional.ofNullable(this.eventDispatcherTracker).ifPresent(EventDispatcherTracker::close);
         this.eventDispatcherTracker = null;
-    }
-
-    public void track(Class<? extends ServiceTracker<Object, Object>> klazz, ServiceTracker<Object, Object> tracker) {
-        this.trackers.put(klazz.getName(), tracker);
-        tracker.open();
-    }
-
-    public void close(Class<? extends ServiceTracker<Object, Object>> trackerClass) {
-        Optional.ofNullable(this.trackers.remove(trackerClass.getName())).ifPresent(ServiceTracker::close);
-    }
-
-    public void closeAll() {
-        this.trackers.forEach((trackerClass, tracker) -> tracker.close());
-    }
-
-    public ServiceTracker<Object, Object> getTracker(Class<? extends ServiceTracker<Object, Object>> trackerClass) {
-        return this.trackers.get(trackerClass.getName());
-    }
-
-    public void close(ServiceTracker<Object, Object> tracker) {
-        tracker.close();
-    }
-
-    public void closeQuietly(ServiceTracker<Object, Object> tracker) {
-        try {
-            tracker.close();
-        } catch (Exception ex) { // NOSONAR
-            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
-        }
-    }
-
-    public void closeQuietly(DispatcherServletTracker dispatcherServletTracker) {
-        try {
-            dispatcherServletTracker.close();
-        } catch (Exception ex) { // NOSONAR
-            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
-        }
-    }
-
-    public void closeQuietly(EventDispatcherTracker eventDispatcherTracker) {
-        try {
-            eventDispatcherTracker.close();
-        } catch (Exception ex) { // NOSONAR
-            // Ignore, anyway Framework is managing it as the Tracked service is being removed from service registry.
-        }
     }
 }

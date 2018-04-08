@@ -20,40 +20,33 @@
 
 package io.adeptj.runtime.osgi;
 
+import io.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
 
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
 
-import static io.adeptj.runtime.common.Constants.BUNDLE_CTX_ATTR;
-
 /**
- * BridgeServletContextAttributeListener.
+ * A {@link ServletContextAttributeListener} which initializes the {@link EventDispatcherTracker} when {@link BundleContext}
+ * is being set as a {@link javax.servlet.ServletContext} attribute and again closes and opens when {@link BundleContext} is
+ * replaced as a {@link javax.servlet.ServletContext} attribute.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public class BridgeServletContextAttributeListener implements ServletContextAttributeListener {
 
     @Override
     public void attributeAdded(ServletContextAttributeEvent event) {
-        if (this.isAttributeBundleContext(event.getName())) {
+        if (BundleContext.class.isAssignableFrom(event.getValue().getClass())) {
             ServiceTrackers.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
         }
     }
 
     @Override
-    public void attributeRemoved(ServletContextAttributeEvent event) {
-        if (this.isAttributeBundleContext(event.getName())) {
-            ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
-        }
-    }
-
-    @Override
     public void attributeReplaced(ServletContextAttributeEvent event) {
-        // Does nothing as of now.
-    }
-
-    private boolean isAttributeBundleContext(String attributeName) {
-        return BUNDLE_CTX_ATTR.equals(attributeName);
+        if (BundleContext.class.isAssignableFrom(event.getValue().getClass())) {
+            ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
+            ServiceTrackers.INSTANCE.openEventDispatcherTracker(BundleContextHolder.INSTANCE.getBundleContext());
+        }
     }
 }

@@ -20,7 +20,7 @@
 
 package io.adeptj.runtime.osgi;
 
-import io.adeptj.runtime.common.OSGiUtils;
+import io.adeptj.runtime.common.OSGiUtil;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
 import org.osgi.framework.Bundle;
@@ -73,7 +73,7 @@ final class Bundles {
         bundleInstaller
                 .installBundles(bundleInstaller.findBundles(bundlesDir), systemBundleContext)
                 .peek(bundle -> installCount.incrementAndGet())
-                .filter(OSGiUtils::isNotFragment)
+                .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
         LOGGER.info(BUNDLE_PROVISIONED_MSG, installCount.get(), Times.elapsedMillis(startTime));
     }

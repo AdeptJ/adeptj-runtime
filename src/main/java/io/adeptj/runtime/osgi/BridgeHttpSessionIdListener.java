@@ -24,9 +24,10 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
 
 /**
- * BridgeHttpSessionIdListener.
+ * An {@link HttpSessionIdListener} which propagates the {@link javax.servlet.http.HttpSession} Id change
+ * event to Felix {@link org.apache.felix.http.base.internal.EventDispatcher}.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public class BridgeHttpSessionIdListener implements HttpSessionIdListener {
 

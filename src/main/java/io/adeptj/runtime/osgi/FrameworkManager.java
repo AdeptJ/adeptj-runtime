@@ -41,13 +41,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
-
-import static java.util.Optional.ofNullable;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME;
 
 /**
  * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
@@ -92,8 +90,8 @@ public enum FrameworkManager {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
             this.provisionBundles(systemBundleContext);
-            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(),
-                    Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages"));
+            List<String> errors = Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages");
+            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(), errors);
             LOGGER.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Failed to start OSGi Framework!!", ex);
@@ -105,17 +103,7 @@ public enum FrameworkManager {
     public void stopFramework() {
         try {
             if (this.framework != null) {
-                Optional.ofNullable(this.errorHandler).ifPresent(svc -> {
-                    Object property = svc.getReference().getProperty(HTTP_WHITEBOARD_SERVLET_NAME);
-                    LOGGER.info("Removing OSGi ErrorHandler: [{}]", property);
-                    try {
-                        svc.unregister();
-                    } catch (Exception ex) { // NOSONAR
-                        LOGGER.error(ex.getMessage(), ex);
-                    }
-                });
-                Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext())
-                        .ifPresent(context -> context.removeFrameworkListener(this.frameworkListener));
+                this.removeServicesAndListeners();
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
@@ -128,10 +116,29 @@ public enum FrameworkManager {
         }
     }
 
+    private void removeServicesAndListeners() {
+        Optional.ofNullable(this.errorHandler).ifPresent(serviceRegistration -> {
+            try {
+                LOGGER.info("Removing OSGi ErrorHandler service!!");
+                serviceRegistration.unregister();
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        });
+        Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext()).ifPresent(bundleContext -> {
+            try {
+                LOGGER.info("Removing OSGi FrameworkListener!!");
+                bundleContext.removeFrameworkListener(this.frameworkListener);
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        });
+    }
+
     private void provisionBundles(BundleContext systemBundleContext) throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
-        if (Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()
-                && !Boolean.getBoolean("provision.bundles.explicitly")) {
+        if (!Boolean.getBoolean("provision.bundles.explicitly")
+                && Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
             LOGGER.info("Bundles already provisioned, this must be a server restart!!");
         } else {
             LOGGER.info("Provisioning Bundles first time!!");
@@ -144,7 +151,7 @@ public enum FrameworkManager {
         Config felixConf = Configs.DEFAULT.felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
-        ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
+        Optional.ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
         LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }

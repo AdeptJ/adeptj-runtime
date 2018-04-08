@@ -27,9 +27,10 @@ import static io.adeptj.runtime.osgi.HttpSessionEvents.SESSION_CREATED;
 import static io.adeptj.runtime.osgi.HttpSessionEvents.SESSION_DESTROYED;
 
 /**
- * BridgeHttpSessionListener.
+ * An {@link HttpSessionListener} which propagates the {@link javax.servlet.http.HttpSession} create and destroy
+ * event to Felix {@link org.apache.felix.http.base.internal.EventDispatcher}.
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public class BridgeHttpSessionListener implements HttpSessionListener {
 

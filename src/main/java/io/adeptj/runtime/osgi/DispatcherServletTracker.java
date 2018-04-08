@@ -21,7 +21,7 @@
 package io.adeptj.runtime.osgi;
 
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
-import io.adeptj.runtime.common.OSGiUtils;
+import io.adeptj.runtime.common.OSGiUtil;
 import io.adeptj.runtime.common.Times;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -29,10 +29,13 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OSGi ServiceTracker for Felix DispatcherServlet.
+ * OSGi ServiceTracker for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -42,76 +45,45 @@ public class DispatcherServletTracker extends ServiceTracker<HttpServlet, HttpSe
 
     private static final String DISPATCHER_SERVLET_FILTER = "(http.felix.dispatcher=*)";
 
-    private HttpServlet dispatcherServlet;
+    private volatile HttpServlet dispatcherServlet;
 
     DispatcherServletTracker(BundleContext context) {
-        super(context, OSGiUtils.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
+        super(context, OSGiUtil.filter(context, HttpServlet.class, DISPATCHER_SERVLET_FILTER), null);
     }
 
     @Override
     public HttpServlet addingService(ServiceReference<HttpServlet> reference) {
-        HttpServlet httpServlet = null;
-        try {
-            httpServlet = super.addingService(reference);
-            LOGGER.info("Adding OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
-            this.handleDispatcherServlet(httpServlet);
-        } catch (Exception ex) { // NOSONAR
-            // This might be due to the OSGi framework restart from Felix WebConsole.
-            LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
+        AtomicBoolean dispatcherServletInitialized = new AtomicBoolean();
+        if (this.dispatcherServlet == null) {
+            try {
+                long startTime = System.nanoTime();
+                this.dispatcherServlet = super.addingService(reference);
+                LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
+                this.dispatcherServlet.init(BridgeServletConfigHolder.INSTANCE.getBridgeServletConfig());
+                dispatcherServletInitialized.set(true);
+                LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
+            } catch (ServletException ex) {
+                LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
+            }
         }
-        return httpServlet;
+        return dispatcherServletInitialized.get() ? this.dispatcherServlet : null;
     }
 
     @Override
     public void removedService(ServiceReference<HttpServlet> reference, HttpServlet service) {
-        LOGGER.info("Removing OSGi Service: [{}]", OSGiUtils.getServiceDesc(reference));
-        // Passing null so that DispatcherServlet.init() won't be called again.
-        this.handleDispatcherServlet(null);
+        LOGGER.info("Removing OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
+        Optional.ofNullable(this.dispatcherServlet).ifPresent(httpServlet -> {
+            try {
+                httpServlet.destroy();
+                LOGGER.info("Felix DispatcherServlet Destroyed!!");
+            } catch (Exception ex) { // NOSONAR
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        });
         super.removedService(reference, service);
-        /*
-         * Note: Since the DispatcherServlet has already been removed therefore close this ServiceTracker too.
-         * Otherwise this will cause [java.lang.IllegalStateException: Invalid BundleContext] on Framework restart.
-         * When Framework is being restarted from Web console then tracker is still open with stale BundleContext.
-         * Now with the Framework restart DispatcherServlet OSGi service becomes available and Framework calls addingService method.
-         * Which further tries to get DispatcherServlet OSGi service using the stale BundleContext
-         * from which this ServiceTracker was created and causes the [java.lang.IllegalStateException: Invalid BundleContext].
-         * Since a Framework restart creates a new BundleContext and this tracker will again be opened with
-         * the new BundleContext therefore closing it here make sense.
-         *
-         * Ignore exceptions, anyway Framework is managing it as the DispatcherServlet is being removed from service registry.
-         */
-        ServiceTrackers.INSTANCE.closeQuietly(this);
     }
 
     HttpServlet getDispatcherServlet() {
         return this.dispatcherServlet;
-    }
-
-    private void handleDispatcherServlet(HttpServlet dispatcherServlet) {
-        this.destroyDispatcherServlet();
-        this.dispatcherServlet = dispatcherServlet;
-        this.initDispatcherServlet();
-    }
-
-    private void destroyDispatcherServlet() {
-        if (this.dispatcherServlet != null) {
-            LOGGER.info("Destroying Felix DispatcherServlet!!");
-            this.dispatcherServlet.destroy();
-            // Set dispatcherServlet as null, don't want to call DispatcherServlet.init() with this reference.
-            this.dispatcherServlet = null;
-        }
-    }
-
-    private void initDispatcherServlet() {
-        if (this.dispatcherServlet != null) {
-            try {
-                LOGGER.info("Initializing Felix DispatcherServlet!!");
-                long startTime = System.nanoTime();
-                this.dispatcherServlet.init(BridgeServletConfigHolder.INSTANCE.getBridgeServletConfig());
-                LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error("Failed to initialize Felix DispatcherServlet!!", ex);
-            }
-        }
     }
 }

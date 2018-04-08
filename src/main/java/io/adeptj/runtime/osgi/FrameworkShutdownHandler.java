@@ -50,13 +50,11 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
         logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
-        logger.info("Closing EventDispatcherTracker!!");
         ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
         // see - https://github.com/AdeptJ/adeptj-runtime/issues/4
         // Close the DispatcherServletTracker here rather than in BridgeServlet#destroy method.
         // As with version 3.0.18 of Felix Http base the way with HttpSessionListener(s) handled
         // is changed which results in a NPE.
-        logger.info("Closing DispatcherServletTracker!!");
         ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
         FrameworkManager.INSTANCE.stopFramework();
         ServletContextHolder.INSTANCE.setServletContext(null);

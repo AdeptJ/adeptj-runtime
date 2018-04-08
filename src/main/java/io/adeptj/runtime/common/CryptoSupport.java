@@ -20,9 +20,9 @@
 
 package io.adeptj.runtime.common;
 
+import com.typesafe.config.Config;
 import io.adeptj.runtime.config.Configs;
 import io.adeptj.runtime.exception.SystemException;
-import com.typesafe.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,29 +45,9 @@ public final class CryptoSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CryptoSupport.class);
 
-    private static final SecureRandom DEFAULT_SECURE_RANDOM;
-
-    static {
-        DEFAULT_SECURE_RANDOM = new SecureRandom();
-    }
+    private static final SecureRandom DEFAULT_SECURE_RANDOM = new SecureRandom();
 
     private CryptoSupport() {
-    }
-
-    /**
-     * Generates the random salt for hashing using SHA1PRNG.
-     *
-     * @return salt as bytes.
-     */
-    public static byte[] saltBytes() {
-        byte[] saltBytes = new byte[Configs.DEFAULT.common().getInt("salt-size")];
-        try {
-            DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
-            return saltBytes;
-        } catch (Exception ex) {
-            LOGGER.error("Exception while generating salt!!", ex);
-            throw new SystemException(ex.getMessage(), ex);
-        }
     }
 
     /**
@@ -76,7 +56,7 @@ public final class CryptoSupport {
      * @return UTF-8 Base64 encoded hash.
      */
     public static String saltBase64() {
-        byte[] saltBytes = saltBytes();
+        byte[] saltBytes = new byte[Configs.DEFAULT.common().getInt("salt-size")];
         try {
             DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
             return new String(Base64.getEncoder().encode(saltBytes), UTF8);
@@ -89,34 +69,19 @@ public final class CryptoSupport {
     /**
      * Generates UTF-8 Base64 encoded hashed text using PBKDF2WithHmacSHA256.
      *
-     * @param plainText the char array of text to hash
-     * @param salt      the additive for more secure hashing as bytes
-     * @return hashed text as byte array
-     */
-    public static byte[] hashBytes(char[] plainText, byte[] salt) {
-        Config config = Configs.DEFAULT.common();
-        try {
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(config.getString("secret-key-algo"));
-            PBEKeySpec keySpec = new PBEKeySpec(plainText, salt, config.getInt("iteration-count"),
-                    config.getInt("derived-key-size"));
-            return secretKeyFactory.generateSecret(keySpec).getEncoded();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            LOGGER.error("Exception while generating hashed text!!", ex);
-            throw new SystemException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * Generates UTF-8 Base64 encoded hashed text using PBKDF2WithHmacSHA256.
-     *
      * @param plainText the text to hash
      * @param salt      the additive for more secure hashing
      * @return Hashed text
      */
     public static String hashBase64(String plainText, String salt) {
+        Config config = Configs.DEFAULT.common();
         try {
-            return new String(Base64.getEncoder().encode(hashBytes(plainText.toCharArray(), salt.getBytes(UTF8))), UTF8);
-        } catch (UnsupportedEncodingException | SystemException ex) {
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(config.getString("secret-key-algo"));
+            PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF8),
+                    config.getInt("iteration-count"),
+                    config.getInt("derived-key-size"));
+            return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF8);
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             LOGGER.error("Exception while generating hashed text!!", ex);
             throw new SystemException(ex.getMessage(), ex);
         }
