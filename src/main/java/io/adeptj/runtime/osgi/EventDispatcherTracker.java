@@ -20,69 +20,58 @@
 
 package io.adeptj.runtime.osgi;
 
-import io.adeptj.runtime.common.OSGiUtil;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.tracker.ServiceTracker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
 import java.util.EventListener;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * OSGi ServiceTracker for Felix {@link org.apache.felix.http.base.internal.EventDispatcher}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class EventDispatcherTracker extends ServiceTracker<EventListener, EventListener> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventDispatcherTracker.class);
-
-    private static final String EVENT_DISPATCHER_FILTER = "(http.felix.dispatcher=*)";
+public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> {
 
     /**
-     * This is an instance of Felix EventDispatcher which implements both {@link HttpSessionListener}
-     * and {@link HttpSessionIdListener}
+     * This is an instance of Felix {@link javafx.event.EventDispatcher} which implements
+     * both {@link HttpSessionListener} and {@link HttpSessionIdListener}
      */
-    private EventListener eventListener;
+    private volatile EventListener eventListener;
 
     EventDispatcherTracker(BundleContext context) {
-        super(context, OSGiUtil.filter(context, EventListener.class, EVENT_DISPATCHER_FILTER), null);
+        super(context, EventListener.class);
     }
 
     @Override
-    public EventListener addingService(ServiceReference<EventListener> reference) {
-        AtomicBoolean eventListenerInitialized = new AtomicBoolean();
-        if (this.eventListener == null) {
-            LOGGER.info("Adding OSGi Service: [{}]", OSGiUtil.getServiceDesc(reference));
-            this.eventListener = super.addingService(reference);
-            eventListenerInitialized.set(true);
-        }
-        return eventListenerInitialized.get() ? this.eventListener : null;
+    protected void setService(EventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
     @Override
-    public void removedService(ServiceReference<EventListener> reference, EventListener service) {
-        LOGGER.info("Removing OSGi Service: [{}]", OSGiUtil.getServiceDesc(reference));
-        super.removedService(reference, service);
+    protected void unsetService() {
+        this.eventListener = null;
+        this.serviceRemoved.set(true);
+    }
+
+    @Override
+    protected EventListener getTrackedService() {
+        return this.eventListener;
     }
 
     HttpSessionListener getHttpSessionListener() {
-        return HttpSessionListener.class.cast(this.eventListener);
+        return HttpSessionListener.class.cast(this.getTrackedService());
     }
 
     HttpSessionIdListener getHttpSessionIdListener() {
-        return HttpSessionIdListener.class.cast(this.eventListener);
+        return HttpSessionIdListener.class.cast(this.getTrackedService());
     }
 
     HttpSessionAttributeListener getHttpSessionAttributeListener() {
         HttpSessionAttributeListener attributeListener = null;
-        if (HttpSessionAttributeListener.class.isInstance(this.eventListener)) {
-            attributeListener = HttpSessionAttributeListener.class.cast(this.eventListener);
+        if (HttpSessionAttributeListener.class.isInstance(this.getTrackedService())) {
+            attributeListener = HttpSessionAttributeListener.class.cast(this.getTrackedService());
         }
         return attributeListener;
     }

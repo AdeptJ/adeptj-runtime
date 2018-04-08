@@ -51,7 +51,7 @@ public enum ServiceTrackers {
     }
 
     public HttpServlet getDispatcherServlet() {
-        return this.dispatcherServletTracker == null ? null : this.dispatcherServletTracker.getDispatcherServlet();
+        return this.dispatcherServletTracker == null ? null : this.dispatcherServletTracker.getTrackedService();
     }
 
     public void closeDispatcherServletTracker() {
