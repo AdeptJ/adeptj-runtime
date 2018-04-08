@@ -21,8 +21,10 @@
 package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.CryptoSupport;
-import io.adeptj.runtime.exception.SystemException;
+import io.adeptj.runtime.common.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static io.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * A simple servlet that generates salt and corresponding hashed text.
@@ -50,6 +53,8 @@ public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoServlet.class);
+
     private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 
     @Override
@@ -65,7 +70,8 @@ public class CryptoServlet extends HttpServlet {
                 resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
             }
         } catch (IOException ex) {
-            throw new SystemException(ex.getMessage(), ex);
+            LOGGER.error("Exception while creating response Json!!", ex);
+            ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
