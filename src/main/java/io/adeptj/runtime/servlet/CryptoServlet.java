@@ -32,7 +32,7 @@ import java.io.IOException;
 import static io.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
 
 /**
- * CryptoServlet that generates salt and corresponding hashed text.
+ * A simple servlet that generates salt and corresponding hashed text.
  * <p>
  * Note: This is independent of OSGi and directly managed by Undertow.
  *
@@ -49,18 +49,18 @@ public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;
 
-    private static final String RESP_JSON_FORMAT = "{\n" + "  \"salt\" : \"%s\",\n" + "  \"hash\" : \"%s\"\n" + "}";
+    private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String text = req.getParameter("text");
         if (StringUtils.isEmpty(text)) {
             resp.setContentType("text/plain");
             resp.getWriter().write("request parameter [text] can't be null!!");
-            return;
+        } else {
+            resp.setContentType("application/json");
+            String salt = CryptoSupport.saltBase64();
+            resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
         }
-        String salt = CryptoSupport.saltBase64();
-        resp.setContentType("application/json");
-        resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
     }
 }
