@@ -35,8 +35,8 @@ import java.util.EventListener;
 public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> {
 
     /**
-     * This is an instance of Felix {@link javafx.event.EventDispatcher} which implements
-     * both {@link HttpSessionListener} and {@link HttpSessionIdListener}
+     * This is an instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher}
+     * which implements both {@link HttpSessionListener} and {@link HttpSessionIdListener}
      */
     private volatile EventListener eventListener;
 
