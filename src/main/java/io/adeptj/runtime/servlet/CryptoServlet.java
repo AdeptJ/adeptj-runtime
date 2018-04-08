@@ -21,6 +21,7 @@
 package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.CryptoSupport;
+import io.adeptj.runtime.exception.SystemException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.annotation.WebServlet;
@@ -52,15 +53,19 @@ public class CryptoServlet extends HttpServlet {
     private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String text = req.getParameter("text");
-        if (StringUtils.isEmpty(text)) {
-            resp.setContentType("text/plain");
-            resp.getWriter().write("request parameter [text] can't be null!!");
-        } else {
-            resp.setContentType("application/json");
-            String salt = CryptoSupport.saltBase64();
-            resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
+        try {
+            if (StringUtils.isEmpty(text)) {
+                resp.setContentType("text/plain");
+                resp.getWriter().write("request parameter [text] can't be null!!");
+            } else {
+                resp.setContentType("application/json");
+                String salt = CryptoSupport.saltBase64();
+                resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
+            }
+        } catch (IOException ex) {
+            throw new SystemException(ex.getMessage(), ex);
         }
     }
 }
