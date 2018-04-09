@@ -36,11 +36,11 @@ public class BridgeHttpSessionListener implements HttpSessionListener {
 
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        HttpSessionEvents.handleEvent(SESSION_CREATED, se);
+        HttpSessionEvents.handleHttpSessionEvent(SESSION_CREATED, se);
     }
 
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
-        HttpSessionEvents.handleEvent(SESSION_DESTROYED, se);
+        HttpSessionEvents.handleHttpSessionEvent(SESSION_DESTROYED, se);
     }
 }

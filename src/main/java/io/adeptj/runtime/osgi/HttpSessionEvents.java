@@ -52,7 +52,7 @@ public enum HttpSessionEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
 
-    public static void handleEvent(HttpSessionEvents type, HttpSessionEvent event) {
+    public static void handleHttpSessionEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
             case SESSION_CREATED:
                 logSessionCreated(event);
@@ -72,7 +72,7 @@ public enum HttpSessionEvents {
         sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
     }
 
-    public static void handleEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
+    public static void handleHttpSessionBindingEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
         switch (type) {
             case SESSION_ATTRIBUTE_ADDED:
                 sessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
@@ -91,14 +91,16 @@ public enum HttpSessionEvents {
 
     private static void logSessionCreated(HttpSessionEvent event) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]", event.getSession().getId(),
+            LOGGER.debug("Created HttpSession with id: [{}], @Time: [{}]",
+                    event.getSession().getId(),
                     Date.from(Instant.ofEpochMilli(event.getSession().getCreationTime())));
         }
     }
 
     private static void logSessionDestroyed(HttpSessionEvent event) {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.", event.getSession().getId(),
+            LOGGER.debug("Destroyed HttpSession with id: [{}], active for: [{}] seconds.",
+                    event.getSession().getId(),
                     Times.elapsedSeconds(event.getSession().getCreationTime()));
         }
     }

@@ -37,16 +37,16 @@ public class BridgeHttpSessionAttributeListener implements HttpSessionAttributeL
 
     @Override
     public void attributeAdded(HttpSessionBindingEvent event) {
-        HttpSessionEvents.handleEvent(SESSION_ATTRIBUTE_ADDED, event);
+        HttpSessionEvents.handleHttpSessionBindingEvent(SESSION_ATTRIBUTE_ADDED, event);
     }
 
     @Override
     public void attributeRemoved(HttpSessionBindingEvent event) {
-        HttpSessionEvents.handleEvent(SESSION_ATTRIBUTE_REMOVED, event);
+        HttpSessionEvents.handleHttpSessionBindingEvent(SESSION_ATTRIBUTE_REMOVED, event);
     }
 
     @Override
     public void attributeReplaced(HttpSessionBindingEvent event) {
-        HttpSessionEvents.handleEvent(SESSION_ATTRIBUTE_REPLACED, event);
+        HttpSessionEvents.handleHttpSessionBindingEvent(SESSION_ATTRIBUTE_REPLACED, event);
     }
 }
