@@ -35,43 +35,58 @@ import java.util.EventListener;
 public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> {
 
     /**
-     * This is an instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher}
+     * The Felix {@link org.apache.felix.http.base.internal.EventDispatcher}
      * which implements both {@link HttpSessionListener} and {@link HttpSessionIdListener}
      */
     private volatile EventListener eventListener;
 
+    /**
+     * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link EventListener}
+     *
+     * @param context the {@link BundleContext}
+     */
     EventDispatcherTracker(BundleContext context) {
         super(context, EventListener.class);
     }
 
+    /**
+     * Initializes the {@link EventListener}
+     *
+     * @param trackedService the tracked service instance.
+     */
     @Override
-    protected void setService(EventListener eventListener) {
-        this.eventListener = eventListener;
+    protected void setup(EventListener trackedService) {
+        this.eventListener = trackedService;
     }
 
+    /**
+     * Sets the {@link EventListener} to null.
+     */
     @Override
-    protected void unsetService() {
+    protected void cleanup() {
         this.eventListener = null;
-        this.serviceRemoved.set(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected EventListener getTrackedService() {
+    protected EventListener getServiceInstance() {
         return this.eventListener;
     }
 
     HttpSessionListener getHttpSessionListener() {
-        return HttpSessionListener.class.cast(this.getTrackedService());
+        return HttpSessionListener.class.cast(this.getServiceInstance());
     }
 
     HttpSessionIdListener getHttpSessionIdListener() {
-        return HttpSessionIdListener.class.cast(this.getTrackedService());
+        return HttpSessionIdListener.class.cast(this.getServiceInstance());
     }
 
     HttpSessionAttributeListener getHttpSessionAttributeListener() {
         HttpSessionAttributeListener attributeListener = null;
-        if (HttpSessionAttributeListener.class.isInstance(this.getTrackedService())) {
-            attributeListener = HttpSessionAttributeListener.class.cast(this.getTrackedService());
+        if (HttpSessionAttributeListener.class.isInstance(this.getServiceInstance())) {
+            attributeListener = HttpSessionAttributeListener.class.cast(this.getServiceInstance());
         }
         return attributeListener;
     }

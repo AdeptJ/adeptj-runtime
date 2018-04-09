@@ -22,12 +22,12 @@ package io.adeptj.runtime.osgi;
 
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
 import io.adeptj.runtime.common.Times;
+import org.apache.felix.http.base.internal.dispatch.DispatcherServlet;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
-import java.util.Optional;
 
 /**
  * OSGi ServiceTracker for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
@@ -39,46 +39,58 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
     /**
-     * This is an instance of Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
+     * The Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
     private volatile HttpServlet dispatcherServlet;
 
+    /**
+     * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link HttpServlet}
+     *
+     * @param context the {@link BundleContext}
+     */
     DispatcherServletTracker(BundleContext context) {
         super(context, HttpServlet.class);
     }
 
+    /**
+     * Initializes the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
+     *
+     * @param trackedService the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
+     */
     @Override
-    protected void setService(HttpServlet httpServlet) {
+    protected void setup(HttpServlet trackedService) {
+        long startTime = System.nanoTime();
+        this.dispatcherServlet = trackedService;
         try {
-            long startTime = System.nanoTime();
-            this.dispatcherServlet = httpServlet;
             this.dispatcherServlet.init(BridgeServletConfigHolder.INSTANCE.getBridgeServletConfig());
             LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
-            // What if DispatcherServlet is initialized with passed service instance but init method failed.
-            // DispatcherServlet has to be initialized fully to perform the dispatcher tasks.
-            // Set the instance null so that http status 503 can be returned by BridgeServlet
+            /*
+             * If the init method failed above then DispatcherServlet won't be usable at all.
+             * DispatcherServlet has to be initialized fully to perform the dispatcher tasks.
+             * Set the instance null so that http status 503 can be returned by BridgeServlet.
+             * Also the ServiceTracker will not be tracking it at all when addingService method returns.
+             */
             this.dispatcherServlet = null;
             LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
         }
     }
 
+    /**
+     * Calls the Felix {@link DispatcherServlet#destroy()} and set the tracked instance to null.
+     */
     @Override
-    protected void unsetService() {
-        Optional.ofNullable(this.dispatcherServlet).ifPresent(dispatcher -> {
-            try {
-                dispatcher.destroy();
-                LOGGER.info("Felix DispatcherServlet Destroyed!!");
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-        });
+    protected void cleanup() {
+        this.dispatcherServlet.destroy();
+        LOGGER.info("Felix DispatcherServlet Destroyed!!");
         this.dispatcherServlet = null;
-        this.serviceRemoved.set(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected HttpServlet getTrackedService() {
+    protected HttpServlet getServiceInstance() {
         return this.dispatcherServlet;
     }
 }

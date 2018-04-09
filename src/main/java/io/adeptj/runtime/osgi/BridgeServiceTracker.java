@@ -41,34 +41,67 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
 
     private static final String DEFAULT_FILTER = "(http.felix.dispatcher=*)";
 
-    AtomicBoolean serviceRemoved;
+    /**
+     * Stores service removal status.
+     */
+    private final AtomicBoolean serviceRemoved;
 
     BridgeServiceTracker(BundleContext context, Class<T> objectClass) {
         super(context, OSGiUtil.filter(context, objectClass, DEFAULT_FILTER), null);
         this.serviceRemoved = new AtomicBoolean();
     }
 
+    /**
+     * Called by {@link ServiceTracker} when the service to look becomes available.
+     *
+     * @param reference the tracked service reference.
+     * @return tracked service instance.
+     */
     @Override
     public T addingService(ServiceReference<T> reference) {
-        if (!this.serviceRemoved.get()) {
+        if (!this.serviceRemoved.get() && this.getServiceInstance() == null) {
             LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            this.setService(super.addingService(reference));
+            this.setup(super.addingService(reference));
         }
-        return this.serviceRemoved.get() ? null : this.getTrackedService();
+        return this.serviceRemoved.get() ? null : this.getServiceInstance();
     }
 
+    /**
+     * Called by {@link ServiceTracker} when the service to look removed from OSGi service registry.
+     *
+     * @param reference the tracked service reference.
+     * @param service   tracked service instance.
+     */
     @Override
     public void removedService(ServiceReference<T> reference, T service) {
-        if (Objects.equals(service, this.getTrackedService())) {
+        if (Objects.equals(service, this.getServiceInstance())) {
             LOGGER.info("Removing OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            this.unsetService();
+            try {
+                this.cleanup();
+            } catch (Exception ex) { // NOSONAR
+                LOGGER.error(ex.getMessage(), ex);
+            }
         }
+        this.serviceRemoved.set(true);
         super.removedService(reference, service);
     }
 
-    protected abstract void setService(T service);
+    /**
+     * Perform any setup tasks with the tracked service instance.
+     *
+     * @param trackedService the tracked service instance.
+     */
+    protected abstract void setup(T trackedService);
 
-    protected abstract void unsetService();
+    /**
+     * Perform any cleanup tasks on the tracked service instance.
+     */
+    protected abstract void cleanup();
 
-    protected abstract T getTrackedService();
+    /**
+     * Returns the fully initialized tracked service instance.
+     *
+     * @return the fully initialized tracked service instance.
+     */
+    protected abstract T getServiceInstance();
 }
