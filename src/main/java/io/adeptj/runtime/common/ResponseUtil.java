@@ -63,4 +63,13 @@ public final class ResponseUtil {
             throw new SystemException(ex.getMessage(), ex);
         }
     }
+
+    public static void write(HttpServletResponse resp, String content) {
+        try {
+            resp.getWriter().write(content);
+        } catch (IOException ex) {
+            // Now what? may be wrap and re-throw. Let the container handle it.
+            throw new SystemException(ex.getMessage(), ex);
+        }
+    }
 }

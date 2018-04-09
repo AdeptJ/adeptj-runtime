@@ -30,10 +30,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static io.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * A simple servlet that generates salt and corresponding hashed text.
@@ -60,18 +58,13 @@ public class CryptoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String text = req.getParameter("text");
-        try {
-            if (StringUtils.isEmpty(text)) {
-                resp.setContentType("text/plain");
-                resp.getWriter().write("request parameter [text] can't be null!!");
-            } else {
-                resp.setContentType("application/json");
-                String salt = CryptoSupport.saltBase64();
-                resp.getWriter().write(String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
-            }
-        } catch (IOException ex) {
-            LOGGER.error("Exception while creating response Json!!", ex);
-            ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
+        if (StringUtils.isEmpty(text)) {
+            resp.setContentType("text/plain");
+            ResponseUtil.write(resp, "request parameter [text] can't be null!!");
+        } else {
+            resp.setContentType("application/json");
+            String salt = CryptoSupport.saltBase64();
+            ResponseUtil.write(resp, String.format(RESP_JSON_FORMAT, salt, CryptoSupport.hashBase64(text, salt)));
         }
     }
 }

@@ -20,7 +20,6 @@
 
 package io.adeptj.runtime.osgi;
 
-import io.adeptj.runtime.common.BundleContextHolder;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,9 @@ public enum ServiceTrackers {
 
     private volatile EventDispatcherTracker eventDispatcherTracker;
 
-    public void openDispatcherServletTracker() {
+    public void openDispatcherServletTracker(BundleContext bundleContext) {
         if (this.dispatcherServletTracker == null) {
-            this.dispatcherServletTracker = new DispatcherServletTracker(BundleContextHolder.INSTANCE.getBundleContext());
+            this.dispatcherServletTracker = new DispatcherServletTracker(bundleContext);
             this.dispatcherServletTracker.open();
         }
     }

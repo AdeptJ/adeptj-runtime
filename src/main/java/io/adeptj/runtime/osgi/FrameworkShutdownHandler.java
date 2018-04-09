@@ -38,14 +38,6 @@ import javax.servlet.annotation.WebListener;
 public class FrameworkShutdownHandler implements ServletContextListener {
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        // Nothing to do here as OSGi Framework is initialized in FrameworkLauncher.
-        // Can't do the Framework initialization here because we register EventListener(s) and HttpServlet(s)
-        // using the ServletContext passed which results in java.lang.UnsupportedOperationException
-        // UT010042: This method cannot be called from a ServletContextListener that has been added programmatically.
-    }
-
-    @Override
     public void contextDestroyed(ServletContextEvent event) {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);

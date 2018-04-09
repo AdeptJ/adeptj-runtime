@@ -21,10 +21,12 @@
 package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
+import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.osgi.ServiceTrackers;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +44,8 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
  * a registry of managed HttpServlet/Filter(s) etc.
  * <p>
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
- * <p>
- * <p>
+ *
+ *
  * <b>This HttpServlet listens at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
@@ -68,7 +70,8 @@ public class BridgeServlet extends HttpServlet {
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
         BridgeServletConfigHolder.INSTANCE.setBridgeServletConfig(this.getServletConfig());
-        ServiceTrackers.INSTANCE.openDispatcherServletTracker();
+        BundleContext bundleContext = BundleContextHolder.INSTANCE.getBundleContext();
+        ServiceTrackers.INSTANCE.openDispatcherServletTracker(bundleContext);
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
@@ -84,10 +87,10 @@ public class BridgeServlet extends HttpServlet {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
                 ResponseUtil.unavailable(resp);
-                return;
+            } else {
+                dispatcherServlet.service(req, resp);
+                RequestUtil.logException(req, LOGGER, FELIX_DISPATCHER_EXCEPTION_MSG);
             }
-            dispatcherServlet.service(req, resp);
-            RequestUtil.logException(req, LOGGER, FELIX_DISPATCHER_EXCEPTION_MSG);
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);
             ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
