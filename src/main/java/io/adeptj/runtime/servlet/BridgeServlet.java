@@ -56,9 +56,11 @@ public class BridgeServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServlet.class);
 
-    private static final String UNAVAILABLE_MSG = "Can't serve request: [{}], DispatcherServlet is unavailable!!";
+    private static final String UNAVAILABLE_MSG = "Can't process request: [{}], DispatcherServlet is unavailable!!";
 
     private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
+
+    private static final String PROCESSING_REQUEST_MSG = "Processing [{}] request for [{}]";
 
     /**
      * Open the DispatcherServletTracker.
@@ -76,12 +78,15 @@ public class BridgeServlet extends HttpServlet {
     }
 
     /**
-     * Bridge for Felix DispatcherServlet, delegate all the calls to underlying DispatcherServlet.
+     * Delegates all the request to {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
      *
      * @see class header for detailed description.
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(PROCESSING_REQUEST_MSG, req.getMethod(), req.getRequestURI());
+        }
         HttpServlet dispatcherServlet = ServiceTrackers.INSTANCE.getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
@@ -92,7 +97,7 @@ public class BridgeServlet extends HttpServlet {
                 RequestUtil.logException(req, LOGGER, FELIX_DISPATCHER_EXCEPTION_MSG);
             }
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while handling request: [{}]", req.getRequestURI(), ex);
+            LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), ex);
             ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
         }
     }
