@@ -40,6 +40,6 @@ public class FrameworkLauncher implements StartupAware {
      */
     @Override
     public void onStartup(ServletContext servletContext) {
-        FrameworkManager.INSTANCE.startFramework();
+        FrameworkManager.getInstance().startFramework();
     }
 }

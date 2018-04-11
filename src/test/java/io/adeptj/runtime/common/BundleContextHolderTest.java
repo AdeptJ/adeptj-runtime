@@ -35,8 +35,8 @@ class BundleContextHolderTest {
 
     @Test
     void testIsBundleContextSetWhenSetBundleContextCalled() {
-        Mockito.when(BundleContextHolder.INSTANCE.getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
-        Assertions.assertNotNull(BundleContextHolder.INSTANCE.getBundleContext());
+        Mockito.when(BundleContextHolder.getInstance().getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
+        Assertions.assertNotNull(BundleContextHolder.getInstance().getBundleContext());
     }
 
     @Test
