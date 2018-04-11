@@ -26,15 +26,12 @@ import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.osgi.ServiceTrackers;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
@@ -71,9 +68,9 @@ public class BridgeServlet extends HttpServlet {
         LOGGER.info("Initializing BridgeServlet!!");
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
-        BridgeServletConfigHolder.INSTANCE.setBridgeServletConfig(this.getServletConfig());
-        BundleContext bundleContext = BundleContextHolder.INSTANCE.getBundleContext();
-        ServiceTrackers.INSTANCE.openDispatcherServletTracker(bundleContext);
+        BridgeServletConfigHolder.getInstance().setBridgeServletConfig(this.getServletConfig());
+        ServiceTrackers.getInstance()
+                .openDispatcherServletTracker(BundleContextHolder.getInstance().getBundleContext());
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
@@ -84,10 +81,8 @@ public class BridgeServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(PROCESSING_REQUEST_MSG, req.getMethod(), req.getRequestURI());
-        }
-        HttpServlet dispatcherServlet = ServiceTrackers.INSTANCE.getDispatcherServlet();
+        RequestUtil.logRequestDebug(req, LOGGER, PROCESSING_REQUEST_MSG);
+        HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
@@ -98,7 +93,7 @@ public class BridgeServlet extends HttpServlet {
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), ex);
-            ResponseUtil.sendError(resp, SC_INTERNAL_SERVER_ERROR);
+            ResponseUtil.serverError(resp);
         }
     }
 

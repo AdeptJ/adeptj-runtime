@@ -52,7 +52,7 @@ public final class TemplateEngines {
     }
 
     static MustacheEngine buildMustacheEngine() {
-        ViewEngineConfig config = ConfigBeanFactory.create(Configs.DEFAULT.trimou(), ViewEngineConfig.class);
+        ViewEngineConfig config = ConfigBeanFactory.create(Configs.INSTANCE.trimou(), ViewEngineConfig.class);
         return MustacheEngineBuilder.newBuilder()
                 .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getResourceBundleBasename(), MESSAGE))
                 .addTemplateLocator(templateLocator(config))

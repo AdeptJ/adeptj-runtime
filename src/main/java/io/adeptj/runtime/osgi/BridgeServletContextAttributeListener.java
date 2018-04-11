@@ -38,14 +38,14 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
     @Override
     public void attributeAdded(ServletContextAttributeEvent event) {
         if (BundleContext.class.isInstance(event.getValue())) {
-            ServiceTrackers.INSTANCE.openEventDispatcherTracker((BundleContext) event.getValue());
+            ServiceTrackers.getInstance().openEventDispatcherTracker((BundleContext) event.getValue());
         }
     }
 
     @Override
     public void attributeReplaced(ServletContextAttributeEvent event) {
         if (BundleContext.class.isInstance(event.getValue())) {
-            ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
+            ServiceTrackers.getInstance().closeEventDispatcherTracker();
             /*
              * Now open the EventDispatcherTracker with fresh BundleContext which is already hold by
              * BundleContextHolder after being set in FrameworkLifecycleListener.
@@ -53,7 +53,8 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
              * Rationale: If we use the BundleContext contained in the passed event which is a stale
              * BundleContext in case of a framework restart event and results in a IllegalStateException.
              */
-            ServiceTrackers.INSTANCE.openEventDispatcherTracker(BundleContextHolder.INSTANCE.getBundleContext());
+            ServiceTrackers.getInstance()
+                    .openEventDispatcherTracker(BundleContextHolder.getInstance().getBundleContext());
         }
     }
 }

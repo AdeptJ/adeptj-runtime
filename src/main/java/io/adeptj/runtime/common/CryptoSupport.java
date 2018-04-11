@@ -56,7 +56,7 @@ public final class CryptoSupport {
      * @return UTF-8 Base64 encoded hash.
      */
     public static String saltBase64() {
-        byte[] saltBytes = new byte[Configs.DEFAULT.common().getInt("salt-size")];
+        byte[] saltBytes = new byte[Configs.of().common().getInt("salt-size")];
         try {
             DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
             return new String(Base64.getEncoder().encode(saltBytes), UTF8);
@@ -74,7 +74,7 @@ public final class CryptoSupport {
      * @return Hashed text
      */
     public static String hashBase64(String plainText, String salt) {
-        Config config = Configs.DEFAULT.common();
+        Config config = Configs.of().common();
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(config.getString("secret-key-algo"));
             PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF8),

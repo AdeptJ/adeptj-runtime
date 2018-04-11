@@ -65,8 +65,7 @@ final class CredentialMatcher {
     }
 
     private static boolean fromServerConfig(String id, String pwd) {
-        return Configs.DEFAULT
-                .undertow()
+        return Configs.of().undertow()
                 .getObject(KEY_USER_CREDENTIAL_MAPPING)
                 .unwrapped()
                 .entrySet()

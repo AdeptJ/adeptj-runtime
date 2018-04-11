@@ -60,18 +60,18 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 LOGGER.info("Handling OSGi Framework Restart!!");
                 // Add the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 BundleContext bundleContext = event.getBundle().getBundleContext();
-                BundleContextHolder.INSTANCE.setBundleContext(bundleContext);
-                ServletContext servletContext = ServletContextHolder.INSTANCE.getServletContext();
+                BundleContextHolder.getInstance().setBundleContext(bundleContext);
+                ServletContext servletContext = ServletContextHolder.getInstance().getServletContext();
                 servletContext.setAttribute(BUNDLE_CTX_ATTR, bundleContext);
-                ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
+                ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                ServiceTrackers.INSTANCE.openDispatcherServletTracker(bundleContext);
+                ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
                 break;
             case STOPPED_UPDATE:
                 LOGGER.info("Closing DispatcherServletTracker!!");
-                ServiceTrackers.INSTANCE.closeDispatcherServletTracker();
+                ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Closing EventDispatcherTracker!!");
-                ServiceTrackers.INSTANCE.closeEventDispatcherTracker();
+                ServiceTrackers.getInstance().closeEventDispatcherTracker();
                 break;
             default:
                 // log it and ignore as we are not interested in any other event.

@@ -55,6 +55,12 @@ public final class RequestUtil {
         }
     }
 
+    public static void logRequestDebug(HttpServletRequest req, Logger logger, String message) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(message, req.getMethod(), req.getRequestURI());
+        }
+    }
+
     public static void logout(HttpServletRequest req) {
         try {
             req.logout();

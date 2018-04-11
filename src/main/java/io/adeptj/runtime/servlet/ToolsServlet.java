@@ -69,7 +69,7 @@ public class ToolsServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        Bundle[] bundles = BundleContextHolder.INSTANCE.getBundleContext().getBundles();
+        Bundle[] bundles = BundleContextHolder.getInstance().getBundleContext().getBundles();
         long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         TemplateEngines.getDefault().render(TemplateContext.builder()

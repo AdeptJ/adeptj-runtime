@@ -40,4 +40,8 @@ public enum BridgeServletConfigHolder {
     public ServletConfig getBridgeServletConfig() {
         return bridgeServletConfig;
     }
+
+    public static BridgeServletConfigHolder getInstance() {
+        return INSTANCE;
+    }
 }

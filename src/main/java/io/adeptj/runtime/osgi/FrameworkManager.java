@@ -88,9 +88,9 @@ public enum FrameworkManager {
             BundleContext systemBundleContext = this.framework.getBundleContext();
             this.frameworkListener = new FrameworkLifecycleListener();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
-            BundleContextHolder.INSTANCE.setBundleContext(systemBundleContext);
+            BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
             this.provisionBundles(systemBundleContext);
-            List<String> errors = Configs.DEFAULT.undertow().getStringList("common.osgi-error-pages");
+            List<String> errors = Configs.INSTANCE.undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(), errors);
             LOGGER.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -125,7 +125,7 @@ public enum FrameworkManager {
                 LOGGER.error(ex.getMessage(), ex);
             }
         });
-        Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext()).ifPresent(bundleContext -> {
+        Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext()).ifPresent(bundleContext -> {
             try {
                 LOGGER.info("Removing OSGi FrameworkListener!!");
                 bundleContext.removeFrameworkListener(this.frameworkListener);
@@ -138,7 +138,7 @@ public enum FrameworkManager {
     private void provisionBundles(BundleContext systemBundleContext) throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
         if (!Boolean.getBoolean("provision.bundles.explicitly")
-                && Paths.get(Configs.DEFAULT.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
+                && Paths.get(Configs.INSTANCE.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
             LOGGER.info("Bundles already provisioned, this must be a server restart!!");
         } else {
             LOGGER.info("Provisioning Bundles first time!!");
@@ -148,7 +148,7 @@ public enum FrameworkManager {
 
     private Map<String, String> frameworkConfigs() {
         Map<String, String> configs = this.loadFrameworkProperties();
-        Config felixConf = Configs.DEFAULT.felix();
+        Config felixConf = Configs.of().felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
         Optional.ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
@@ -190,5 +190,9 @@ public enum FrameworkManager {
         } catch (IOException ex) {
             LOGGER.error("IOException!!", ex);
         }
+    }
+
+    public static FrameworkManager getInstance() {
+        return INSTANCE;
     }
 }

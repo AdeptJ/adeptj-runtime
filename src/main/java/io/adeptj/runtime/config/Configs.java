@@ -40,7 +40,7 @@ import static io.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
  */
 public enum Configs {
 
-    DEFAULT;
+    INSTANCE;
 
     private final Config main;
 
@@ -83,4 +83,9 @@ public enum Configs {
             return ConfigFactory.defaultReference().getConfig(MAIN_CONF_SECTION);
         }
     }
+
+    public static Configs of() {
+        return INSTANCE;
+    }
+
 }

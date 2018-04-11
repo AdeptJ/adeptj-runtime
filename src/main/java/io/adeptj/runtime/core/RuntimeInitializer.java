@@ -51,7 +51,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
         } else {
-            ServletContextHolder.INSTANCE.setServletContext(context);
+            ServletContextHolder.getInstance().setServletContext(context);
             startupAwareClasses
                     .stream()
                     .sorted(new StartupAwareComparator())

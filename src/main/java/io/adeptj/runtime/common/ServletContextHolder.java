@@ -44,4 +44,8 @@ public enum ServletContextHolder {
     public <T> T getAttributeOfType(String name, Class<T> type) {
         return type.cast(this.context.getAttribute(name));
     }
+
+    public static ServletContextHolder getInstance() {
+        return INSTANCE;
+    }
 }

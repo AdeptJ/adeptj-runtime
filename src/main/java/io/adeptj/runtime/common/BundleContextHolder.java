@@ -40,4 +40,8 @@ public enum BundleContextHolder {
     public void setBundleContext(BundleContext bundleContext) { // NOSONAR
         this.bundleContext = bundleContext;
     }
+
+    public static BundleContextHolder getInstance() {
+        return INSTANCE;
+    }
 }

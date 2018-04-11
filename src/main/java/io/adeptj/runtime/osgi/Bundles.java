@@ -67,7 +67,7 @@ final class Bundles {
      */
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
         long startTime = System.nanoTime();
-        String bundlesDir = Configs.DEFAULT.common().getString(BUNDLES_ROOT_DIR_KEY);
+        String bundlesDir = Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY);
         AtomicInteger installCount = new AtomicInteger();
         BundleInstaller bundleInstaller = new BundleInstaller();
         bundleInstaller

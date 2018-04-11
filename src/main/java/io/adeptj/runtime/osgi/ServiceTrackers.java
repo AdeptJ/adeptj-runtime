@@ -76,4 +76,8 @@ public enum ServiceTrackers {
         Optional.ofNullable(this.eventDispatcherTracker).ifPresent(EventDispatcherTracker::close);
         this.eventDispatcherTracker = null;
     }
+
+    public static ServiceTrackers getInstance() {
+        return INSTANCE;
+    }
 }

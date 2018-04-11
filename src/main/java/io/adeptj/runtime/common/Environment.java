@@ -84,7 +84,7 @@ public final class Environment {
         } else if (IS_OS_UNIX) {
             StringBuilder cmdBuilder = new StringBuilder();
             int index = OFFSET;
-            for (String browser : Configs.DEFAULT.common().getStringList(KEY_BROWSERS)) {
+            for (String browser : Configs.of().common().getStringList(KEY_BROWSERS)) {
                 if (index == OFFSET) {
                     cmdBuilder.append(EMPTY).append(browser).append(SPACE).append(url);
                 } else {

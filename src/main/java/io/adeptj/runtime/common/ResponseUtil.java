@@ -25,6 +25,7 @@ import io.adeptj.runtime.exception.SystemException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
@@ -35,6 +36,15 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 public final class ResponseUtil {
 
     private ResponseUtil() {
+    }
+
+    public static void serverError(HttpServletResponse resp) {
+        try {
+            resp.sendError(SC_INTERNAL_SERVER_ERROR);
+        } catch (IOException ex) {
+            // Now what? may be wrap and re-throw. Let the container handle it.
+            throw new SystemException(ex.getMessage(), ex);
+        }
     }
 
     public static void sendError(HttpServletResponse resp, int errorCode) {

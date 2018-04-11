@@ -58,7 +58,7 @@ public class ServerLogsWebSocket {
     @OnOpen
     public void onOpen(Session session) {
         try {
-            this.logsTailer = new ServerLogsTailer(new File(Configs.DEFAULT.logging().getString(SERVER_LOG_FILE)), session);
+            this.logsTailer = new ServerLogsTailer(new File(Configs.INSTANCE.logging().getString(SERVER_LOG_FILE)), session);
             this.logsTailer.startTailer();
             session.getAsyncRemote().sendText("Server logs tailing will be started shortly!!");
         } catch (RejectedExecutionException ex) {

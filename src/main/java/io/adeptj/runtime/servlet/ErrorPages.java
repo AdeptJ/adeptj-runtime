@@ -84,7 +84,7 @@ public final class ErrorPages {
                     .build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
             ErrorPages.render500Page(req, resp);
-        } else if (Configs.DEFAULT.undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
+        } else if (Configs.of().undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
             ErrorPages.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
         }
     }
@@ -97,7 +97,7 @@ public final class ErrorPages {
             ErrorPages.render500Page(req, resp);
         } else if (RequestUtil.hasException(req) && StringUtils.equals(STATUS_500, statusCode)) {
             ErrorPages.render500PageWithExceptionTrace(req, resp);
-        } else if (Configs.DEFAULT.undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
+        } else if (Configs.of().undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
             ErrorPages.renderErrorPageForStatusCode(req, resp, statusCode);
         } else {
             ResponseUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);

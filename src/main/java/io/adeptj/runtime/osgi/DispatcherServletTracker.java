@@ -62,7 +62,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
         long startTime = System.nanoTime();
         this.dispatcherServlet = trackedService;
         try {
-            this.dispatcherServlet.init(BridgeServletConfigHolder.INSTANCE.getBridgeServletConfig());
+            this.dispatcherServlet.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
             LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
             /*

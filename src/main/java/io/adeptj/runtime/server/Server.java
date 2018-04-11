@@ -176,7 +176,7 @@ public final class Server implements Lifecycle {
 
     @Override
     public void start() {
-        this.cfgReference = new WeakReference<>(Configs.DEFAULT.undertow());
+        this.cfgReference = new WeakReference<>(Configs.of().undertow());
         Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);

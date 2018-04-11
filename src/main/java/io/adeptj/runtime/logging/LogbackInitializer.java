@@ -94,7 +94,7 @@ public final class LogbackInitializer {
 
     public static void init() {
         long startTime = System.nanoTime();
-        Config loggingCfg = Configs.DEFAULT.logging();
+        Config loggingCfg = Configs.of().logging();
         LogbackConfig logbackConfig = getLogbackConfig(loggingCfg);
         LogbackManager logbackMgr = LogbackManager.INSTANCE;
         RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.createRollingFileAppender(logbackConfig);

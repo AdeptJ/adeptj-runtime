@@ -118,7 +118,7 @@ public final class Launcher {
     private static void launchBrowser(Map<String, String> commands) {
         if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
             try {
-                Config config = Configs.DEFAULT.undertow().getConfig(KEY_HTTP);
+                Config config = Configs.of().undertow().getConfig(KEY_HTTP);
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, config.getInt(KEY_PORT))));
             } catch (IOException ex) {
                 // Just log it, its okay if browser is not launched.
@@ -131,10 +131,10 @@ public final class Launcher {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
             Logger logger = LoggerFactory.getLogger(Launcher.class);
             // Check if OSGi Framework was already started, try to stop the framework gracefully.
-            Optional.ofNullable(BundleContextHolder.INSTANCE.getBundleContext())
+            Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
                     .ifPresent(context -> {
                         logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
-                        FrameworkManager.INSTANCE.stopFramework();
+                        FrameworkManager.getInstance().stopFramework();
                     });
             logger.error("Shutting down JVM!!", th);
             // Let the LOGBACK cleans up it's state.
