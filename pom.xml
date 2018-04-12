@@ -55,12 +55,13 @@
         <trimou-core.version>2.4.0.Final</trimou-core.version>
         <caffeine.version>2.6.2</caffeine.version>
         <itextpdf.version>5.5.13</itextpdf.version>
-        <classmate.version>1.3.4</classmate.version>
+        <classmate.version>1.4.0</classmate.version>
         <javax.el.version>3.0.1-b10</javax.el.version>
         <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
         <reactor-core.version>3.1.6.RELEASE</reactor-core.version>
         <failsafe.version>1.1.0</failsafe.version>
+        <scribejava.version>5.3.0</scribejava.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>5.6.10</felix.framework.version>
@@ -825,7 +826,7 @@
 
         <profile>
 
-            <id>AdeptJ-Logging</id>
+            <id>AdeptJLogging</id>
 
             <dependencies>
 
@@ -896,7 +897,7 @@
 
             <!-- Apache HttpClient OSGi Version -->
 
-            <id>Apache-HttpClient</id>
+            <id>ApacheHttpClient</id>
 
             <dependencies>
 
@@ -1042,11 +1043,9 @@
 
         <profile>
 
-            <id>RESTEasy</id>
+            <id>HibernateValidator</id>
 
             <dependencies>
-
-                <!-- Hibernate Validator Dependencies Start -->
 
                 <dependency>
                     <groupId>com.sun.mail</groupId>
@@ -1093,9 +1092,15 @@
                     </exclusions>
                 </dependency>
 
-                <!-- Hibernate Validator Dependencies End -->
+            </dependencies>
 
-                <!-- RESTEasy Dependencies Start -->
+        </profile>
+
+        <profile>
+
+            <id>RESTEasy</id>
+
+            <dependencies>
 
                 <dependency>
                     <groupId>javax.validation</groupId>
@@ -1147,8 +1152,6 @@
                         </exclusion>
                     </exclusions>
                 </dependency>
-
-                <!-- RESTEasy Dependencies End -->
 
                 <dependency>
                     <groupId>net.jcip</groupId>
@@ -1329,7 +1332,7 @@
 
         <profile>
 
-            <id>Shiro</id>
+            <id>ApacheShiro</id>
 
             <dependencies>
 
@@ -1583,41 +1586,6 @@
 
         <profile>
 
-            <id>JPA-Hibernate</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-core</artifactId>
-                    <version>5.2.12.Final</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.fasterxml</groupId>
-                            <artifactId>classmate</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.javassist</groupId>
-                            <artifactId>javassist</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
             <id>MySQL</id>
 
             <dependencies>
@@ -1625,7 +1593,7 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                    <version>6.0.6</version>
+                    <version>8.0.9-rc</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1710,7 +1678,6 @@
                 <dependency>
                     <groupId>org.unbescape</groupId>
                     <artifactId>unbescape</artifactId>
-                    <version>${unbescape.version}</version>
                 </dependency>
 
                 <dependency>
@@ -1760,14 +1727,14 @@
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-core</artifactId>
-                    <version>5.3.0</version>
+                    <version>${scribejava.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-apis</artifactId>
-                    <version>5.3.0</version>
+                    <version>${scribejava.version}</version>
                     <scope>provided</scope>
                 </dependency>
 

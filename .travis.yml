@@ -12,7 +12,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P Apache-HttpClient,RESTEasy,Jackson,MySQL,JDBC-CP-Hikari,JPA-EclipseLink,AWS sonar:sonar -Dsonar.projectKey=adeptj-runtime
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package -P ApacheHttpClient,HibernateValidator,RESTEasy,Jackson,ReactiveStreams sonar:sonar -Dsonar.projectKey=adeptj-runtime
 
 cache:
   directories:
