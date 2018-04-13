@@ -22,9 +22,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.adeptj</groupId>
+        <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.20.Final</version>
+        <version>1.0.19.Final</version>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
     <version>1.0.14-SNAPSHOT</version>
@@ -59,8 +59,6 @@
         <javax.el.version>3.0.1-b10</javax.el.version>
         <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
         <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
-        <reactor-core.version>3.1.6.RELEASE</reactor-core.version>
-        <failsafe.version>1.1.0</failsafe.version>
         <scribejava.version>5.3.0</scribejava.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
