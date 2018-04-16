@@ -67,6 +67,7 @@ final class Bundles {
      * @throws IOException exception thrown by provisioning mechanism.
      */
     static void provisionBundles(BundleContext systemBundleContext) throws IOException {
+        LOGGER.info("Bundles provisioning start!!");
         long startTime = System.nanoTime();
         String bundlesDir = Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY);
         BundleInstaller bundleInstaller = new BundleInstaller();

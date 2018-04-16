@@ -139,9 +139,8 @@ public enum FrameworkManager {
         // config directory will not yet be created if framework is being provisioned first time.
         if (!Boolean.getBoolean("provision.bundles.explicitly")
                 && Paths.get(Configs.INSTANCE.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
-            LOGGER.info("Bundles already provisioned, this must be a server restart!!");
+            LOGGER.info("As per configuration, bundles provisioning is skipped on server restart!!");
         } else {
-            LOGGER.info("Provisioning Bundles first time!!");
             Bundles.provisionBundles(systemBundleContext);
         }
     }
