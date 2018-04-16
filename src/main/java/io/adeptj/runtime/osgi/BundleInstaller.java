@@ -50,6 +50,12 @@ class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
+    private static int installCount;
+
+    static int getInstallCount() {
+        return installCount;
+    }
+
     Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
         return JarURLConnection.class.cast(Bundles.class.getResource(bundlesDir).openConnection())
                 .getJarFile()
@@ -73,6 +79,7 @@ class BundleInstaller {
                 LOGGER.warn("Not an OSGi Bundle: {}", bundleUrl);
             } else {
                 bundle = systemBundleContext.installBundle(bundleUrl.toExternalForm());
+                installCount++;
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
             LOGGER.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);
