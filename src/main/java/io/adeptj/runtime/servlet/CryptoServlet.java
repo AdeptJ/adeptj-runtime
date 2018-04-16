@@ -23,8 +23,6 @@ package io.adeptj.runtime.servlet;
 import io.adeptj.runtime.common.CryptoSupport;
 import io.adeptj.runtime.common.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -50,8 +48,6 @@ import static io.adeptj.runtime.common.Constants.TOOLS_CRYPTO_URI;
 public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoServlet.class);
 
     private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 

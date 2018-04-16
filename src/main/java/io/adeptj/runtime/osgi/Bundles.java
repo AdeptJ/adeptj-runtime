@@ -74,7 +74,7 @@ final class Bundles {
         bundleInstaller.installBundles(bundles, systemBundleContext)
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
-        LOGGER.info(BUNDLE_PROVISIONED_MSG, BundleInstaller.getInstallCount(), Times.elapsedMillis(startTime));
+        LOGGER.info(BUNDLE_PROVISIONED_MSG, bundleInstaller.getInstallCount(), Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {

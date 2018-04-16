@@ -32,6 +32,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
@@ -50,10 +51,10 @@ class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
-    private static int installCount;
+    private AtomicInteger installCount = new AtomicInteger();
 
-    static int getInstallCount() {
-        return installCount;
+    int getInstallCount() {
+        return installCount.get();
     }
 
     Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
@@ -79,7 +80,7 @@ class BundleInstaller {
                 LOGGER.warn("Not an OSGi Bundle: {}", bundleUrl);
             } else {
                 bundle = systemBundleContext.installBundle(bundleUrl.toExternalForm());
-                installCount++;
+                this.installCount.incrementAndGet();
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
             LOGGER.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);
