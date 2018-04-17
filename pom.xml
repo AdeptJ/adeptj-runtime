@@ -468,6 +468,7 @@
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotations</artifactId>
             <version>2.2.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -917,6 +918,35 @@
 
         <profile>
 
+            <id>JWT</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt</artifactId>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.fasterxml.jackson.core</groupId>
+                            <artifactId>jackson-databind</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-websecurity-jwt</artifactId>
+                    <version>1.0.9.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
             <id>Jackson</id>
 
             <dependencies>
@@ -1090,6 +1120,13 @@
                     </exclusions>
                 </dependency>
 
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-commons-validator</artifactId>
+                    <version>1.0.1.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
             </dependencies>
 
         </profile>
@@ -1135,18 +1172,6 @@
                         <exclusion>
                             <groupId>javax.el</groupId>
                             <artifactId>javax.el-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt</artifactId>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.fasterxml.jackson.core</groupId>
-                            <artifactId>jackson-databind</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -1214,20 +1239,6 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                     <version>1.2.17</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-validator</artifactId>
-                    <version>1.0.1.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.0.9.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
