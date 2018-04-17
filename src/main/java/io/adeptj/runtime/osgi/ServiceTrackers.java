@@ -21,6 +21,7 @@
 package io.adeptj.runtime.osgi;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public enum ServiceTrackers {
 
     public void closeDispatcherServletTracker() {
         LOGGER.info("Closing DispatcherServletTracker!!");
-        Optional.ofNullable(this.dispatcherServletTracker).ifPresent(DispatcherServletTracker::close);
+        this.closeServiceTracker(this.dispatcherServletTracker);
         this.dispatcherServletTracker = null;
     }
 
@@ -73,11 +74,21 @@ public enum ServiceTrackers {
 
     protected void closeEventDispatcherTracker() {
         LOGGER.info("Closing EventDispatcherTracker!!");
-        Optional.ofNullable(this.eventDispatcherTracker).ifPresent(EventDispatcherTracker::close);
+        this.closeServiceTracker(this.eventDispatcherTracker);
         this.eventDispatcherTracker = null;
     }
 
     public static ServiceTrackers getInstance() {
         return INSTANCE;
+    }
+
+    <S, T> void closeServiceTracker(ServiceTracker<S, T> serviceTracker) {
+        Optional.ofNullable(serviceTracker).ifPresent(tracker -> {
+            try {
+                tracker.close();
+            } catch (Exception ex) { // NOSONAR
+                LOGGER.error("Exception while closing the ServiceTracker!!", ex);
+            }
+        });
     }
 }
