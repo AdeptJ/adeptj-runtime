@@ -55,12 +55,12 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
     /**
      * Initializes the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      *
-     * @param trackedService the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
+     * @param service the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
     @Override
-    protected void setup(HttpServlet trackedService) {
+    protected HttpServlet setup(HttpServlet service) {
         long startTime = System.nanoTime();
-        this.dispatcherServlet = trackedService;
+        this.dispatcherServlet = service;
         try {
             this.dispatcherServlet.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
             LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
@@ -74,6 +74,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
             this.dispatcherServlet = null;
             LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
         }
+        return this.dispatcherServlet;
     }
 
     /**
@@ -86,11 +87,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
         this.dispatcherServlet = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected HttpServlet getServiceInstance() {
+    HttpServlet getDispatcherServlet() {
         return this.dispatcherServlet;
     }
 }

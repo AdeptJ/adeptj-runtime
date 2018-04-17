@@ -51,7 +51,7 @@ class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
-    private AtomicInteger installCount = new AtomicInteger();
+    private final AtomicInteger installCount = new AtomicInteger();
 
     int getInstallCount() {
         return installCount.get();

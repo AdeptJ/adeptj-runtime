@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServlet;
 import java.util.Optional;
 
 /**
- * ServiceTrackers. Utility for performing operations on OSGi {@link org.osgi.util.tracker.ServiceTracker} instances.
+ * Utility for performing operations on OSGi {@link org.osgi.util.tracker.ServiceTracker} instances.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -50,7 +50,7 @@ public enum ServiceTrackers {
     }
 
     public HttpServlet getDispatcherServlet() {
-        return this.dispatcherServletTracker.getServiceInstance();
+        return this.dispatcherServletTracker.getDispatcherServlet();
     }
 
     public void closeDispatcherServletTracker() {

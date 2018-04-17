@@ -35,10 +35,21 @@ import java.util.EventListener;
 public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> {
 
     /**
-     * The Felix {@link org.apache.felix.http.base.internal.EventDispatcher}
-     * which implements both {@link HttpSessionListener} and {@link HttpSessionIdListener}
+     * Instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher} which implements
+     * the {@link HttpSessionListener}
      */
-    private volatile EventListener eventListener;
+    private volatile HttpSessionListener sessionListener;
+
+    /**
+     * Instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher} which implements
+     * the {@link HttpSessionIdListener}
+     */
+    private volatile HttpSessionIdListener sessionIdListener;
+
+    /**
+     * Just in case someone implements HttpSessionAttributeListener OSGi service, track that as well.
+     */
+    private volatile HttpSessionAttributeListener sessionAttributeListener;
 
     /**
      * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link EventListener}
@@ -50,44 +61,43 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
     }
 
     /**
-     * Initializes the {@link EventListener}
+     * Initializes {@link HttpSessionListener}, {@link HttpSessionIdListener} and {@link HttpSessionAttributeListener}
      *
-     * @param trackedService the tracked service instance.
+     * @param service the tracked service instance.
      */
     @Override
-    protected void setup(EventListener trackedService) {
-        this.eventListener = trackedService;
+    protected EventListener setup(EventListener service) {
+        if (service instanceof HttpSessionListener) {
+            this.sessionListener = (HttpSessionListener) service;
+        }
+        if (service instanceof HttpSessionIdListener) {
+            this.sessionIdListener = (HttpSessionIdListener) service;
+        }
+        if (service instanceof HttpSessionAttributeListener) {
+            this.sessionAttributeListener = (HttpSessionAttributeListener) service;
+        }
+        return service;
     }
 
     /**
-     * Sets the {@link EventListener} to null.
+     * Sets the {@link EventListener} instances to null.
      */
     @Override
     protected void cleanup() {
-        this.eventListener = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected EventListener getServiceInstance() {
-        return this.eventListener;
+        this.sessionListener = null;
+        this.sessionIdListener = null;
+        this.sessionAttributeListener = null;
     }
 
     HttpSessionListener getHttpSessionListener() {
-        return HttpSessionListener.class.cast(this.getServiceInstance());
+        return this.sessionListener;
     }
 
     HttpSessionIdListener getHttpSessionIdListener() {
-        return HttpSessionIdListener.class.cast(this.getServiceInstance());
+        return this.sessionIdListener;
     }
 
     HttpSessionAttributeListener getHttpSessionAttributeListener() {
-        HttpSessionAttributeListener attributeListener = null;
-        if (HttpSessionAttributeListener.class.isInstance(this.getServiceInstance())) {
-            attributeListener = HttpSessionAttributeListener.class.cast(this.getServiceInstance());
-        }
-        return attributeListener;
+        return this.sessionAttributeListener;
     }
 }

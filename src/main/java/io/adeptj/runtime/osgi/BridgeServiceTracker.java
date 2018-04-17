@@ -27,7 +27,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -42,7 +41,10 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
     private static final String DEFAULT_FILTER = "(http.felix.dispatcher=*)";
 
     /**
-     * Stores service removal status.
+     * This is to prevent {@link IllegalStateException} : Invalid {@link BundleContext} when service is removed and
+     * then added again on framework restart using the stale {@link BundleContext}.
+     * <p>
+     * This is registered again using the fresh {@link BundleContext} obtained via {@link FrameworkLifecycleListener}
      */
     private final AtomicBoolean serviceRemoved;
 
@@ -59,11 +61,12 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
      */
     @Override
     public T addingService(ServiceReference<T> reference) {
+        T service = null;
         if (!this.serviceRemoved.get()) {
             LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            this.setup(super.addingService(reference));
+            service = this.setup(super.addingService(reference));
         }
-        return this.serviceRemoved.get() ? null : this.getServiceInstance();
+        return this.serviceRemoved.get() ? null : service;
     }
 
     /**
@@ -74,13 +77,11 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
      */
     @Override
     public void removedService(ServiceReference<T> reference, T service) {
-        if (Objects.equals(service, this.getServiceInstance())) {
-            LOGGER.info("Removing OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            try {
-                this.cleanup();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
+        LOGGER.info("Removing OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
+        try {
+            this.cleanup();
+        } catch (Exception ex) { // NOSONAR
+            LOGGER.error(ex.getMessage(), ex);
         }
         this.serviceRemoved.set(true);
         super.removedService(reference, service);
@@ -89,19 +90,13 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
     /**
      * Perform any setup tasks with the tracked service instance.
      *
-     * @param trackedService the tracked service instance.
+     * @param service the tracked service instance.
+     * @return The fully initialized service instance or null if service don't want to be tracked.
      */
-    protected abstract void setup(T trackedService);
+    protected abstract T setup(T service);
 
     /**
      * Perform any cleanup tasks on the tracked service instance.
      */
     protected abstract void cleanup();
-
-    /**
-     * Returns the fully initialized tracked service instance.
-     *
-     * @return the fully initialized tracked service instance.
-     */
-    protected abstract T getServiceInstance();
 }
