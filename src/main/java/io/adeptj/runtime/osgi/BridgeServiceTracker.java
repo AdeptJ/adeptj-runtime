@@ -91,7 +91,7 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
      * Perform any setup tasks with the tracked service instance.
      *
      * @param service the tracked service instance.
-     * @return The fully initialized service instance or null if service don't want to be tracked.
+     * @return The fully initialized service instance or null if service need not to be tracked.
      */
     protected abstract T setup(T service);
 
