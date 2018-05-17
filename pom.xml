@@ -48,7 +48,7 @@
         <jboss-logging-annotations.version>2.1.0.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
         <jdeparser.version>2.0.2.Final</jdeparser.version>
-        <jboss-classfilewriter.version>1.2.1.Final</jboss-classfilewriter.version>
+        <jboss-classfilewriter.version>1.2.2.Final</jboss-classfilewriter.version>
         <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
         <jansi.version>1.17</jansi.version>
