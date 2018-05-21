@@ -73,7 +73,7 @@
         <felix.log.version>1.0.1</felix.log.version>
         <felix.metatype.version>1.1.6</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
-        <felix.fileinstall.version>3.6.2</felix.fileinstall.version>
+        <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
 
         <!-- AdeptJ Modules Dependencies -->
