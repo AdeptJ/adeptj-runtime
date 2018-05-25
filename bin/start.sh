@@ -39,7 +39,13 @@ if [ ${DEBUG} = true ]; then
 	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
 fi
 
-JVM_OPTS="-server -Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m ${DEBUG_OPTS}"
+if [ ${JAVA_VERSION} -gt 9 ]; then
+  GRAAL_VM_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler"
+fi
+
+JVM_MEM_OPTS="-Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m"
+
+JVM_OPTS="-server ${GRAAL_VM_OPTS} ${JVM_MEM_OPTS} ${DEBUG_OPTS}"
 
 RESTEASY_OPTS=" -Dresteasy.allowGzip=false"
 
@@ -48,7 +54,7 @@ if [ ${JAVA_VERSION} -gt 8 ]; then
   JVM_OPTS="--add-modules java.xml.bind "${JVM_OPTS}
 fi
 
-ADEPTJ_RUNTIME_OPTS="${JVM_OPTS}${RESTEASY_OPTS}
+ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.port=9007 \
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
@@ -66,9 +72,9 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS}${RESTEASY_OPTS}
  -Denable.req.buffering=true \
  -Dreq.buff.maxBuffers=200 \
  -Duse.provided.keyStore=false \
- -Djavax.net.ssl.keyStore=path-to-local-java-keystore \
- -Djavax.net.ssl.keyStorePassword=java-keystore-password \
- -Djavax.net.ssl.keyPassword=key-password"
+ -Dadeptj.rt.keyStore=path-to-local-java-keystore \
+ -Dadeptj.rt.keyStorePassword=java-keystore-password \
+ -Dadeptj.rt.keyPassword=key-password"
 
 cd target
 

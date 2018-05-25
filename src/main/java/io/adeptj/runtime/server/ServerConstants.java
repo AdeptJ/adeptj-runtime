@@ -66,6 +66,10 @@ final class ServerConstants {
 
     static final String SYS_PROP_MAX_CONCUR_REQ = "max.concurrent.requests";
 
+    static final String SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER = "worker.task.thread.multiplier";
+
+    static final String SYS_PROP_SYS_TASK_THREAD_MULTIPLIER = "sys.task.thread.multiplier";
+
     static final String KEY_SESSION_TIMEOUT = "common.session-timeout";
 
     static final String KEY_HTTP_ONLY = "common.session-cookie-httpOnly";

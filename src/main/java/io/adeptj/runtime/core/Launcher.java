@@ -24,6 +24,7 @@ import com.adeptj.runtime.tools.logging.LogbackManager;
 import com.typesafe.config.Config;
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Environment;
+import io.adeptj.runtime.common.Lifecycle;
 import io.adeptj.runtime.common.ShutdownHook;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
@@ -86,9 +87,9 @@ public final class Launcher {
             pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             Map<String, String> commands = parseArgs(args);
-            Server server = new Server();
-            server.start();
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook(server, SERVER_STOP_THREAD_NAME));
+            Lifecycle lifecycle = new Server();
+            lifecycle.start();
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
             launchBrowser(commands);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR

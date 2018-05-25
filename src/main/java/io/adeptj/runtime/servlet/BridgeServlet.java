@@ -81,18 +81,18 @@ public class BridgeServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        RequestUtil.logRequestDebug(req, LOGGER, PROCESSING_REQUEST_MSG);
+        RequestUtil.logRequestDebug(req, PROCESSING_REQUEST_MSG);
         HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
                 LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
                 ResponseUtil.unavailable(resp);
-            } else {
-                dispatcherServlet.service(req, resp);
-                RequestUtil.logException(req, LOGGER, FELIX_DISPATCHER_EXCEPTION_MSG);
+                return;
             }
-        } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), ex);
+            dispatcherServlet.service(req, resp);
+            RequestUtil.logException(req, FELIX_DISPATCHER_EXCEPTION_MSG);
+        } catch (Throwable th) { // NOSONAR
+            LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), th);
             ResponseUtil.serverError(resp);
         }
     }

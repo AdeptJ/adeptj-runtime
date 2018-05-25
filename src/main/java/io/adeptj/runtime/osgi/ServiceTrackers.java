@@ -82,7 +82,7 @@ public enum ServiceTrackers {
         return INSTANCE;
     }
 
-    <S, T> void closeServiceTracker(ServiceTracker<S, T> serviceTracker) {
+    private <S, T> void closeServiceTracker(ServiceTracker<S, T> serviceTracker) {
         Optional.ofNullable(serviceTracker).ifPresent(tracker -> {
             try {
                 tracker.close();

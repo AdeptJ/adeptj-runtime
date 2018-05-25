@@ -22,7 +22,9 @@ package io.adeptj.runtime.common;
 
 import io.adeptj.runtime.exception.SystemException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -33,6 +35,8 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
  * @author Rakesh.Kumar, AdeptJ
  */
 public final class RequestUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
 
     private RequestUtil() {
     }
@@ -49,22 +53,23 @@ public final class RequestUtil {
         return req.getAttribute(ERROR_EXCEPTION) != null;
     }
 
-    public static void logException(HttpServletRequest req, Logger logger, String message) {
+    public static void logException(HttpServletRequest req, String message) {
         if (RequestUtil.hasException(req)) {
-            logger.error(message, req.getAttribute(ERROR_EXCEPTION));
+            LOGGER.error(message, req.getAttribute(ERROR_EXCEPTION));
         }
     }
 
-    public static void logRequestDebug(HttpServletRequest req, Logger logger, String message) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(message, req.getMethod(), req.getRequestURI());
+    public static void logRequestDebug(HttpServletRequest req, String message) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(message, req.getMethod(), req.getRequestURI());
         }
     }
 
     public static void logout(HttpServletRequest req) {
         try {
             req.logout();
-        } catch (Exception ex) {
+        } catch (ServletException ex) {
+            LOGGER.error(ex.getMessage(), ex);
             throw new SystemException(ex.getMessage(), ex);
         }
     }

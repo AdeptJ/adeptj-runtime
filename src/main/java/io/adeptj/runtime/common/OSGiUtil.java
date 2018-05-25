@@ -106,6 +106,6 @@ public final class OSGiUtil {
     }
 
     public static String getServiceDesc(ServiceReference<?> reference) {
-        return (String) reference.getProperty(SERVICE_DESCRIPTION);
+        return String.valueOf(reference.getProperty(SERVICE_DESCRIPTION));
     }
 }

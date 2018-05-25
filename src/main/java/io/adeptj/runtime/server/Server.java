@@ -148,6 +148,8 @@ import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
+import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_SYS_TASK_THREAD_MULTIPLIER;
+import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER;
 import static io.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static io.adeptj.runtime.server.ServerConstants.TOOLS_DASHBOARD_URL;
 import static io.adeptj.runtime.server.ServerConstants.TOOLS_ERROR_URL;
@@ -174,6 +176,9 @@ public final class Server implements Lifecycle {
 
     private WeakReference<Config> cfgReference;
 
+    /**
+     * Bootstrap Undertow Server and OSGi Framework.
+     */
     @Override
     public void start() {
         this.cfgReference = new WeakReference<>(Configs.of().undertow());
@@ -225,7 +230,7 @@ public final class Server implements Lifecycle {
         try {
             this.rootHandler.shutdown();
             if (this.rootHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
-                LOGGER.info("Completed remaining requests successfully!!");
+                LOGGER.debug("Completed remaining requests successfully!!");
             }
         } catch (InterruptedException ie) {
             LOGGER.error("Error while waiting for pending request to complete!!", ie);
@@ -256,23 +261,31 @@ public final class Server implements Lifecycle {
 
     private Builder workerOptions(Builder builder) {
         if (Environment.isProd()) {
-            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
-            // defaults to 64
-            int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
-            int calcCoreTaskThreads = Runtime.getRuntime().availableProcessors() * WORKER_TASK_THREAD_MULTIPLIER;
-            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, calcCoreTaskThreads > cfgCoreTaskThreads
-                    ? calcCoreTaskThreads : cfgCoreTaskThreads);
-            // defaults to double of [worker-task-core-threads] i.e 128
-            int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
-            int calcMaxTaskThreads = calcCoreTaskThreads * SYS_TASK_THREAD_MULTIPLIER;
-            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > cfgMaxTaskThreads
-                    ? calcMaxTaskThreads : cfgMaxTaskThreads);
-            // For a 16 core system, number of worker task core and max threads will be.
+            // Note : For a 16 core system, number of worker task core and max threads will be.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 * 2 = 256
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
+            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
+            // defaults to 64
+            int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
+            LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
+            int availableProcessors = Runtime.getRuntime().availableProcessors();
+            LOGGER.info("No. of CPU available: [{}]", availableProcessors);
+            int calcCoreTaskThreads = availableProcessors *
+                    Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
+            LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
+            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, calcCoreTaskThreads > cfgCoreTaskThreads
+                    ? calcCoreTaskThreads : cfgCoreTaskThreads);
+            // defaults to double of [worker-task-core-threads] i.e 128
+            int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            LOGGER.info("Configured worker task max threads: [{}]", cfgCoreTaskThreads);
+            int calcMaxTaskThreads = calcCoreTaskThreads *
+                    Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
+            LOGGER.info("Calculated worker task max threads: [{}]", cfgCoreTaskThreads);
+            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > cfgMaxTaskThreads
+                    ? calcMaxTaskThreads : cfgMaxTaskThreads);
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
         return builder;
@@ -283,12 +296,12 @@ public final class Server implements Lifecycle {
             Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
             if (!Environment.useProvidedKeyStore()) {
-                System.setProperty("javax.net.ssl.keyStore", httpsConf.getString(KEY_KEYSTORE));
-                System.setProperty("javax.net.ssl.keyStorePassword", httpsConf.getString("keyStorePwd"));
-                System.setProperty("javax.net.ssl.keyPassword", httpsConf.getString("keyPwd"));
+                System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
+                System.setProperty("adeptj.rt.keyStorePassword", httpsConf.getString("keyStorePwd"));
+                System.setProperty("adeptj.rt.keyPassword", httpsConf.getString("keyPwd"));
                 LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
-            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.createSslContext());
+            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.newSslContext());
         }
         return undertowBuilder;
     }

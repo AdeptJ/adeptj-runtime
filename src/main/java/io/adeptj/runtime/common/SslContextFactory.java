@@ -37,16 +37,16 @@ import java.security.UnrecoverableKeyException;
  */
 public final class SslContextFactory {
 
-    private static final String PROTOCOL_TLS = "TLS";
+    private static final String PROTOCOL_TLS = "TLSv1.2";
 
     private SslContextFactory() {
     }
 
-    public static SSLContext createSslContext() {
+    public static SSLContext newSslContext() {
         try {
-            String keyStoreLoc = System.getProperty("javax.net.ssl.keyStore");
-            String keyStorePwd = System.getProperty("javax.net.ssl.keyStorePassword");
-            String keyPwd = System.getProperty("javax.net.ssl.keyPassword");
+            String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
+            String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
+            String keyPwd = System.getProperty("adeptj.rt.keyPassword");
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
             SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
