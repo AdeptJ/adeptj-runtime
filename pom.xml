@@ -65,7 +65,7 @@
         <felix.webconsole.plugins.ds.version>2.0.8</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
         <felix.webconsole.plugins.useradmin>1.0.2</felix.webconsole.plugins.useradmin>
-        <felix.inventory.version>1.0.4</felix.inventory.version>
+        <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.http.bridge.version>4.0.0</felix.http.bridge.version>
         <felix.http.base.version>4.0.0</felix.http.base.version>
         <felix.log.version>1.0.1</felix.log.version>
