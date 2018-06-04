@@ -1269,7 +1269,7 @@
                 <dependency>
                     <groupId>org.eclipse.microprofile.rest.client</groupId>
                     <artifactId>microprofile-rest-client-api</artifactId>
-                    <version>1.0.1</version>
+                    <version>1.1</version>
                     <scope>provided</scope>
                 </dependency>
 
