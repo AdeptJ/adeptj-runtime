@@ -59,7 +59,7 @@
         <mongo.version>3.7.1</mongo.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
-        <felix.framework.version>5.6.10</felix.framework.version>
+        <felix.framework.version>6.0.0</felix.framework.version>
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
         <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
         <felix.webconsole.plugins.ds.version>2.0.8</felix.webconsole.plugins.ds.version>
