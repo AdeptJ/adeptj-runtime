@@ -58,7 +58,7 @@ class BundleInstaller {
     }
 
     Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
-        return JarURLConnection.class.cast(Bundles.class.getResource(bundlesDir).openConnection())
+        return ((JarURLConnection) Bundles.class.getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
                 .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches());

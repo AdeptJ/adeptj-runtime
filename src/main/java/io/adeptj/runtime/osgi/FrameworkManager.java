@@ -92,7 +92,8 @@ public enum FrameworkManager {
             this.provisionBundles(systemBundleContext);
             List<String> errors = Configs.INSTANCE.undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(), errors);
-            LOGGER.info("OSGi Framework started in [{}] ms!!", Times.elapsedMillis(startTime));
+            LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
+                    systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.
@@ -121,7 +122,7 @@ public enum FrameworkManager {
             try {
                 LOGGER.info("Removing OSGi ErrorHandler service!!");
                 serviceRegistration.unregister();
-            } catch (Exception ex) {
+            } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }
         });
@@ -129,7 +130,7 @@ public enum FrameworkManager {
             try {
                 LOGGER.info("Removing OSGi FrameworkListener!!");
                 bundleContext.removeFrameworkListener(this.frameworkListener);
-            } catch (Exception ex) {
+            } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }
         });
