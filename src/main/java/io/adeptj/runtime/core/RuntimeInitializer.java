@@ -46,7 +46,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
      */
     @Override
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) {
-        Logger logger = LoggerFactory.getLogger(RuntimeInitializer.class);
+        Logger logger = LoggerFactory.getLogger(this.getClass());
         if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
             logger.error("No @HandlesTypes(StartupAware) on classpath!!");
             throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
@@ -55,11 +55,10 @@ public class RuntimeInitializer implements ServletContainerInitializer {
             startupAwareClasses
                     .stream()
                     .sorted(new StartupAwareComparator())
-                    .forEach(clazz -> {
-                        logger.info("@HandlesTypes: [{}]", clazz);
+                    .forEach(startupAwareClass -> {
+                        logger.info("@HandlesTypes: [{}]", startupAwareClass);
                         try {
-                            StartupAware.class.cast(ConstructorUtils.invokeConstructor(clazz))
-                                    .onStartup(context);
+                            ((StartupAware) ConstructorUtils.invokeConstructor(startupAwareClass)).onStartup(context);
                         } catch (Exception ex) { // NOSONAR
                             logger.error("Exception while executing StartupAware#onStartup!!", ex);
                             throw new InitializationException(ex);

@@ -69,8 +69,7 @@ public class BridgeServlet extends HttpServlet {
         LOGGER.info("Opening DispatcherServletTracker which initializes the Felix DispatcherServlet!!");
         // Store BridgeServlet's ServletConfig which is used to init Felix DispatcherServlet.
         BridgeServletConfigHolder.getInstance().setBridgeServletConfig(this.getServletConfig());
-        ServiceTrackers.getInstance()
-                .openDispatcherServletTracker(BundleContextHolder.getInstance().getBundleContext());
+        ServiceTrackers.getInstance().openDispatcherServletTracker(BundleContextHolder.getInstance().getBundleContext());
         LOGGER.info("BridgeServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
