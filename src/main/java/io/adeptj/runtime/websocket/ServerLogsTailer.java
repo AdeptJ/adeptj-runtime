@@ -21,10 +21,12 @@
 package io.adeptj.runtime.websocket;
 
 import io.adeptj.runtime.common.DefaultExecutorService;
+import io.adeptj.runtime.config.Configs;
 import org.apache.commons.io.input.Tailer;
 
 import javax.websocket.Session;
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * Tails server log using Apache Commons IO {@link Tailer}.
@@ -33,14 +35,20 @@ import java.io.File;
  */
 class ServerLogsTailer {
 
+    private static final String SERVER_LOG_FILE = "server-log-file";
+
     /**
      * The delay between checks of the file for new content in milliseconds.
      */
     private static final int DELAY_MILLIS = Integer.getInteger("websocket.logs.tailing.delay", 1000);
 
+    /**
+     * The commons {@link Tailer}
+     */
     private Tailer tailer;
 
-    ServerLogsTailer(File logFile, Session session) {
+    ServerLogsTailer(Session session) {
+        File logFile = Paths.get(Configs.INSTANCE.logging().getString(SERVER_LOG_FILE)).toFile();
         this.tailer = Tailer.create(logFile, new ServerLogsTailerListener(logFile, session), DELAY_MILLIS, true);
     }
 

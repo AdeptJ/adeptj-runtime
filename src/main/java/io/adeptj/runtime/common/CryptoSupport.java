@@ -28,13 +28,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-import static io.adeptj.runtime.common.Constants.UTF8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * CryptoSupport, utility for salt and hashed text generation and matching.
@@ -57,13 +56,8 @@ public final class CryptoSupport {
      */
     public static String saltBase64() {
         byte[] saltBytes = new byte[Configs.of().common().getInt("salt-size")];
-        try {
-            DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
-            return new String(Base64.getEncoder().encode(saltBytes), UTF8);
-        } catch (UnsupportedEncodingException | SystemException ex) {
-            LOGGER.error("Exception while generating salt!!", ex);
-            throw new SystemException(ex.getMessage(), ex);
-        }
+        DEFAULT_SECURE_RANDOM.nextBytes(saltBytes);
+        return new String(Base64.getEncoder().encode(saltBytes), UTF_8);
     }
 
     /**
@@ -77,11 +71,11 @@ public final class CryptoSupport {
         Config config = Configs.of().common();
         try {
             SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(config.getString("secret-key-algo"));
-            PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF8),
+            PBEKeySpec keySpec = new PBEKeySpec(plainText.toCharArray(), salt.getBytes(UTF_8),
                     config.getInt("iteration-count"),
                     config.getInt("derived-key-size"));
-            return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF8);
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
+            return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF_8);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             LOGGER.error("Exception while generating hashed text!!", ex);
             throw new SystemException(ex.getMessage(), ex);
         }
