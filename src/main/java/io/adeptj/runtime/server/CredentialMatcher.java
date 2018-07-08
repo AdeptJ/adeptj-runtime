@@ -30,7 +30,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 
-import static io.adeptj.runtime.common.Constants.UTF8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
@@ -88,7 +88,7 @@ final class CredentialMatcher {
         try {
             hashPassword = CURLY_BRACE_OPEN + SHA256.toLowerCase() + CURLY_BRACE_CLOSE +
                     new String(Base64.getEncoder()
-                            .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF8))), UTF8);
+                            .encode(MessageDigest.getInstance(SHA256).digest(pwd.getBytes(UTF_8))), UTF_8);
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception!!", ex);
         }
