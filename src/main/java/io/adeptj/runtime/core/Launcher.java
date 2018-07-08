@@ -21,7 +21,6 @@
 package io.adeptj.runtime.core;
 
 import com.adeptj.runtime.tools.logging.LogbackManager;
-import com.typesafe.config.Config;
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Environment;
 import io.adeptj.runtime.common.Lifecycle;
@@ -86,11 +85,11 @@ public final class Launcher {
         try {
             pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            Map<String, String> commands = parseArgs(args);
-            Lifecycle lifecycle = new Server();
+            Map<String, String> runtimeArgs = parseArgs(args);
+            Lifecycle lifecycle = new Server(runtimeArgs);
             lifecycle.start();
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
-            launchBrowser(commands);
+            launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
@@ -102,25 +101,22 @@ public final class Launcher {
         // Useful for debugging the server startup in development mode.
         if (Environment.isDev()) {
             Integer waitTime = Integer.getInteger("wait.time.for.debug.attach", 10);
-            LoggerFactory.getLogger(Launcher.class)
-                    .info("Waiting [{}] seconds for debugger to attach!", waitTime);
+            LoggerFactory.getLogger(Launcher.class).info("Waiting [{}] seconds for debugger to attach!", waitTime);
             TimeUnit.SECONDS.sleep(waitTime);
         }
     }
 
     private static Map<String, String> parseArgs(String[] args) {
-        Map<String, String> commands = Stream.of(args)
+        return Stream.of(args)
                 .map(cmd -> cmd.split(REGEX_EQ))
                 .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
-        LoggerFactory.getLogger(Launcher.class).debug("Commands to AdeptJ Runtime: {}", commands);
-        return commands;
     }
 
     private static void launchBrowser(Map<String, String> commands) {
         if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
             try {
-                Config config = Configs.of().undertow().getConfig(KEY_HTTP);
-                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL, config.getInt(KEY_PORT))));
+                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL,
+                        Configs.of().undertow().getConfig(KEY_HTTP).getInt(KEY_PORT))));
             } catch (IOException ex) {
                 // Just log it, its okay if browser is not launched.
                 LoggerFactory.getLogger(Launcher.class).error("Exception while launching browser!!", ex);

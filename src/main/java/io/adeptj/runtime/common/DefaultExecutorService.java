@@ -45,4 +45,8 @@ public enum DefaultExecutorService {
     public void shutdown() {
         Optional.ofNullable(this.executorService).ifPresent(ExecutorService::shutdown);
     }
+
+    public static DefaultExecutorService getInstance() {
+        return INSTANCE;
+    }
 }

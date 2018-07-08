@@ -168,6 +168,8 @@ public final class Server implements Lifecycle {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
+    private Map<String, String> runtimeArgs;
+
     private Undertow undertow;
 
     private DeploymentManager deploymentManager;
@@ -176,11 +178,16 @@ public final class Server implements Lifecycle {
 
     private WeakReference<Config> cfgReference;
 
+    public Server(Map<String, String> runtimeArgs) {
+        this.runtimeArgs = runtimeArgs;
+    }
+
     /**
      * Bootstrap Undertow Server and OSGi Framework.
      */
     @Override
     public void start() {
+        LOGGER.debug("AdeptJ Runtime jvm args: {}", this.runtimeArgs);
         this.cfgReference = new WeakReference<>(Configs.of().undertow());
         Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
@@ -199,9 +206,7 @@ public final class Server implements Lifecycle {
         } catch (ServletException ex) {
             throw new InitializationException(ex.getMessage(), ex);
         }
-        if (!Environment.isServerConfFileExists()) {
-            this.createServerConfFile();
-        }
+        this.createServerConfFile();
     }
 
     /**
@@ -217,7 +222,7 @@ public final class Server implements Lifecycle {
             this.deploymentManager.undeploy();
             this.undertow.stop();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
-            DefaultExecutorService.INSTANCE.shutdown();
+            DefaultExecutorService.getInstance().shutdown();
         } catch (Throwable ex) { // NOSONAR
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
@@ -242,7 +247,7 @@ public final class Server implements Lifecycle {
     }
 
     private void printBanner() {
-        try (InputStream stream = Server.class.getResourceAsStream(BANNER_TXT)) {
+        try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
             LOGGER.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
@@ -251,11 +256,13 @@ public final class Server implements Lifecycle {
     }
 
     private void createServerConfFile() {
-        try (InputStream stream = Server.class.getResourceAsStream("/reference.conf")) {
-            Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
-                    IOUtils.toBytes(stream), StandardOpenOption.CREATE);
-        } catch (IOException ex) {
-            LOGGER.error("Exception while creating server conf file!!", ex);
+        if (!Environment.isServerConfFileExists()) {
+            try (InputStream stream = this.getClass().getResourceAsStream("/reference.conf")) {
+                Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
+                        IOUtils.toBytes(stream), StandardOpenOption.CREATE);
+            } catch (IOException ex) {
+                LOGGER.error("Exception while creating server conf file!!", ex);
+            }
         }
     }
 

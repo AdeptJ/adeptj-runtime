@@ -45,7 +45,7 @@ class ServerLogsTailer {
     }
 
     void startTailer() {
-        DefaultExecutorService.INSTANCE.execute(this.tailer);
+        DefaultExecutorService.getInstance().execute(this.tailer);
     }
 
     void stopTailer() {
