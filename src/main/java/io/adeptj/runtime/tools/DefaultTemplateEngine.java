@@ -48,8 +48,8 @@ public enum DefaultTemplateEngine implements TemplateEngine {
         long startTime = System.nanoTime();
         this.mustacheEngine = TemplateEngines.buildMustacheEngine();
         // Can't use the static LOGGER due to enum restriction.
-        LoggerFactory.getLogger(DefaultTemplateEngine.class).info("MustacheEngine initialized in: [{}] ms!!",
-                Times.elapsedMillis(startTime));
+        LoggerFactory.getLogger(DefaultTemplateEngine.class)
+                .info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     /**
