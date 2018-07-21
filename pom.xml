@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.23.Final</version>
+        <version>1.0.24.Final</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -39,7 +39,7 @@
         <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.9.Final</undertow.version>
+        <undertow.version>2.0.10.Final</undertow.version>
         <xnio.version>3.6.3.Final</xnio.version>
         <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
@@ -56,7 +56,7 @@
         <itextpdf.version>5.5.13</itextpdf.version>
         <classmate.version>1.4.0</classmate.version>
         <javax.el.version>3.0.1-b10</javax.el.version>
-        <mongo.version>3.7.1</mongo.version>
+        <mongo.version>3.8.0</mongo.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>6.0.0</felix.framework.version>
@@ -79,6 +79,7 @@
         <felix.useradmin.version>1.0.3</felix.useradmin.version>
         <felix.useradmin.filestore.version>1.0.2</felix.useradmin.filestore.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
+        <felix.systemready.version>0.2.0</felix.systemready.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
@@ -574,6 +575,13 @@
         </dependency>
 
         <!-- Apache Felix Dependencies Start -->
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.systemready</artifactId>
+            <version>${felix.systemready.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -1616,7 +1624,7 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.1 (JPA 2.2) Dependencies -->
+                <!-- EclipseLink 2.7.2 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
