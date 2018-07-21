@@ -71,7 +71,7 @@ public final class ErrorPages {
     public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         Integer statusCode = (Integer) RequestUtil.getAttribute(req, ERROR_STATUS_CODE);
         if (RequestUtil.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            TemplateEngines.getDefault().render(TemplateContext.builder()
+            TemplateEngines.getEngine().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .locale(req.getLocale())
@@ -105,7 +105,7 @@ public final class ErrorPages {
     }
 
     private static void renderGenericErrorPage(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -114,7 +114,7 @@ public final class ErrorPages {
     }
 
     private static void renderErrorPageForStatusCode(HttpServletRequest req, HttpServletResponse resp, String statusCode) {
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -123,7 +123,7 @@ public final class ErrorPages {
     }
 
     private static void render500Page(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -132,7 +132,7 @@ public final class ErrorPages {
     }
 
     private static void render500PageWithExceptionTrace(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())

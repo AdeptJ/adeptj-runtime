@@ -47,8 +47,8 @@ public final class TemplateEngines {
     private TemplateEngines() {
     }
 
-    public static TemplateEngine getDefault() {
-        return DefaultTemplateEngine.INSTANCE;
+    public static TemplateEngine getEngine() {
+        return DefaultTemplateEngine.getInstance();
     }
 
     static MustacheEngine buildMustacheEngine() {

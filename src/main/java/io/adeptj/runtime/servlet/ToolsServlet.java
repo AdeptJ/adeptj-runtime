@@ -72,7 +72,7 @@ public class ToolsServlet extends HttpServlet {
         Bundle[] bundles = BundleContextHolder.getInstance().getBundleContext().getBundles();
         long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(TOOLS_TEMPLATE)

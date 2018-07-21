@@ -39,7 +39,7 @@
         <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.10.Final</undertow.version>
+        <undertow.version>2.0.11.Final</undertow.version>
         <xnio.version>3.6.3.Final</xnio.version>
         <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>

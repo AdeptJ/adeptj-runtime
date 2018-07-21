@@ -22,7 +22,6 @@ package io.adeptj.runtime.tools;
 
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.common.Times;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
@@ -60,17 +59,20 @@ public enum DefaultTemplateEngine implements TemplateEngine {
     public void render(TemplateContext context) {
         try {
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            String template = mustache == null ? null : mustache.render(context.getContextObject());
-            if (StringUtils.isEmpty(template)) {
+            if (mustache == null) {
                 LOGGER.error("Template not found: [{}]", context.getTemplate());
                 ResponseUtil.sendError(context.getResponse(), SC_NOT_FOUND);
             } else {
-                context.getResponse().getWriter().write(template);
+                context.getResponse().getWriter().write(mustache.render(context.getContextObject()));
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
             ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public static DefaultTemplateEngine getInstance() {
+        return INSTANCE;
     }
 }

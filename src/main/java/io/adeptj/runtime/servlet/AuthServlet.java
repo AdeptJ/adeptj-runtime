@@ -75,7 +75,7 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngines.getDefault().render(TemplateContext.builder()
+            TemplateEngines.getEngine().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .template(LOGIN_TEMPLATE)
@@ -97,7 +97,7 @@ public class AuthServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngines.getDefault().render(TemplateContext.builder()
+        TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(LOGIN_TEMPLATE)
