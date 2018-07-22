@@ -21,7 +21,7 @@
 package io.adeptj.runtime.tools;
 
 import io.adeptj.runtime.common.ResponseUtil;
-import io.adeptj.runtime.common.Times;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
@@ -29,12 +29,11 @@ import org.trimou.engine.MustacheEngine;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 /**
  * Renders Html Templates using Trimou {@link MustacheEngine}
  *
- * @author Rakesh.Kumar, AdeptJ.
+ * @author Rakesh.Kumar, AdeptJ
  */
 public enum DefaultTemplateEngine implements TemplateEngine {
 
@@ -42,14 +41,12 @@ public enum DefaultTemplateEngine implements TemplateEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
 
+    private static final int SB_CAPACITY = Integer.getInteger("template.builder.capacity", 100);
+
     private final MustacheEngine mustacheEngine;
 
     DefaultTemplateEngine() {
-        long startTime = System.nanoTime();
-        this.mustacheEngine = TemplateEngines.buildMustacheEngine();
-        // Can't use the static LOGGER due to enum restriction.
-        LoggerFactory.getLogger(DefaultTemplateEngine.class)
-                .info("MustacheEngine initialized in: [{}] ms!!", Times.elapsedMillis(startTime));
+        this.mustacheEngine = TemplateEngines.newMustacheEngine();
     }
 
     /**
@@ -59,12 +56,9 @@ public enum DefaultTemplateEngine implements TemplateEngine {
     public void render(TemplateContext context) {
         try {
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            if (mustache == null) {
-                LOGGER.error("Template not found: [{}]", context.getTemplate());
-                ResponseUtil.sendError(context.getResponse(), SC_NOT_FOUND);
-            } else {
-                context.getResponse().getWriter().write(mustache.render(context.getContextObject()));
-            }
+            StringBuilder output = new StringBuilder(SB_CAPACITY);
+            mustache.render(output, context.getContextObject());
+            IOUtils.write(output.toString(), context.getResponse().getWriter());
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);

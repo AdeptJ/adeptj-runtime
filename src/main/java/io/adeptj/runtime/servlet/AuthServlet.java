@@ -26,12 +26,10 @@ import io.adeptj.runtime.tools.ContextObject;
 import io.adeptj.runtime.tools.TemplateContext;
 import io.adeptj.runtime.tools.TemplateEngines;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 import static io.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
 import static io.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
@@ -72,7 +70,7 @@ public class AuthServlet extends HttpServlet {
      * Render login page.
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
             TemplateEngines.getEngine().render(TemplateContext.builder()
