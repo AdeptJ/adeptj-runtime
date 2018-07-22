@@ -36,12 +36,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
-import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.EventListener;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT;
 import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED;
@@ -61,7 +61,7 @@ public class Servlets {
 
     private static final String BRIDGE_SERVLET = "AdeptJ BridgeServlet";
 
-    private static final String ROOT_MAPPING = "/*";
+    private static final String ROOT_MAPPING = "/";
 
     private static final String ALL_CONTEXT_SELECT_FILTER = "(osgi.http.whiteboard.context.name=*)";
 
@@ -105,9 +105,8 @@ public class Servlets {
                 ArrayUtils.isEmpty(webServlet.urlPatterns()) ? webServlet.value() : webServlet.urlPatterns());
         properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
         handleInitParams(webServlet, properties);
-        handleName(cls, webServlet.name(), properties);
-        String servletFQCN = cls.getName();
-        LOGGER.info("Registering OSGi Servlet: [{}]", servletFQCN);
+        String servletName = resolveServletName(cls, webServlet.name(), properties);
+        LOGGER.info("Registering OSGi Servlet: [{}]", servletName);
         return ctx.registerService(Servlet.class, servlet, properties);
     }
 
@@ -120,23 +119,24 @@ public class Servlets {
         properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, ALL_CONTEXT_SELECT_FILTER);
         properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
         handleInitParams(webServlet, properties);
-        String servletName = handleName(cls, webServlet.name(), properties);
-        LOGGER.info("Registering OSGi ErrorHandler: [{}]", servletName);
+        String servletName = resolveServletName(cls, webServlet.name(), properties);
+        LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletName);
         return ctx.registerService(Servlet.class, errorServlet, properties);
     }
 
     private static WebServlet checkWebServletAnnotation(Class<? extends HttpServlet> cls) {
-        return Optional.ofNullable(cls.getAnnotation(WebServlet.class)).orElseThrow(() ->
-                new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
+        return Optional.ofNullable(cls.getAnnotation(WebServlet.class))
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
     }
 
     private static void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
-        Arrays.stream(webServlet.initParams())
+        Stream.of(webServlet.initParams())
                 .forEach(initParam ->
                         properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value()));
     }
 
-    private static String handleName(Class<? extends HttpServlet> cls, String name, Dictionary<String, Object> props) {
+    private static String resolveServletName(Class<? extends HttpServlet> cls, String name, Dictionary<String, Object> props) {
         String servletName = name.isEmpty() ? cls.getSimpleName() : name;
         props.put(HTTP_WHITEBOARD_SERVLET_NAME, servletName);
         return servletName;

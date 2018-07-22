@@ -25,7 +25,7 @@ import io.adeptj.runtime.common.Environment;
 import io.adeptj.runtime.common.Servlets;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
-import io.adeptj.runtime.servlet.osgi.DefaultErrorHandler;
+import io.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -91,7 +91,7 @@ public enum FrameworkManager {
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
             this.provisionBundles(systemBundleContext);
             List<String> errors = Configs.INSTANCE.undertow().getStringList("common.osgi-error-pages");
-            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new DefaultErrorHandler(), errors);
+            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -120,7 +120,7 @@ public enum FrameworkManager {
     private void removeServicesAndListeners() {
         Optional.ofNullable(this.errorHandler).ifPresent(serviceRegistration -> {
             try {
-                LOGGER.info("Removing OSGi ErrorHandler service!!");
+                LOGGER.info("Removing OSGiErrorServlet!!");
                 serviceRegistration.unregister();
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
