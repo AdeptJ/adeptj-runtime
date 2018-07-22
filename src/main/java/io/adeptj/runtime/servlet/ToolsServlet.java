@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.time.Instant;
 import java.util.Date;
 
@@ -71,7 +71,7 @@ public class ToolsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         Bundle[] bundles = BundleContextHolder.getInstance().getBundleContext().getBundles();
         long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
-        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+        MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
         TemplateEngines.getEngine().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
@@ -86,8 +86,8 @@ public class ToolsServlet extends HttpServlet {
                         .put("jvm", JAVA_VM_NAME + "(build " + JAVA_VM_VERSION + ", " + JAVA_VM_INFO + ")")
                         .put("startTime", Date.from(Instant.ofEpochMilli(startTime)))
                         .put("upTime", Times.format(startTime))
-                        .put("maxMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getMax()))
-                        .put("usedMemory", FileUtils.byteCountToDisplaySize(memoryMXBean.getHeapMemoryUsage().getUsed()))
+                        .put("maxMemory", FileUtils.byteCountToDisplaySize(memoryUsage.getMax()))
+                        .put("usedMemory", FileUtils.byteCountToDisplaySize(memoryUsage.getUsed()))
                         .put("processors", Runtime.getRuntime().availableProcessors()))
                 .build());
     }
