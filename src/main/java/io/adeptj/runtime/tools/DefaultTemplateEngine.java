@@ -20,7 +20,6 @@
 
 package io.adeptj.runtime.tools;
 
-import io.adeptj.runtime.common.ResponseUtil;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,6 @@ import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Renders Html Templates using Trimou {@link MustacheEngine}
@@ -62,7 +60,7 @@ public enum DefaultTemplateEngine implements TemplateEngine {
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-            ResponseUtil.sendError(context.getResponse(), SC_INTERNAL_SERVER_ERROR);
+            throw new RenderException(ex.getMessage(), ex);
         }
     }
 

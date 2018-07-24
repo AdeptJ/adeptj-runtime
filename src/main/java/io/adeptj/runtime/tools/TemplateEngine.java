@@ -31,6 +31,7 @@ public interface TemplateEngine {
      * Renders the template contained by the TemplateContext.
      *
      * @param context the TemplateEngine context
+     * @throws RenderException the {@link RenderException}
      */
-    void render(TemplateContext context);
+    void render(TemplateContext context) throws RenderException;
 }

@@ -83,9 +83,9 @@
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
-        <adeptj-modules-webconsole-security.version>1.0.2.Final</adeptj-modules-webconsole-security.version>
+        <adeptj-modules-webconsole-security.version>1.0.3.Final</adeptj-modules-webconsole-security.version>
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
-        <adeptj-runtime-tools.version>1.0.5.Final</adeptj-runtime-tools.version>
+        <adeptj-runtime-tools.version>1.0.6.Final</adeptj-runtime-tools.version>
     </properties>
 
     <!-- Project Information -->
