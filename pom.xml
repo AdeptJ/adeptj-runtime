@@ -68,7 +68,7 @@
         <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.http.bridge.version>4.0.0</felix.http.bridge.version>
         <felix.http.base.version>4.0.0</felix.http.base.version>
-        <felix.log.version>1.0.1</felix.log.version>
+        <felix.log.version>1.2.0</felix.log.version>
         <felix.metatype.version>1.2.0</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
@@ -639,11 +639,11 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.core</artifactId>
+                    <artifactId>osgi.core</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.compendium</artifactId>
+                    <artifactId>org.osgi.service.log</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
