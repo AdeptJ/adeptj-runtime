@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.24.Final</version>
+        <version>1.0.25.Final</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -60,21 +60,22 @@
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>6.0.0</felix.framework.version>
+        <felix.webconsole.version>4.3.4</felix.webconsole.version>
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
         <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
         <felix.webconsole.plugins.ds.version>2.0.8</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
         <felix.webconsole.plugins.useradmin>1.0.2</felix.webconsole.plugins.useradmin>
         <felix.inventory.version>1.0.6</felix.inventory.version>
-        <felix.http.bridge.version>4.0.0</felix.http.bridge.version>
-        <felix.http.base.version>4.0.0</felix.http.base.version>
+        <felix.http.bridge.version>4.0.2</felix.http.bridge.version>
+        <felix.http.base.version>4.0.2</felix.http.base.version>
         <felix.log.version>1.2.0</felix.log.version>
         <felix.metatype.version>1.2.0</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
-        <felix.scr.version>2.1.0</felix.scr.version>
-        <felix.configadmin.version>1.9.2</felix.configadmin.version>
+        <felix.scr.version>2.1.2</felix.scr.version>
+        <felix.configadmin.version>1.9.4</felix.configadmin.version>
         <felix.eventadmin.version>1.5.0</felix.eventadmin.version>
         <felix.useradmin.version>1.0.3</felix.useradmin.version>
         <felix.useradmin.filestore.version>1.0.2</felix.useradmin.filestore.version>
@@ -989,14 +990,29 @@
 
                 <dependency>
                     <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt</artifactId>
-                    <scope>provided</scope>
+                    <artifactId>jjwt-api</artifactId>
+                    <scope>compile</scope>
+                    <version>${jjwt.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt-impl</artifactId>
+                    <scope>compile</scope>
+                    <version>${jjwt.version}</version>
                     <exclusions>
                         <exclusion>
-                            <groupId>com.fasterxml.jackson.core</groupId>
-                            <artifactId>jackson-databind</artifactId>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bcprov-jdk15on</artifactId>
                         </exclusion>
                     </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt-jackson</artifactId>
+                    <scope>compile</scope>
+                    <version>${jjwt.version}</version>
                 </dependency>
 
                 <dependency>
