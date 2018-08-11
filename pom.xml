@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>1.0.25.Final</version>
+        <version>2.0.0.Final</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -39,8 +39,8 @@
         <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.11.Final</undertow.version>
-        <xnio.version>3.6.3.Final</xnio.version>
+        <undertow.version>2.0.12.Final</undertow.version>
+        <xnio.version>3.6.4.Final</xnio.version>
         <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
         <jboss-threads.version>2.3.2.Final</jboss-threads.version>
@@ -429,12 +429,6 @@
         </dependency>
 
         <!-- Undertow Dependencies Ends -->
-
-        <dependency>
-            <groupId>com.jsoniter</groupId>
-            <artifactId>jsoniter</artifactId>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>javax.annotation</groupId>
