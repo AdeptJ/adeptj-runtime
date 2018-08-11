@@ -27,6 +27,7 @@ import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
 import io.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceRegistration;
@@ -39,6 +40,7 @@ import javax.servlet.Servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +48,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
+
+import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
  * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
@@ -68,8 +72,6 @@ public enum FrameworkManager {
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
 
-    private static final String FELIX_LOG_LEVEL = "felix.log.level";
-
     private ServiceRegistration<Servlet> errorHandler;
 
     private Framework framework;
@@ -89,7 +91,7 @@ public enum FrameworkManager {
             this.frameworkListener = new FrameworkLifecycleListener();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
-            this.provisionBundles(systemBundleContext);
+            this.provisionBundles();
             List<String> errors = Configs.INSTANCE.undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
@@ -136,13 +138,13 @@ public enum FrameworkManager {
         });
     }
 
-    private void provisionBundles(BundleContext systemBundleContext) throws IOException {
+    private void provisionBundles() throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
         if (!Boolean.getBoolean("provision.bundles.explicitly")
-                && Paths.get(Configs.INSTANCE.felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
+                && Paths.get(Configs.of().felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
             LOGGER.info("As per configuration, bundles provisioning is skipped on server restart!!");
         } else {
-            Bundles.provisionBundles(systemBundleContext);
+            Bundles.provisionBundles();
         }
     }
 
@@ -151,7 +153,10 @@ public enum FrameworkManager {
         Config felixConf = Configs.of().felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
-        Optional.ofNullable(System.getProperty(FELIX_LOG_LEVEL)).ifPresent(level -> configs.put(FELIX_LOG_LEVEL, level));
+        String felixLogLevel = System.getProperty(LOG_LEVEL_PROP);
+        if (StringUtils.isNotEmpty(felixLogLevel)) {
+            configs.put(LOG_LEVEL_PROP, felixLogLevel);
+        }
         LOGGER.debug("OSGi Framework Configurations: {}", configs);
         return configs;
     }
@@ -159,8 +164,9 @@ public enum FrameworkManager {
     private Map<String, String> loadFrameworkProperties() {
         Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
+        Path frameworkConfPath = Environment.getFrameworkConfPath();
         if (Environment.isFrameworkConfFileExists()) {
-            try (InputStream is = Files.newInputStream(Environment.getFrameworkConfPath())) {
+            try (InputStream is = Files.newInputStream(frameworkConfPath)) {
                 props.load(is);
                 props.forEach((key, val) -> configs.put((String) key, (String) val));
             } catch (IOException ex) {
@@ -170,7 +176,7 @@ public enum FrameworkManager {
             }
         } else {
             this.loadClasspathFrameworkProperties(props, configs);
-            this.createFrameworkPropertiesFile();
+            this.createFrameworkPropertiesFile(frameworkConfPath);
         }
         return configs;
     }
@@ -184,9 +190,9 @@ public enum FrameworkManager {
         }
     }
 
-    private void createFrameworkPropertiesFile() {
+    private void createFrameworkPropertiesFile(Path frameworkConfPath) {
         try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
-            Files.write(Environment.getFrameworkConfPath(), IOUtils.toByteArray(is));
+            Files.write(frameworkConfPath, IOUtils.toByteArray(is));
         } catch (IOException ex) {
             LOGGER.error("IOException!!", ex);
         }

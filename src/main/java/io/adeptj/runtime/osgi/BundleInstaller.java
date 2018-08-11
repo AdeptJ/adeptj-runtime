@@ -20,9 +20,9 @@
 
 package io.adeptj.runtime.osgi;
 
+import io.adeptj.runtime.common.BundleContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +51,10 @@ class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
-    private final AtomicInteger installCount = new AtomicInteger();
+    private final AtomicInteger installedBundlesCount = new AtomicInteger();
 
-    int getInstallCount() {
-        return installCount.get();
+    int getInstalledBundlesCount() {
+        return this.installedBundlesCount.get();
     }
 
     Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
@@ -64,23 +64,23 @@ class BundleInstaller {
                 .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches());
     }
 
-    Stream<Bundle> installBundles(Stream<JarEntry> jarEntryStream, BundleContext systemBundleContext) {
+    Stream<Bundle> installBundles(ClassLoader classLoader, Stream<JarEntry> jarEntryStream) {
         return jarEntryStream
-                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
-                .map(url -> this.installBundle(url, systemBundleContext))
+                .map(jarEntry -> classLoader.getResource(jarEntry.getName()))
+                .map(this::installBundle)
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Bundle::getBundleId));
+                .sorted(Comparator.comparingLong(Bundle::getBundleId));
     }
 
-    private Bundle installBundle(URL bundleUrl, BundleContext systemBundleContext) {
+    private Bundle installBundle(URL bundleUrl) {
         LOGGER.debug("Installing Bundle from location: [{}]", bundleUrl);
         Bundle bundle = null;
-        try (JarInputStream jar = new JarInputStream(bundleUrl.openStream(), false)) {
-            if (StringUtils.isEmpty(jar.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
+        try (JarInputStream jis = new JarInputStream(bundleUrl.openStream(), false)) {
+            if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
                 LOGGER.warn("Not an OSGi Bundle: {}", bundleUrl);
             } else {
-                bundle = systemBundleContext.installBundle(bundleUrl.toExternalForm());
-                this.installCount.incrementAndGet();
+                bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(bundleUrl.toExternalForm());
+                this.installedBundlesCount.incrementAndGet();
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
             LOGGER.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);

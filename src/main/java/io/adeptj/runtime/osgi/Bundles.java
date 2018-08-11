@@ -24,13 +24,10 @@ import io.adeptj.runtime.common.OSGiUtil;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.jar.JarEntry;
-import java.util.stream.Stream;
 
 import static io.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
@@ -63,19 +60,17 @@ final class Bundles {
      * 2. Install Bundles
      * 3. Start Bundles
      *
-     * @param systemBundleContext the {@link BundleContext} of system bundle.
      * @throws IOException exception thrown by provisioning mechanism.
      */
-    static void provisionBundles(BundleContext systemBundleContext) throws IOException {
+    static void provisionBundles() throws IOException {
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
         String bundlesDir = Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY);
         BundleInstaller bundleInstaller = new BundleInstaller();
-        Stream<JarEntry> bundles = bundleInstaller.findBundles(bundlesDir);
-        bundleInstaller.installBundles(bundles, systemBundleContext)
+        bundleInstaller.installBundles(Bundles.class.getClassLoader(), bundleInstaller.findBundles(bundlesDir))
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
-        LOGGER.info(BUNDLE_PROVISIONED_MSG, bundleInstaller.getInstallCount(), Times.elapsedMillis(startTime));
+        LOGGER.info(BUNDLE_PROVISIONED_MSG, bundleInstaller.getInstalledBundlesCount(), Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {
