@@ -22,7 +22,6 @@ package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
 import io.adeptj.runtime.common.BundleContextHolder;
-import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.osgi.ServiceTrackers;
@@ -55,10 +54,6 @@ public class BridgeServlet extends HttpServlet {
 
     private static final String UNAVAILABLE_MSG = "Can't process request: [{}], DispatcherServlet is unavailable!!";
 
-    private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
-
-    private static final String PROCESSING_REQUEST_MSG = "Processing [{}] request for [{}]";
-
     /**
      * Open the DispatcherServletTracker.
      */
@@ -80,7 +75,6 @@ public class BridgeServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        RequestUtil.logRequestDebug(req, PROCESSING_REQUEST_MSG);
         HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
         try {
             if (dispatcherServlet == null) {
@@ -89,7 +83,6 @@ public class BridgeServlet extends HttpServlet {
                 return;
             }
             dispatcherServlet.service(req, resp);
-            RequestUtil.logException(req, FELIX_DISPATCHER_EXCEPTION_MSG);
         } catch (Throwable th) { // NOSONAR
             LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), th);
             ResponseUtil.serverError(resp);

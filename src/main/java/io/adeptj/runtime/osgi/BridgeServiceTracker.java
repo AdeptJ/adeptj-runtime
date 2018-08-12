@@ -64,7 +64,7 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
         T service = null;
         if (!this.serviceRemoved.get()) {
             LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            service = this.setup(super.addingService(reference));
+            service = this.addingService(super.addingService(reference));
         }
         return this.serviceRemoved.get() ? null : service;
     }
@@ -79,7 +79,7 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
     public void removedService(ServiceReference<T> reference, T service) {
         LOGGER.info("Removing OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
         try {
-            this.cleanup();
+            this.removedService(service);
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
         }
@@ -93,10 +93,10 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
      * @param service the tracked service instance.
      * @return The fully initialized service instance or null if service need not to be tracked.
      */
-    protected abstract T setup(T service);
+    protected abstract T addingService(T service);
 
     /**
      * Perform any cleanup tasks on the tracked service instance.
      */
-    protected abstract void cleanup();
+    protected abstract void removedService(T service);
 }

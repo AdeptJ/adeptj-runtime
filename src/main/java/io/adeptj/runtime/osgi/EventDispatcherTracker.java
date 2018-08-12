@@ -66,7 +66,7 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
      * @param service the tracked service instance.
      */
     @Override
-    protected EventListener setup(EventListener service) {
+    protected EventListener addingService(EventListener service) {
         if (service instanceof HttpSessionListener) {
             this.sessionListener = (HttpSessionListener) service;
         }
@@ -83,7 +83,7 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
      * Sets the {@link EventListener} instances to null.
      */
     @Override
-    protected void cleanup() {
+    protected void removedService(EventListener service) {
         this.sessionListener = null;
         this.sessionIdListener = null;
         this.sessionAttributeListener = null;

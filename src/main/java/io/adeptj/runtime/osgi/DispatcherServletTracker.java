@@ -21,10 +21,8 @@
 package io.adeptj.runtime.osgi;
 
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
-import io.adeptj.runtime.common.Times;
 import org.apache.felix.http.base.internal.dispatch.DispatcherServlet;
 import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
@@ -36,12 +34,9 @@ import javax.servlet.http.HttpServlet;
  */
 public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
+    private static final String EXCEPTION_MSG = "Exception adding Felix DispatcherServlet OSGi Service!!";
 
-    /**
-     * The Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
-     */
-    private volatile HttpServlet dispatcherServlet;
+    private volatile DispatcherServletWrapper dispatcherServletWrapper;
 
     /**
      * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link HttpServlet}
@@ -58,36 +53,33 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
      * @param service the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
     @Override
-    protected HttpServlet setup(HttpServlet service) {
-        long startTime = System.nanoTime();
-        this.dispatcherServlet = service;
+    protected HttpServlet addingService(HttpServlet service) {
+        this.dispatcherServletWrapper = new DispatcherServletWrapper(service);
         try {
-            this.dispatcherServlet.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
-            LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
+            this.dispatcherServletWrapper.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
         } catch (Exception ex) { // NOSONAR
             /*
              * If the init method failed above then DispatcherServlet won't be usable at all.
              * DispatcherServlet has to be initialized fully to perform the dispatcher tasks.
              * Set the instance null so that http status 503 can be returned by BridgeServlet.
-             * Also the ServiceTracker will not be tracking it at all when addingService method returns.
+             * Also the ServiceTracker will not be tracking it at all when addingService method returns null.
              */
-            this.dispatcherServlet = null;
-            LOGGER.error("Exception adding Felix DispatcherServlet OSGi Service!!", ex);
+            this.dispatcherServletWrapper = null;
+            LoggerFactory.getLogger(this.getClass()).error(EXCEPTION_MSG, ex);
         }
-        return this.dispatcherServlet;
+        return this.dispatcherServletWrapper;
     }
 
     /**
      * Calls the Felix {@link DispatcherServlet#destroy()} and set the tracked instance to null.
      */
     @Override
-    protected void cleanup() {
-        this.dispatcherServlet.destroy();
-        LOGGER.info("Felix DispatcherServlet Destroyed!!");
-        this.dispatcherServlet = null;
+    protected void removedService(HttpServlet service) {
+        this.dispatcherServletWrapper.destroy();
+        this.dispatcherServletWrapper = null;
     }
 
     HttpServlet getDispatcherServlet() {
-        return this.dispatcherServlet;
+        return this.dispatcherServletWrapper;
     }
 }
