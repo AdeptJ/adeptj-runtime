@@ -63,27 +63,29 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
     /**
      * Initializes {@link HttpSessionListener}, {@link HttpSessionIdListener} and {@link HttpSessionAttributeListener}
      *
-     * @param service the tracked service instance.
+     * @param eventListener the tracked eventListener instance.
      */
     @Override
-    protected EventListener addingService(EventListener service) {
-        if (service instanceof HttpSessionListener) {
-            this.sessionListener = (HttpSessionListener) service;
+    protected EventListener addingService(EventListener eventListener) {
+        if (eventListener instanceof HttpSessionListener) {
+            this.sessionListener = (HttpSessionListener) eventListener;
         }
-        if (service instanceof HttpSessionIdListener) {
-            this.sessionIdListener = (HttpSessionIdListener) service;
+        if (eventListener instanceof HttpSessionIdListener) {
+            this.sessionIdListener = (HttpSessionIdListener) eventListener;
         }
-        if (service instanceof HttpSessionAttributeListener) {
-            this.sessionAttributeListener = (HttpSessionAttributeListener) service;
+        if (eventListener instanceof HttpSessionAttributeListener) {
+            this.sessionAttributeListener = (HttpSessionAttributeListener) eventListener;
         }
-        return service;
+        return eventListener;
     }
 
     /**
      * Sets the {@link EventListener} instances to null.
+     *
+     * @param eventListener the tracked eventListener instance.
      */
     @Override
-    protected void removedService(EventListener service) {
+    protected void removedService(EventListener eventListener) {
         this.sessionListener = null;
         this.sessionIdListener = null;
         this.sessionAttributeListener = null;

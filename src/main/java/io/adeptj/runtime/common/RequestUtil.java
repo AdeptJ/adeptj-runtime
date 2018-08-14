@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -49,11 +50,11 @@ public final class RequestUtil {
         return getAttribute(req, name) != null;
     }
 
-    public static boolean hasException(HttpServletRequest req) {
+    public static boolean hasException(ServletRequest req) {
         return req.getAttribute(ERROR_EXCEPTION) != null;
     }
 
-    public static void logException(HttpServletRequest req, String message) {
+    public static void logException(ServletRequest req, String message) {
         if (RequestUtil.hasException(req)) {
             LOGGER.error(message, req.getAttribute(ERROR_EXCEPTION));
         }

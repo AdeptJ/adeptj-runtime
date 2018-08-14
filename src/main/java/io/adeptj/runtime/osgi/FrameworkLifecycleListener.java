@@ -49,16 +49,16 @@ public class FrameworkLifecycleListener implements FrameworkListener {
      * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext. <br>
      * 3. Closes the DispatcherServletTracker and open again with new BundleContext. <br>
      * 4. As the BundleContext is removed and added from ServletContext the corresponding BridgeServletContextAttributeListener
-     * is fired with events which in turn closes the EventDispatcherTracker and open again with new BundleContext.
+     * is fired with events which in turn closes the EventDispatcherTracker and opens again with new BundleContext.
      */
     @Override
     public void frameworkEvent(FrameworkEvent event) {
         switch (event.getType()) {
             case STARTED:
                 LOGGER.info("Handling OSGi Framework Restart!!");
-                // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 BundleContext bundleContext = event.getBundle().getBundleContext();
                 BundleContextHolder.getInstance().setBundleContext(bundleContext);
+                // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 ServletContextHolder.getInstance()
                         .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CTX, bundleContext);
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();

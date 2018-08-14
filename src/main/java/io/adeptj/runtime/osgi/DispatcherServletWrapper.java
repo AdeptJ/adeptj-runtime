@@ -30,7 +30,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
@@ -42,8 +41,6 @@ import java.lang.invoke.MethodHandles;
 public class DispatcherServletWrapper extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static final String PROCESSING_REQUEST_MSG = "Processing [{}] request for [{}]";
 
     private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
 
@@ -60,15 +57,14 @@ public class DispatcherServletWrapper extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         long startTime = System.nanoTime();
         super.init(config);
-        this.dispatcherServlet.init(this.getServletConfig());
+        this.dispatcherServlet.init(config);
         LOGGER.info("Felix DispatcherServlet initialized in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        RequestUtil.logRequestDebug((HttpServletRequest) req, PROCESSING_REQUEST_MSG);
         this.dispatcherServlet.service(req, res);
-        RequestUtil.logException((HttpServletRequest) req, FELIX_DISPATCHER_EXCEPTION_MSG);
+        RequestUtil.logException(req, FELIX_DISPATCHER_EXCEPTION_MSG);
     }
 
     @Override

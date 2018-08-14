@@ -50,11 +50,11 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
     /**
      * Initializes the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      *
-     * @param service the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
+     * @param dispatcherServlet the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
     @Override
-    protected HttpServlet addingService(HttpServlet service) {
-        this.dispatcherServletWrapper = new DispatcherServletWrapper(service);
+    protected HttpServlet addingService(HttpServlet dispatcherServlet) {
+        this.dispatcherServletWrapper = new DispatcherServletWrapper(dispatcherServlet);
         try {
             this.dispatcherServletWrapper.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
         } catch (Exception ex) { // NOSONAR
@@ -62,7 +62,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
              * If the init method failed above then DispatcherServlet won't be usable at all.
              * DispatcherServlet has to be initialized fully to perform the dispatcher tasks.
              * Set the instance null so that http status 503 can be returned by BridgeServlet.
-             * Also the ServiceTracker will not be tracking it at all when addingService method returns null.
+             * Also, the ServiceTracker will not be tracking it at all when this method returns null.
              */
             this.dispatcherServletWrapper = null;
             LoggerFactory.getLogger(this.getClass()).error(EXCEPTION_MSG, ex);
@@ -72,9 +72,11 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
 
     /**
      * Calls the Felix {@link DispatcherServlet#destroy()} and set the tracked instance to null.
+     *
+     * @param dispatcherServlet the Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
     @Override
-    protected void removedService(HttpServlet service) {
+    protected void removedService(HttpServlet dispatcherServlet) {
         this.dispatcherServletWrapper.destroy();
         this.dispatcherServletWrapper = null;
     }
