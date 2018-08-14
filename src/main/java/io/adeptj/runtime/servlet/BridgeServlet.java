@@ -43,7 +43,7 @@ import javax.servlet.http.HttpServletResponse;
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
  *
  *
- * <b>This HttpServlet listens at "/" i.e root.<b>
+ * <b>BridgeServlet is mounted at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
  */
