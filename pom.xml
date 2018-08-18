@@ -154,11 +154,6 @@
         <plugins>
 
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -236,7 +231,10 @@
                             <!-- Bundle dependencies must be in [provided] scope -->
                             <includeScope>provided</includeScope>
                             <excludeTransitive>true</excludeTransitive>
-                            <excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
+                            <excludeArtifactIds>
+                                org.apache.felix.http.base,
+                                osgi.annotation
+                            </excludeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -575,6 +573,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Just to mitigate strange compilation error happening while building -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Apache Felix Dependencies Start -->
 
         <dependency>
@@ -844,6 +849,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
@@ -874,24 +885,7 @@
 
         <profile>
 
-            <id>iText</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>com.itextpdf</groupId>
-                    <artifactId>itextpdf</artifactId>
-                    <version>${itextpdf.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>AdeptJLogging</id>
+            <id>AdeptJ-Logging</id>
 
             <dependencies>
 
@@ -987,33 +981,6 @@
             <id>JWT</id>
 
             <dependencies>
-
-                <!--<dependency>-->
-                    <!--<groupId>io.jsonwebtoken</groupId>-->
-                    <!--<artifactId>jjwt-api</artifactId>-->
-                    <!--<scope>compile</scope>-->
-                    <!--<version>${jjwt.version}</version>-->
-                <!--</dependency>-->
-
-                <!--<dependency>-->
-                    <!--<groupId>io.jsonwebtoken</groupId>-->
-                    <!--<artifactId>jjwt-impl</artifactId>-->
-                    <!--<scope>compile</scope>-->
-                    <!--<version>${jjwt.version}</version>-->
-                    <!--<exclusions>-->
-                        <!--<exclusion>-->
-                            <!--<groupId>org.bouncycastle</groupId>-->
-                            <!--<artifactId>bcprov-jdk15on</artifactId>-->
-                        <!--</exclusion>-->
-                    <!--</exclusions>-->
-                <!--</dependency>-->
-
-                <!--<dependency>-->
-                    <!--<groupId>io.jsonwebtoken</groupId>-->
-                    <!--<artifactId>jjwt-jackson</artifactId>-->
-                    <!--<scope>compile</scope>-->
-                    <!--<version>${jjwt.version}</version>-->
-                <!--</dependency>-->
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
@@ -1345,14 +1312,14 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>1.1.1.Final</version>
+                    <version>2.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>1.2.0.Final</version>
+                    <version>2.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
