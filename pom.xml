@@ -1601,7 +1601,7 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.2 (JPA 2.2) Dependencies -->
+                <!-- EclipseLink 2.7.3 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
@@ -1617,8 +1617,8 @@
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
-                            <groupId>org.glassfish</groupId>
-                            <artifactId>javax.json</artifactId>
+                            <groupId>javax.json</groupId>
+                            <artifactId>javax.json-api</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -1630,8 +1630,8 @@
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
-                            <groupId>org.glassfish</groupId>
-                            <artifactId>javax.json</artifactId>
+                            <groupId>javax.json</groupId>
+                            <artifactId>javax.json-api</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
