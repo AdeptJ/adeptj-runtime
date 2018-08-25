@@ -211,6 +211,12 @@
                                     <mainClass>${main.class}</mainClass>
                                 </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.osgi:osgi.annotation</exclude>
+                                    <exclude>org.apache.felix:org.apache.felix.http.base</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
@@ -231,10 +237,6 @@
                             <!-- Bundle dependencies must be in [provided] scope -->
                             <includeScope>provided</includeScope>
                             <excludeTransitive>true</excludeTransitive>
-                            <excludeArtifactIds>
-                                org.apache.felix.http.base,
-                                osgi.annotation
-                            </excludeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -577,7 +579,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Apache Felix Dependencies Start -->
@@ -659,7 +661,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.base</artifactId>
             <version>${felix.http.base.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
