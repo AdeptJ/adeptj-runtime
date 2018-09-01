@@ -23,6 +23,7 @@ package io.adeptj.runtime.osgi;
 import io.adeptj.runtime.common.BridgeServletConfigHolder;
 import org.apache.felix.http.base.internal.dispatch.DispatcherServlet;
 import org.osgi.framework.BundleContext;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServlet;
@@ -33,6 +34,8 @@ import javax.servlet.http.HttpServlet;
  * @author Rakesh.Kumar, AdeptJ
  */
 public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletTracker.class);
 
     private static final String EXCEPTION_MSG = "Exception adding Felix DispatcherServlet OSGi Service!!";
 
@@ -65,7 +68,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
              * Also, the ServiceTracker will not be tracking it at all when this method returns null.
              */
             this.dispatcherServletWrapper = null;
-            LoggerFactory.getLogger(this.getClass()).error(EXCEPTION_MSG, ex);
+            LOGGER.error(EXCEPTION_MSG, ex);
         }
         return this.dispatcherServletWrapper;
     }
