@@ -80,7 +80,7 @@
         <felix.useradmin.version>1.0.3</felix.useradmin.version>
         <felix.useradmin.filestore.version>1.0.2</felix.useradmin.filestore.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
-        <felix.systemready.version>0.2.0</felix.systemready.version>
+        <felix.systemready.version>0.4.0</felix.systemready.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
