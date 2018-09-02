@@ -31,19 +31,19 @@ import javax.websocket.Session;
  */
 class ServerLogsTailerListener extends TailerListenerAdapter {
 
-    private final Session session;
+    private Session webSocketSession;
 
-    ServerLogsTailerListener(Session session) {
-        this.session = session;
+    void setWebSocketSession(Session webSocketSession) {
+        this.webSocketSession = webSocketSession;
     }
 
     @Override
     public void handle(String line) {
-        this.session.getAsyncRemote().sendText(line);
+        this.webSocketSession.getAsyncRemote().sendText(line);
     }
 
     @Override
     public void handle(Exception ex) {
-        this.session.getAsyncRemote().sendText(ex.toString());
+        this.webSocketSession.getAsyncRemote().sendText(ex.toString());
     }
 }

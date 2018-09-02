@@ -46,9 +46,13 @@ class ServerLogsTailer {
      */
     private Tailer tailer;
 
+    private ServerLogsTailerListener tailerListener;
+
     ServerLogsTailer(Session session) {
+        this.tailerListener = new ServerLogsTailerListener();
+        this.tailerListener.setWebSocketSession(session);
         this.tailer = Tailer.create(Paths.get(Configs.of().logging().getString(SERVER_LOG_FILE)).toFile(),
-                new ServerLogsTailerListener(session),
+                this.tailerListener,
                 DELAY_MILLIS,
                 true);
     }
@@ -59,5 +63,8 @@ class ServerLogsTailer {
 
     void stopTailer() {
         this.tailer.stop();
+        this.tailerListener.setWebSocketSession(null);
+        this.tailerListener = null;
+        this.tailer = null;
     }
 }
