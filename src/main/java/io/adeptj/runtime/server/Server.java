@@ -189,7 +189,8 @@ public final class Server implements Lifecycle {
     public void start() {
         LOGGER.debug("AdeptJ Runtime jvm args: {}", this.runtimeArgs);
         this.cfgReference = new WeakReference<>(Configs.of().undertow());
-        Config httpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTP);
+        Config undertowConfig = Objects.requireNonNull(this.cfgReference.get());
+        Config httpConf = undertowConfig.getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
@@ -197,8 +198,7 @@ public final class Server implements Lifecycle {
         this.deploymentManager.deploy();
         try {
             this.rootHandler = this.rootHandler(this.deploymentManager.start());
-            this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()),
-                    Objects.requireNonNull(this.cfgReference.get()))))
+            this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()), undertowConfig)))
                     .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
