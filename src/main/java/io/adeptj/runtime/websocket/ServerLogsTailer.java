@@ -25,7 +25,6 @@ import io.adeptj.runtime.config.Configs;
 import org.apache.commons.io.input.Tailer;
 
 import javax.websocket.Session;
-import java.io.File;
 import java.nio.file.Paths;
 
 /**
@@ -48,8 +47,10 @@ class ServerLogsTailer {
     private Tailer tailer;
 
     ServerLogsTailer(Session session) {
-        File logFile = Paths.get(Configs.INSTANCE.logging().getString(SERVER_LOG_FILE)).toFile();
-        this.tailer = Tailer.create(logFile, new ServerLogsTailerListener(logFile, session), DELAY_MILLIS, true);
+        this.tailer = Tailer.create(Paths.get(Configs.of().logging().getString(SERVER_LOG_FILE)).toFile(),
+                new ServerLogsTailerListener(session),
+                DELAY_MILLIS,
+                true);
     }
 
     void startTailer() {

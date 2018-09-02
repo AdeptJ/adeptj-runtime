@@ -23,8 +23,6 @@ package io.adeptj.runtime.websocket;
 import org.apache.commons.io.input.TailerListenerAdapter;
 
 import javax.websocket.Session;
-import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * Simple implementation of a {@link org.apache.commons.io.input.TailerListener}.
@@ -33,12 +31,9 @@ import java.io.FileNotFoundException;
  */
 class ServerLogsTailerListener extends TailerListenerAdapter {
 
-    private final File logFile;
-
     private final Session session;
 
-    ServerLogsTailerListener(File logFile, Session session) {
-        this.logFile = logFile;
+    ServerLogsTailerListener(Session session) {
         this.session = session;
     }
 
@@ -50,10 +45,5 @@ class ServerLogsTailerListener extends TailerListenerAdapter {
     @Override
     public void handle(Exception ex) {
         this.session.getAsyncRemote().sendText(ex.toString());
-    }
-
-    @Override
-    public void fileNotFound() {
-        this.session.getAsyncRemote().sendText(new FileNotFoundException(this.logFile.toString()).toString());
     }
 }
