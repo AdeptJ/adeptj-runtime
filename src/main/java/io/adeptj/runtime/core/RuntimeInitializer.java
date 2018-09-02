@@ -61,7 +61,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
                             ((StartupAware) ConstructorUtils.invokeConstructor(startupAwareClass)).onStartup(context);
                         } catch (Exception ex) { // NOSONAR
                             logger.error("Exception while executing StartupAware#onStartup!!", ex);
-                            throw new InitializationException(ex);
+                            throw new InitializationException(ex.getMessage(), ex);
                         }
                     });
             context.addListener(FrameworkShutdownHandler.class);

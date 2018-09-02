@@ -67,7 +67,6 @@ import org.xnio.Xnio;
 import org.xnio.XnioWorker;
 
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -78,6 +77,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -203,7 +203,7 @@ public final class Server implements Lifecycle {
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();
-        } catch (ServletException ex) {
+        } catch (Exception ex) { // NOSONAR
             throw new InitializationException(ex.getMessage(), ex);
         }
         this.createServerConfFile();
@@ -298,7 +298,7 @@ public final class Server implements Lifecycle {
         return builder;
     }
 
-    private Builder enableHttp2(Builder undertowBuilder) {
+    private Builder enableHttp2(Builder undertowBuilder) throws GeneralSecurityException, IOException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);

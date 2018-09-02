@@ -33,5 +33,5 @@ public interface TemplateEngine {
      * @param context the TemplateEngine context
      * @throws RenderException the {@link RenderException}
      */
-    void render(TemplateContext context) throws RenderException;
+    void render(TemplateContext context);
 }

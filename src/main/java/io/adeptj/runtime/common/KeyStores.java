@@ -20,37 +20,29 @@
 
 package io.adeptj.runtime.common;
 
-import io.adeptj.runtime.exception.InitializationException;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 
 /**
  * Utilities for Java KeyStore.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class KeyStores {
+final class KeyStores {
 
     private KeyStores() {
     }
 
-    public static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
+    static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) throws GeneralSecurityException, IOException {
         try (InputStream is = Environment.useProvidedKeyStore() ? Files.newInputStream(Paths.get(keyStoreLoc))
                 : KeyStores.class.getResourceAsStream(keyStoreLoc)) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException ex) {
-            LoggerFactory.getLogger(SslContextFactory.class).error("Exception while loading KeyStore!!", ex);
-            throw new InitializationException(ex.getMessage(), ex);
         }
     }
 }

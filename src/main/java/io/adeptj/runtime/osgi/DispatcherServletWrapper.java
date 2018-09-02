@@ -47,7 +47,7 @@ public class DispatcherServletWrapper extends HttpServlet {
     /**
      * The Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
      */
-    private volatile HttpServlet dispatcherServlet;
+    private final HttpServlet dispatcherServlet;
 
     DispatcherServletWrapper(HttpServlet dispatcherServlet) {
         this.dispatcherServlet = dispatcherServlet;

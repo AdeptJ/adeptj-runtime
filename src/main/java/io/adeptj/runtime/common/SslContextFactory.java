@@ -20,15 +20,10 @@
 
 package io.adeptj.runtime.common;
 
-import io.adeptj.runtime.exception.InitializationException;
-import org.slf4j.LoggerFactory;
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 /**
  * Utilities for SSL/TLS.
@@ -37,24 +32,19 @@ import java.security.UnrecoverableKeyException;
  */
 public final class SslContextFactory {
 
-    private static final String PROTOCOL_TLS = "TLSv1.2";
+    private static final String PROTOCOL_TLS_V12 = "TLSv1.2";
 
     private SslContextFactory() {
     }
 
-    public static SSLContext newSslContext() {
-        try {
-            String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
-            String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
-            String keyPwd = System.getProperty("adeptj.rt.keyPassword");
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
-            SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS);
-            sslContext.init(kmf.getKeyManagers(), null, null);
-            return sslContext;
-        } catch (NoSuchAlgorithmException | KeyManagementException | UnrecoverableKeyException | KeyStoreException ex) {
-            LoggerFactory.getLogger(SslContextFactory.class).error("Exception while initializing SSLContext!!", ex);
-            throw new InitializationException("Exception while initializing SSLContext!!", ex);
-        }
+    public static SSLContext newSslContext() throws GeneralSecurityException, IOException {
+        String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
+        String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
+        String keyPwd = System.getProperty("adeptj.rt.keyPassword");
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
+        SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS_V12);
+        sslContext.init(kmf.getKeyManagers(), null, null);
+        return sslContext;
     }
 }
