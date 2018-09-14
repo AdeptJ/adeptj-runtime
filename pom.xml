@@ -41,7 +41,7 @@
         <!-- Common Dependencies -->
         <undertow.version>2.0.13.Final</undertow.version>
         <xnio.version>3.6.5.Final</xnio.version>
-        <wildfly-client-config.version>1.0.0.Final</wildfly-client-config.version>
+        <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
         <jboss-threads.version>2.3.2.Final</jboss-threads.version>
         <jboss-logging.version>3.3.2.Final</jboss-logging.version>
