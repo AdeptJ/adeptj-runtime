@@ -53,10 +53,8 @@
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <jansi.version>1.17.1</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
-        <itextpdf.version>5.5.13</itextpdf.version>
         <classmate.version>1.4.0</classmate.version>
         <javax.el.version>3.0.1-b10</javax.el.version>
-        <mongo.version>3.8.0</mongo.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>6.0.1</felix.framework.version>
@@ -64,7 +62,6 @@
         <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
         <felix.webconsole.plugins.ds.version>2.1.0</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
-        <felix.webconsole.plugins.useradmin>1.0.2</felix.webconsole.plugins.useradmin>
         <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.http.bridge.version>4.0.4</felix.http.bridge.version>
         <felix.http.base.version>4.0.4</felix.http.base.version>
@@ -73,8 +70,6 @@
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
-        <felix.useradmin.version>1.0.3</felix.useradmin.version>
-        <felix.useradmin.filestore.version>1.0.2</felix.useradmin.filestore.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
         <felix.systemready.version>0.4.0</felix.systemready.version>
 
@@ -1742,44 +1737,23 @@
 
                 <dependency>
                     <groupId>org.mongodb</groupId>
-                    <artifactId>mongo-java-driver</artifactId>
+                    <artifactId>bson</artifactId>
                     <version>${mongo.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
-                <!-- Morphia Dependencies -->
-
                 <dependency>
-                    <groupId>org.mongodb.morphia</groupId>
-                    <artifactId>morphia</artifactId>
-                    <version>${morphia.version}</version>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-core</artifactId>
+                    <version>${mongo.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.mongodb</groupId>
-                            <artifactId>mongo-java-driver</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>cglib</groupId>
-                            <artifactId>cglib-nodep</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>cglib</groupId>
-                            <artifactId>cglib-nodep</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib-nodep</artifactId>
-                    <version>3.2.6</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.thoughtworks.proxytoys</groupId>
-                    <artifactId>proxytoys</artifactId>
-                    <version>1.0</version>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-async</artifactId>
+                    <version>${mongo.version}</version>
+                    <scope>provided</scope>
                 </dependency>
 
             </dependencies>
