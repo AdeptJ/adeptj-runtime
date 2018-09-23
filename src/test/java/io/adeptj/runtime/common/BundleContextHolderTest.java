@@ -22,8 +22,6 @@ package io.adeptj.runtime.common;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.osgi.framework.BundleContext;
 
 /**
  * BundleContextHolderTest.
@@ -35,7 +33,6 @@ class BundleContextHolderTest {
 
     @Test
     void testIsBundleContextSetWhenSetBundleContextCalled() {
-        Mockito.when(BundleContextHolder.getInstance().getBundleContext()).thenReturn(Mockito.mock(BundleContext.class));
         Assertions.assertNotNull(BundleContextHolder.getInstance().getBundleContext());
     }
 
