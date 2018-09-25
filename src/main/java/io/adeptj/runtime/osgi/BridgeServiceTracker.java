@@ -38,7 +38,7 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServiceTracker.class);
 
-    private static final String DEFAULT_FILTER = "(http.felix.dispatcher=*)";
+    private static final String DISPATCHER_SERVICE_FILTER = "(http.felix.dispatcher=*)";
 
     /**
      * This is to prevent {@link IllegalStateException} : Invalid {@link BundleContext} when service is removed and
@@ -49,7 +49,7 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
     private final AtomicBoolean serviceRemoved;
 
     BridgeServiceTracker(BundleContext context, Class<T> objectClass) {
-        super(context, OSGiUtil.filter(context, objectClass, DEFAULT_FILTER), null);
+        super(context, OSGiUtil.filter(context, objectClass, DISPATCHER_SERVICE_FILTER), null);
         this.serviceRemoved = new AtomicBoolean();
     }
 
