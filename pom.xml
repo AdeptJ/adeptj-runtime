@@ -1814,7 +1814,7 @@
 
         <profile>
 
-            <id>JDK11</id>
+            <id>Jdk11</id>
 
             <dependencies>
 
@@ -1836,12 +1836,6 @@
                             <artifactId>javax.activation-api</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.sun.istack</groupId>
-                    <artifactId>istack-commons-runtime</artifactId>
-                    <version>${istack-commons-runtime.version}</version>
                 </dependency>
 
                 <dependency>
@@ -1874,6 +1868,12 @@
                             <artifactId>stax-ex</artifactId>
                         </exclusion>
                     </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
+                    <version>${istack-commons-runtime.version}</version>
                 </dependency>
 
                 <dependency>
