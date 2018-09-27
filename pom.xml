@@ -55,6 +55,16 @@
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.4.0</classmate.version>
         <javax.el.version>3.0.1-b10</javax.el.version>
+        <javax.mail.version>1.6.2</javax.mail.version>
+
+        <!-- JAX-B Dependencies -->
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
+        <istack-commons-runtime.version>3.0.7</istack-commons-runtime.version>
+        <jaxb-runtime.version>2.4.0-b180830.0438</jaxb-runtime.version>
+        <txw2.version>2.4.0-b180830.0438</txw2.version>
+        <FastInfoset.version>1.2.15</FastInfoset.version>
+        <stax-ex.version>1.8</stax-ex.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>6.0.1</felix.framework.version>
@@ -66,7 +76,7 @@
         <felix.http.bridge.version>4.0.4</felix.http.bridge.version>
         <felix.http.base.version>4.0.4</felix.http.base.version>
         <felix.log.version>1.2.0</felix.log.version>
-        <felix.metatype.version>1.2.0</felix.metatype.version>
+        <felix.metatype.version>1.2.2</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.4</felix.http.sslfilter.version>
@@ -1796,6 +1806,98 @@
                     <artifactId>scribejava-apis</artifactId>
                     <version>${scribejava.version}</version>
                     <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
+            <id>JDK11</id>
+
+            <dependencies>
+
+                <!-- JAX-B Dependencies -->
+
+                <dependency>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>javax.activation</artifactId>
+                    <version>${javax.activation.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                    <version>${jaxb-api.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.activation</groupId>
+                            <artifactId>javax.activation-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.sun.istack</groupId>
+                    <artifactId>istack-commons-runtime</artifactId>
+                    <version>${istack-commons-runtime.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                    <version>${jaxb-runtime.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.sun.istack</groupId>
+                            <artifactId>istack-commons-runtime</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.sun.xml.fastinfoset</groupId>
+                            <artifactId>FastInfoset</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javax.activation</groupId>
+                            <artifactId>javax.activation-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javax.xml.bind</groupId>
+                            <artifactId>jaxb-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.glassfish.jaxb</groupId>
+                            <artifactId>txw2</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jvnet.staxex</groupId>
+                            <artifactId>stax-ex</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>txw2</artifactId>
+                    <version>${txw2.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.sun.xml.fastinfoset</groupId>
+                    <artifactId>FastInfoset</artifactId>
+                    <version>${FastInfoset.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.jvnet.staxex</groupId>
+                    <artifactId>stax-ex</artifactId>
+                    <version>${stax-ex.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.activation</groupId>
+                            <artifactId>activation</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
             </dependencies>
