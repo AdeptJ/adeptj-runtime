@@ -22,6 +22,7 @@ package io.adeptj.runtime.server;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Objects;
 
 /**
  * SimplePrincipal.
@@ -44,30 +45,16 @@ final class SimplePrincipal implements Principal, Serializable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimplePrincipal that = (SimplePrincipal) o;
+        return Objects.equals(name, that.name);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        SimplePrincipal other = (SimplePrincipal) obj;
-        if (name == null) {
-            return other.name == null;
-        } else {
-            return name.equals(other.name);
-        }
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override

@@ -47,7 +47,7 @@ final class SimpleIdentityManager implements IdentityManager {
 
     @SuppressWarnings("unchecked")
     SimpleIdentityManager(Config cfg) {
-        this.userRolesMapping = new HashMap<>(Map.class.cast(cfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped()));
+        this.userRolesMapping = new HashMap<>((Map) cfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped());
     }
 
     /**

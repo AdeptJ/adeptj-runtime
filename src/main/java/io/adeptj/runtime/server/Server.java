@@ -221,13 +221,13 @@ public final class Server implements Lifecycle {
             // Calls contextDestroyed on all registered ServletContextListener and performs other cleanup tasks.
             this.deploymentManager.undeploy();
             this.undertow.stop();
-            LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
             DefaultExecutorService.getInstance().shutdown();
+            LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable ex) { // NOSONAR
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the Logback cleans up it's state.
-            LogbackManager.INSTANCE.getLoggerContext().stop();
+            LogbackManager.getInstance().getLoggerContext().stop();
         }
     }
 
@@ -327,7 +327,7 @@ public final class Server implements Lifecycle {
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            LogbackManager.INSTANCE.getLoggerContext().stop();
+            LogbackManager.getInstance().getLoggerContext().stop();
             System.exit(-1); // NOSONAR
         }
         return port;

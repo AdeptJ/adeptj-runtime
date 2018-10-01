@@ -135,7 +135,7 @@ public final class Launcher {
                     });
             logger.error("Shutting down JVM!!", th);
             // Let the LOGBACK cleans up it's state.
-            LogbackManager.INSTANCE.getLoggerContext().stop();
+            LogbackManager.getInstance().getLoggerContext().stop();
             System.exit(-1);
         }
     }

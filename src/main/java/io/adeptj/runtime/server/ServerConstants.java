@@ -48,10 +48,6 @@ final class ServerConstants {
 
     static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
 
-    static final String KEY_AJP = "ajp";
-
-    static final String SYS_PROP_ENABLE_AJP = "enable.ajp";
-
     static final String SYS_PROP_CHECK_PORT = "adeptj.rt.port.check";
 
     static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
