@@ -1094,13 +1094,6 @@
             <dependencies>
 
                 <dependency>
-                    <groupId>com.sun.mail</groupId>
-                    <artifactId>javax.mail</artifactId>
-                    <version>${javax.mail.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.el</artifactId>
                     <version>${javax.el.version}</version>
@@ -1111,13 +1104,6 @@
                     <groupId>com.fasterxml</groupId>
                     <artifactId>classmate</artifactId>
                     <version>${classmate.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.thoughtworks.paranamer</groupId>
-                    <artifactId>paranamer</artifactId>
-                    <version>2.8</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1568,6 +1554,35 @@
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.json</artifactId>
                     <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
+            <id>Email</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>javax.mail</artifactId>
+                    <version>${javax.mail.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-email</artifactId>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.sun.mail</groupId>
+                            <artifactId>javax.mail</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
             </dependencies>
