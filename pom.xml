@@ -542,12 +542,6 @@
         <!-- OSGi Bundles Start -->
 
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <scope>provided</scope>
@@ -557,15 +551,6 @@
         <dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
-            <version>${javax.json-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSR 374 [JSON-P] RI -->
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-            <version>${javax.json.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -573,7 +558,6 @@
         <dependency>
             <groupId>javax.json.bind</groupId>
             <artifactId>javax.json.bind-api</artifactId>
-            <version>${javax.json.bind-api.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -582,15 +566,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
-        <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>yasson</artifactId>
-            <version>${yasson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
 
         <dependency>
             <groupId>commons-fileupload</groupId>
@@ -845,13 +820,6 @@
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-utils</artifactId>
             <version>${adeptj-modules-commons-utils.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-modules-cache-api</artifactId>
-            <version>1.0.0.Final</version>
             <scope>provided</scope>
         </dependency>
 
@@ -1351,40 +1319,9 @@
 
         <profile>
 
-            <id>Ehcache</id>
+            <id>Cache</id>
 
             <dependencies>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-ehcache</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                    <version>${ehcache.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>Caffeine</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-caffeine</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
 
                 <dependency>
                     <groupId>com.github.ben-manes.caffeine</groupId>
@@ -1393,150 +1330,10 @@
                     <scope>provided</scope>
                 </dependency>
 
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>ApacheShiro</id>
-
-            <dependencies>
-
                 <dependency>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                    <version>3.2.1</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-collections4</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils</artifactId>
-                    <version>1.9.3</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-configuration2</artifactId>
-                    <version>2.2</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-logging</groupId>
-                            <artifactId>commons-logging</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.apache.commons</groupId>
-                            <artifactId>commons-lang3</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.ehcache</groupId>
-                    <artifactId>ehcache</artifactId>
-                    <version>${ehcache.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-core</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>jcl-over-slf4j</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>commons-beanutils</groupId>
-                            <artifactId>commons-beanutils</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-web</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-lang</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-cache</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-crypto-hash</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-crypto-cipher</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-config-core</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-config-ogdl</artifactId>
-                    <version>${shiro.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-event</artifactId>
-                    <version>${shiro.version}</version>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-cache-caffeine</artifactId>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1569,8 +1366,8 @@
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-datasource</artifactId>
-                    <version>1.1.0.Final</version>
+                    <artifactId>adeptj-modules-commons-jdbc</artifactId>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1643,7 +1440,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.0.5.Final</version>
+                    <version>1.1.0-SNAPSHOT</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1731,65 +1528,6 @@
 
         <profile>
 
-            <id>Thymeleaf</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.attoparser</groupId>
-                    <artifactId>attoparser</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.unbescape</groupId>
-                    <artifactId>unbescape</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>ognl</groupId>
-                    <artifactId>ognl</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javassist</groupId>
-                            <artifactId>javassist</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.thymeleaf</groupId>
-                    <artifactId>thymeleaf</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.attoparser</groupId>
-                            <artifactId>attoparser</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.unbescape</groupId>
-                            <artifactId>unbescape</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>ognl</groupId>
-                            <artifactId>ognl</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
             <id>OAuth2</id>
 
             <dependencies>
@@ -1805,6 +1543,30 @@
                     <groupId>com.github.scribejava</groupId>
                     <artifactId>scribejava-apis</artifactId>
                     <version>${scribejava.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
+            <id>JAVAX-JSON</id>
+
+            <dependencies>
+
+                <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
+                <dependency>
+                    <groupId>org.eclipse</groupId>
+                    <artifactId>yasson</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <!-- JSR 374 [JSON-P] RI -->
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.json</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
