@@ -111,7 +111,6 @@ import static io.adeptj.runtime.server.ServerConstants.AUTH_SERVLET;
 import static io.adeptj.runtime.server.ServerConstants.CRYPTO_SERVLET;
 import static io.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
 import static io.adeptj.runtime.server.ServerConstants.ERROR_PAGE_SERVLET;
-import static io.adeptj.runtime.server.ServerConstants.KEY_AJP;
 import static io.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
 import static io.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
 import static io.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
@@ -141,7 +140,6 @@ import static io.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
 import static io.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
 import static io.adeptj.runtime.server.ServerConstants.REALM;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
-import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_AJP;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static io.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
@@ -189,16 +187,16 @@ public final class Server implements Lifecycle {
     public void start() {
         LOGGER.debug("AdeptJ Runtime jvm args: {}", this.runtimeArgs);
         this.cfgReference = new WeakReference<>(Configs.of().undertow());
-        Config undertowConfig = Objects.requireNonNull(this.cfgReference.get());
-        Config httpConf = undertowConfig.getConfig(KEY_HTTP);
+        Config undertowConf = Objects.requireNonNull(this.cfgReference.get());
+        Config httpConf = undertowConf.getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo());
+        this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo());
         this.deploymentManager.deploy();
         try {
             this.rootHandler = this.rootHandler(this.deploymentManager.start());
-            this.undertow = this.enableAJP(this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()), undertowConfig)))
+            this.undertow = this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()), undertowConf))
                     .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
@@ -218,7 +216,9 @@ public final class Server implements Lifecycle {
         LOGGER.info("Stopping AdeptJ Runtime!!");
         try {
             this.gracefulShutdown();
+            // Calls stop on LifecycleObjects - io.undertow.servlet.core.Lifecycle
             this.deploymentManager.stop();
+            // Calls contextDestroyed on all registered ServletContextListener and performs other cleanup tasks.
             this.deploymentManager.undeploy();
             this.undertow.stop();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
@@ -298,7 +298,7 @@ public final class Server implements Lifecycle {
         return builder;
     }
 
-    private Builder enableHttp2(Builder undertowBuilder) throws GeneralSecurityException, IOException {
+    private Builder enableHttp2(Builder builder) throws GeneralSecurityException, IOException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
             int httpsPort = httpsConf.getInt(KEY_PORT);
@@ -308,19 +308,9 @@ public final class Server implements Lifecycle {
                 System.setProperty("adeptj.rt.keyPassword", httpsConf.getString("keyPwd"));
                 LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
-            undertowBuilder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.newSslContext());
+            builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.newSslContext());
         }
-        return undertowBuilder;
-    }
-
-    private Builder enableAJP(Builder undertowBuilder) {
-        if (Boolean.getBoolean(SYS_PROP_ENABLE_AJP)) {
-            Config ajpConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_AJP);
-            int ajpPort = ajpConf.getInt(KEY_PORT);
-            undertowBuilder.addAjpListener(ajpPort, ajpConf.getString(KEY_HOST));
-            LOGGER.info("AJP enabled @ port: [{}]", ajpPort);
-        }
-        return undertowBuilder;
+        return builder;
     }
 
     private int handlePortAvailability(Config httpConf) {
