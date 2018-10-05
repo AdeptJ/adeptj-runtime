@@ -22,9 +22,9 @@ package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Times;
-import io.adeptj.runtime.tools.TemplateData;
-import io.adeptj.runtime.tools.TemplateContext;
-import io.adeptj.runtime.tools.TemplateEngine;
+import io.adeptj.runtime.mvc.TemplateData;
+import io.adeptj.runtime.mvc.TemplateContext;
+import io.adeptj.runtime.mvc.TemplateEngine;
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.Bundle;
 

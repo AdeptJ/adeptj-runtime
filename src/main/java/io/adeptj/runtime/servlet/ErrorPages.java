@@ -23,9 +23,9 @@ package io.adeptj.runtime.servlet;
 import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.config.Configs;
-import io.adeptj.runtime.tools.TemplateData;
-import io.adeptj.runtime.tools.TemplateContext;
-import io.adeptj.runtime.tools.TemplateEngine;
+import io.adeptj.runtime.mvc.TemplateData;
+import io.adeptj.runtime.mvc.TemplateContext;
+import io.adeptj.runtime.mvc.TemplateEngine;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

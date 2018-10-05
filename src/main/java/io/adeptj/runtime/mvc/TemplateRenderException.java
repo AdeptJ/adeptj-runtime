@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package io.adeptj.runtime.tools;
+package io.adeptj.runtime.mvc;
 
 /**
  * The {@link TemplateRenderException} thrown when an exception occurred while rendering a given template.

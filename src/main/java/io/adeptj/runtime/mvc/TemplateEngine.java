@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package io.adeptj.runtime.tools;
+package io.adeptj.runtime.mvc;
 
 import com.typesafe.config.Config;
 import io.adeptj.runtime.config.Configs;

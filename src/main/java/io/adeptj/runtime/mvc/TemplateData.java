@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package io.adeptj.runtime.tools;
+package io.adeptj.runtime.mvc;
 
 import org.trimou.engine.resolver.Mapper;
 
