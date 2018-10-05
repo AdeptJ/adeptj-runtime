@@ -21,6 +21,7 @@
 package io.adeptj.runtime.mvc;
 
 import com.typesafe.config.Config;
+import io.adeptj.runtime.common.Times;
 import io.adeptj.runtime.config.Configs;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -53,6 +54,8 @@ public enum TemplateEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final String TEMPLATE_ENGINE_INIT_MSG = "TemplateEngine initialized in [{}] ms!!";
+
     private static final int SB_CAPACITY = Integer.getInteger("template.builder.capacity", 100);
 
     private static final String RB_HELPER_NAME = "msg";
@@ -76,6 +79,7 @@ public enum TemplateEngine {
     private final MustacheEngine mustacheEngine;
 
     TemplateEngine() {
+        long startTime = System.nanoTime();
         Config config = Configs.of().trimou();
         this.mustacheEngine = MustacheEngineBuilder.newBuilder()
                 .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
@@ -84,7 +88,6 @@ public enum TemplateEngine {
                         .setRootPath(config.getString(KEY_PREFIX))
                         .setSuffix(config.getString(KEY_SUFFIX))
                         .setScanClasspath(false)
-                        .setClassLoader(this.getClass().getClassLoader())
                         .build())
                 .setProperty(START_DELIMITER, config.getString(KEY_START_DELIMITER))
                 .setProperty(END_DELIMITER, config.getString(KEY_END_DELIMITER))
@@ -92,6 +95,7 @@ public enum TemplateEngine {
                 .setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean(KEY_CACHE_ENABLED))
                 .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt(KEY_CACHE_EXPIRATION))
                 .build();
+        LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
     }
 
     /**
