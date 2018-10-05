@@ -102,7 +102,7 @@ public enum TemplateEngine {
      * Renders the template contained by the TemplateContext.
      *
      * @param context the TemplateEngine context
-     * @throws TemplateRenderException the {@link TemplateRenderException}
+     * @throws TemplateProcessingException the {@link TemplateProcessingException}
      */
     public void render(TemplateContext context) {
         try {
@@ -113,7 +113,7 @@ public enum TemplateEngine {
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-            throw new TemplateRenderException(ex.getMessage(), ex);
+            throw new TemplateProcessingException(ex.getMessage(), ex);
         }
     }
 

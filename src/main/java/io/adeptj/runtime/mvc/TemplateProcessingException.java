@@ -21,15 +21,15 @@
 package io.adeptj.runtime.mvc;
 
 /**
- * The {@link TemplateRenderException} thrown when an exception occurred while rendering a given template.
+ * The {@link TemplateProcessingException} thrown when an exception occurred while processing a given template.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-final class TemplateRenderException extends RuntimeException {
+final class TemplateProcessingException extends RuntimeException {
 
     private static final long serialVersionUID = -8077495079692215520L;
 
-    TemplateRenderException(String message, Throwable cause) {
+    TemplateProcessingException(String message, Throwable cause) {
         super(message, cause);
     }
 }
