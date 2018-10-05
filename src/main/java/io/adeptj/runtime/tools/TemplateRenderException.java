@@ -21,15 +21,15 @@
 package io.adeptj.runtime.tools;
 
 /**
- * RenderException.
+ * The {@link TemplateRenderException} thrown when an exception occurred while rendering a given template.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public final class RenderException extends RuntimeException {
+final class TemplateRenderException extends RuntimeException {
 
     private static final long serialVersionUID = -8077495079692215520L;
 
-    public RenderException(String message, Throwable cause) {
+    TemplateRenderException(String message, Throwable cause) {
         super(message, cause);
     }
 }

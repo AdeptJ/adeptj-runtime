@@ -23,9 +23,9 @@ package io.adeptj.runtime.servlet;
 import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
 import io.adeptj.runtime.config.Configs;
-import io.adeptj.runtime.tools.ContextObject;
+import io.adeptj.runtime.tools.TemplateData;
 import io.adeptj.runtime.tools.TemplateContext;
-import io.adeptj.runtime.tools.TemplateEngines;
+import io.adeptj.runtime.tools.TemplateEngine;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,11 +71,11 @@ public final class ErrorPages {
     public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         Integer statusCode = (Integer) RequestUtil.getAttribute(req, ERROR_STATUS_CODE);
         if (RequestUtil.hasException(req) && Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            TemplateEngines.getEngine().render(TemplateContext.builder()
+            TemplateEngine.getInstance().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .locale(req.getLocale())
-                    .contextObject(ContextObject.newContextObject()
+                    .templateData(TemplateData.newTemplateData()
                             .put(KEY_STATUS_CODE, statusCode)
                             .put(KEY_ERROR_MSG, RequestUtil.getAttribute(req, ERROR_MESSAGE))
                             .put(KEY_REQ_URI, RequestUtil.getAttribute(req, ERROR_REQUEST_URI))
@@ -105,7 +105,7 @@ public final class ErrorPages {
     }
 
     private static void renderGenericErrorPage(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -114,7 +114,7 @@ public final class ErrorPages {
     }
 
     private static void renderErrorPageForStatusCode(HttpServletRequest req, HttpServletResponse resp, String statusCode) {
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -123,7 +123,7 @@ public final class ErrorPages {
     }
 
     private static void render500Page(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
@@ -132,12 +132,12 @@ public final class ErrorPages {
     }
 
     private static void render500PageWithExceptionTrace(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
                 .template(TEMPLATE_500)
-                .contextObject(ContextObject.newContextObject()
+                .templateData(TemplateData.newTemplateData()
                         .put(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
                 .build());
     }

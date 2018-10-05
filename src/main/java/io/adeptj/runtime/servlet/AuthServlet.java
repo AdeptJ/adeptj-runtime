@@ -22,9 +22,9 @@ package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.RequestUtil;
 import io.adeptj.runtime.common.ResponseUtil;
-import io.adeptj.runtime.tools.ContextObject;
+import io.adeptj.runtime.tools.TemplateData;
 import io.adeptj.runtime.tools.TemplateContext;
-import io.adeptj.runtime.tools.TemplateEngines;
+import io.adeptj.runtime.tools.TemplateEngine;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -73,7 +73,7 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String requestURI = req.getRequestURI();
         if (TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngines.getEngine().render(TemplateContext.builder()
+            TemplateEngine.getInstance().render(TemplateContext.builder()
                     .request(req)
                     .response(resp)
                     .template(LOGIN_TEMPLATE)
@@ -95,12 +95,12 @@ public class AuthServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(LOGIN_TEMPLATE)
                 .locale(req.getLocale())
-                .contextObject(ContextObject.newContextObject()
+                .templateData(TemplateData.newTemplateData()
                         .put(ERROR_MSG_KEY, ERROR_MSG)
                         .put(J_USERNAME, req.getParameter(J_USERNAME)))
                 .build());

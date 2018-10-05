@@ -87,6 +87,8 @@
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.3.Final</adeptj-modules-webconsole-security.version>
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
+        <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
+        <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
         <adeptj-runtime-tools.version>1.0.6.Final</adeptj-runtime-tools.version>
     </properties>
 
@@ -814,6 +816,20 @@
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-utils</artifactId>
             <version>${adeptj-modules-commons-utils.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-logging</artifactId>
+            <version>${adeptj-modules-commons-logging.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+         <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-crypto</artifactId>
+            <version>${adeptj-modules-commons-crypto.version}</version>
             <scope>provided</scope>
         </dependency>
 

@@ -33,7 +33,7 @@ public final class TemplateContext {
 
     private String template;
 
-    private ContextObject contextObject;
+    private TemplateData templateData;
 
     private final HttpServletRequest request;
 
@@ -50,8 +50,8 @@ public final class TemplateContext {
         return template;
     }
 
-    ContextObject getContextObject() {
-        return contextObject;
+    TemplateData getTemplateData() {
+        return templateData;
     }
 
     public HttpServletRequest getRequest() {
@@ -79,7 +79,7 @@ public final class TemplateContext {
 
         private String template;
 
-        private ContextObject contextObject;
+        private TemplateData templateData;
 
         private Locale locale;
 
@@ -105,8 +105,8 @@ public final class TemplateContext {
             return this;
         }
 
-        public Builder contextObject(ContextObject contextObject) {
-            this.contextObject = contextObject;
+        public Builder templateData(TemplateData templateData) {
+            this.templateData = templateData;
             return this;
         }
 
@@ -118,7 +118,7 @@ public final class TemplateContext {
         public TemplateContext build() {
             TemplateContext context = new TemplateContext(this.request, this.response);
             context.template = this.template;
-            context.contextObject = this.contextObject;
+            context.templateData = this.templateData;
             // English is default Locale if no locale set.
             context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
             return context;

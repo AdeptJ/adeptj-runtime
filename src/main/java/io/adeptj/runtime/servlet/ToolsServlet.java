@@ -22,9 +22,9 @@ package io.adeptj.runtime.servlet;
 
 import io.adeptj.runtime.common.BundleContextHolder;
 import io.adeptj.runtime.common.Times;
-import io.adeptj.runtime.tools.ContextObject;
+import io.adeptj.runtime.tools.TemplateData;
 import io.adeptj.runtime.tools.TemplateContext;
-import io.adeptj.runtime.tools.TemplateEngines;
+import io.adeptj.runtime.tools.TemplateEngine;
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.Bundle;
 
@@ -72,12 +72,12 @@ public class ToolsServlet extends HttpServlet {
         Bundle[] bundles = BundleContextHolder.getInstance().getBundleContext().getBundles();
         long startTime = ManagementFactory.getRuntimeMXBean().getStartTime();
         MemoryUsage memoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-        TemplateEngines.getEngine().render(TemplateContext.builder()
+        TemplateEngine.getInstance().render(TemplateContext.builder()
                 .request(req)
                 .response(resp)
                 .template(TOOLS_TEMPLATE)
                 .locale(req.getLocale())
-                .contextObject(ContextObject.newContextObject()
+                .templateData(TemplateData.newTemplateData()
                         .put("username", req.getRemoteUser())
                         .put("sysProps", System.getProperties().entrySet())
                         .put("totalBundles", bundles.length)

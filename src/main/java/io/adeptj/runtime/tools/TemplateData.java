@@ -20,51 +20,42 @@
 
 package io.adeptj.runtime.tools;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.trimou.Mustache;
-import org.trimou.engine.MustacheEngine;
+import org.trimou.engine.resolver.Mapper;
 
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * Renders Html Templates using Trimou {@link MustacheEngine}
+ * TemplateData object for storing variables used in template rendering.
  *
- * @author Rakesh.Kumar, AdeptJ
+ * @author Rakesh.Kumar, AdeptJ.
  */
-public enum DefaultTemplateEngine implements TemplateEngine {
+public final class TemplateData implements Mapper, Iterable<Entry<String, Object>> {
 
-    INSTANCE;
+    private final Map<String, Object> variables;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTemplateEngine.class);
-
-    private static final int SB_CAPACITY = Integer.getInteger("template.builder.capacity", 100);
-
-    private final MustacheEngine mustacheEngine;
-
-    DefaultTemplateEngine() {
-        this.mustacheEngine = TemplateEngines.newMustacheEngine();
+    private TemplateData() {
+        this.variables = new HashMap<>();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public TemplateData put(String key, Object value) {
+        this.variables.put(key, value);
+        return this;
+    }
+
+    public static TemplateData newTemplateData() {
+        return new TemplateData();
+    }
+
     @Override
-    public void render(TemplateContext context) {
-        try {
-            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            StringBuilder output = new StringBuilder(SB_CAPACITY);
-            mustache.render(output, context.getContextObject());
-            IOUtils.write(output.toString(), context.getResponse().getWriter());
-        } catch (Exception ex) { // NOSONAR
-            LOGGER.error(ex.getMessage(), ex);
-            context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
-            throw new RenderException(ex.getMessage(), ex);
-        }
+    public Object get(String key) {
+        return this.variables.get(key);
     }
 
-    public static DefaultTemplateEngine getInstance() {
-        return INSTANCE;
+    @Override
+    public Iterator<Entry<String, Object>> iterator() {
+        return this.variables.entrySet().iterator();
     }
 }
