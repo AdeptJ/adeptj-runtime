@@ -59,10 +59,10 @@
 
         <!-- JAX-B Dependencies -->
         <javax.activation.version>1.2.0</javax.activation.version>
-        <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
+        <jaxb-api.version>2.3.1</jaxb-api.version>
         <istack-commons-runtime.version>3.0.7</istack-commons-runtime.version>
-        <jaxb-runtime.version>2.4.0-b180830.0438</jaxb-runtime.version>
-        <txw2.version>2.4.0-b180830.0438</txw2.version>
+        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
+        <txw2.version>2.3.1</txw2.version>
         <FastInfoset.version>1.2.15</FastInfoset.version>
         <stax-ex.version>1.8</stax-ex.version>
 
@@ -85,7 +85,7 @@
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
-        <adeptj-modules-webconsole-security.version>1.0.3.Final</adeptj-modules-webconsole-security.version>
+        <adeptj-modules-webconsole-security.version>1.0.4.Final</adeptj-modules-webconsole-security.version>
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
         <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
