@@ -38,8 +38,6 @@ import static io.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
  */
 final class Bundles {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Bundles.class);
-
     private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
 
     private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles (excluding system bundle) in: [{}] ms!!";
@@ -64,26 +62,28 @@ final class Bundles {
      */
     static void provisionBundles() throws IOException {
         long startTime = System.nanoTime();
-        LOGGER.info("Bundles provisioning start!!");
+        Logger logger = LoggerFactory.getLogger(Bundles.class);
+        logger.info("Bundles provisioning start!!");
         BundleInstaller installer = new BundleInstaller();
         installer.install(Bundles.class.getClassLoader(), Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
-        LOGGER.info(BUNDLE_PROVISIONED_MSG, installer.getInstallationCount(), Times.elapsedMillis(startTime));
+        logger.info(BUNDLE_PROVISIONED_MSG, installer.getInstallationCount(), Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {
+        Logger logger = LoggerFactory.getLogger(Bundles.class);
         try {
             if (Boolean.getBoolean(BENCHMARK_BUNDLE_START)) {
                 long startTime = System.nanoTime();
                 bundle.start();
-                LOGGER.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
+                logger.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
             } else {
                 bundle.start();
-                LOGGER.info("Started Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
+                logger.info("Started Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
             }
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
+            logger.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
         }
     }
 }
