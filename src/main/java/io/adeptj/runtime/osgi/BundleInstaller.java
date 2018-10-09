@@ -29,11 +29,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.net.URL;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -47,44 +45,37 @@ class BundleInstaller {
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    private static final Pattern PATTERN_BUNDLE = Pattern.compile("^bundles.*\\.jar$");
+    private final AtomicInteger installationCount = new AtomicInteger();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
-
-    private final AtomicInteger installedBundlesCount = new AtomicInteger();
-
-    int getInstalledBundlesCount() {
-        return this.installedBundlesCount.get();
+    int getInstallationCount() {
+        return this.installationCount.get() + 1; // add the system bundle to the total count.
     }
 
-    Stream<JarEntry> findBundles(String bundlesDir) throws IOException {
-        return ((JarURLConnection) Bundles.class.getResource(bundlesDir).openConnection())
+    Stream<Bundle> install(ClassLoader cl, String bundlesDir) throws IOException {
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+        Pattern pattern = Pattern.compile("^bundles.*\\.jar$");
+        return ((JarURLConnection) this.getClass().getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
-                .filter(jarEntry -> PATTERN_BUNDLE.matcher(jarEntry.getName()).matches());
-    }
-
-    Stream<Bundle> installBundles(ClassLoader classLoader, Stream<JarEntry> jarEntryStream) {
-        return jarEntryStream
-                .map(jarEntry -> classLoader.getResource(jarEntry.getName()))
-                .map(this::installBundle)
+                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
+                .map(jarEntry -> cl.getResource(jarEntry.getName()))
+                .filter(Objects::nonNull)
+                .map(url -> {
+                    logger.debug("Installing Bundle from location: [{}]", url);
+                    Bundle bundle = null;
+                    try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
+                        if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
+                            logger.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
+                        } else {
+                            bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toExternalForm());
+                            this.installationCount.incrementAndGet();
+                        }
+                    } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
+                        logger.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
+                    }
+                    return bundle;
+                })
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparingLong(Bundle::getBundleId));
-    }
-
-    private Bundle installBundle(URL bundleUrl) {
-        LOGGER.debug("Installing Bundle from location: [{}]", bundleUrl);
-        Bundle bundle = null;
-        try (JarInputStream jis = new JarInputStream(bundleUrl.openStream(), false)) {
-            if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                LOGGER.warn("Artifact [{}] is not a Bundle, skipping install!!", bundleUrl);
-            } else {
-                bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(bundleUrl.toExternalForm());
-                this.installedBundlesCount.incrementAndGet();
-            }
-        } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-            LOGGER.error("Exception while installing Bundle: [{}]. Cause:", bundleUrl, ex);
-        }
-        return bundle;
     }
 }

@@ -65,12 +65,11 @@ final class Bundles {
     static void provisionBundles() throws IOException {
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
-        String bundlesDir = Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY);
-        BundleInstaller bundleInstaller = new BundleInstaller();
-        bundleInstaller.installBundles(Bundles.class.getClassLoader(), bundleInstaller.findBundles(bundlesDir))
+        BundleInstaller installer = new BundleInstaller();
+        installer.install(Bundles.class.getClassLoader(), Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
-        LOGGER.info(BUNDLE_PROVISIONED_MSG, bundleInstaller.getInstalledBundlesCount(), Times.elapsedMillis(startTime));
+        LOGGER.info(BUNDLE_PROVISIONED_MSG, installer.getInstallationCount(), Times.elapsedMillis(startTime));
     }
 
     private static void startBundle(Bundle bundle) {
