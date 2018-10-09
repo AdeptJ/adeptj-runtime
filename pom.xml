@@ -212,6 +212,7 @@
                             <!-- Bundle dependencies must be in [provided] scope -->
                             <includeScope>provided</includeScope>
                             <excludeTransitive>true</excludeTransitive>
+                            <excludeArtifactIds>org.apache.felix.http.base</excludeArtifactIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -645,7 +646,7 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.base</artifactId>
             <version>${felix.http.base.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

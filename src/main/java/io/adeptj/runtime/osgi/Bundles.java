@@ -42,7 +42,7 @@ final class Bundles {
 
     private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
 
-    private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
+    private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles (excluding system bundle) in: [{}] ms!!";
 
     private static final String BENCHMARK_BUNDLE_START = "benchmark.bundle.start";
 

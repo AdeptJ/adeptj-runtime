@@ -77,7 +77,7 @@ class BundleInstaller {
         Bundle bundle = null;
         try (JarInputStream jis = new JarInputStream(bundleUrl.openStream(), false)) {
             if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                LOGGER.warn("Not an OSGi Bundle: {}", bundleUrl);
+                LOGGER.warn("Artifact [{}] is not a Bundle, skipping install!!", bundleUrl);
             } else {
                 bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(bundleUrl.toExternalForm());
                 this.installedBundlesCount.incrementAndGet();
