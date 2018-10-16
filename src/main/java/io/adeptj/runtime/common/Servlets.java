@@ -90,8 +90,9 @@ public class Servlets {
         ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET, new BridgeServlet());
         bridgeServlet.addMapping(ROOT_MAPPING);
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
-        // Otherwise the request processing fails throwing exception [java.lang.IllegalStateException: UT010026:
-        // Async is not supported for this request, as not all filters or Servlets were marked as supporting async]
+        // Otherwise the request processing fails throwing exception.
+        // [java.lang.IllegalStateException: UT010026: Async is not supported for this request, as not all filters or Servlets
+        // were marked as supporting async]
         bridgeServlet.setAsyncSupported(true);
         // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
         bridgeServlet.setLoadOnStartup(0);

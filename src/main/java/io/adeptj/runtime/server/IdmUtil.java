@@ -69,6 +69,6 @@ final class IdmUtil {
      * @return boolean to indicate whether the credentials verification was successful or not.
      */
     private static boolean verifyCredentials(String username, String id, char[] password) {
-        return StringUtils.equals(username, id) && isNotEmpty(password) && match(username, new String(password));
+        return StringUtils.equals(username, id) && isNotEmpty(password) && match(username, password);
     }
 }
