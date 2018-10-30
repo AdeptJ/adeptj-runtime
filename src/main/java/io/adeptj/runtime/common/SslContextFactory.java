@@ -32,18 +32,16 @@ import java.security.GeneralSecurityException;
  */
 public final class SslContextFactory {
 
-    private static final String PROTOCOL_TLS_V12 = "TLSv1.2";
-
     private SslContextFactory() {
     }
 
-    public static SSLContext newSslContext() throws GeneralSecurityException, IOException {
+    public static SSLContext newSslContext(String defaultTLSVersion) throws GeneralSecurityException, IOException {
         String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
         String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
         String keyPwd = System.getProperty("adeptj.rt.keyPassword");
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
-        SSLContext sslContext = SSLContext.getInstance(PROTOCOL_TLS_V12);
+        SSLContext sslContext = SSLContext.getInstance(System.getProperty("tls.version", defaultTLSVersion));
         sslContext.init(kmf.getKeyManagers(), null, null);
         return sslContext;
     }

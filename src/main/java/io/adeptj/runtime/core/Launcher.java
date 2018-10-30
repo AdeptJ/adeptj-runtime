@@ -93,7 +93,7 @@ public final class Launcher {
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
-            shutdownJvm(th);
+            shutdownJvm();
         }
     }
 
@@ -124,18 +124,17 @@ public final class Launcher {
         }
     }
 
-    private static void shutdownJvm(Throwable th) {
+    private static void shutdownJvm() {
+        Logger logger = LoggerFactory.getLogger(Launcher.class);
+        // Check if OSGi Framework was already started, try to stop the framework gracefully.
+        Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
+                .ifPresent(context -> {
+                    logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
+                    FrameworkManager.getInstance().stopFramework();
+                });
+        // Let the LOGBACK cleans up it's state.
+        LogbackManager.getInstance().getLoggerContext().stop();
         if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
-            Logger logger = LoggerFactory.getLogger(Launcher.class);
-            // Check if OSGi Framework was already started, try to stop the framework gracefully.
-            Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
-                    .ifPresent(context -> {
-                        logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
-                        FrameworkManager.getInstance().stopFramework();
-                    });
-            logger.error("Shutting down JVM!!", th);
-            // Let the LOGBACK cleans up it's state.
-            LogbackManager.getInstance().getLoggerContext().stop();
             System.exit(-1);
         }
     }

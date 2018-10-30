@@ -66,6 +66,7 @@ import org.xnio.Options;
 import org.xnio.Xnio;
 import org.xnio.XnioWorker;
 
+import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import java.io.IOException;
 import java.io.InputStream;
@@ -308,7 +309,8 @@ public final class Server implements Lifecycle {
                 System.setProperty("adeptj.rt.keyPassword", httpsConf.getString("keyPwd"));
                 LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
-            builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), SslContextFactory.newSslContext());
+            SSLContext sslContext = SslContextFactory.newSslContext(httpsConf.getString("tlsVersion"));
+            builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
         }
         return builder;
     }

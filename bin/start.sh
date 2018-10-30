@@ -47,11 +47,11 @@ JVM_MEM_OPTS="-Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m
 
 JVM_OPTS="-server ${GRAAL_VM_OPTS} ${JVM_MEM_OPTS} ${DEBUG_OPTS}"
 
-RESTEASY_OPTS=" -Dresteasy.allowGzip=false"
+RESTEASY_OPTS=" -Dresteasy.allowGzip=true"
 
 # Add the [java.xml.bind] module if Java version is greater than 8, otherwise some of the bundles will not start.
 if [ ${JAVA_VERSION} -gt 8 ]; then
-  JVM_OPTS="--add-modules java.xml.bind "${JVM_OPTS}
+  JVM_OPTS="--illegal-access=warn "${JVM_OPTS}
 fi
 
 ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
@@ -59,6 +59,7 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
+ -Dtls.version=TLSv1.2 \
  -Dwebsocket.logs.tailing.delay=5000 \
  -Dwait.time.for.debug.attach=5
  -Dlog.async=true \
