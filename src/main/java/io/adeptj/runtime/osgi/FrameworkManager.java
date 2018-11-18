@@ -92,7 +92,7 @@ public enum FrameworkManager {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
             this.provisionBundles();
-            List<String> errors = Configs.INSTANCE.undertow().getStringList("common.osgi-error-pages");
+            List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
