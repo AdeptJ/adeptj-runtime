@@ -39,7 +39,7 @@
         <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.15.Final</undertow.version>
+        <undertow.version>2.0.16.Final</undertow.version>
         <xnio.version>3.6.5.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
@@ -238,6 +238,12 @@
     </build>
 
     <dependencies>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-access</artifactId>
+            <version>1.2.3</version>
+        </dependency>
 
         <!-- Undertow Dependencies Starts -->
 
@@ -807,6 +813,13 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-logging</artifactId>
+            <version>${adeptj-modules-commons-logging.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-mvc</artifactId>
             <version>${adeptj-modules-commons-logging.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -20,28 +20,15 @@
 
 package io.adeptj.runtime.mvc;
 
-import com.typesafe.config.Config;
-import io.adeptj.runtime.common.Times;
-import io.adeptj.runtime.config.Configs;
+import io.adeptj.runtime.osgi.ServiceTrackers;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
-import org.trimou.engine.MustacheEngine;
-import org.trimou.engine.MustacheEngineBuilder;
-import org.trimou.engine.locator.ClassPathTemplateLocator;
-import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
 import java.lang.invoke.MethodHandles;
 
-import static io.adeptj.runtime.common.Constants.UTF8;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
-import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
-import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENABLED;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
-import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 
 /**
  * TemplateEngine for rendering the HTML templates.
@@ -76,26 +63,27 @@ public enum TemplateEngine {
 
     private static final String KEY_SUFFIX = "suffix";
 
-    private final MustacheEngine mustacheEngine;
+    //private final MustacheEngine mustacheEngine;
 
     TemplateEngine() {
-        long startTime = System.nanoTime();
-        Config config = Configs.of().trimou();
-        this.mustacheEngine = MustacheEngineBuilder.newBuilder()
-                .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
-                .addTemplateLocator(ClassPathTemplateLocator.builder()
-                        .setPriority(config.getInt(KEY_TEMPLATE_LOCATOR_PRIORITY))
-                        .setRootPath(config.getString(KEY_PREFIX))
-                        .setSuffix(config.getString(KEY_SUFFIX))
-                        .setScanClasspath(false)
-                        .build())
-                .setProperty(START_DELIMITER, config.getString(KEY_START_DELIMITER))
-                .setProperty(END_DELIMITER, config.getString(KEY_END_DELIMITER))
-                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
-                .setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean(KEY_CACHE_ENABLED))
-                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt(KEY_CACHE_EXPIRATION))
-                .build();
-        LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
+        //long startTime = System.nanoTime();
+        //Config config = Configs.of().trimou();
+//        this.mustacheEngine = MustacheEngineBuilder.newBuilder()
+//                .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
+//                .addTemplateLocator(ClassPathTemplateLocator.builder()
+//                        .setPriority(config.getInt(KEY_TEMPLATE_LOCATOR_PRIORITY))
+//                        .setRootPath(config.getString(KEY_PREFIX))
+//                        .setSuffix(config.getString(KEY_SUFFIX))
+//                        .setScanClasspath(false)
+//                        .build())
+//                .setProperty(START_DELIMITER, config.getString(KEY_START_DELIMITER))
+//                .setProperty(END_DELIMITER, config.getString(KEY_END_DELIMITER))
+//                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
+//                .setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean(KEY_CACHE_ENABLED))
+//                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt(KEY_CACHE_EXPIRATION))
+//                .build();
+        //this.mustacheEngine = ServiceTrackers.getInstance().getMustacheEngine();
+        //LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
     }
 
     /**
@@ -106,7 +94,7 @@ public enum TemplateEngine {
      */
     public void render(TemplateContext context) {
         try {
-            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
+            Mustache mustache = ServiceTrackers.getInstance().getMustacheEngine().getMustache(context.getTemplate());
             StringBuilder output = new StringBuilder(SB_CAPACITY);
             mustache.render(output, context.getTemplateData());
             IOUtils.write(output.toString(), context.getResponse().getWriter());
