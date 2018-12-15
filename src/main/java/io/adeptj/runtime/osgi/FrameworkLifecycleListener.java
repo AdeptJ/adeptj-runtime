@@ -64,6 +64,8 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
                 ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
+                ServiceTrackers.getInstance().closeMustacheEngineTracker();
+                ServiceTrackers.getInstance().openMustacheEngineTracker(bundleContext);
                 break;
             case STOPPED_UPDATE:
                 LOGGER.info("Closing DispatcherServletTracker!!");

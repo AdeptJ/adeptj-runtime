@@ -105,6 +105,5 @@ public class BridgeServlet extends HttpServlet {
     @Override
     public void destroy() {
         LOGGER.info("Destroying BridgeServlet!!");
-        ServiceTrackers.getInstance().closeMustacheEngineTracker();
     }
 }

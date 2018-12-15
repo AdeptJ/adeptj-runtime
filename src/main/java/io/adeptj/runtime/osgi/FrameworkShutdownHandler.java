@@ -48,6 +48,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
         // As with version 3.0.18 of Felix Http base the way with HttpSessionListener(s) handled
         // is changed which results in a NPE.
         ServiceTrackers.getInstance().closeDispatcherServletTracker();
+        ServiceTrackers.getInstance().closeMustacheEngineTracker();
         FrameworkManager.getInstance().stopFramework();
         ServletContextHolder.getInstance().setServletContext(null);
         logger.info("OSGi Framework stopped in [{}] ms!!", Times.elapsedMillis(startTime));
