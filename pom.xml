@@ -39,7 +39,7 @@
         <main.class>io.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.16.Final</undertow.version>
+        <undertow.version>2.0.17.Final</undertow.version>
         <xnio.version>3.6.5.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
@@ -238,12 +238,6 @@
     </build>
 
     <dependencies>
-
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>1.2.3</version>
-        </dependency>
 
         <!-- Undertow Dependencies Starts -->
 
@@ -839,22 +833,10 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <scope>test</scope>
-        </dependency>
-
+        
     </dependencies>
 
     <profiles>
@@ -1156,8 +1138,8 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>javax.ws.rs-api</artifactId>
+                    <groupId>jakarta.ws.rs</groupId>
+                    <artifactId>jakarta.ws.rs-api</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1336,44 +1318,24 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.3 (JPA 2.2) Dependencies -->
-
-                <dependency>
-                    <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>javax.persistence</artifactId>
-                    <version>${jpa.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.core</artifactId>
-                    <version>${eclipselink.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.json</groupId>
-                            <artifactId>javax.json-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
+                <!-- EclipseLink 2.7.4 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>org.eclipse.persistence.jpa</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.json</groupId>
-                            <artifactId>javax.json-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+                    <artifactId>jakarta.persistence</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.asm</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
                 </dependency>
@@ -1387,7 +1349,14 @@
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.asm</artifactId>
+                    <artifactId>org.eclipse.persistence.jpa.jpql</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.core</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
                 </dependency>
