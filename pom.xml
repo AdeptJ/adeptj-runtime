@@ -43,7 +43,7 @@
         <xnio.version>3.7.0.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.4.0.Final</wildfly-common.version>
-        <jboss-threads.version>2.3.2.Final</jboss-threads.version>
+        <jboss-threads.version>2.3.3.Final</jboss-threads.version>
         <jboss-logging.version>3.3.2.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.1.0.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
@@ -73,8 +73,8 @@
         <felix.webconsole.plugins.ds.version>2.1.0</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
         <felix.inventory.version>1.0.6</felix.inventory.version>
-        <felix.http.bridge.version>4.0.4</felix.http.bridge.version>
-        <felix.http.base.version>4.0.4</felix.http.base.version>
+        <felix.http.bridge.version>4.0.6</felix.http.bridge.version>
+        <felix.http.base.version>4.0.6</felix.http.base.version>
         <felix.log.version>1.2.0</felix.log.version>
         <felix.metatype.version>1.2.2</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
@@ -456,6 +456,20 @@
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
             <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.promise</artifactId>
+            <version>${org.osgi.util.promise.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.function</artifactId>
+            <version>${org.osgi.util.function.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
