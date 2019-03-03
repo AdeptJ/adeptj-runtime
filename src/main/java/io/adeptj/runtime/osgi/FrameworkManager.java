@@ -45,7 +45,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -120,22 +119,23 @@ public enum FrameworkManager {
     }
 
     private void removeServicesAndListeners() {
-        Optional.ofNullable(this.errorHandler).ifPresent(serviceRegistration -> {
+        if (this.errorHandler != null) {
             try {
                 LOGGER.info("Removing OSGiErrorServlet!!");
-                serviceRegistration.unregister();
+                errorHandler.unregister();
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }
-        });
-        Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext()).ifPresent(bundleContext -> {
+        }
+        BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
+        if (bundleContext != null) {
             try {
                 LOGGER.info("Removing OSGi FrameworkListener!!");
                 bundleContext.removeFrameworkListener(this.frameworkListener);
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }
-        });
+        }
     }
 
     private void provisionBundles() throws IOException {

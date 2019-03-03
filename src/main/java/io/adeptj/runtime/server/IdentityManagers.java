@@ -21,40 +21,36 @@
 package io.adeptj.runtime.server;
 
 import io.undertow.security.idm.Account;
+import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.PasswordCredential;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static io.adeptj.runtime.server.CredentialMatcher.match;
-import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-
 /**
  * Utility methods for {@link io.undertow.security.idm.IdentityManager}.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class IdmUtil {
+final class IdentityManagers {
 
-    private IdmUtil() {
+    private IdentityManagers() {
     }
 
-    static Account verifyAccount(Map<String, List<String>> userRolesMapping, Account account) {
-        return userRolesMapping
-                .entrySet()
+    static boolean verifyAccount(Map<String, List<String>> userRolesMapping, Account account) {
+        return userRolesMapping.entrySet()
                 .stream()
                 .anyMatch(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
-                        && entry.getValue().containsAll(account.getRoles()))
-                ? account : null;
+                        && entry.getValue().containsAll(account.getRoles()));
     }
 
-    static Account verifyCredentials(Map<String, List<String>> userRolesMapping, String id, PasswordCredential credential) {
-        return userRolesMapping
-                .entrySet()
+    static Account verifyCredentials(Map<String, List<String>> userRolesMapping, String id, Credential credential) {
+        return userRolesMapping.entrySet()
                 .stream()
-                .filter(entry -> IdmUtil.verifyCredentials(entry.getKey(), id, credential.getPassword()))
+                .filter(entry -> doVerifyCredentials(entry.getKey(), id, credential))
                 .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
                 .findFirst()
                 .orElse(null);
@@ -63,12 +59,14 @@ final class IdmUtil {
     /**
      * Verify the given credentials.
      *
-     * @param username one from configs.
-     * @param id       one that is submitted by client.
-     * @param password one that is submitted by client.
+     * @param username   one from configs.
+     * @param id         one that is submitted by client.
+     * @param credential the submitted user credential.
      * @return boolean to indicate whether the credentials verification was successful or not.
      */
-    private static boolean verifyCredentials(String username, String id, char[] password) {
-        return StringUtils.equals(username, id) && isNotEmpty(password) && match(username, password);
+    private static boolean doVerifyCredentials(String username, String id, Credential credential) {
+        PasswordCredential pc = (PasswordCredential) credential;
+        return StringUtils.equals(username, id)
+                && ArrayUtils.isNotEmpty(pc.getPassword()) && CredentialMatcher.match(username, pc.getPassword());
     }
 }

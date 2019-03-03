@@ -24,7 +24,6 @@ import com.typesafe.config.Config;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
-import io.undertow.security.idm.PasswordCredential;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +56,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(Account account) {
-        return IdmUtil.verifyAccount(this.userRolesMapping, account);
+        return IdentityManagers.verifyAccount(this.userRolesMapping, account) ? account : null;
     }
 
     /**
@@ -65,7 +64,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        return IdmUtil.verifyCredentials(this.userRolesMapping, id, (PasswordCredential) credential);
+        return IdentityManagers.verifyCredentials(this.userRolesMapping, id, credential);
     }
 
     /**
