@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.trimou.engine.MustacheEngine;
 
 import javax.servlet.http.HttpServlet;
-import java.util.Optional;
 
 /**
  * Utility for performing operations on OSGi {@link org.osgi.util.tracker.ServiceTracker} instances.
@@ -103,12 +102,12 @@ public enum ServiceTrackers {
     }
 
     private <S, T> void closeServiceTracker(ServiceTracker<S, T> serviceTracker) {
-        Optional.ofNullable(serviceTracker).ifPresent(tracker -> {
+        if (serviceTracker != null) {
             try {
-                tracker.close();
+                serviceTracker.close();
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Exception while closing the ServiceTracker!!", ex);
             }
-        });
+        }
     }
 }
