@@ -41,7 +41,7 @@
 **Built upon**
 
 1. High performance [Undertow](http://undertow.io/) web server.
-2. [OSGi](https://www.osgi.org) Framework R6(Apache Felix as implementation).
+2. [OSGi](https://www.osgi.org) Framework R7(Apache [Felix](http://felix.apache.org/) as implementation).
 
 **Uber Jar is ~30MB in size with below mentioned modules, starts in ~1500ms and low on resources**
 
