@@ -36,7 +36,7 @@
     <inceptionYear>2016</inceptionYear>
 
     <properties>
-        <main.class>io.adeptj.runtime.core.Launcher</main.class>
+        <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
         <undertow.version>2.0.19.Final</undertow.version>
