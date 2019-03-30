@@ -24,7 +24,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.trimou.engine.MustacheEngine;
 
 import javax.servlet.http.HttpServlet;
 
@@ -39,11 +38,9 @@ public enum ServiceTrackers {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTrackers.class);
 
-    private volatile DispatcherServletTracker dispatcherServletTracker;
+    private DispatcherServletTracker dispatcherServletTracker;
 
-    private volatile EventDispatcherTracker eventDispatcherTracker;
-
-    private volatile MustacheEngineTracker mustacheEngineTracker;
+    private EventDispatcherTracker eventDispatcherTracker;
 
     public void openDispatcherServletTracker(BundleContext bundleContext) {
         if (this.dispatcherServletTracker == null) {
@@ -78,23 +75,6 @@ public enum ServiceTrackers {
         LOGGER.info("Closing EventDispatcherTracker!!");
         this.closeServiceTracker(this.eventDispatcherTracker);
         this.eventDispatcherTracker = null;
-    }
-
-    public void openMustacheEngineTracker(BundleContext bundleContext) {
-        if (this.mustacheEngineTracker == null) {
-            this.mustacheEngineTracker = new MustacheEngineTracker(bundleContext);
-            this.mustacheEngineTracker.open();
-        }
-    }
-
-    public MustacheEngine getMustacheEngine() {
-        return this.mustacheEngineTracker.getMustacheEngine();
-    }
-
-    public void closeMustacheEngineTracker() {
-        LOGGER.info("Closing MustacheEngineTracker!!");
-        this.closeServiceTracker(this.mustacheEngineTracker);
-        this.mustacheEngineTracker = null;
     }
 
     public static ServiceTrackers getInstance() {

@@ -860,13 +860,6 @@
             <version>${adeptj-modules-commons-logging.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-modules-mvc</artifactId>
-            <version>${adeptj-modules-commons-logging.version}</version>
-            <scope>provided</scope>
-        </dependency>
         
          <dependency>
             <groupId>com.adeptj</groupId>
@@ -1717,9 +1710,9 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <version>${maven-dependency-plugin.version}</version>
                         <executions>
-                            <!-- copy libs -->
+                            <!-- copy lib -->
                             <execution>
-                                <id>copy-dependencies-libs</id>
+                                <id>copy-dependencies-lib</id>
                                 <phase>prepare-package</phase>
                                 <goals>
                                     <goal>copy-dependencies</goal>
@@ -1727,7 +1720,6 @@
                                 <configuration>
                                     <!-- Library dependencies must be in [runtime] scope -->
                                     <includeScope>runtime</includeScope>
-                                    <excludeTransitive>true</excludeTransitive>
                                     <excludeArtifactIds>
                                         org.apache.felix.http.base,
                                         osgi.annotation
