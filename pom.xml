@@ -40,7 +40,7 @@
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
         <undertow.version>2.0.19.Final</undertow.version>
-        <xnio.version>3.7.0.Final</xnio.version>
+        <xnio.version>3.7.1.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.0.Final</wildfly-common.version>
         <jboss-threads.version>2.3.3.Final</jboss-threads.version>
@@ -1733,7 +1733,7 @@
                                         osgi.annotation
                                     </excludeArtifactIds>
                                     <!-- All libraries will be copied here -->
-                                    <outputDirectory>${project.build.directory}/libs</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -1751,7 +1751,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <classpathPrefix>libs/</classpathPrefix>
+                                    <classpathPrefix>lib/</classpathPrefix>
                                     <mainClass>${main.class}</mainClass>
                                 </manifest>
                             </archive>
