@@ -81,9 +81,10 @@
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.6</felix.http.sslfilter.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
+        <felix.rootcause.version>0.1.0</felix.rootcause.version>
         <felix.systemready.version>0.4.0</felix.systemready.version>
         <felix.healthcheck.core.version>2.0.0</felix.healthcheck.core.version>
-        <felix.healthcheck.generalchecks.version>2.0.0</felix.healthcheck.generalchecks.version>
+        <felix.healthcheck.generalchecks.version>2.0.2</felix.healthcheck.generalchecks.version>
         <org.apache.felix.healthcheck.webconsoleplugin.version>2.0.0</org.apache.felix.healthcheck.webconsoleplugin.version>
 
         <!-- AdeptJ Modules Dependencies -->
@@ -793,6 +794,13 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.sslfilter</artifactId>
             <version>${felix.http.sslfilter.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.rootcause</artifactId>
+            <version>${felix.rootcause.version}</version>
             <scope>provided</scope>
         </dependency>
 
