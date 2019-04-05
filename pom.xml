@@ -54,7 +54,7 @@
         <jansi.version>1.17.1</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.5.0</classmate.version>
-        <javax.el.version>3.0.1-b10</javax.el.version>
+        <javax.el.version>3.0.1-b11</javax.el.version>
         <javax.mail.version>1.6.2</javax.mail.version>
 
         <!-- JAX-B Dependencies -->
@@ -71,7 +71,7 @@
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
         <felix.webconsole.plugins.event.version>1.1.8</felix.webconsole.plugins.event.version>
         <felix.webconsole.plugins.ds.version>2.1.0</felix.webconsole.plugins.ds.version>
-        <felix.webconsole.plugins.memoryusage.version>1.0.8</felix.webconsole.plugins.memoryusage.version>
+        <felix.webconsole.plugins.memoryusage.version>1.0.10</felix.webconsole.plugins.memoryusage.version>
         <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.http.bridge.version>4.0.6</felix.http.bridge.version>
         <felix.http.base.version>4.0.6</felix.http.base.version>
@@ -1521,7 +1521,7 @@
 
         <profile>
 
-            <id>JAVAX-JSON</id>
+            <id>javax-json</id>
 
             <dependencies>
 
