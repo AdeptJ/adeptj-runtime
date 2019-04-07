@@ -39,7 +39,7 @@
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.19.Final</undertow.version>
+        <undertow.version>2.0.20.Final</undertow.version>
         <xnio.version>3.7.1.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.0.Final</wildfly-common.version>
@@ -82,8 +82,8 @@
         <felix.http.sslfilter.version>1.2.6</felix.http.sslfilter.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
         <felix.rootcause.version>0.1.0</felix.rootcause.version>
-        <felix.systemready.version>0.4.0</felix.systemready.version>
-        <felix.healthcheck.core.version>2.0.0</felix.healthcheck.core.version>
+        <felix.systemready.version>0.4.2</felix.systemready.version>
+        <felix.healthcheck.core.version>2.0.2</felix.healthcheck.core.version>
         <felix.healthcheck.generalchecks.version>2.0.2</felix.healthcheck.generalchecks.version>
         <org.apache.felix.healthcheck.webconsoleplugin.version>2.0.0</org.apache.felix.healthcheck.webconsoleplugin.version>
 
