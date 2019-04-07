@@ -56,6 +56,8 @@
         <classmate.version>1.5.0</classmate.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <javax.mail.version>1.6.2</javax.mail.version>
+        <yasson.version>1.0.3</yasson.version>
+        <glassfish.javax.json.version>1.1.4</glassfish.javax.json.version>
 
         <!-- JAX-B Dependencies JDK 10+ -->
         <jakarta.xml.bind-api.version>2.3.2</jakarta.xml.bind-api.version>
@@ -375,14 +377,14 @@
         <!-- Undertow core [provided] dependencies end -->
 
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>javax.websocket</groupId>
-            <artifactId>javax.websocket-api</artifactId>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -429,8 +431,8 @@
         <!-- Undertow Dependencies Ends -->
 
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -457,18 +459,6 @@
             <groupId>org.osgi</groupId>
             <artifactId>osgi.annotation</artifactId>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.promise</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.function</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -556,23 +546,19 @@
         </dependency>
 
         <!-- JSR 374 [JSON-P] Specification API -->
+
         <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <!-- JSR 367 [JSON-B] Specification API-->
+
         <dependency>
-            <groupId>javax.json.bind</groupId>
-            <artifactId>javax.json.bind-api</artifactId>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.json</groupId>
-                    <artifactId>javax.json-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -581,7 +567,19 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Apache Felix Dependencies Start -->
+        <!-- OSGi/Apache Felix Dependencies Start -->
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.promise</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.function</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -790,7 +788,7 @@
             <version>${felix.http.sslfilter.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.rootcause</artifactId>
@@ -823,7 +821,7 @@
             <version>${felix.healthcheck.generalchecks.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.healthcheck.webconsoleplugin</artifactId>
@@ -862,8 +860,8 @@
             <version>${adeptj-modules-commons-logging.version}</version>
             <scope>provided</scope>
         </dependency>
-        
-         <dependency>
+
+        <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-commons-crypto</artifactId>
             <version>${adeptj-modules-commons-crypto.version}</version>
@@ -881,7 +879,7 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
     </dependencies>
 
     <profiles>
@@ -1149,12 +1147,16 @@
                     <scope>provided</scope>
                     <exclusions>
                         <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging</artifactId>
-                        </exclusion>
-                        <exclusion>
                             <groupId>com.fasterxml</groupId>
                             <artifactId>classmate</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javax.validation</groupId>
+                            <artifactId>validation-api</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.jboss.logging</groupId>
+                            <artifactId>jboss-logging</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
@@ -1177,8 +1179,8 @@
             <dependencies>
 
                 <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
+                    <groupId>jakarta.validation</groupId>
+                    <artifactId>jakarta.validation-api</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1196,9 +1198,9 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>javax.interceptor</groupId>
-                    <artifactId>javax.interceptor-api</artifactId>
-                    <version>${javax.interceptor-api.version}</version>
+                    <groupId>jakarta.interceptor</groupId>
+                    <artifactId>jakarta.interceptor-api</artifactId>
+                    <version>${jakarta.interceptor-api.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1523,6 +1525,7 @@
                 <dependency>
                     <groupId>org.eclipse</groupId>
                     <artifactId>yasson</artifactId>
+                    <version>${yasson.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1530,6 +1533,7 @@
                 <dependency>
                     <groupId>org.glassfish</groupId>
                     <artifactId>javax.json</artifactId>
+                    <version>${glassfish.javax.json.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1623,7 +1627,7 @@
 
         <profile>
 
-        <id>shade</id>
+            <id>shade</id>
 
             <build>
 

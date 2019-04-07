@@ -16,3 +16,8 @@ deployment/log
 .idea
 adeptj-runtime.iml
 deployment
+target_swiftype
+*.pem
+*.prefs
+.classpath
+.project
