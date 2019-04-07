@@ -57,14 +57,13 @@
         <javax.el.version>3.0.1-b11</javax.el.version>
         <javax.mail.version>1.6.2</javax.mail.version>
 
-        <!-- JAX-B Dependencies -->
-        <javax.activation.version>1.2.0</javax.activation.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <istack-commons-runtime.version>3.0.7</istack-commons-runtime.version>
-        <jaxb-runtime.version>2.3.1</jaxb-runtime.version>
-        <txw2.version>2.3.1</txw2.version>
-        <FastInfoset.version>1.2.15</FastInfoset.version>
-        <stax-ex.version>1.8</stax-ex.version>
+        <!-- JAX-B Dependencies JDK 10+ -->
+        <jakarta.xml.bind-api.version>2.3.2</jakarta.xml.bind-api.version>
+        <istack-commons-runtime.version>3.0.8</istack-commons-runtime.version>
+        <jaxb-runtime.version>2.3.2</jaxb-runtime.version>
+        <txw2.version>2.3.2</txw2.version>
+        <FastInfoset.version>1.2.16</FastInfoset.version>
+        <stax-ex.version>1.8.1</stax-ex.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>6.0.2</felix.framework.version>
@@ -85,7 +84,7 @@
         <felix.systemready.version>0.4.2</felix.systemready.version>
         <felix.healthcheck.core.version>2.0.2</felix.healthcheck.core.version>
         <felix.healthcheck.generalchecks.version>2.0.2</felix.healthcheck.generalchecks.version>
-        <org.apache.felix.healthcheck.webconsoleplugin.version>2.0.0</org.apache.felix.healthcheck.webconsoleplugin.version>
+        <felix.healthcheck.webconsoleplugin.version>2.0.0</felix.healthcheck.webconsoleplugin.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
@@ -833,7 +832,7 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.healthcheck.webconsoleplugin</artifactId>
-            <version>${org.apache.felix.healthcheck.webconsoleplugin.version}</version>
+            <version>${felix.healthcheck.webconsoleplugin.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -1578,56 +1577,25 @@
 
             <dependencies>
 
-                <!-- JAX-B Dependencies -->
+                <!-- JAX-B API/Implementation Dependencies -->
 
                 <dependency>
-                    <groupId>com.sun.activation</groupId>
-                    <artifactId>javax.activation</artifactId>
-                    <version>${javax.activation.version}</version>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                    <!-- scope is provided in parent, must be compile scope to put in /lib -->
+                    <scope>compile</scope>
                 </dependency>
 
                 <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                    <version>${jaxb-api.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.activation</groupId>
-                            <artifactId>javax.activation-api</artifactId>
-                        </exclusion>
-                    </exclusions>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                    <version>${jakarta.xml.bind-api.version}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.glassfish.jaxb</groupId>
                     <artifactId>jaxb-runtime</artifactId>
                     <version>${jaxb-runtime.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.sun.istack</groupId>
-                            <artifactId>istack-commons-runtime</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.sun.xml.fastinfoset</groupId>
-                            <artifactId>FastInfoset</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.activation</groupId>
-                            <artifactId>javax.activation-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.glassfish.jaxb</groupId>
-                            <artifactId>txw2</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.jvnet.staxex</groupId>
-                            <artifactId>stax-ex</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
@@ -1652,12 +1620,6 @@
                     <groupId>org.jvnet.staxex</groupId>
                     <artifactId>stax-ex</artifactId>
                     <version>${stax-ex.version}</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.activation</groupId>
-                            <artifactId>activation</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
             </dependencies>
