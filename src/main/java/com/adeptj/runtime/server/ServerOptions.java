@@ -96,7 +96,7 @@ final class ServerOptions {
     private static <T> Option<T> toOption(String name) {
         Option<T> option = null;
         try {
-            option = (Option) UndertowOptions.class.getField(name).get(null);
+            option = (Option<T>) UndertowOptions.class.getField(name).get(null);
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             LOGGER.error("Exception while accessing field: [{}]", name, ex);
         }

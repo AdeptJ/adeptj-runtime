@@ -40,7 +40,9 @@ import java.lang.invoke.MethodHandles;
  */
 public class DispatcherServletWrapper extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final long serialVersionUID = 282686082848634854L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
 
