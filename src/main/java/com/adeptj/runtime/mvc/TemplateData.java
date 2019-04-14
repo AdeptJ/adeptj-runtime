@@ -40,7 +40,7 @@ public final class TemplateData implements Mapper, Iterable<Entry<String, Object
         this.variables = new HashMap<>();
     }
 
-    public TemplateData put(String key, Object value) {
+    public TemplateData with(String key, Object value) {
         this.variables.put(key, value);
         return this;
     }

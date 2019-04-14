@@ -76,10 +76,10 @@ public final class ErrorPages {
                     .response(resp)
                     .locale(req.getLocale())
                     .templateData(TemplateData.newTemplateData()
-                            .put(KEY_STATUS_CODE, statusCode)
-                            .put(KEY_ERROR_MSG, RequestUtil.getAttribute(req, ERROR_MESSAGE))
-                            .put(KEY_REQ_URI, RequestUtil.getAttribute(req, ERROR_REQUEST_URI))
-                            .put(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
+                            .with(KEY_STATUS_CODE, statusCode)
+                            .with(KEY_ERROR_MSG, RequestUtil.getAttribute(req, ERROR_MESSAGE))
+                            .with(KEY_REQ_URI, RequestUtil.getAttribute(req, ERROR_REQUEST_URI))
+                            .with(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
                     .template(TEMPLATE_500)
                     .build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
@@ -138,7 +138,7 @@ public final class ErrorPages {
                 .locale(req.getLocale())
                 .template(TEMPLATE_500)
                 .templateData(TemplateData.newTemplateData()
-                        .put(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
+                        .with(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
                 .build());
     }
 }

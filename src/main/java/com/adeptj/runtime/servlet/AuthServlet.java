@@ -32,6 +32,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
+import static com.adeptj.runtime.common.Constants.TOOLS_DASHBOARD_URI;
+import static com.adeptj.runtime.common.Constants.TOOLS_LOGOUT_URI;
+
 /**
  * AuthServlet does the following:
  * <p>
@@ -46,7 +50,7 @@ import javax.servlet.http.HttpServletResponse;
         name = "AdeptJ AuthServlet",
         urlPatterns = {
                 Constants.TOOLS_LOGIN_URI,
-                Constants.TOOLS_LOGOUT_URI
+                TOOLS_LOGOUT_URI
         },
         asyncSupported = true
 )
@@ -69,19 +73,20 @@ public class AuthServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String requestURI = req.getRequestURI();
         if (Constants.TOOLS_LOGIN_URI.equals(requestURI)) {
-            TemplateEngine.getInstance().render(TemplateContext.builder()
-                    .request(req)
-                    .response(resp)
-                    .template(LOGIN_TEMPLATE)
-                    .locale(req.getLocale())
-                    .build());
-        } else if (Constants.TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(Constants.OSGI_ADMIN_ROLE)) {
+            TemplateEngine.getInstance()
+                    .render(TemplateContext.builder()
+                            .request(req)
+                            .response(resp)
+                            .template(LOGIN_TEMPLATE)
+                            .locale(req.getLocale())
+                            .build());
+        } else if (TOOLS_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
             // Invalidate the session and redirect to /tools/dashboard page.
             RequestUtil.logout(req);
-            ResponseUtil.redirect(resp, Constants.TOOLS_DASHBOARD_URI);
+            ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
         } else {
             // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /tools/dashboard.
-            ResponseUtil.redirect(resp, Constants.TOOLS_DASHBOARD_URI);
+            ResponseUtil.redirect(resp, TOOLS_DASHBOARD_URI);
         }
     }
 
@@ -91,14 +96,15 @@ public class AuthServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
-        TemplateEngine.getInstance().render(TemplateContext.builder()
-                .request(req)
-                .response(resp)
-                .template(LOGIN_TEMPLATE)
-                .locale(req.getLocale())
-                .templateData(TemplateData.newTemplateData()
-                        .put(ERROR_MSG_KEY, ERROR_MSG)
-                        .put(J_USERNAME, req.getParameter(J_USERNAME)))
-                .build());
+        TemplateEngine.getInstance()
+                .render(TemplateContext.builder()
+                        .request(req)
+                        .response(resp)
+                        .template(LOGIN_TEMPLATE)
+                        .locale(req.getLocale())
+                        .templateData(TemplateData.newTemplateData()
+                                .with(ERROR_MSG_KEY, ERROR_MSG)
+                                .with(J_USERNAME, req.getParameter(J_USERNAME)))
+                        .build());
     }
 }
