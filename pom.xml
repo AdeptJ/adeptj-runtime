@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>6</version>
+        <version>7</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -95,6 +95,7 @@
         <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
         <adeptj-runtime-tools.version>1.0.6.Final</adeptj-runtime-tools.version>
+        <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
 
     <!-- Project Information -->
@@ -516,6 +517,12 @@
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-tools</artifactId>
             <version>${adeptj-runtime-tools.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-runtime-extensions</artifactId>
+            <version>${adeptj-runtime-extensions.version}</version>
         </dependency>
 
         <!-- RenderEngine Dependencies -->

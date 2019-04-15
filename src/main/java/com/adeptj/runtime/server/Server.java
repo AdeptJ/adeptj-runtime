@@ -31,12 +31,12 @@ import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.InitializationException;
+import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
 import com.adeptj.runtime.servlet.ToolsServlet;
-import com.adeptj.runtime.tools.logging.LogbackManager;
 import com.adeptj.runtime.websocket.ServerLogsWebSocket;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
@@ -112,7 +112,10 @@ public final class Server implements Lifecycle {
 
     private WeakReference<Config> cfgReference;
 
-    public Server(Map<String, String> runtimeArgs) {
+    private LogbackManager logbackManager;
+
+    public Server(LogbackManager logbackManager, Map<String, String> runtimeArgs) {
+        this.logbackManager = logbackManager;
         this.runtimeArgs = runtimeArgs;
     }
 
@@ -163,7 +166,7 @@ public final class Server implements Lifecycle {
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the Logback cleans up it's state.
-            LogbackManager.getInstance().getLoggerContext().stop();
+            this.logbackManager.getLoggerContext().stop();
         }
     }
 
@@ -264,7 +267,7 @@ public final class Server implements Lifecycle {
         if (Boolean.getBoolean(ServerConstants.SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            LogbackManager.getInstance().getLoggerContext().stop();
+            this.logbackManager.getLoggerContext().stop();
             System.exit(-1); // NOSONAR
         }
         return port;

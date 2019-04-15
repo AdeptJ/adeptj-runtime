@@ -24,8 +24,9 @@ import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.typesafe.config.Config;
+import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
 import com.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
+import com.typesafe.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -43,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -73,6 +75,8 @@ public enum FrameworkManager {
 
     private ServiceRegistration<Servlet> errorHandler;
 
+    private ServiceRegistration<WebConsolePasswordChangeListener> passwordChangeListener;
+
     private Framework framework;
 
     private FrameworkLifecycleListener frameworkListener;
@@ -93,6 +97,10 @@ public enum FrameworkManager {
             this.provisionBundles();
             List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
+            this.passwordChangeListener = systemBundleContext
+                    .registerService(WebConsolePasswordChangeListener.class,
+                            new WebConsolePasswordChangeListener(),
+                            new Hashtable<>());
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -122,7 +130,15 @@ public enum FrameworkManager {
         if (this.errorHandler != null) {
             try {
                 LOGGER.info("Removing OSGiErrorServlet!!");
-                errorHandler.unregister();
+                this.errorHandler.unregister();
+            } catch (Exception ex) { // NOSONAR
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        }
+        if (this.passwordChangeListener != null) {
+            try {
+                LOGGER.info("Removing WebConsolePasswordChangeListener!!");
+                this.passwordChangeListener.unregister();
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }
