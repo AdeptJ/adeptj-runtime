@@ -42,12 +42,12 @@
         <undertow.version>2.0.20.Final</undertow.version>
         <xnio.version>3.7.1.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
-        <wildfly-common.version>1.5.0.Final</wildfly-common.version>
+        <wildfly-common.version>1.5.1.Final</wildfly-common.version>
         <jboss-threads.version>2.3.3.Final</jboss-threads.version>
         <jboss-logging.version>3.4.0.Final</jboss-logging.version>
-        <jboss-logging-annotations.version>2.1.0.Final</jboss-logging-annotations.version>
-        <jboss-logging-processor.version>2.1.0.Final</jboss-logging-processor.version>
-        <jdeparser.version>2.0.2.Final</jdeparser.version>
+        <jboss-logging-annotations.version>2.2.0.Final</jboss-logging-annotations.version>
+        <jboss-logging-processor.version>2.2.0.Final</jboss-logging-processor.version>
+        <jdeparser.version>2.0.3.Final</jdeparser.version>
         <jboss-classfilewriter.version>1.2.4.Final</jboss-classfilewriter.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
