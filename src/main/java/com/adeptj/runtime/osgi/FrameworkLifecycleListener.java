@@ -56,16 +56,25 @@ public class FrameworkLifecycleListener implements FrameworkListener {
         switch (event.getType()) {
             case STARTED:
                 LOGGER.info("Handling OSGi Framework Restart!!");
-                BundleContext bundleContext = event.getBundle().getBundleContext();
-                BundleContextHolder.getInstance().setBundleContext(bundleContext);
+                ServiceRegistrations.getInstance().unregisterErrorHandler();
+                ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
+                ServiceRegistrations.getInstance().unregisterLogbackManager();
+                BundleContext systemBundleContext = event.getBundle().getBundleContext();
+                ServiceRegistrations.getInstance().registerErrorHandler(systemBundleContext);
+                ServiceRegistrations.getInstance().registerWebConsolePasswordChangeListener(systemBundleContext);
+                ServiceRegistrations.getInstance().registerLogbackManager(systemBundleContext);
+                BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
                 // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 ServletContextHolder.getInstance()
-                        .getServletContext().setAttribute(Constants.ATTRIBUTE_BUNDLE_CTX, bundleContext);
+                        .getServletContext().setAttribute(Constants.ATTRIBUTE_BUNDLE_CTX, systemBundleContext);
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
+                ServiceTrackers.getInstance().openDispatcherServletTracker(systemBundleContext);
                 break;
             case STOPPED_UPDATE:
+                ServiceRegistrations.getInstance().unregisterErrorHandler();
+                ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
+                ServiceRegistrations.getInstance().unregisterLogbackManager();
                 LOGGER.info("Closing DispatcherServletTracker!!");
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Closing EventDispatcherTracker!!");

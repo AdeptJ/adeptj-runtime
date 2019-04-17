@@ -21,14 +21,10 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Environment;
-import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.common.WebConsolePasswordChangeListenerHolder;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
-import com.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import com.typesafe.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,8 +43,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -99,17 +93,10 @@ public enum FrameworkManager {
             this.frameworkListener = new FrameworkLifecycleListener();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
+            ServiceRegistrations.getInstance().registerErrorHandler(systemBundleContext);
+            ServiceRegistrations.getInstance().registerWebConsolePasswordChangeListener(systemBundleContext);
+            ServiceRegistrations.getInstance().registerLogbackManager(systemBundleContext);
             this.provisionBundles();
-            List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
-            this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
-            WebConsolePasswordChangeListener passwordChangeListener = new WebConsolePasswordChangeListener();
-            WebConsolePasswordChangeListenerHolder.getInstance().setPasswordChangeListener(passwordChangeListener);
-            this.passwordChangeListener = systemBundleContext
-                    .registerService(WebConsolePasswordChangeListener.class, passwordChangeListener, new Hashtable<>());
-            this.logbackManager = systemBundleContext
-                    .registerService(LogbackManager.class,
-                            LogbackManagerHolder.getInstance().getLogbackManager(),
-                            new Hashtable<>());
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -136,30 +123,9 @@ public enum FrameworkManager {
     }
 
     private void removeServicesAndListeners() {
-        if (this.errorHandler != null) {
-            try {
-                LOGGER.info("Removing OSGiErrorServlet!!");
-                this.errorHandler.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-        }
-        if (this.passwordChangeListener != null) {
-            try {
-                LOGGER.info("Removing WebConsolePasswordChangeListener!!");
-                this.passwordChangeListener.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-        }
-        if (this.logbackManager != null) {
-            try {
-                LOGGER.info("Removing LogbackManager!!");
-                this.logbackManager.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-        }
+        ServiceRegistrations.getInstance().unregisterErrorHandler();
+        ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
+        ServiceRegistrations.getInstance().unregisterLogbackManager();
         BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
         if (bundleContext != null) {
             try {
