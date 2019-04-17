@@ -25,13 +25,13 @@ import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Lifecycle;
+import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.SslContextFactory;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.InitializationException;
-import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AuthServlet;
 import com.adeptj.runtime.servlet.CryptoServlet;
@@ -112,10 +112,7 @@ public final class Server implements Lifecycle {
 
     private WeakReference<Config> cfgReference;
 
-    private LogbackManager logbackManager;
-
-    public Server(LogbackManager logbackManager, Map<String, String> runtimeArgs) {
-        this.logbackManager = logbackManager;
+    public Server(Map<String, String> runtimeArgs) {
         this.runtimeArgs = runtimeArgs;
     }
 
@@ -166,7 +163,7 @@ public final class Server implements Lifecycle {
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
             // Let the Logback cleans up it's state.
-            this.logbackManager.getLoggerContext().stop();
+            LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
         }
     }
 
@@ -267,7 +264,7 @@ public final class Server implements Lifecycle {
         if (Boolean.getBoolean(ServerConstants.SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
-            this.logbackManager.getLoggerContext().stop();
+            LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
             System.exit(-1); // NOSONAR
         }
         return port;

@@ -21,9 +21,12 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Environment;
+import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.common.WebConsolePasswordChangeListenerHolder;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
 import com.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import com.typesafe.config.Config;
@@ -77,6 +80,8 @@ public enum FrameworkManager {
 
     private ServiceRegistration<WebConsolePasswordChangeListener> passwordChangeListener;
 
+    private ServiceRegistration<LogbackManager> logbackManager;
+
     private Framework framework;
 
     private FrameworkLifecycleListener frameworkListener;
@@ -97,9 +102,13 @@ public enum FrameworkManager {
             this.provisionBundles();
             List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
             this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
+            WebConsolePasswordChangeListener passwordChangeListener = new WebConsolePasswordChangeListener();
+            WebConsolePasswordChangeListenerHolder.getInstance().setPasswordChangeListener(passwordChangeListener);
             this.passwordChangeListener = systemBundleContext
-                    .registerService(WebConsolePasswordChangeListener.class,
-                            new WebConsolePasswordChangeListener(),
+                    .registerService(WebConsolePasswordChangeListener.class, passwordChangeListener, new Hashtable<>());
+            this.logbackManager = systemBundleContext
+                    .registerService(LogbackManager.class,
+                            LogbackManagerHolder.getInstance().getLogbackManager(),
                             new Hashtable<>());
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
@@ -139,6 +148,14 @@ public enum FrameworkManager {
             try {
                 LOGGER.info("Removing WebConsolePasswordChangeListener!!");
                 this.passwordChangeListener.unregister();
+            } catch (Exception ex) { // NOSONAR
+                LOGGER.error(ex.getMessage(), ex);
+            }
+        }
+        if (this.logbackManager != null) {
+            try {
+                LOGGER.info("Removing LogbackManager!!");
+                this.logbackManager.unregister();
             } catch (Exception ex) { // NOSONAR
                 LOGGER.error(ex.getMessage(), ex);
             }

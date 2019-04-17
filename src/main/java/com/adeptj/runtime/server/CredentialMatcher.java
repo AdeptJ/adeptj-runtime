@@ -20,7 +20,9 @@
 
 package com.adeptj.runtime.server;
 
+import com.adeptj.runtime.common.WebConsolePasswordChangeListenerHolder;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,7 +63,11 @@ final class CredentialMatcher {
     static boolean match(String username, char[] password) {
         // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console,
         // make use of default password maintained in provisioning file.
-        return fromServerConfig(username, password);
+        WebConsolePasswordChangeListener passwordChangeListener
+                = WebConsolePasswordChangeListenerHolder.getInstance().getPasswordChangeListener();
+        return passwordChangeListener.isPasswordNotEmpty() ?
+                fromOSGiManagerConfig(password, passwordChangeListener) :
+                fromServerConfig(username, password);
     }
 
     private static boolean fromServerConfig(String id, char[] password) {
@@ -74,9 +80,9 @@ final class CredentialMatcher {
                         && Arrays.equals(makeHash(password), ((String) entry.getValue()).toCharArray()));
     }
 
-    private static boolean fromOSGiManagerConfig(char[] password) {
+    private static boolean fromOSGiManagerConfig(char[] password, WebConsolePasswordChangeListener passwordChangeListener) {
         try {
-            return Arrays.equals(makeHash(password), "".toCharArray());
+            return Arrays.equals(makeHash(password), passwordChangeListener.getPassword());
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
         }

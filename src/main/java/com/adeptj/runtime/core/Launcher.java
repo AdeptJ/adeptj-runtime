@@ -24,10 +24,10 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Lifecycle;
+import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.Server;
@@ -75,20 +75,20 @@ public final class Launcher {
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
-        LogbackManager logbackManager = LogbackInitializer.init();
+        LogbackInitializer.init();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             Map<String, String> runtimeArgs = parseArgs(args);
-            Lifecycle lifecycle = new Server(logbackManager, runtimeArgs);
+            Lifecycle lifecycle = new Server(runtimeArgs);
             lifecycle.start();
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, Constants.SERVER_STOP_THREAD_NAME));
             launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
-            shutdownJvm(logbackManager);
+            shutdownJvm();
         }
     }
 
@@ -119,7 +119,7 @@ public final class Launcher {
         }
     }
 
-    private static void shutdownJvm(LogbackManager logbackManager) {
+    private static void shutdownJvm() {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
@@ -128,7 +128,7 @@ public final class Launcher {
                     FrameworkManager.getInstance().stopFramework();
                 });
         // Let the LOGBACK cleans up it's state.
-        logbackManager.getLoggerContext().stop();
+        LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
         if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
             System.exit(-1);
         }
