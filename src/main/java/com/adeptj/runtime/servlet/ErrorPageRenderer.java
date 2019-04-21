@@ -47,7 +47,7 @@ public final class ErrorPageRenderer {
 
     private static final String STATUS_500 = "500";
 
-    private static final String TEMPLATE_ERROR = "/tools/error";
+    private static final String ERROR_URI = "/error";
 
     private static final String KEY_STATUS_CODE = "statusCode";
 
@@ -63,7 +63,7 @@ public final class ErrorPageRenderer {
 
     private static final String KEY_STATUS_CODES = "common.status-codes";
 
-    private static final String TEMPLATE_ERROR_RESOLVABLE = "error/%s";
+    private static final String TEMPLATE_ERROR_FMT = "error/%s";
 
     private ErrorPageRenderer() {
     }
@@ -91,7 +91,7 @@ public final class ErrorPageRenderer {
 
     static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), Constants.SLASH);
-        if (StringUtils.equals(TEMPLATE_ERROR, req.getRequestURI())) {
+        if (StringUtils.equals(ERROR_URI, req.getRequestURI())) {
             ErrorPageRenderer.renderGenericErrorPage(req, resp);
         } else if (StringUtils.equals(STATUS_500, statusCode)) {
             ErrorPageRenderer.render500Page(req, resp);
@@ -118,7 +118,7 @@ public final class ErrorPageRenderer {
                 .request(req)
                 .response(resp)
                 .locale(req.getLocale())
-                .template(String.format(TEMPLATE_ERROR_RESOLVABLE, statusCode))
+                .template(String.format(TEMPLATE_ERROR_FMT, statusCode))
                 .build());
     }
 

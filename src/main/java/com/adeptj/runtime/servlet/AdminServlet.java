@@ -65,8 +65,7 @@ public class AdminServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        String requestURI = req.getRequestURI();
-        if (ADMIN_LOGIN_URI.equals(requestURI)) {
+        if (ADMIN_LOGIN_URI.equals(req.getRequestURI())) {
             TemplateEngine.getInstance()
                     .render(TemplateContext.builder()
                             .request(req)
@@ -74,14 +73,14 @@ public class AdminServlet extends HttpServlet {
                             .template(LOGIN_TEMPLATE)
                             .locale(req.getLocale())
                             .build());
-        } else if (ADMIN_LOGOUT_URI.equals(requestURI) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
-            // Invalidate the session and redirect to /tools/dashboard page.
-            RequestUtil.logout(req);
-            ResponseUtil.redirect(resp, DEFAULT_LANDING_PAGE_URI);
-        } else {
-            // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /tools/dashboard.
-            ResponseUtil.redirect(resp, DEFAULT_LANDING_PAGE_URI);
+            return;
         }
+        if (ADMIN_LOGOUT_URI.equals(req.getRequestURI()) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
+            // Invalidate the session.
+            RequestUtil.logout(req);
+        }
+        // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console/bundles.
+        ResponseUtil.redirect(resp, DEFAULT_LANDING_PAGE_URI);
     }
 
     /**

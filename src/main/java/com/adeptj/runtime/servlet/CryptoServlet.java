@@ -46,7 +46,7 @@ public class CryptoServlet extends HttpServlet {
     private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String text = req.getParameter("text");
         if (StringUtils.isEmpty(text)) {
             resp.setContentType("text/plain");
