@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.mvc;
+package com.adeptj.runtime.templating;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

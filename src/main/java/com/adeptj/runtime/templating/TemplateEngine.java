@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.mvc;
+package com.adeptj.runtime.templating;
 
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;

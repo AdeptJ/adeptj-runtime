@@ -94,7 +94,6 @@
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
         <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
-        <adeptj-runtime-tools.version>1.0.6.Final</adeptj-runtime-tools.version>
         <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
 
@@ -511,13 +510,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Admin Runtime Tools dependency -->
-
-        <dependency>
-            <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-runtime-tools</artifactId>
-            <version>${adeptj-runtime-tools.version}</version>
-        </dependency>
+        <!-- Admin Runtime Extensions dependency -->
 
         <dependency>
             <groupId>com.adeptj</groupId>

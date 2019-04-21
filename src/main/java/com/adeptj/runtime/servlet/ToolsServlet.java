@@ -23,9 +23,9 @@ package com.adeptj.runtime.servlet;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.mvc.TemplateContext;
-import com.adeptj.runtime.mvc.TemplateData;
-import com.adeptj.runtime.mvc.TemplateEngine;
+import com.adeptj.runtime.templating.TemplateContext;
+import com.adeptj.runtime.templating.TemplateData;
+import com.adeptj.runtime.templating.TemplateEngine;
 import org.apache.commons.io.FileUtils;
 import org.osgi.framework.Bundle;
 
