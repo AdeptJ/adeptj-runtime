@@ -36,7 +36,6 @@ import com.typesafe.config.Config;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_CONSOLE;
@@ -133,20 +132,15 @@ public final class LogbackInitializer {
         root.addAppender(appender);
     }
 
-    @SuppressWarnings("unchecked")
     private static void addLoggers(Config loggingCfg, List<Appender<ILoggingEvent>> appenderList) {
-        loggingCfg.getObject(KEY_LOGGERS)
-                .unwrapped()
-                .forEach((logCfgName, logCfgMap) -> {
-                    Map<String, Object> configs = (Map<String, Object>) logCfgMap;
-                    appenderList.forEach(appender ->
-                            LogbackManagerHolder.getInstance().getLogbackManager().addLogger(LogbackConfig.builder()
-                                    .logger((String) configs.get(KEY_LOG_NAME))
-                                    .level((String) configs.get(KEY_LOG_LEVEL))
-                                    .additivity((Boolean) configs.get(KEY_LOG_ADDITIVITY))
-                                    .appender(appender)
-                                    .build()));
-                });
+        loggingCfg.getConfigList(KEY_LOGGERS)
+                .forEach(config -> appenderList.forEach(appender ->
+                        LogbackManagerHolder.getInstance().getLogbackManager().addLogger(LogbackConfig.builder()
+                                .logger(config.getString(KEY_LOG_NAME))
+                                .level(config.getString(KEY_LOG_LEVEL))
+                                .additivity(config.getBoolean(KEY_LOG_ADDITIVITY))
+                                .appender(appender)
+                                .build())));
     }
 
     private static void addAsyncAppender(Config config, RollingFileAppender<ILoggingEvent> fileAppender) {
