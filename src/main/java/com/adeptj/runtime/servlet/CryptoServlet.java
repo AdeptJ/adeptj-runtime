@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.CryptoSupport;
 import com.adeptj.runtime.common.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +29,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.adeptj.runtime.common.Constants.CRYPTO_SERVLET_URI;
+
 /**
  * A simple servlet that generates salt and corresponding hashed text.
  * <p>
@@ -37,13 +38,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(
-        name = "AdeptJ CryptoServlet",
-        urlPatterns = {
-                Constants.TOOLS_CRYPTO_URI
-        },
-        asyncSupported = true
-)
+@WebServlet(name = "AdeptJ CryptoServlet", urlPatterns = CRYPTO_SERVLET_URI, asyncSupported = true)
 public class CryptoServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3839904764769823479L;

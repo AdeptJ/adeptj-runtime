@@ -112,13 +112,9 @@ final class ServerConstants {
 
     static final String ERROR_PAGE_SERVLET = "AdeptJ ErrorPageServlet";
 
-    static final String TOOLS_ERROR_URL = "/tools/error/*";
+    static final String ERROR_PAGE_SERVLET_URI = "/error/*";
 
-    static final String TOOLS_SERVLET = "AdeptJ ToolsServlet";
-
-    static final String TOOLS_DASHBOARD_URL = "/tools/dashboard";
-
-    static final String AUTH_SERVLET = "AdeptJ AuthServlet";
+    static final String ADMIN_SERVLET = "AdeptJ AdminServlet";
 
     static final String CRYPTO_SERVLET = "AdeptJ CryptoServlet";
 }

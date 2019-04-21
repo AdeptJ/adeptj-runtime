@@ -47,13 +47,15 @@ public final class Constants {
 
     public static final String SLASH = "/";
 
-    public static final String TOOLS_DASHBOARD_URI = "/tools/dashboard";
+    public static final String DEFAULT_LANDING_PAGE_URI = "/system/console/bundles";
 
-    public static final String TOOLS_CRYPTO_URI = "/tools/crypto";
+    public static final String CRYPTO_SERVLET_URI = "/utils/crypto";
 
-    public static final String TOOLS_LOGIN_URI = "/tools/login";
+    public static final String ADMIN_LOGIN_URI = "/admin/login";
 
-    public static final String TOOLS_LOGOUT_URI = "/tools/logout";
+    public static final String ADMIN_LOGOUT_URI = "/admin/logout";
+
+    public static final String ADMIN_SERVLET_URI = "/admin/*";
 
     public static final String BANNER_TXT = "/banner.txt";
 

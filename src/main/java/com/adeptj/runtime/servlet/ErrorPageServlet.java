@@ -32,19 +32,13 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(
-        name = "AdeptJ ErrorPageServlet",
-        urlPatterns = {
-                "/tools/error/*"
-        },
-        asyncSupported = true
-)
+@WebServlet(name = "AdeptJ ErrorPageServlet", urlPatterns = "/error/*", asyncSupported = true)
 public class ErrorPageServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        ErrorPages.renderErrorPage(req, resp);
+        ErrorPageRenderer.renderErrorPage(req, resp);
     }
 }

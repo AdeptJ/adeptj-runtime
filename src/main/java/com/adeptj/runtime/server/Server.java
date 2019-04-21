@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
@@ -33,10 +32,9 @@ import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.InitializationException;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
-import com.adeptj.runtime.servlet.AuthServlet;
+import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorPageServlet;
-import com.adeptj.runtime.servlet.ToolsServlet;
 import com.adeptj.runtime.websocket.ServerLogsWebSocket;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
@@ -89,6 +87,70 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.BANNER_TXT;
+import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
+import static com.adeptj.runtime.common.Constants.CRYPTO_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
+import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
+import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
+import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
+import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
+import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
+import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.KEY_HOST;
+import static com.adeptj.runtime.common.Constants.KEY_HTTP;
+import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
+import static com.adeptj.runtime.common.Constants.KEY_PORT;
+import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
+import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.CRYPTO_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
+import static com.adeptj.runtime.server.ServerConstants.ERROR_PAGE_SERVLET;
+import static com.adeptj.runtime.server.ServerConstants.ERROR_PAGE_SERVLET_URI;
+import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
+import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
+import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
+import static com.adeptj.runtime.server.ServerConstants.KEY_ERROR_PAGES;
+import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
+import static com.adeptj.runtime.server.ServerConstants.KEY_IGNORE_FLUSH;
+import static com.adeptj.runtime.server.ServerConstants.KEY_INVALIDATE_SESSION_ON_LOGOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_KEYSTORE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_LOCATION;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_SIZE_THRESHOLD;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_FILE_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUEST_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_CORE_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_MAX_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_BUFFER_SIZE;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_IO_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_CORE_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_MAX_THREADS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TCP_NO_DELAY;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
+import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.REALM;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SYS_TASK_THREAD_MULTIPLIER;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER;
+import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
+import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
@@ -124,7 +186,7 @@ public final class Server implements Lifecycle {
         LOGGER.debug("AdeptJ Runtime jvm args: {}", this.runtimeArgs);
         this.cfgReference = new WeakReference<>(Configs.of().undertow());
         Config undertowConf = Objects.requireNonNull(this.cfgReference.get());
-        Config httpConf = undertowConf.getConfig(Constants.KEY_HTTP);
+        Config httpConf = undertowConf.getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
@@ -133,7 +195,7 @@ public final class Server implements Lifecycle {
         try {
             this.rootHandler = this.rootHandler(this.deploymentManager.start());
             this.undertow = this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()), undertowConf))
-                    .addHttpListener(httpPort, httpConf.getString(Constants.KEY_HOST))
+                    .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();
@@ -170,7 +232,7 @@ public final class Server implements Lifecycle {
     private void gracefulShutdown() {
         try {
             this.rootHandler.shutdown();
-            if (this.rootHandler.awaitShutdown(Long.getLong(ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME, ServerConstants.DEFAULT_WAIT_TIME))) {
+            if (this.rootHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
                 LOGGER.debug("Completed remaining requests successfully!!");
             }
         } catch (InterruptedException ie) {
@@ -183,7 +245,7 @@ public final class Server implements Lifecycle {
     }
 
     private void printBanner() {
-        try (InputStream stream = this.getClass().getResourceAsStream(Constants.BANNER_TXT)) {
+        try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
             LOGGER.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
             // Just log it, its not critical.
@@ -194,7 +256,7 @@ public final class Server implements Lifecycle {
     private void createServerConfFile() {
         if (!Environment.isServerConfFileExists()) {
             try (InputStream stream = this.getClass().getResourceAsStream("/reference.conf")) {
-                Files.write(Paths.get(USER_DIR, Constants.DIR_ADEPTJ_RUNTIME, Constants.DIR_DEPLOYMENT, Constants.SERVER_CONF_FILE),
+                Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                         IOUtils.toBytes(stream), StandardOpenOption.CREATE);
             } catch (IOException ex) {
                 LOGGER.error("Exception while creating server conf file!!", ex);
@@ -210,22 +272,22 @@ public final class Server implements Lifecycle {
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
-            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(ServerConstants.KEY_WORKER_OPTIONS);
+            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
-            int cfgCoreTaskThreads = workerOptions.getInt(ServerConstants.KEY_WORKER_TASK_CORE_THREADS);
+            int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
             int availableProcessors = Runtime.getRuntime().availableProcessors();
             LOGGER.info("No. of CPU available: [{}]", availableProcessors);
             int calcCoreTaskThreads = availableProcessors *
-                    Integer.getInteger(ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, ServerConstants.WORKER_TASK_THREAD_MULTIPLIER);
+                    Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
             builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, calcCoreTaskThreads > cfgCoreTaskThreads
                     ? calcCoreTaskThreads : cfgCoreTaskThreads);
             // defaults to double of [worker-task-core-threads] i.e 128
-            int cfgMaxTaskThreads = workerOptions.getInt(ServerConstants.KEY_WORKER_TASK_MAX_THREADS);
+            int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
             LOGGER.info("Configured worker task max threads: [{}]", cfgCoreTaskThreads);
             int calcMaxTaskThreads = calcCoreTaskThreads *
-                    Integer.getInteger(ServerConstants.SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, ServerConstants.SYS_TASK_THREAD_MULTIPLIER);
+                    Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task max threads: [{}]", cfgCoreTaskThreads);
             builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > cfgMaxTaskThreads
                     ? calcMaxTaskThreads : cfgMaxTaskThreads);
@@ -235,33 +297,33 @@ public final class Server implements Lifecycle {
     }
 
     private Builder enableHttp2(Builder builder) throws GeneralSecurityException, IOException {
-        if (Boolean.getBoolean(ServerConstants.SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(ServerConstants.KEY_HTTPS);
-            int httpsPort = httpsConf.getInt(Constants.KEY_PORT);
+        if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
+            Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
+            int httpsPort = httpsConf.getInt(KEY_PORT);
             if (!Environment.useProvidedKeyStore()) {
-                System.setProperty("adeptj.rt.keyStore", httpsConf.getString(ServerConstants.KEY_KEYSTORE));
+                System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
                 System.setProperty("adeptj.rt.keyStorePassword", httpsConf.getString("keyStorePwd"));
                 System.setProperty("adeptj.rt.keyPassword", httpsConf.getString("keyPwd"));
                 LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
             }
             SSLContext sslContext = SslContextFactory.newSslContext(httpsConf.getString("tlsVersion"));
-            builder.addHttpsListener(httpsPort, httpsConf.getString(Constants.KEY_HOST), sslContext);
+            builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
         }
         return builder;
     }
 
     private int handlePortAvailability(Config httpConf) {
-        Integer port = Integer.getInteger(Constants.SYS_PROP_SERVER_PORT);
+        Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
-            LOGGER.warn("No port specified via system property: [{}], using default port: [{}]",
-                    Constants.SYS_PROP_SERVER_PORT, httpConf.getInt(Constants.KEY_PORT));
-            port = httpConf.getInt(Constants.KEY_PORT);
+            LOGGER.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
+                    httpConf.getInt(KEY_PORT));
+            port = httpConf.getInt(KEY_PORT);
         }
         // Note: Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
         // as it is being started already and another server start(from same location) will again start new OSGi
         // Framework which may interfere with already started OSGi Framework as the bundle deployment, heap dump,
         // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side doing this.
-        if (Boolean.getBoolean(ServerConstants.SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
+        if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             // Let the LOGBACK cleans up it's state.
             LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
@@ -310,29 +372,29 @@ public final class Server implements Lifecycle {
     private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler) {
         Config cfg = Objects.requireNonNull(this.cfgReference.get());
         Map<HttpString, String> headers = new HashMap<>();
-        headers.put(HttpString.tryFromString(Constants.HEADER_SERVER), cfg.getString(Constants.KEY_HEADER_SERVER));
+        headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
-            headers.put(HttpString.tryFromString(Constants.HEADER_X_POWERED_BY), Version.getFullVersionString());
+            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
         }
-        HttpHandler headersHandler = Boolean.getBoolean(ServerConstants.SYS_PROP_ENABLE_REQ_BUFF) ?
+        HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
                 new SetHeadersHandler(new RequestBufferingHandler(servletInitialHandler,
-                        Integer.getInteger(ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(Constants.KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
+                        Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
                 new SetHeadersHandler(servletInitialHandler, headers);
         return Handlers.gracefulShutdown(
-                new RequestLimitingHandler(Integer.getInteger(ServerConstants.SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(Constants.KEY_MAX_CONCURRENT_REQS)),
-                        new AllowedMethodsHandler(Handlers.predicate(exchange -> Constants.CONTEXT_PATH.equals(exchange.getRequestURI()),
-                                Handlers.redirect(Constants.TOOLS_DASHBOARD_URI), headersHandler), this.allowedMethods(cfg))));
+                new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
+                        new AllowedMethodsHandler(Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
+                                Handlers.redirect(DEFAULT_LANDING_PAGE_URI), headersHandler), this.allowedMethods(cfg))));
     }
 
     private Set<HttpString> allowedMethods(Config cfg) {
-        return cfg.getStringList(Constants.KEY_ALLOWED_METHODS)
+        return cfg.getStringList(KEY_ALLOWED_METHODS)
                 .stream()
                 .map(Verb::from)
                 .collect(Collectors.toSet());
     }
 
     private List<ErrorPage> errorPages(Config cfg) {
-        return cfg.getObject(ServerConstants.KEY_ERROR_PAGES).unwrapped()
+        return cfg.getObject(KEY_ERROR_PAGES).unwrapped()
                 .entrySet()
                 .stream()
                 .map(e -> Servlets.errorPage(String.valueOf(e.getValue()), Integer.parseInt(e.getKey())))
@@ -350,45 +412,41 @@ public final class Server implements Lifecycle {
 
     private SecurityConstraint securityConstraint(Config cfg) {
         return Servlets.securityConstraint()
-                .addRolesAllowed(cfg.getStringList(ServerConstants.KEY_AUTH_ROLES))
+                .addRolesAllowed(cfg.getStringList(KEY_AUTH_ROLES))
                 .addWebResourceCollection(Servlets.webResourceCollection()
-                        .addHttpMethods(cfg.getStringList(ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS))
-                        .addUrlPatterns(cfg.getStringList(ServerConstants.KEY_SECURED_URLS)));
+                        .addHttpMethods(cfg.getStringList(KEY_SECURED_URLS_ALLOWED_METHODS))
+                        .addUrlPatterns(cfg.getStringList(KEY_SECURED_URLS)));
     }
 
     private List<ServletInfo> servlets() {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets
-                .servlet(ServerConstants.ERROR_PAGE_SERVLET, ErrorPageServlet.class)
-                .addMapping(ServerConstants.TOOLS_ERROR_URL)
+                .servlet(ERROR_PAGE_SERVLET, ErrorPageServlet.class)
+                .addMapping(ERROR_PAGE_SERVLET_URI)
                 .setAsyncSupported(true));
         servlets.add(Servlets
-                .servlet(ServerConstants.TOOLS_SERVLET, ToolsServlet.class)
-                .addMapping(ServerConstants.TOOLS_DASHBOARD_URL)
+                .servlet(ADMIN_SERVLET, AdminServlet.class)
+                .addMapping(ADMIN_SERVLET_URI)
                 .setAsyncSupported(true));
-        servlets.add(Servlets
-                .servlet(ServerConstants.AUTH_SERVLET, AuthServlet.class)
-                .addMappings(Constants.TOOLS_LOGIN_URI, Constants.TOOLS_LOGOUT_URI)
-                .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(ServerConstants.CRYPTO_SERVLET, CryptoServlet.class)
-                .addMappings(Constants.TOOLS_CRYPTO_URI)
+        servlets.add(Servlets.servlet(CRYPTO_SERVLET, CryptoServlet.class)
+                .addMappings(CRYPTO_SERVLET_URI)
                 .setAsyncSupported(true));
         return servlets;
     }
 
     private MultipartConfigElement defaultMultipartConfig(Config cfg) {
-        return Servlets.multipartConfig(cfg.getString(ServerConstants.KEY_MULTIPART_FILE_LOCATION),
-                cfg.getLong(ServerConstants.KEY_MULTIPART_MAX_FILE_SIZE),
-                cfg.getLong(ServerConstants.KEY_MULTIPART_MAX_REQUEST_SIZE),
-                cfg.getInt(ServerConstants.KEY_MULTIPART_FILE_SIZE_THRESHOLD));
+        return Servlets.multipartConfig(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
+                cfg.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
+                cfg.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
+                cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
     private WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
-        Config wsOptions = cfg.getConfig(ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS);
+        Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
         return new WebSocketDeploymentInfo()
                 .setWorker(this.webSocketWorker(wsOptions))
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(ServerConstants.KEY_WS_USE_DIRECT_BUFFER),
-                        wsOptions.getInt(ServerConstants.KEY_WS_BUFFER_SIZE)))
+                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
+                        wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
                 .addEndpoint(ServerLogsWebSocket.class);
     }
 
@@ -396,10 +454,10 @@ public final class Server implements Lifecycle {
         XnioWorker worker = null;
         try {
             worker = Xnio.getInstance().createWorker(OptionMap.builder()
-                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt(ServerConstants.KEY_WS_IO_THREADS))
-                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(ServerConstants.KEY_WS_TASK_CORE_THREADS))
-                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(ServerConstants.KEY_WS_TASK_MAX_THREADS))
-                    .set(Options.TCP_NODELAY, wsOptions.getBoolean(ServerConstants.KEY_WS_TCP_NO_DELAY))
+                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
+                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
+                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
+                    .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                     .getMap());
         } catch (IOException ex) {
             LOGGER.error("Can't create XnioWorker!!", ex);
@@ -408,28 +466,28 @@ public final class Server implements Lifecycle {
     }
 
     private int sessionTimeout(Config cfg) {
-        return Integer.getInteger(ServerConstants.SYS_PROP_SESSION_TIMEOUT, cfg.getInt(ServerConstants.KEY_SESSION_TIMEOUT));
+        return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, cfg.getInt(KEY_SESSION_TIMEOUT));
     }
 
     private ServletSessionConfig sessionConfig(Config cfg) {
-        return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(ServerConstants.KEY_HTTP_ONLY));
+        return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
     }
 
     private DeploymentInfo deploymentInfo() {
         Config cfg = Objects.requireNonNull(this.cfgReference.get());
         return Servlets.deployment()
-                .setDeploymentName(Constants.DEPLOYMENT_NAME)
-                .setContextPath(Constants.CONTEXT_PATH)
+                .setDeploymentName(DEPLOYMENT_NAME)
+                .setContextPath(CONTEXT_PATH)
                 .setClassLoader(Server.class.getClassLoader())
                 .addServletContainerInitializer(this.sciInfo())
-                .setIgnoreFlush(cfg.getBoolean(ServerConstants.KEY_IGNORE_FLUSH))
-                .setDefaultEncoding(cfg.getString(ServerConstants.KEY_DEFAULT_ENCODING))
+                .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
+                .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(this.sessionTimeout(cfg))
-                .setChangeSessionIdOnLogin(cfg.getBoolean(ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN))
-                .setInvalidateSessionOnLogout(cfg.getBoolean(ServerConstants.KEY_INVALIDATE_SESSION_ON_LOGOUT))
+                .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSIONID_ON_LOGIN))
+                .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
-                .setUseCachedAuthenticationMechanism(cfg.getBoolean(ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM))
-                .setLoginConfig(Servlets.loginConfig(FORM_AUTH, ServerConstants.REALM, Constants.TOOLS_LOGIN_URI, Constants.TOOLS_LOGIN_URI))
+                .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
+                .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addSecurityConstraint(this.securityConstraint(cfg))
                 .addServlets(this.servlets())
                 .addErrorPages(this.errorPages(cfg))

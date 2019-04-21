@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>AdeptJ Runtime Login</title>
-		<link rel="stylesheet" type="text/css" href="/static/styles/login.css">
-	</head>
-		<body>
-			<div class="login-bg">
-				<div class="login-card">
-				    <h2>Welcome!</h2>
-				    <div class="sep-top"></div>
-				    <form method="post" name="loginForm" action="/auth/j_security_check">
-				            <div class="group user-icon">
-				                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}" autofocus="autofocus" required >
-				            </div>
-				            <div class="group lock-icon">
-				                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required >
-				            </div>
-                            <button type="submit" class="button buttonBlue">Login</button>
-                            <span class="error">{{error}}</span>
-				    </form>
-				
-				</div>
-			</div>
-		</body>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>AdeptJ Runtime Login</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
+</head>
+<body>
+<div class="login-bg">
+    <div class="login-card">
+        <h2>Welcome!</h2>
+        <div class="sep-top"></div>
+        <form method="post" name="loginForm" action="/auth/j_security_check">
+            <div class="group user-icon">
+                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}" autofocus="autofocus" required>
+            </div>
+            <div class="group lock-icon">
+                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required>
+            </div>
+            <button type="submit" class="button buttonBlue">Login</button>
+            <span class="error">{{error}}</span>
+        </form>
+
+    </div>
+</div>
+</body>
 </html>

@@ -39,11 +39,11 @@ import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
- * ErrorPages
+ * ErrorPageRenderer
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class ErrorPages {
+public final class ErrorPageRenderer {
 
     private static final String STATUS_500 = "500";
 
@@ -65,7 +65,7 @@ public final class ErrorPages {
 
     private static final String TEMPLATE_ERROR_RESOLVABLE = "error/%s";
 
-    private ErrorPages() {
+    private ErrorPageRenderer() {
     }
 
     public static void renderOSGiErrorPage(HttpServletRequest req, HttpServletResponse resp) {
@@ -83,22 +83,22 @@ public final class ErrorPages {
                     .template(TEMPLATE_500)
                     .build());
         } else if (Integer.valueOf(SC_INTERNAL_SERVER_ERROR).equals(statusCode)) {
-            ErrorPages.render500Page(req, resp);
+            ErrorPageRenderer.render500Page(req, resp);
         } else if (Configs.of().undertow().getIntList(KEY_STATUS_CODES).contains(statusCode)) {
-            ErrorPages.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
+            ErrorPageRenderer.renderErrorPageForStatusCode(req, resp, String.valueOf(statusCode));
         }
     }
 
     static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
         String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), Constants.SLASH);
         if (StringUtils.equals(TEMPLATE_ERROR, req.getRequestURI())) {
-            ErrorPages.renderGenericErrorPage(req, resp);
+            ErrorPageRenderer.renderGenericErrorPage(req, resp);
         } else if (StringUtils.equals(STATUS_500, statusCode)) {
-            ErrorPages.render500Page(req, resp);
+            ErrorPageRenderer.render500Page(req, resp);
         } else if (RequestUtil.hasException(req) && StringUtils.equals(STATUS_500, statusCode)) {
-            ErrorPages.render500PageWithExceptionTrace(req, resp);
+            ErrorPageRenderer.render500PageWithExceptionTrace(req, resp);
         } else if (Configs.of().undertow().getStringList(KEY_STATUS_CODES).contains(statusCode)) {
-            ErrorPages.renderErrorPageForStatusCode(req, resp, statusCode);
+            ErrorPageRenderer.renderErrorPageForStatusCode(req, resp, statusCode);
         } else {
             ResponseUtil.sendError(resp, HttpServletResponse.SC_NOT_FOUND);
         }

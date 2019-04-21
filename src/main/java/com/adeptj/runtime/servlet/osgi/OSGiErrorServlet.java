@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.servlet.osgi;
 
-import com.adeptj.runtime.servlet.ErrorPages;
+import com.adeptj.runtime.servlet.ErrorPageRenderer;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,6 +41,6 @@ public class OSGiErrorServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        ErrorPages.renderOSGiErrorPage(req, resp);
+        ErrorPageRenderer.renderOSGiErrorPage(req, resp);
     }
 }
