@@ -1192,8 +1192,8 @@
 
                 <dependency>
                     <groupId>org.glassfish.hk2.external</groupId>
-                    <artifactId>javax.inject</artifactId>
-                    <version>${javax.inject.version}</version>
+                    <artifactId>jakarta.inject</artifactId>
+                    <version>${jakarta.inject.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
