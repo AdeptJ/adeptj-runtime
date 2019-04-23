@@ -33,7 +33,7 @@ JAVA_VERSION=$(javaVersion)
 
 DEBUG=true
 
-DEBUG_PORT=8000
+DEBUG_PORT=9000
 
 if [ ${DEBUG} = true ]; then
 	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
@@ -64,7 +64,7 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dwait.time.for.debug.attach=5
  -Dlog.async=true \
  -Dlog.immediate.flush=true \
- -Dfelix.log.level=3 \
+ -Dfelix.log.level=1 \
  -Dbenchmark.bundle.start=true \
  -Dprovision.bundles.explicitly=false \
  -Dshutdown.wait.time=60000 \
