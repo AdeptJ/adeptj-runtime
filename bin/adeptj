@@ -30,16 +30,16 @@ help_and_exit() {
 case $1 in
 
     start)
-        ./start "$@"
+        ./start.sh "$@"
         ;;
 
     stop)
-        ./stop
+        ./stop.sh
         ;;
 
     restart)
-        ./stop
-        ./start
+        ./stop.sh
+        ./start.sh
         ;;
 
     -h)
