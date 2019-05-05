@@ -58,6 +58,7 @@
         <javax.mail.version>1.6.2</javax.mail.version>
         <yasson.version>1.0.3</yasson.version>
         <glassfish.javax.json.version>1.1.4</glassfish.javax.json.version>
+        <jakarta.enterprise.concurrent.version>1.1.1</jakarta.enterprise.concurrent.version>
 
         <!-- JAX-B Dependencies JDK 10+ -->
         <jakarta.xml.bind-api.version>2.3.2</jakarta.xml.bind-api.version>
@@ -564,6 +565,18 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise.concurrent</groupId>
+            <artifactId>jakarta.enterprise.concurrent-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.enterprise.concurrent</artifactId>
+            <version>${jakarta.enterprise.concurrent.version}</version>
             <scope>provided</scope>
         </dependency>
 
