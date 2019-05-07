@@ -29,7 +29,7 @@ public final class Constants {
 
     public static final String BUNDLES_ROOT_DIR_KEY = "bundles-root-dir";
 
-    public static final String ATTRIBUTE_BUNDLE_CTX = "org.osgi.framework.BundleContext";
+    public static final String ATTRIBUTE_BUNDLE_CONTEXT = "org.osgi.framework.BundleContext";
 
     public static final String MAIN_CONF_SECTION = "main";
 

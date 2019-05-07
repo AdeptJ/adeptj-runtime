@@ -21,7 +21,6 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.ServletContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -30,6 +29,7 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static org.osgi.framework.FrameworkEvent.STARTED;
 import static org.osgi.framework.FrameworkEvent.STOPPED_UPDATE;
 
@@ -66,7 +66,7 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
                 // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 ServletContextHolder.getInstance()
-                        .getServletContext().setAttribute(Constants.ATTRIBUTE_BUNDLE_CTX, systemBundleContext);
+                        .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, systemBundleContext);
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
                 ServiceTrackers.getInstance().openDispatcherServletTracker(systemBundleContext);

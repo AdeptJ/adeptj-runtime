@@ -86,9 +86,15 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
      */
     @Override
     protected void removedService(EventListener eventListener) {
-        this.sessionListener = null;
-        this.sessionIdListener = null;
-        this.sessionAttributeListener = null;
+        if (eventListener instanceof HttpSessionListener) {
+            this.sessionListener = null;
+        }
+        if (eventListener instanceof HttpSessionIdListener) {
+            this.sessionIdListener = null;
+        }
+        if (eventListener instanceof HttpSessionAttributeListener) {
+            this.sessionAttributeListener = null;
+        }
     }
 
     HttpSessionListener getHttpSessionListener() {

@@ -52,6 +52,8 @@ public enum HttpSessionEvents {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
 
+    // <<---------- HttpSessionListener ---------->>
+
     public static void handleHttpSessionEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
             case SESSION_CREATED:
@@ -68,9 +70,13 @@ public enum HttpSessionEvents {
         }
     }
 
+    // <<---------- HttpSessionIdListener ---------->>
+
     public static void handleSessionIdChangedEvent(HttpSessionEvent event, String oldSessionId) {
         sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
     }
+
+    // <<---------- HttpSessionAttributeListener ---------->>
 
     public static void handleHttpSessionBindingEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
         switch (type) {
