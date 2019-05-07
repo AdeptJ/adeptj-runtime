@@ -31,7 +31,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
 /**
  * {@link HttpServlet} wrapper for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
@@ -42,7 +41,7 @@ public class DispatcherServletWrapper extends HttpServlet {
 
 	private static final long serialVersionUID = 282686082848634854L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+	private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletWrapper.class);
 
     private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
 

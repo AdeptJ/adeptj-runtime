@@ -38,18 +38,18 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
      * Instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher} which implements
      * the {@link HttpSessionListener}
      */
-    private volatile HttpSessionListener sessionListener;
+    private HttpSessionListener sessionListener;
 
     /**
      * Instance of Felix {@link org.apache.felix.http.base.internal.EventDispatcher} which implements
      * the {@link HttpSessionIdListener}
      */
-    private volatile HttpSessionIdListener sessionIdListener;
+    private HttpSessionIdListener sessionIdListener;
 
     /**
-     * Just in case someone implements HttpSessionAttributeListener OSGi service, track that as well.
+     * Just in case someone implements {@link HttpSessionAttributeListener} OSGi service, track that as well.
      */
-    private volatile HttpSessionAttributeListener sessionAttributeListener;
+    private HttpSessionAttributeListener sessionAttributeListener;
 
     /**
      * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link EventListener}

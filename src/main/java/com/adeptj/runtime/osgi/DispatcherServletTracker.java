@@ -39,7 +39,7 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
 
     private static final String EXCEPTION_MSG = "Exception adding Felix DispatcherServlet OSGi Service!!";
 
-    private volatile DispatcherServletWrapper dispatcherServletWrapper;
+    private DispatcherServletWrapper dispatcherServletWrapper;
 
     /**
      * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link HttpServlet}
