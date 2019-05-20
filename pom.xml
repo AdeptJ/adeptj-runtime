@@ -85,7 +85,7 @@
         <felix.jaas.version>1.0.2</felix.jaas.version>
         <felix.rootcause.version>0.1.0</felix.rootcause.version>
         <felix.systemready.version>0.4.2</felix.systemready.version>
-        <felix.healthcheck.core.version>2.0.4</felix.healthcheck.core.version>
+        <felix.healthcheck.core.version>2.0.6</felix.healthcheck.core.version>
         <felix.healthcheck.generalchecks.version>2.0.4</felix.healthcheck.generalchecks.version>
         <felix.healthcheck.webconsoleplugin.version>2.0.0</felix.healthcheck.webconsoleplugin.version>
 
