@@ -39,7 +39,7 @@
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.21.Final</undertow.version>
+        <undertow.version>2.0.22.Final</undertow.version>
         <xnio.version>3.7.2.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.1.Final</wildfly-common.version>
@@ -75,7 +75,7 @@
         <felix.webconsole.plugins.ds.version>2.1.0</felix.webconsole.plugins.ds.version>
         <felix.webconsole.plugins.memoryusage.version>1.0.10</felix.webconsole.plugins.memoryusage.version>
         <felix.inventory.version>1.0.6</felix.inventory.version>
-        <felix.http.bridge.version>4.0.6</felix.http.bridge.version>
+        <felix.http.bridge.version>4.0.8</felix.http.bridge.version>
         <felix.http.base.version>4.0.6</felix.http.base.version>
         <felix.log.version>1.2.0</felix.log.version>
         <felix.metatype.version>1.2.2</felix.metatype.version>
