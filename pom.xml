@@ -39,8 +39,8 @@
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.23.Final</undertow.version>
-        <xnio.version>3.7.2.Final</xnio.version>
+        <undertow.version>2.0.24.Final</undertow.version>
+        <xnio.version>3.7.3.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.2.Final</wildfly-common.version>
         <jboss-threads.version>2.3.3.Final</jboss-threads.version>
@@ -1035,7 +1035,6 @@
                 <dependency>
                     <groupId>org.yaml</groupId>
                     <artifactId>snakeyaml</artifactId>
-                    <version>${snakeyaml.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1043,12 +1042,6 @@
                     <groupId>com.fasterxml.jackson.dataformat</groupId>
                     <artifactId>jackson-dataformat-yaml</artifactId>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.yaml</groupId>
-                            <artifactId>snakeyaml</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
@@ -1085,12 +1078,6 @@
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr310</artifactId>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.fasterxml.jackson.core</groupId>
-                            <artifactId>jackson-annotations</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
@@ -1114,12 +1101,6 @@
                 <dependency>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>stax2-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml.woodstox</groupId>
-                    <artifactId>woodstox-core</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
