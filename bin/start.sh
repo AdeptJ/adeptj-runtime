@@ -39,7 +39,7 @@ if [ ${DEBUG} = true ]; then
 	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
 fi
 
-if [ ${JAVA_VERSION} -gt 9 ]; then
+if [ "${JAVA_VERSION}" -gt 9 ]; then
   GRAAL_VM_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler"
 fi
 
@@ -50,7 +50,7 @@ JVM_OPTS="-server ${GRAAL_VM_OPTS} ${JVM_MEM_OPTS} ${DEBUG_OPTS}"
 RESTEASY_OPTS=" -Dresteasy.allowGzip=true"
 
 # Add the [java.xml.bind] module if Java version is greater than 8, otherwise some of the bundles will not start.
-if [ ${JAVA_VERSION} -gt 8 ]; then
+if [ "${JAVA_VERSION}" -gt 8 ]; then
   JVM_OPTS="--illegal-access=warn "${JVM_OPTS}
 fi
 
@@ -77,6 +77,6 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.keyStorePassword=java-keystore-password \
  -Dadeptj.rt.keyPassword=key-password"
 
-cd target
+cd target || exit
 
 java ${ADEPTJ_RUNTIME_OPTS} -jar adeptj-runtime.jar
