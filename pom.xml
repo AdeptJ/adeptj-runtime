@@ -51,13 +51,13 @@
         <jboss-classfilewriter.version>1.2.4.Final</jboss-classfilewriter.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
-        <jansi.version>1.17.1</jansi.version>
+        <jansi.version>1.18</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.5.0</classmate.version>
         <javax.el.version>3.0.1-b11</javax.el.version>
         <javax.mail.version>1.6.2</javax.mail.version>
-        <yasson.version>1.0.3</yasson.version>
-        <glassfish.javax.json.version>1.1.4</glassfish.javax.json.version>
+        <yasson.version>1.0.4</yasson.version>
+        <glassfish.jakarta.json.version>1.1.5</glassfish.jakarta.json.version>
         <jakarta.enterprise.concurrent.version>1.1.1</jakarta.enterprise.concurrent.version>
 
         <!-- JAX-B Dependencies JDK 10+ -->
@@ -1513,8 +1513,8 @@
                 <!-- JSR 374 [JSON-P] RI -->
                 <dependency>
                     <groupId>org.glassfish</groupId>
-                    <artifactId>javax.json</artifactId>
-                    <version>${glassfish.javax.json.version}</version>
+                    <artifactId>jakarta.json</artifactId>
+                    <version>${glassfish.jakarta.json.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
