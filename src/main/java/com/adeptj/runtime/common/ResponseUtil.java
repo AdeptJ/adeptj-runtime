@@ -68,7 +68,7 @@ public final class ResponseUtil {
     public static void redirect(HttpServletResponse resp, String redirectUrl) {
         try {
             resp.sendRedirect(resp.encodeRedirectURL(redirectUrl));
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
             throw new SystemException(ex.getMessage(), ex);
         }

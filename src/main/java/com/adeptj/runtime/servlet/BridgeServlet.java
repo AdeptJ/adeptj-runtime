@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
  *
- *
  * <b>BridgeServlet is mounted at "/" i.e root.<b>
  *
  * @author Rakesh.Kumar, AdeptJ
