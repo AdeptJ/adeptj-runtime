@@ -77,7 +77,7 @@
         <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.http.bridge.version>4.0.8</felix.http.bridge.version>
         <felix.http.base.version>4.0.6</felix.http.base.version>
-        <felix.log.version>1.2.0</felix.log.version>
+        <felix.log.version>1.2.2</felix.log.version>
         <felix.metatype.version>1.2.2</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
         <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
