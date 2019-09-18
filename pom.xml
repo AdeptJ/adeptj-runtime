@@ -43,7 +43,7 @@
         <xnio.version>3.7.3.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.2.Final</wildfly-common.version>
-        <jboss-threads.version>2.3.3.Final</jboss-threads.version>
+        <jboss-threads.version>3.0.0.Final</jboss-threads.version>
         <jboss-logging.version>3.4.1.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.2.0.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.2.0.Final</jboss-logging-processor.version>
