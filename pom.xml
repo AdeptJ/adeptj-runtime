@@ -40,7 +40,7 @@
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
         <undertow.version>2.0.26.Final</undertow.version>
-        <xnio.version>3.7.3.Final</xnio.version>
+        <xnio.version>3.7.4.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.2.Final</wildfly-common.version>
         <jboss-threads.version>3.0.0.Final</jboss-threads.version>
