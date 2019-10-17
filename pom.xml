@@ -39,7 +39,7 @@
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.26.Final</undertow.version>
+        <undertow.version>2.0.27.Final</undertow.version>
         <xnio.version>3.7.6.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.2.Final</wildfly-common.version>
@@ -93,7 +93,7 @@
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.4.Final</adeptj-modules-webconsole-security.version>
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
-        <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
+        <adeptj-modules-commons-logging.version>1.0.2.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
         <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
