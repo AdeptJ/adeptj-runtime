@@ -89,7 +89,7 @@ final class ServerOptions {
     }
 
     private static void longOptions(Builder builder, Map<String, ?> options) {
-        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), Long.valueOf((String) optVal)));
+        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), Long.valueOf((Integer) optVal)));
     }
 
     @SuppressWarnings("unchecked")
