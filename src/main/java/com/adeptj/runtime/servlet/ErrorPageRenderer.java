@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.config.Configs;
@@ -32,10 +31,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
-import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
-import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
+import static com.adeptj.runtime.common.Constants.SLASH;
+import static javax.servlet.RequestDispatcher.*;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
@@ -90,7 +87,7 @@ public final class ErrorPageRenderer {
     }
 
     static void renderErrorPage(HttpServletRequest req, HttpServletResponse resp) {
-        String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), Constants.SLASH);
+        String statusCode = StringUtils.substringAfterLast(req.getRequestURI(), SLASH);
         if (StringUtils.equals(ERROR_URI, req.getRequestURI())) {
             ErrorPageRenderer.renderGenericErrorPage(req, resp);
         } else if (StringUtils.equals(STATUS_500, statusCode)) {

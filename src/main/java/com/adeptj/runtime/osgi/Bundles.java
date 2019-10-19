@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.osgi;
 
-import com.adeptj.runtime.common.Constants;
 import com.adeptj.runtime.common.OSGiUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
@@ -29,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 /**
  * Utility that handles the installation/activation of required bundles after the system bundle is up and running.
@@ -64,7 +65,7 @@ final class Bundles {
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         logger.info("Bundles provisioning start!!");
         BundleInstaller installer = new BundleInstaller();
-        installer.install(Bundles.class.getClassLoader(), Configs.of().common().getString(Constants.BUNDLES_ROOT_DIR_KEY))
+        installer.install(Bundles.class.getClassLoader(), Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(Bundles::startBundle);
         logger.info(BUNDLE_PROVISIONED_MSG, installer.getInstallationCount(), Times.elapsedMillis(startTime));

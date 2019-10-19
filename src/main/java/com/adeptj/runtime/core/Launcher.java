@@ -20,13 +20,7 @@
 
 package com.adeptj.runtime.core;
 
-import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Constants;
-import com.adeptj.runtime.common.Environment;
-import com.adeptj.runtime.common.Lifecycle;
-import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.ShutdownHook;
-import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.common.*;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
@@ -41,6 +35,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import static com.adeptj.runtime.common.Constants.*;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
@@ -83,7 +78,7 @@ public final class Launcher {
             Map<String, String> runtimeArgs = parseArgs(args);
             Lifecycle lifecycle = new Server(runtimeArgs);
             lifecycle.start();
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, Constants.SERVER_STOP_THREAD_NAME));
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
             launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
@@ -103,15 +98,15 @@ public final class Launcher {
 
     private static Map<String, String> parseArgs(String[] args) {
         return Stream.of(args)
-                .map(cmd -> cmd.split(Constants.REGEX_EQ))
+                .map(cmd -> cmd.split(REGEX_EQ))
                 .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
     }
 
     private static void launchBrowser(Map<String, String> commands) {
-        if (Boolean.parseBoolean(commands.get(Constants.ARG_OPEN_CONSOLE))) {
+        if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
             try {
-                Environment.launchBrowser(new URL(String.format(Constants.OSGI_CONSOLE_URL,
-                        Configs.of().undertow().getConfig(Constants.KEY_HTTP).getInt(Constants.KEY_PORT))));
+                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL,
+                        Configs.of().undertow().getConfig(KEY_HTTP).getInt(KEY_PORT))));
             } catch (IOException ex) {
                 // Just log it, its okay if browser is not launched.
                 LoggerFactory.getLogger(Launcher.class).error("Exception while launching browser!!", ex);
