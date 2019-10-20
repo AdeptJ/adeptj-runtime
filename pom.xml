@@ -1693,6 +1693,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>lib/</classpathPrefix>
                                     <mainClass>${main.class}</mainClass>
