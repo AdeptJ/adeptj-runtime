@@ -23,20 +23,16 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.extensions.logging.LogbackManager;
-import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
 import com.typesafe.config.Config;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.Servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -69,12 +65,6 @@ public enum FrameworkManager {
     private static final String MEM_DUMP_LOC = "felix.memoryusage.dump.location";
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
-
-    private ServiceRegistration<Servlet> errorHandler;
-
-    private ServiceRegistration<WebConsolePasswordChangeListener> passwordChangeListener;
-
-    private ServiceRegistration<LogbackManager> logbackManager;
 
     private Framework framework;
 
