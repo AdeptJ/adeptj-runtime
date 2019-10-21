@@ -16,9 +16,6 @@
         <fileSet>
             <directory>${project.basedir}/bin</directory>
         </fileSet>
-        <fileSet>
-            <directory>${project.basedir}/etc</directory>
-        </fileSet>
     </fileSets>
     <files>
         <file>
