@@ -43,8 +43,8 @@
         <undertow.version>2.0.29.Final</undertow.version>
         <xnio.version>3.7.7.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
-        <wildfly-common.version>1.5.2.Final</wildfly-common.version>
-        <jboss-threads.version>3.0.0.Final</jboss-threads.version>
+        <wildfly-common.version>1.5.3.Final</wildfly-common.version>
+        <jboss-threads.version>3.0.1.Final</jboss-threads.version>
         <jboss-logging.version>3.4.1.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.2.1.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.2.1.Final</jboss-logging-processor.version>
@@ -503,7 +503,7 @@
         <dependency>
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotations</artifactId>
-            <version>2.3.3</version>
+            <version>2.3.4</version>
             <scope>compile</scope>
         </dependency>
 
