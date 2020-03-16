@@ -40,10 +40,10 @@
         <main.class>com.adeptj.runtime.core.Launcher</main.class>
         <skipTests>true</skipTests>
         <!-- Common Dependencies -->
-        <undertow.version>2.0.29.Final</undertow.version>
+        <undertow.version>2.0.30.Final</undertow.version>
         <xnio.version>3.7.7.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
-        <wildfly-common.version>1.5.3.Final</wildfly-common.version>
+        <wildfly-common.version>1.5.4.Final</wildfly-common.version>
         <jboss-threads.version>3.0.1.Final</jboss-threads.version>
         <jboss-logging.version>3.4.1.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.2.1.Final</jboss-logging-annotations.version>
