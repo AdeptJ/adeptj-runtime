@@ -34,7 +34,6 @@ import com.adeptj.runtime.extensions.logging.core.LogbackConfig;
 import com.adeptj.runtime.extensions.logging.internal.LogbackManagerImpl;
 import com.typesafe.config.Config;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ch.qos.logback.classic.Level.toLevel;
@@ -102,9 +101,7 @@ public final class LogbackInitializer {
         RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.newRollingFileAppender(logbackConfig);
         ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr
                 .newConsoleAppender(APPENDER_CONSOLE, loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE));
-        List<Appender<ILoggingEvent>> appenderList = new ArrayList<>();
-        appenderList.add(consoleAppender);
-        appenderList.add(fileAppender);
+        List<Appender<ILoggingEvent>> appenderList = List.of(consoleAppender, fileAppender);
         logbackMgr.getAppenders().addAll(appenderList);
         LoggerContext context = logbackMgr.getLoggerContext();
         initRootLogger(context, consoleAppender, loggingCfg);
