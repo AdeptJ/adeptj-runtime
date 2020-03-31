@@ -963,30 +963,6 @@
 
         <profile>
 
-            <!-- Apache HttpClient OSGi Version -->
-
-            <id>ApacheHttpClient</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpcore-osgi</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient-osgi</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
             <id>JWT</id>
 
             <dependencies>
@@ -1489,7 +1465,7 @@
 
         <profile>
 
-            <id>javax-json</id>
+            <id>jakarta-json</id>
 
             <dependencies>
 
