@@ -56,12 +56,13 @@
         <jansi.version>1.18</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.5.1</classmate.version>
-        <javax.el.version>3.0.1-b11</javax.el.version>
-        <javax.mail.version>1.6.2</javax.mail.version>
         <glassfish.jakarta.inject.osgi.version>2.6.1</glassfish.jakarta.inject.osgi.version>
         <yasson.version>1.0.6</yasson.version>
         <glassfish.jakarta.json.version>1.1.6</glassfish.jakarta.json.version>
         <jakarta.enterprise.concurrent.version>1.1.1</jakarta.enterprise.concurrent.version>
+        <jakarta.activation.version>1.2.2</jakarta.activation.version>
+        <jakarta.mail.version>1.6.5</jakarta.mail.version>
+        <jakarta.el.version>3.0.3</jakarta.el.version>
 
         <!-- JAX-B Dependencies JDK 10+ -->
         <jakarta.xml.bind-api.version>2.3.3</jakarta.xml.bind-api.version>
@@ -536,6 +537,12 @@
             <artifactId>failsafe</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>expiringmap</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- OSGi Bundles Start -->
 
         <dependency>
@@ -575,6 +582,13 @@
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.enterprise.concurrent</artifactId>
             <version>${jakarta.enterprise.concurrent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+            <version>${jakarta.activation.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -1114,8 +1128,8 @@
 
                 <dependency>
                     <groupId>org.glassfish</groupId>
-                    <artifactId>javax.el</artifactId>
-                    <version>${javax.el.version}</version>
+                    <artifactId>jakarta.el</artifactId>
+                    <version>${jakarta.el.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1191,24 +1205,10 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>javax.enterprise</groupId>
-                    <artifactId>cdi-api</artifactId>
-                    <version>${cdi-api.version}</version>
+                    <groupId>jakarta.enterprise</groupId>
+                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                    <version>${jakarta.enterprise.cdi-api.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.el</groupId>
-                            <artifactId>javax.el-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.inject</groupId>
-                            <artifactId>javax.inject</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.interceptor</groupId>
-                            <artifactId>javax.interceptor-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
@@ -1521,9 +1521,15 @@
 
                 <dependency>
                     <groupId>com.sun.mail</groupId>
-                    <artifactId>javax.mail</artifactId>
-                    <version>${javax.mail.version}</version>
+                    <artifactId>jakarta.mail</artifactId>
+                    <version>${jakarta.mail.version}</version>
                     <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.sun.activation</groupId>
+                            <artifactId>jakarta.activation</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
                 <dependency>

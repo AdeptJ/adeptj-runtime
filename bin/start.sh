@@ -51,7 +51,7 @@ RESTEASY_OPTS=" -Dresteasy.allowGzip=true"
 
 # Add the [java.xml.bind] module if Java version is greater than 8, otherwise some of the bundles will not start.
 if [ "${JAVA_VERSION}" -gt 8 ]; then
-  JVM_OPTS="--illegal-access=warn "${JVM_OPTS}
+  JVM_OPTS="--illegal-access=permit "${JVM_OPTS}
 fi
 
 ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
