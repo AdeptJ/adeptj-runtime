@@ -281,16 +281,14 @@ public final class Server implements Lifecycle {
             int calcCoreTaskThreads = availableProcessors *
                     Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
-            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, calcCoreTaskThreads > cfgCoreTaskThreads
-                    ? calcCoreTaskThreads : cfgCoreTaskThreads);
+            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, Math.max(calcCoreTaskThreads, cfgCoreTaskThreads));
             // defaults to double of [worker-task-core-threads] i.e 128
             int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
             LOGGER.info("Configured worker task max threads: [{}]", cfgCoreTaskThreads);
             int calcMaxTaskThreads = calcCoreTaskThreads *
                     Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task max threads: [{}]", cfgCoreTaskThreads);
-            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, calcMaxTaskThreads > cfgMaxTaskThreads
-                    ? calcMaxTaskThreads : cfgMaxTaskThreads);
+            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, Math.max(calcMaxTaskThreads, cfgMaxTaskThreads));
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
         return builder;
