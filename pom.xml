@@ -85,7 +85,7 @@
         <felix.log.version>1.2.2</felix.log.version>
         <felix.metatype.version>1.2.2</felix.metatype.version>
         <felix.threaddump.version>1.0.0</felix.threaddump.version>
-        <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
+        <felix.fileinstall.version>3.6.6</felix.fileinstall.version>
         <felix.http.sslfilter.version>1.2.6</felix.http.sslfilter.version>
         <felix.jaas.version>1.0.2</felix.jaas.version>
         <felix.rootcause.version>0.1.0</felix.rootcause.version>
@@ -1084,6 +1084,12 @@
                 <dependency>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>stax2-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml.uuid</groupId>
+                    <artifactId>java-uuid-generator</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
