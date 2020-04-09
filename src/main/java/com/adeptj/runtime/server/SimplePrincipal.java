@@ -33,7 +33,7 @@ final class SimplePrincipal implements Principal, Serializable {
 
     private static final long serialVersionUID = 7723547817002486608L;
 
-    private String name;
+    private final String name;
 
     SimplePrincipal(String name) {
         this.name = name;

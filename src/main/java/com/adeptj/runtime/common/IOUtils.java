@@ -26,10 +26,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.adeptj.runtime.common.Constants.UTF8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Common Utilities
+ * Common utility methods.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -42,7 +42,7 @@ public final class IOUtils {
     }
 
     public static String toString(InputStream input) throws IOException {
-        return toByteArrayOutputStream(input).toString(UTF8);
+        return toByteArrayOutputStream(input).toString(UTF_8);
     }
 
     public static byte[] toBytes(InputStream input) throws IOException {

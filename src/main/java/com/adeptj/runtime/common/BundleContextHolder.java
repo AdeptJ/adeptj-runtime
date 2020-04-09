@@ -31,7 +31,7 @@ public enum BundleContextHolder {
 
     INSTANCE;
 
-    private volatile BundleContext bundleContext;
+    private BundleContext bundleContext;
 
     public BundleContext getBundleContext() {
         return this.bundleContext;

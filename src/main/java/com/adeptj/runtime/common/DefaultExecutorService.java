@@ -33,7 +33,7 @@ public enum DefaultExecutorService {
 
     INSTANCE;
 
-    private volatile ExecutorService executorService;
+    private ExecutorService executorService;
 
     public void execute(Runnable command) {
         if (this.executorService == null) {

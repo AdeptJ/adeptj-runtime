@@ -34,9 +34,9 @@ final class SimpleAccount implements Account {
 
     private static final long serialVersionUID = -2090504892837494810L;
 
-    private SimplePrincipal principal;
+    private final SimplePrincipal principal;
 
-    private Set<String> roles;
+    private final Set<String> roles;
 
     SimpleAccount(SimplePrincipal principal, Set<String> roles) {
         this.principal = principal;

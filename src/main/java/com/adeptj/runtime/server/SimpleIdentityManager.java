@@ -21,13 +21,18 @@
 package com.adeptj.runtime.server;
 
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigList;
+import com.typesafe.config.ConfigValue;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.Map.Entry;
 
 /**
  * Simple IdentityManager implementation that does the authentication from provisioning file or from
@@ -42,11 +47,17 @@ final class SimpleIdentityManager implements IdentityManager {
     /**
      * User to Roles mapping.
      */
-    private Map<String, List<String>> userRolesMapping;
+    private final Map<String, List<String>> userRolesMapping;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     SimpleIdentityManager(Config cfg) {
-        this.userRolesMapping = new HashMap<>((Map) cfg.getObject(KEY_USER_ROLES_MAPPING).unwrapped());
+        this.userRolesMapping = new HashMap<>();
+        for (Entry<String, ConfigValue> entry : cfg.getObject(KEY_USER_ROLES_MAPPING).entrySet()) {
+            List<String> roles = new ArrayList<>();
+            for (ConfigValue role : (ConfigList) entry.getValue()) {
+                roles.add((String) role.unwrapped());
+            }
+            this.userRolesMapping.put(entry.getKey(), roles);
+        }
     }
 
     /**
