@@ -2,25 +2,28 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>AdeptJ Runtime Login</title>
+    <title>{{msg "login.page.title.msg"}}</title>
     <link rel="stylesheet" type="text/css" href="/static/css/login.css">
 </head>
 <body>
 <div class="login-bg">
     <div class="login-card">
-        <h2>Welcome!</h2>
+        <h2>{{msg "login.welcome.msg"}}</h2>
         <div class="sep-top"></div>
-        <form method="post" name="loginForm" action="/auth/j_security_check">
+        <form method="post" name="loginForm" action="/admin/auth/j_security_check">
             <div class="group user-icon">
-                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}" autofocus="autofocus" required>
+                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}"
+                       autofocus="autofocus" required>
             </div>
             <div class="group lock-icon">
-                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off" required>
+                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off"
+                       required>
             </div>
             <button type="submit" class="button buttonBlue">Login</button>
-            <span class="error">{{error}}</span>
+            {{#isLoginError}}
+            <span class="error">{{msg "login.error.msg"}}</span>
+            {{/isLoginError}}
         </form>
-
     </div>
 </div>
 </body>

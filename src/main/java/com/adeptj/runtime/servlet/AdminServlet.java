@@ -36,6 +36,7 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
+import static java.lang.Boolean.TRUE;
 
 /**
  * AdminServlet does the following:
@@ -56,9 +57,7 @@ public class AdminServlet extends HttpServlet {
 
     private static final String J_USERNAME = "j_username";
 
-    private static final String ERROR_MSG_KEY = "error";
-
-    private static final String ERROR_MSG = "Invalid credentials!!";
+    private static final String IS_LOGIN_ERROR = "isLoginError";
 
     /**
      * Render login page.
@@ -96,7 +95,7 @@ public class AdminServlet extends HttpServlet {
                         .template(LOGIN_TEMPLATE)
                         .locale(req.getLocale())
                         .templateData(TemplateData.newTemplateData()
-                                .with(ERROR_MSG_KEY, ERROR_MSG)
+                                .with(IS_LOGIN_ERROR, TRUE)
                                 .with(J_USERNAME, req.getParameter(J_USERNAME)))
                         .build());
     }

@@ -38,7 +38,7 @@ import java.util.List;
 
 import static ch.qos.logback.classic.Level.toLevel;
 import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_CONSOLE;
-import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_FILE;
+import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_ROLLING_FILE;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
@@ -88,6 +88,8 @@ public final class LogbackInitializer {
 
     private static final String KEY_IMMEDIATE_FLUSH = "file-appender-immediate-flush";
 
+    private static final String LOGGER_NAME = "com.adeptj.runtime.logging.LogbackInitializer";
+
     // Utility methods only.
     private LogbackInitializer() {
     }
@@ -95,7 +97,7 @@ public final class LogbackInitializer {
     public static void init() {
         long startTime = System.nanoTime();
         Config loggingCfg = Configs.of().logging();
-        LogbackConfig logbackConfig = getLogbackConfig(loggingCfg);
+        LogbackConfig logbackConfig = newLogbackConfig(loggingCfg);
         LogbackManager logbackMgr = new LogbackManagerImpl();
         LogbackManagerHolder.getInstance().setLogbackManager(logbackMgr);
         RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.newRollingFileAppender(logbackConfig);
@@ -108,12 +110,12 @@ public final class LogbackInitializer {
         addLoggers(loggingCfg, appenderList);
         addAsyncAppender(loggingCfg, fileAppender);
         context.start();
-        context.getLogger(LogbackInitializer.class).info(INIT_MSG, Times.elapsedMillis(startTime));
+        context.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
     }
 
-    private static LogbackConfig getLogbackConfig(Config loggingCfg) {
+    private static LogbackConfig newLogbackConfig(Config loggingCfg) {
         return LogbackConfig.builder()
-                .appenderName(APPENDER_FILE)
+                .appenderName(APPENDER_ROLLING_FILE)
                 .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
                 .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
                 .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
@@ -131,23 +133,28 @@ public final class LogbackInitializer {
 
     private static void addLoggers(Config loggingCfg, List<Appender<ILoggingEvent>> appenderList) {
         loggingCfg.getConfigList(KEY_LOGGERS)
-                .forEach(config -> appenderList.forEach(appender ->
-                        LogbackManagerHolder.getInstance().getLogbackManager().addLogger(LogbackConfig.builder()
-                                .logger(config.getString(KEY_LOG_NAME))
-                                .level(config.getString(KEY_LOG_LEVEL))
-                                .additivity(config.getBoolean(KEY_LOG_ADDITIVITY))
-                                .appender(appender)
-                                .build())));
+                .forEach(loggerCfg -> appenderList.forEach(appender -> addLogger(loggerCfg, appender)));
     }
 
-    private static void addAsyncAppender(Config config, RollingFileAppender<ILoggingEvent> fileAppender) {
+    private static void addLogger(Config loggerCfg, Appender<ILoggingEvent> appender) {
+        LogbackManagerHolder.getInstance().getLogbackManager()
+                .addLogger(LogbackConfig.builder()
+                        .logger(loggerCfg.getString(KEY_LOG_NAME))
+                        .level(loggerCfg.getString(KEY_LOG_LEVEL))
+                        .additivity(loggerCfg.getBoolean(KEY_LOG_ADDITIVITY))
+                        .appender(appender)
+                        .build());
+    }
+
+    private static void addAsyncAppender(Config config, Appender<ILoggingEvent> appender) {
         if (Boolean.getBoolean(SYS_PROP_LOG_ASYNC)) {
-            LogbackManagerHolder.getInstance().getLogbackManager().newAsyncAppender(LogbackConfig.builder()
-                    .asyncAppenderName(APPENDER_ASYNC)
-                    .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
-                    .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
-                    .asyncAppender(fileAppender)
-                    .build());
+            LogbackManagerHolder.getInstance().getLogbackManager()
+                    .newAsyncAppender(LogbackConfig.builder()
+                            .asyncAppenderName(APPENDER_ASYNC)
+                            .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
+                            .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
+                            .asyncAppender(appender)
+                            .build());
         }
     }
 }
