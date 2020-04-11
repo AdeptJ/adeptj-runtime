@@ -164,7 +164,7 @@ public final class Server implements Lifecycle {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private Map<String, String> runtimeArgs;
+    private final Map<String, String> runtimeArgs;
 
     private Undertow undertow;
 
@@ -313,7 +313,7 @@ public final class Server implements Lifecycle {
     private int handlePortAvailability(Config httpConf) {
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
-            LOGGER.warn("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
+            LOGGER.info("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
                     httpConf.getInt(KEY_PORT));
             port = httpConf.getInt(KEY_PORT);
         }

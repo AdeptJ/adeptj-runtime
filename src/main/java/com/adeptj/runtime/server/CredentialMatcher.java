@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -97,7 +98,7 @@ final class CredentialMatcher {
             byte[] digest = MessageDigest.getInstance(SHA256).digest(new String(password).getBytes(UTF_8));
             byte[] encoded = Base64.getEncoder().encode(digest);
             return (PREFIX + new String(encoded, UTF_8)).toCharArray();
-        } catch (Exception ex) { // NOSONAR
+        } catch (NoSuchAlgorithmException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
         return null;

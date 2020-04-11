@@ -75,7 +75,7 @@ public enum FrameworkManager {
             long startTime = System.nanoTime();
             LOGGER.info("Starting the OSGi Framework!!");
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
-            this.framework = frameworkFactory.newFramework(this.frameworkConfigs());
+            this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs());
             long startTimeFramework = System.nanoTime();
             this.framework.start();
             LOGGER.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
@@ -98,14 +98,14 @@ public enum FrameworkManager {
 
     public void stopFramework() {
         try {
-            if (this.framework != null) {
+            if (this.framework == null) {
+                LOGGER.info("OSGi Framework not started yet, nothing to stop!!");
+            } else {
                 this.removeServicesAndListeners();
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
                 LOGGER.info("OSGi FrameworkEvent: [{}]", FrameworkEvents.asString(event.getType())); // NOSONAR
-            } else {
-                LOGGER.info("OSGi Framework not started yet, nothing to stop!!");
             }
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Error Stopping OSGi Framework!!", ex);
@@ -137,7 +137,7 @@ public enum FrameworkManager {
         }
     }
 
-    private Map<String, String> frameworkConfigs() {
+    private Map<String, String> newFrameworkConfigs() {
         Map<String, String> configs = this.loadFrameworkProperties();
         Config felixConf = Configs.of().felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));

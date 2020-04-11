@@ -40,7 +40,7 @@ public class FrameworkShutdownHandler implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         long startTime = System.nanoTime();
-        Logger logger = LoggerFactory.getLogger(FrameworkShutdownHandler.class);
+        Logger logger = LoggerFactory.getLogger(this.getClass());
         logger.info("Stopping OSGi Framework as ServletContext is being destroyed!!");
         ServiceTrackers.getInstance().closeEventDispatcherTracker();
         // see - https://github.com/AdeptJ/adeptj-runtime/issues/4

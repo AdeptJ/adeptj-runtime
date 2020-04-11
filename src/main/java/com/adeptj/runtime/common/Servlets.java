@@ -111,8 +111,8 @@ public class Servlets {
         return ctx.registerService(Servlet.class, servlet, properties);
     }
 
-    public static ServiceRegistration<Servlet> osgiServlet(BundleContext ctx, HttpServlet errorServlet, List<String> errors) {
-        Class<? extends HttpServlet> cls = errorServlet.getClass();
+    public static ServiceRegistration<Servlet> osgiErrorServlet(BundleContext ctx, HttpServlet servlet, List<String> errors) {
+        Class<? extends HttpServlet> cls = servlet.getClass();
         WebServlet webServlet = checkWebServletAnnotation(cls);
         Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
         properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
@@ -122,7 +122,7 @@ public class Servlets {
         handleInitParams(webServlet, properties);
         String servletName = resolveServletName(cls, webServlet.name(), properties);
         LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletName);
-        return ctx.registerService(Servlet.class, errorServlet, properties);
+        return ctx.registerService(Servlet.class, servlet, properties);
     }
 
     private static WebServlet checkWebServletAnnotation(Class<? extends HttpServlet> cls) {

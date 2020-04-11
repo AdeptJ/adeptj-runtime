@@ -55,7 +55,7 @@ public enum ServiceRegistrations {
 
     public void registerErrorHandler(BundleContext systemBundleContext) {
         List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
-        this.errorHandler = Servlets.osgiServlet(systemBundleContext, new OSGiErrorServlet(), errors);
+        this.errorHandler = Servlets.osgiErrorServlet(systemBundleContext, new OSGiErrorServlet(), errors);
     }
 
     public void unregisterErrorHandler() {

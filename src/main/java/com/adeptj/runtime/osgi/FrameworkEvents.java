@@ -43,7 +43,7 @@ public enum FrameworkEvents {
 
     UNKNOWN(-1);
 
-    private int code;
+    private final int code;
 
     FrameworkEvents(int code) {
         this.code = code;
