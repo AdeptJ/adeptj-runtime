@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Provides {@link ExecutorService} with fixed thread pool for general purpose task execution.
+ * Provides {@link ExecutorService} with cached thread pool for general purpose task execution.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
