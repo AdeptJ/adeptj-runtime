@@ -19,7 +19,8 @@
 ###############################################################################
 
 function javaVersion() {
-   local ver=$(java -version 2>&1 | grep -i version | cut -d'"' -f2 | cut -d'.' -f1-2)
+   local ver;
+   ver=$(java -version 2>&1 | grep -i version | cut -d'"' -f2 | cut -d'.' -f1-2)
    if [[ ${ver} = "1."* ]]
        then
            ver=$(echo ${ver} | sed -e 's/1\.\([0-9]*\)\(.*\)/\1/; 1q')
