@@ -18,7 +18,7 @@
 #                                                                             #
 ###############################################################################
 
-function javaVersion() {
+function findJavaVersion() {
    local ver;
    ver=$(java -version 2>&1 | grep -i version | cut -d'"' -f2 | cut -d'.' -f1-2)
    if [[ ${ver} = "1."* ]]
@@ -27,40 +27,46 @@ function javaVersion() {
        else
            ver=$(echo ${ver} | sed -e 's/\([0-9]*\)\(.*\)/\1/; 1q')
    fi
-   echo ${ver}
+   echo "${ver}"
 }
 
-JAVA_VERSION=$(javaVersion)
+JAVA_VERSION=$(findJavaVersion)
 
-DEBUG=true
-
-DEBUG_PORT=9000
-
-if [ ${DEBUG} = true ]; then
-	DEBUG_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${DEBUG_PORT}"
+if [ "${JAVA_VERSION}" -lt 11 ]; then
+  echo "AdeptJ Runtime needs Java 11 or newer!"
+  exit
 fi
-
-if [ "${JAVA_VERSION}" -gt 9 ]; then
-  GRAAL_VM_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler"
-fi
-
-JVM_MEM_OPTS="-Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m"
-
-JVM_OPTS="-server ${GRAAL_VM_OPTS} ${JVM_MEM_OPTS} ${DEBUG_OPTS}"
 
 RESTEASY_OPTS=" -Dresteasy.allowGzip=true"
 
-# Add the [java.xml.bind] module if Java version is greater than 8, otherwise some of the bundles will not start.
-if [ "${JAVA_VERSION}" -gt 8 ]; then
-  JVM_OPTS="--illegal-access=permit "${JVM_OPTS}
+JVM_MEM_OPTS="-Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m"
+
+JVM_OPTS="--illegal-access=permit -server ${JVM_MEM_OPTS}"
+
+if [ "$1" = "jpda" ] ; then
+  if [ -z "$JPDA_TRANSPORT" ]; then
+    JPDA_TRANSPORT="dt_socket"
+  fi
+  if [ -z "$JPDA_ADDRESS" ]; then
+    JPDA_ADDRESS="localhost:8000"
+  fi
+  if [ -z "$JPDA_SUSPEND" ]; then
+    JPDA_SUSPEND="n"
+  fi
+  if [ -z "$JPDA_OPTS" ]; then
+    JPDA_OPTS="-agentlib:jdwp=transport=$JPDA_TRANSPORT,address=$JPDA_ADDRESS,server=y,suspend=$JPDA_SUSPEND"
+  fi
+  JVM_OPTS="$JVM_OPTS $JPDA_OPTS"
+  shift
 fi
 
 ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.port=9007 \
+ -Dadeptj.rt.https.port=8443 \
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \
  -Denable.http2=true \
- -Dtls.version=TLSv1.2 \
+ -Dtls.version=TLSv1.3 \
  -Dwebsocket.logs.tailing.delay=5000 \
  -Dwait.time.for.debug.attach=5 \
  -Dlog.async=true \
@@ -76,7 +82,8 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Duse.provided.keyStore=false \
  -Dadeptj.rt.keyStore=path-to-local-java-keystore \
  -Dadeptj.rt.keyStorePassword=java-keystore-password \
- -Dadeptj.rt.keyPassword=key-password"
+ -Dadeptj.rt.keyPassword=key-password \
+ -Denable.eclipselink.exceptionhandler.logging=false"
 
 cd target || exit
 

@@ -145,6 +145,7 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SERVER_HTTPS_PORT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SYS_TASK_THREAD_MULTIPLIER;
@@ -297,7 +298,7 @@ public final class Server implements Lifecycle {
     private Builder enableHttp2(Builder builder) throws GeneralSecurityException, IOException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
-            int httpsPort = httpsConf.getInt(KEY_PORT);
+            int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
                 System.setProperty("adeptj.rt.keyStorePassword", httpsConf.getString("keyStorePwd"));
