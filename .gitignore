@@ -21,3 +21,5 @@ target_swiftype
 *.prefs
 .classpath
 .project
+
+.DS_Store
