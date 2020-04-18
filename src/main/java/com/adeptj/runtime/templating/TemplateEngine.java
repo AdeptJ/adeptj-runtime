@@ -23,7 +23,6 @@ package com.adeptj.runtime.templating;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
@@ -55,8 +54,6 @@ public enum TemplateEngine {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String TEMPLATE_ENGINE_INIT_MSG = "TemplateEngine initialized in [{}] ms!!";
-
-    private static final int SB_CAPACITY = Integer.getInteger("template.builder.capacity", 100);
 
     private static final String RB_HELPER_NAME = "msg";
 
@@ -107,9 +104,7 @@ public enum TemplateEngine {
     public void render(TemplateContext context) {
         try {
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            StringBuilder output = new StringBuilder(SB_CAPACITY);
-            mustache.render(output, context.getTemplateData());
-            IOUtils.write(output.toString(), context.getResponse().getWriter());
+            mustache.render(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR
             LOGGER.error(ex.getMessage(), ex);
             context.getRequest().setAttribute(ERROR_EXCEPTION, ex);

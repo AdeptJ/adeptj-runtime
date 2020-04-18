@@ -61,7 +61,7 @@ if [ "$1" = "jpda" ] ; then
 fi
 
 ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
- -Dadeptj.rt.port=9007 \
+ -Dadeptj.rt.port=8080 \
  -Dadeptj.rt.https.port=8443 \
  -Dadeptj.rt.port.check=false \
  -Dadeptj.rt.mode=PROD \

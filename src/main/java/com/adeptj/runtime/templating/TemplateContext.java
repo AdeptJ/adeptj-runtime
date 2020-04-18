@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 
+import static java.util.Locale.ENGLISH;
+
 /**
  * TemplateContext containing required objects for template rendering.
  *
@@ -120,7 +122,7 @@ public final class TemplateContext {
             context.template = this.template;
             context.templateData = this.templateData;
             // English is default Locale if no locale set.
-            context.locale = this.locale == null ? Locale.ENGLISH : this.locale;
+            context.locale = this.locale == null ? ENGLISH : this.locale;
             return context;
         }
     }

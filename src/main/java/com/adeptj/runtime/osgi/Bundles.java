@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
@@ -64,15 +66,19 @@ final class Bundles {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Bundles.class);
         logger.info("Bundles provisioning start!!");
-        BundleInstaller installer = new BundleInstaller();
-        installer.install(Bundles.class.getClassLoader(), Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
-                .filter(OSGiUtil::isNotFragment)
-                .forEach(Bundles::startBundle);
-        logger.info(BUNDLE_PROVISIONED_MSG, installer.getInstallationCount(), Times.elapsedMillis(startTime));
+        List<Bundle> bundles = new BundleInstaller().install(Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY));
+        // Bundles must start in order, that's why sorting with bundle id.
+        bundles.sort(Comparator.comparingLong(Bundle::getBundleId));
+        bundles.forEach(bundle -> {
+            if (OSGiUtil.isNotFragment(bundle)) {
+                startBundle(bundle, logger);
+            }
+        });
+        int installedBundles = bundles.size() + 1; // add the system bundle to the total count.
+        logger.info(BUNDLE_PROVISIONED_MSG, installedBundles, Times.elapsedMillis(startTime));
     }
 
-    private static void startBundle(Bundle bundle) {
-        Logger logger = LoggerFactory.getLogger(Bundles.class);
+    private static void startBundle(Bundle bundle, Logger logger) {
         try {
             if (Boolean.getBoolean(BENCHMARK_BUNDLE_START)) {
                 long startTime = System.nanoTime();

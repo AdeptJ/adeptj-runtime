@@ -23,18 +23,18 @@ package com.adeptj.runtime.osgi;
 import com.adeptj.runtime.common.BundleContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * Find and Install the Bundles from given location using the System Bundle's BundleContext.
@@ -45,15 +45,11 @@ class BundleInstaller {
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    private final AtomicInteger installationCount = new AtomicInteger();
-
-    int getInstallationCount() {
-        return this.installationCount.get() + 1; // add the system bundle to the total count.
-    }
-
-    Stream<Bundle> install(ClassLoader cl, String bundlesDir) throws IOException {
+    List<Bundle> install(String bundlesDir) throws IOException {
         Logger logger = LoggerFactory.getLogger(this.getClass());
         Pattern pattern = Pattern.compile("^bundles.*\\.jar$");
+        BundleContext systemBundleContext = BundleContextHolder.getInstance().getBundleContext();
+        ClassLoader cl = this.getClass().getClassLoader();
         return ((JarURLConnection) this.getClass().getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
@@ -67,8 +63,7 @@ class BundleInstaller {
                         if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
                             logger.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
                         } else {
-                            bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toExternalForm());
-                            this.installationCount.incrementAndGet();
+                            bundle = systemBundleContext.installBundle(url.toExternalForm());
                         }
                     } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
                         logger.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
@@ -76,6 +71,6 @@ class BundleInstaller {
                     return bundle;
                 })
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparingLong(Bundle::getBundleId));
+                .collect(Collectors.toList());
     }
 }
