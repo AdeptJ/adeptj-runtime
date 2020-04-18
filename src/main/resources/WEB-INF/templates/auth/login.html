@@ -1,30 +1,66 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html class="no-js" lang="">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
     <title>{{msg "login.page.title.msg"}}</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
+    <meta content="" name="description">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+
+    <link href="/static/css/normalize.css" rel="stylesheet">
+    <link href="/static/css/vendors/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+
+    <meta content="#fafafa" name="theme-color">
 </head>
+
 <body>
-<div class="login-bg">
-    <div class="login-card">
-        <h2>{{msg "login.welcome.msg"}}</h2>
-        <div class="sep-top"></div>
-        <form method="post" name="loginForm" action="/admin/auth/j_security_check">
-            <div class="group user-icon">
-                <input type="text" placeholder="Username" maxlength="10" name="j_username" value="{{j_username}}"
-                       autofocus="autofocus" required>
+<!--[if IE]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+
+    <main class="page-container login" role="main">
+        <div class="row">
+            <div class="container">
+                <div class="wrapper-login">
+                    <div class="login-block wrapper-middle align-items-center">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2>{{msg "login.welcome.msg"}}</h2>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="login-form">
+                                <form action="/admin/auth/j_security_check" method="post" name="loginForm">
+                                    <div class="form-group">
+                                        <input autofocus="autofocus" class="form-control" maxlength="10" name="j_username" placeholder="Username" required
+                                               type="text" value="{{j_username}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input autocomplete="off" class="form-control" maxlength="30" name="j_password" placeholder="Password" required
+                                               type="password">
+                                    </div>
+
+                                    <button class="btn btn-primary" type="submit">Login</button>
+
+                                    {{#isLoginError}}
+                                    <span class="error">{{msg "login.error.msg"}}</span>
+                                    {{/isLoginError}}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="group lock-icon">
-                <input type="password" placeholder="Password" maxlength="30" name="j_password" autocomplete="off"
-                       required>
-            </div>
-            <button type="submit" class="button buttonBlue">Login</button>
-            {{#isLoginError}}
-            <span class="error">{{msg "login.error.msg"}}</span>
-            {{/isLoginError}}
-        </form>
-    </div>
-</div>
+        </div>
+    </main>
+    <script src="/static/js/vendor/modernizr-3.8.0.min.js"></script>
+    <script src="/static/js/plugins.js"></script>
+    <script src="/static/js/main.js"></script>
+
 </body>
+
 </html>
