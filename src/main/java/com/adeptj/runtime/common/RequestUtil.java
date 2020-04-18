@@ -21,6 +21,7 @@
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.exception.SystemException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,10 @@ public final class RequestUtil {
 
     public static boolean hasException(ServletRequest req) {
         return req.getAttribute(ERROR_EXCEPTION) != null;
+    }
+
+    public static String getException(HttpServletRequest req) {
+        return ExceptionUtils.getStackTrace((Throwable) RequestUtil.getAttribute(req, ERROR_EXCEPTION));
     }
 
     public static boolean isInternalServerError(Integer statusCode) {
