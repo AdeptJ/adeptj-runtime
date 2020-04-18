@@ -96,12 +96,12 @@ public enum TemplateEngine {
     }
 
     /**
-     * Renders the template contained by the TemplateContext.
+     * Renders the template contained by the {@link TemplateEngineContext#getTemplate()}
      *
      * @param context the TemplateEngine context
      * @throws TemplateProcessingException the {@link TemplateProcessingException}
      */
-    public void render(TemplateContext context) {
+    public void render(TemplateEngineContext context) {
         try {
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
             mustache.render(context.getResponse().getWriter(), context.getTemplateData());

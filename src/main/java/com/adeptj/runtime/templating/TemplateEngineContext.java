@@ -31,19 +31,20 @@ import static java.util.Locale.ENGLISH;
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public final class TemplateContext {
+public final class TemplateEngineContext {
 
-    private String template;
-
-    private TemplateData templateData;
+    private final String template;
 
     private final HttpServletRequest request;
 
     private final HttpServletResponse response;
 
+    private TemplateData templateData;
+
     private Locale locale;
 
-    private TemplateContext(HttpServletRequest req, HttpServletResponse resp) {
+    private TemplateEngineContext(String template, HttpServletRequest req, HttpServletResponse resp) {
+        this.template = template;
         this.request = req;
         this.response = resp;
     }
@@ -117,9 +118,8 @@ public final class TemplateContext {
             return this;
         }
 
-        public TemplateContext build() {
-            TemplateContext context = new TemplateContext(this.request, this.response);
-            context.template = this.template;
+        public TemplateEngineContext build() {
+            TemplateEngineContext context = new TemplateEngineContext(this.template, this.request, this.response);
             context.templateData = this.templateData;
             // English is default Locale if no locale set.
             context.locale = this.locale == null ? ENGLISH : this.locale;

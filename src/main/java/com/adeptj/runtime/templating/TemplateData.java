@@ -36,17 +36,13 @@ public final class TemplateData implements Mapper, Iterable<Entry<String, Object
 
     private final Map<String, Object> variables;
 
-    private TemplateData() {
+    public TemplateData() {
         this.variables = new HashMap<>();
     }
 
     public TemplateData with(String key, Object value) {
         this.variables.put(key, value);
         return this;
-    }
-
-    public static TemplateData newTemplateData() {
-        return new TemplateData();
     }
 
     @Override

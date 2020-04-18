@@ -29,6 +29,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Utils for {@link HttpServletRequest}
@@ -52,6 +53,10 @@ public final class RequestUtil {
 
     public static boolean hasException(ServletRequest req) {
         return req.getAttribute(ERROR_EXCEPTION) != null;
+    }
+
+    public static boolean isInternalServerError(Integer statusCode) {
+        return statusCode != null && SC_INTERNAL_SERVER_ERROR == statusCode;
     }
 
     public static void logException(ServletRequest req, String message) {

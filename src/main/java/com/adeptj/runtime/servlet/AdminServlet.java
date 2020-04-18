@@ -22,9 +22,9 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ResponseUtil;
-import com.adeptj.runtime.templating.TemplateContext;
 import com.adeptj.runtime.templating.TemplateData;
 import com.adeptj.runtime.templating.TemplateEngine;
+import com.adeptj.runtime.templating.TemplateEngineContext;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -66,7 +66,7 @@ public class AdminServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         if (ADMIN_LOGIN_URI.equals(req.getRequestURI())) {
             TemplateEngine.getInstance()
-                    .render(TemplateContext.builder()
+                    .render(TemplateEngineContext.builder()
                             .request(req)
                             .response(resp)
                             .template(LOGIN_TEMPLATE)
@@ -89,12 +89,12 @@ public class AdminServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
         TemplateEngine.getInstance()
-                .render(TemplateContext.builder()
+                .render(TemplateEngineContext.builder()
                         .request(req)
                         .response(resp)
                         .template(LOGIN_TEMPLATE)
                         .locale(req.getLocale())
-                        .templateData(TemplateData.newTemplateData()
+                        .templateData(new TemplateData()
                                 .with(IS_LOGIN_ERROR, TRUE)
                                 .with(J_USERNAME, req.getParameter(J_USERNAME)))
                         .build());
