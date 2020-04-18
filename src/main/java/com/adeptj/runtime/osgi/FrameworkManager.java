@@ -133,7 +133,7 @@ public enum FrameworkManager {
                 && Paths.get(Configs.of().felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
             LOGGER.info("As per configuration, bundles provisioning is skipped on server restart!!");
         } else {
-            Bundles.provisionBundles();
+            new BundleInstaller().installAndStartBundles();
         }
     }
 

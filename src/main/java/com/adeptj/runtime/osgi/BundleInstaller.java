@@ -21,56 +21,105 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.OSGiUtil;
+import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.config.Configs;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.util.List;
+import java.net.URL;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 
 /**
- * Find and Install the Bundles from given location using the System Bundle's BundleContext.
+ * Find, install and start the Bundles from given location using the System Bundle's BundleContext.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-class BundleInstaller {
+final class BundleInstaller {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    List<Bundle> install(String bundlesDir) throws IOException {
-        Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
+
+    private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
+
+    private static final String BENCHMARK_BUNDLE_START = "benchmark.bundle.start";
+
+    /**
+     * Provision the Bundles.
+     * <p>
+     * Following happens in order.
+     * 1. Collect Bundles
+     * 2. Install Bundles
+     * 3. Start Bundles
+     *
+     * @throws IOException exception thrown by provisioning mechanism.
+     */
+    void installAndStartBundles() throws IOException {
+        long startTime = System.nanoTime();
+        LOGGER.info("Bundles provisioning start!!");
+        AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
+        this.collect(Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
+                .map(url -> this.install(url, counter))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Bundle::getBundleId))
+                .filter(OSGiUtil::isNotFragment)
+                .forEach(this::start);
+        LOGGER.info(BUNDLE_PROVISIONED_MSG, counter.get(), Times.elapsedMillis(startTime));
+    }
+
+    private Stream<URL> collect(String bundlesDir) throws IOException {
         Pattern pattern = Pattern.compile("^bundles.*\\.jar$");
-        BundleContext systemBundleContext = BundleContextHolder.getInstance().getBundleContext();
-        ClassLoader cl = this.getClass().getClassLoader();
         return ((JarURLConnection) this.getClass().getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
                 .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
-                .map(jarEntry -> cl.getResource(jarEntry.getName()))
-                .filter(Objects::nonNull)
-                .map(url -> {
-                    logger.debug("Installing Bundle from location: [{}]", url);
-                    Bundle bundle = null;
-                    try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
-                        if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
-                            logger.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
-                        } else {
-                            bundle = systemBundleContext.installBundle(url.toExternalForm());
-                        }
-                    } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-                        logger.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
-                    }
-                    return bundle;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
+                .filter(Objects::nonNull);
+    }
+
+    private Bundle install(URL url, AtomicInteger counter) {
+        LOGGER.debug("Installing Bundle from location: [{}]", url);
+        Bundle bundle = null;
+        try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
+            if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
+                LOGGER.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
+            } else {
+                bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toExternalForm());
+                counter.getAndIncrement();
+            }
+        } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
+            LOGGER.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
+        }
+        return bundle;
+    }
+
+    private void start(Bundle bundle) {
+        try {
+            if (Boolean.getBoolean(BENCHMARK_BUNDLE_START)) {
+                long startTime = System.nanoTime();
+                bundle.start();
+                LOGGER.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
+            } else {
+                bundle.start();
+                LOGGER.info("Started Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
+            }
+        } catch (Exception ex) { // NOSONAR
+            LOGGER.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
+        }
     }
 }
