@@ -53,7 +53,7 @@ final class BundleInstaller {
 
     private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
-    private static final String BUNDLE_STARTED_MSG = "Started Bundle: [{}, Version: {}] in [{}] ms!";
+    private static final String BUNDLE_STARTED_MSG = "Started Bundle [{}, Version: {}] in [{}] ms!";
 
     private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
 
