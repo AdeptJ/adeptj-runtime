@@ -618,7 +618,7 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -1234,36 +1234,6 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-base</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml.jackson.dataformat</groupId>
-                    <artifactId>jackson-dataformat-xml</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml.jackson.dataformat</groupId>
-                    <artifactId>jackson-dataformat-cbor</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.yaml</groupId>
-                    <artifactId>snakeyaml</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml.jackson.dataformat</groupId>
-                    <artifactId>jackson-dataformat-yaml</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
                     <groupId>com.fasterxml.jackson.module</groupId>
                     <artifactId>jackson-module-jaxb-annotations</artifactId>
                     <scope>provided</scope>
@@ -1271,7 +1241,13 @@
 
                 <dependency>
                     <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-xml-provider</artifactId>
+                    <artifactId>jackson-jaxrs-base</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                    <artifactId>jackson-datatype-jaxrs</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1301,12 +1277,6 @@
 
                 <dependency>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jaxrs</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr353</artifactId>
                     <scope>provided</scope>
                     <exclusions>
@@ -1315,12 +1285,6 @@
                             <artifactId>javax.json-api</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>stax2-api</artifactId>
-                    <scope>provided</scope>
                 </dependency>
 
             </dependencies>
