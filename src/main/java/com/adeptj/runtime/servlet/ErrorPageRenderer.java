@@ -80,7 +80,7 @@ public final class ErrorPageRenderer {
                                 .with(KEY_STATUS_CODE, statusCode)
                                 .with(KEY_ERROR_MSG, RequestUtil.getAttribute(req, ERROR_MESSAGE))
                                 .with(KEY_REQ_URI, RequestUtil.getAttribute(req, ERROR_REQUEST_URI))
-                                .with(KEY_EXCEPTION, RequestUtil.getAttribute(req, ERROR_EXCEPTION)))
+                                .with(KEY_EXCEPTION, RequestUtil.getException(req)))
                         .build());
             } else {
                 ErrorPageRenderer.render500Page(req, resp);

@@ -20,6 +20,9 @@
 
 package com.adeptj.runtime.templating;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
@@ -44,6 +47,7 @@ public final class TemplateEngineContext {
     private Locale locale;
 
     private TemplateEngineContext(String template, HttpServletRequest req, HttpServletResponse resp) {
+        Validate.isTrue(StringUtils.isNotEmpty(template), "Template name can't be null!");
         this.template = template;
         this.request = req;
         this.response = resp;
