@@ -85,6 +85,6 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.keyPassword=key-password \
  -Denable.eclipselink.exceptionhandler.logging=false"
 
-cd target || exit
+cd target || cd ..
 
 java ${ADEPTJ_RUNTIME_OPTS} -jar adeptj-runtime.jar
