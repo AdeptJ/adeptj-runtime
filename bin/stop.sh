@@ -20,7 +20,6 @@
 
 # This script is used to stop running instance of adeptj runtime.
 # This will find the process and kill it and execute stop command for adeptj.
-JAR_NAME="adeptj-runtime.jar"
 
 # preparing base paths
 BIN_PATH=$(cd $(dirname "$0") && pwd)
@@ -32,20 +31,15 @@ TARGET=$BASE"/target"
 # Moving forward if target directory exist.
 if [[ -d "$TARGET" ]]
 then
-   JAR_PATH=$TARGET"/"$JAR_NAME
-   PID_FILE=$BASE"/runtime.pid"
+
+   PID_FILE=$TARGET"/adeptj.pid"
 
    if [ -e "$PID_FILE" ]
+
    then
        PID=$(cat "$PID_FILE")
-       cd "$BASE"
-       # sending stop command to adeptj
-       java -jar "$JAR_PATH" stop &
-
+       echo "${PID}"
        # killing running adeptj process
-       kill "$PID"
-
-       # clean up afterwards
-       rm -f "$PID_FILE"
+       trap 'kill $PID' EXIT
    fi
 fi
