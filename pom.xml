@@ -98,7 +98,7 @@
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
         <adeptj-modules-webconsole-security.version>1.0.4.Final</adeptj-modules-webconsole-security.version>
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
-        <adeptj-modules-commons-logging.version>1.0.0.Final</adeptj-modules-commons-logging.version>
+        <adeptj-modules-commons-logging.version>1.0.3.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
         <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
@@ -245,7 +245,7 @@
 
     <dependencies>
 
-        <!-- Undertow Dependencies Starts -->
+        <!-- Undertow Dependencies Start -->
 
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -378,18 +378,6 @@
         <!-- Undertow core [provided] dependencies end -->
 
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>jakarta.websocket</groupId>
-            <artifactId>jakarta.websocket-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
             <version>${undertow.version}</version>
@@ -429,13 +417,95 @@
             </exclusions>
         </dependency>
 
-        <!-- Undertow Dependencies Ends -->
+        <!-- Undertow Dependencies End -->
+
+        <!-- Jakarta Dependencies Start -->
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- JSR 374 [JSON-P] Specification API -->
+
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- JSR 374 [JSON-P] RI -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${glassfish.jakarta.json.version}</version>
+            <classifier>module</classifier>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- JSR 367 [JSON-B] Specification API-->
+
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>${yasson.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise.concurrent</groupId>
+            <artifactId>jakarta.enterprise.concurrent-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.enterprise.concurrent</artifactId>
+            <version>${jakarta.enterprise.concurrent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+            <version>${jakarta.activation.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jakarta.xml.bind-api.version}</version>
+        </dependency>
+
+        <!-- Jakarta Dependencies End -->
+
+        <!-- SLF4J/Logback Dependencies Start -->
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -455,24 +525,9 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Just to mitigate strange compilation error happening while building -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.annotation</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        <!-- SLF4J/Logback Dependencies End -->
 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.framework.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.typesafe</groupId>
-            <artifactId>config</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        <!-- Apache Commons Dependencies Start -->
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -499,20 +554,20 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- Admin Runtime Extensions dependency -->
+        <!-- Apache Commons Dependencies End -->
+
+        <!-- Misc Dependencies Start -->
 
         <dependency>
-            <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-runtime-extensions</artifactId>
-            <version>${adeptj-runtime-extensions.version}</version>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <scope>compile</scope>
         </dependency>
-
-        <!-- RenderEngine Dependencies -->
 
         <dependency>
             <groupId>org.trimou</groupId>
@@ -544,34 +599,60 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- OSGi Bundles Start -->
-
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
             <scope>provided</scope>
         </dependency>
 
+        <!-- JAX-B Implementation Dependencies | These are unavailable on JDK11-->
+
         <dependency>
-            <groupId>jakarta.enterprise.concurrent</groupId>
-            <artifactId>jakarta.enterprise.concurrent-api</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>${jaxb-runtime.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.enterprise.concurrent</artifactId>
-            <version>${jakarta.enterprise.concurrent.version}</version>
-            <scope>provided</scope>
+            <groupId>com.sun.istack</groupId>
+            <artifactId>istack-commons-runtime</artifactId>
+            <version>${istack-commons-runtime.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>jakarta.activation</artifactId>
-            <version>${jakarta.activation.version}</version>
-            <scope>provided</scope>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>txw2</artifactId>
+            <version>${txw2.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+            <version>${FastInfoset.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.staxex</groupId>
+            <artifactId>stax-ex</artifactId>
+            <version>${stax-ex.version}</version>
+        </dependency>
+
+        <!-- Misc Dependencies End -->
 
         <!-- OSGi/Apache Felix Dependencies Start -->
+
+        <!-- Just to mitigate strange compilation error happening while building -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.annotation</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.framework.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
@@ -835,7 +916,7 @@
 
         <!-- Apache Felix Dependencies End -->
 
-        <!-- AdeptJ Modules Bundles Start-->
+        <!-- AdeptJ Dependencies Start-->
 
         <dependency>
             <groupId>com.adeptj</groupId>
@@ -872,9 +953,13 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- AdeptJ Modules Bundles End-->
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-runtime-extensions</artifactId>
+            <version>${adeptj-runtime-extensions.version}</version>
+        </dependency>
 
-        <!-- OSGi Bundles End -->
+        <!-- AdeptJ Dependencies End-->
 
         <!-- Test dependencies -->
 
@@ -884,11 +969,29 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
-    <profiles>
+    <!-- Plan is to modularize the build process using Maven profiles. -->
 
-        <!-- Plan is to modularize the build process so that the requisite modules can be embedded in the Uber jar. -->
+    <profiles>
 
         <profile>
 
@@ -901,23 +1004,6 @@
                     <groupId>org.fusesource.jansi</groupId>
                     <artifactId>jansi</artifactId>
                     <version>${jansi.version}</version>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>AdeptJ-Logging</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-logging</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
                 </dependency>
 
             </dependencies>
@@ -1354,6 +1440,10 @@
                             <groupId>org.javassist</groupId>
                             <artifactId>javassist</artifactId>
                         </exclusion>
+                        <exclusion>
+                            <groupId>io.micrometer</groupId>
+                            <artifactId>micrometer-core</artifactId>
+                        </exclusion>
                     </exclusions>
                 </dependency>
 
@@ -1519,49 +1609,6 @@
 
         <profile>
 
-            <id>Jakarta-Json</id>
-
-            <dependencies>
-
-                <!-- JSR 374 [JSON-P] Specification API -->
-
-                <dependency>
-                    <groupId>jakarta.json</groupId>
-                    <artifactId>jakarta.json-api</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-
-                <!-- JSR 374 [JSON-P] RI -->
-                <dependency>
-                    <groupId>org.glassfish</groupId>
-                    <artifactId>jakarta.json</artifactId>
-                    <version>${glassfish.jakarta.json.version}</version>
-                    <classifier>module</classifier>
-                    <scope>compile</scope>
-                </dependency>
-
-                <!-- JSR 367 [JSON-B] Specification API-->
-
-                <dependency>
-                    <groupId>jakarta.json.bind</groupId>
-                    <artifactId>jakarta.json.bind-api</artifactId>
-                    <scope>compile</scope>
-                </dependency>
-
-                <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
-                <dependency>
-                    <groupId>org.eclipse</groupId>
-                    <artifactId>yasson</artifactId>
-                    <version>${yasson.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
             <id>Email</id>
 
             <dependencies>
@@ -1589,61 +1636,6 @@
                             <artifactId>javax.mail</artifactId>
                         </exclusion>
                     </exclusions>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>jdk11+</id>
-
-            <dependencies>
-
-                <!-- JAX-B API/Implementation Dependencies -->
-
-                <dependency>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                    <!-- scope is provided in parent, must be compile scope to put in /lib -->
-                    <scope>compile</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>jakarta.xml.bind</groupId>
-                    <artifactId>jakarta.xml.bind-api</artifactId>
-                    <version>${jakarta.xml.bind-api.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-runtime</artifactId>
-                    <version>${jaxb-runtime.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.sun.istack</groupId>
-                    <artifactId>istack-commons-runtime</artifactId>
-                    <version>${istack-commons-runtime.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>txw2</artifactId>
-                    <version>${txw2.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.sun.xml.fastinfoset</groupId>
-                    <artifactId>FastInfoset</artifactId>
-                    <version>${FastInfoset.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.jvnet.staxex</groupId>
-                    <artifactId>stax-ex</artifactId>
-                    <version>${stax-ex.version}</version>
                 </dependency>
 
             </dependencies>
