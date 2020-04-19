@@ -38,8 +38,9 @@ then
 
    then
        PID=$(cat "$PID_FILE")
-       echo "${PID}"
        # killing running adeptj process
-       trap 'kill $PID' EXIT
+       kill "$PID"
+       rm -f "$PID_FILE"
    fi
 fi
+exit
