@@ -547,28 +547,6 @@
         <!-- OSGi Bundles Start -->
 
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSR 374 [JSON-P] Specification API -->
-
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JSR 367 [JSON-B] Specification API-->
-
-        <dependency>
-            <groupId>jakarta.json.bind</groupId>
-            <artifactId>jakarta.json.bind-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <scope>provided</scope>
@@ -967,6 +945,19 @@
             <id>JWT</id>
 
             <dependencies>
+
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt-impl</artifactId>
+                    <version>${jjwt.version}</version>
+                    <scope>compile</scope>
+                </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
@@ -1535,16 +1526,16 @@
 
         <profile>
 
-            <id>jakarta-json</id>
+            <id>Jakarta-Json</id>
 
             <dependencies>
 
-                <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
+                <!-- JSR 374 [JSON-P] Specification API -->
+
                 <dependency>
-                    <groupId>org.eclipse</groupId>
-                    <artifactId>yasson</artifactId>
-                    <version>${yasson.version}</version>
-                    <scope>provided</scope>
+                    <groupId>jakarta.json</groupId>
+                    <artifactId>jakarta.json-api</artifactId>
+                    <scope>compile</scope>
                 </dependency>
 
                 <!-- JSR 374 [JSON-P] RI -->
@@ -1552,7 +1543,24 @@
                     <groupId>org.glassfish</groupId>
                     <artifactId>jakarta.json</artifactId>
                     <version>${glassfish.jakarta.json.version}</version>
-                    <scope>provided</scope>
+                    <classifier>module</classifier>
+                    <scope>compile</scope>
+                </dependency>
+
+                <!-- JSR 367 [JSON-B] Specification API-->
+
+                <dependency>
+                    <groupId>jakarta.json.bind</groupId>
+                    <artifactId>jakarta.json.bind-api</artifactId>
+                    <scope>compile</scope>
+                </dependency>
+
+                <!-- Eclipse Yasson, JSR 367 [JSON-B] RI -->
+                <dependency>
+                    <groupId>org.eclipse</groupId>
+                    <artifactId>yasson</artifactId>
+                    <version>${yasson.version}</version>
+                    <scope>compile</scope>
                 </dependency>
 
             </dependencies>
