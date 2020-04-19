@@ -100,6 +100,13 @@
         <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
         <adeptj-modules-commons-logging.version>1.0.3.Final</adeptj-modules-commons-logging.version>
         <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
+        <adeptj-modules-jaxrs-core.version>2.0.0.Final</adeptj-modules-jaxrs-core.version>
+        <adeptj-modules-jaxrs-resteasy.version>2.0.0.Final</adeptj-modules-jaxrs-resteasy.version>
+        <adeptj-modules-data-jpa.version>1.1.0.Final</adeptj-modules-data-jpa.version>
+        <adeptj-modules-commons-jdbc.version>1.0.0.Final</adeptj-modules-commons-jdbc.version>
+        <adeptj-modules-cache-caffeine.version>1.0.0.Final</adeptj-modules-cache-caffeine.version>
+        <adeptj-modules-commons-validator.version>1.0.3.Final</adeptj-modules-commons-validator.version>
+        <adeptj-modules-websecurity-jwt.version>1.1.0.Final</adeptj-modules-websecurity-jwt.version>
         <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
 
@@ -271,8 +278,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Required by XNIO-API below. -->
-
         <dependency>
             <groupId>org.wildfly.client</groupId>
             <artifactId>wildfly-client-config</artifactId>
@@ -319,15 +324,11 @@
             </exclusions>
         </dependency>
 
-        <!-- Required at runtime by XNIO-API above. -->
-
         <dependency>
             <groupId>org.jboss.xnio</groupId>
             <artifactId>xnio-nio</artifactId>
             <version>${xnio.version}</version>
         </dependency>
-
-        <!-- Undertow core required [provided] scoped dependencies start -->
 
         <dependency>
             <groupId>org.jboss.jdeparser</groupId>
@@ -374,8 +375,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- Undertow core [provided] dependencies end -->
 
         <dependency>
             <groupId>io.undertow</groupId>
@@ -485,6 +484,12 @@
         </dependency>
 
         <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.sun.activation</groupId>
             <artifactId>jakarta.activation</artifactId>
             <version>${jakarta.activation.version}</version>
@@ -492,15 +497,62 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>${jakarta.xml.bind-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.hk2.external</groupId>
+            <artifactId>jakarta.inject</artifactId>
+            <version>${glassfish.jakarta.inject.osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <version>${jakarta.interceptor-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>${jakarta.enterprise.cdi-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakarta.mail.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>jakarta.activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>${jakarta.el.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Jakarta Dependencies End -->
@@ -564,6 +616,31 @@
         <!-- Misc Dependencies Start -->
 
         <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reactivestreams</groupId>
+            <artifactId>reactive-streams</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
             <scope>compile</scope>
@@ -577,6 +654,93 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml</groupId>
+            <artifactId>classmate</artifactId>
+            <version>${classmate.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml</groupId>
+                    <artifactId>classmate</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.annotation.versioning</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-core</artifactId>
+            <version>${mime4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-dom</artifactId>
+            <version>${mime4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-storage</artifactId>
+            <version>${mime4j.version}</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -955,6 +1119,41 @@
 
         <dependency>
             <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-cache-caffeine</artifactId>
+            <version>${adeptj-modules-cache-caffeine.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-websecurity-jwt</artifactId>
+            <version>${adeptj-modules-websecurity-jwt.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-commons-validator</artifactId>
+            <version>${adeptj-modules-commons-validator.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-jaxrs-core</artifactId>
+            <version>${adeptj-modules-jaxrs-core.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
+            <version>${adeptj-modules-jaxrs-resteasy.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-extensions</artifactId>
             <version>${adeptj-runtime-extensions.version}</version>
         </dependency>
@@ -1004,52 +1203,6 @@
                     <groupId>org.fusesource.jansi</groupId>
                     <artifactId>jansi</artifactId>
                     <version>${jansi.version}</version>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>ReactiveStreams</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.reactivestreams</groupId>
-                    <artifactId>reactive-streams</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>JWT</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>io.jsonwebtoken</groupId>
-                    <artifactId>jjwt-impl</artifactId>
-                    <version>${jjwt.version}</version>
-                    <scope>compile</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-websecurity-jwt</artifactId>
-                    <version>1.1.0.Final</version>
-                    <scope>provided</scope>
                 </dependency>
 
             </dependencies>
@@ -1170,174 +1323,6 @@
                     <scope>provided</scope>
                 </dependency>
 
-                <dependency>
-                    <groupId>com.fasterxml.uuid</groupId>
-                    <artifactId>java-uuid-generator</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>HibernateValidator</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>org.glassfish</groupId>
-                    <artifactId>jakarta.el</artifactId>
-                    <version>${jakarta.el.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.fasterxml</groupId>
-                    <artifactId>classmate</artifactId>
-                    <version>${classmate.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.hibernate.validator</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>${hibernate-validator.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.fasterxml</groupId>
-                            <artifactId>classmate</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.validation</groupId>
-                            <artifactId>validation-api</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-commons-validator</artifactId>
-                    <version>1.0.3.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
-            <id>RESTEasy</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>jakarta.validation</groupId>
-                    <artifactId>jakarta.validation-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>jakarta.ws.rs</groupId>
-                    <artifactId>jakarta.ws.rs-api</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.glassfish.hk2.external</groupId>
-                    <artifactId>jakarta.inject</artifactId>
-                    <version>${glassfish.jakarta.inject.osgi.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>jakarta.interceptor</groupId>
-                    <artifactId>jakarta.interceptor-api</artifactId>
-                    <version>${jakarta.interceptor-api.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>jakarta.enterprise</groupId>
-                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                    <version>${jakarta.enterprise.cdi-api.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>net.jcip</groupId>
-                    <artifactId>jcip-annotations</artifactId>
-                    <version>${jcip-annotations.version}</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.eclipse.microprofile.config</groupId>
-                    <artifactId>microprofile-config-api</artifactId>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.osgi</groupId>
-                            <artifactId>org.osgi.annotation.versioning</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.enterprise</groupId>
-                            <artifactId>cdi-api</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <!-- Mime4j dependencies start -->
-
-                <dependency>
-                    <groupId>org.apache.james</groupId>
-                    <artifactId>apache-mime4j-core</artifactId>
-                    <version>${mime4j.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.james</groupId>
-                    <artifactId>apache-mime4j-dom</artifactId>
-                    <version>${mime4j.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.james</groupId>
-                    <artifactId>apache-mime4j-storage</artifactId>
-                    <version>${mime4j.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>commons-io</groupId>
-                            <artifactId>commons-io</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <!-- Mime4j dependencies end -->
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-jaxrs-core</artifactId>
-                    <version>2.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-jaxrs-resteasy</artifactId>
-                    <version>2.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
             </dependencies>
 
         </profile>
@@ -1389,39 +1374,6 @@
 
         <profile>
 
-            <id>Cache</id>
-
-            <dependencies>
-
-                <dependency>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_annotations</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>org.checkerframework</groupId>
-                            <artifactId>checker-qual</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-cache-caffeine</artifactId>
-                    <version>1.0.0.Final</version>
-                    <scope>provided</scope>
-                </dependency>
-
-            </dependencies>
-
-        </profile>
-
-        <profile>
-
             <id>JDBC-CP-Hikari</id>
 
             <dependencies>
@@ -1450,7 +1402,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-commons-jdbc</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>${adeptj-modules-commons-jdbc.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1510,7 +1462,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-jpa</artifactId>
-                    <version>1.1.0.Final</version>
+                    <version>${adeptj-modules-data-jpa.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1612,19 +1564,6 @@
             <id>Email</id>
 
             <dependencies>
-
-                <dependency>
-                    <groupId>com.sun.mail</groupId>
-                    <artifactId>jakarta.mail</artifactId>
-                    <version>${jakarta.mail.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.sun.activation</groupId>
-                            <artifactId>jakarta.activation</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
 
                 <dependency>
                     <groupId>org.apache.commons</groupId>
