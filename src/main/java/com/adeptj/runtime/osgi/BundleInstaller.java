@@ -24,7 +24,6 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.OSGiUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
@@ -50,8 +49,6 @@ import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 final class BundleInstaller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
-
-    private static final String BUNDLE_SYMBOLIC_NAME = "Bundle-SymbolicName";
 
     private static final String BUNDLE_STARTED_MSG = "Started Bundle [{}, Version: {}] in [{}] ms!";
 
@@ -96,7 +93,7 @@ final class BundleInstaller {
         LOGGER.debug("Installing Bundle from location: [{}]", url);
         Bundle bundle = null;
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
-            if (StringUtils.isEmpty(jis.getManifest().getMainAttributes().getValue(BUNDLE_SYMBOLIC_NAME))) {
+            if (OSGiUtil.isNotBundle(jis.getManifest())) {
                 LOGGER.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
             } else {
                 bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toExternalForm());

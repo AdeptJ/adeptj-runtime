@@ -57,11 +57,9 @@ public class FrameworkLifecycleListener implements FrameworkListener {
             case STARTED:
                 LOGGER.info("Handling OSGi Framework Restart!!");
                 ServiceRegistrations.getInstance().unregisterErrorHandler();
-                ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
                 ServiceRegistrations.getInstance().unregisterLogbackManager();
                 BundleContext systemBundleContext = event.getBundle().getBundleContext();
                 ServiceRegistrations.getInstance().registerErrorHandler(systemBundleContext);
-                ServiceRegistrations.getInstance().registerWebConsolePasswordChangeListener(systemBundleContext);
                 ServiceRegistrations.getInstance().registerLogbackManager(systemBundleContext);
                 BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
                 // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
@@ -73,7 +71,6 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 break;
             case STOPPED_UPDATE:
                 ServiceRegistrations.getInstance().unregisterErrorHandler();
-                ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
                 ServiceRegistrations.getInstance().unregisterLogbackManager();
                 LOGGER.info("Closing DispatcherServletTracker!!");
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();

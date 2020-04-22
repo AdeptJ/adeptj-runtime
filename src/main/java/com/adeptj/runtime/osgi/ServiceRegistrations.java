@@ -22,10 +22,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Servlets;
-import com.adeptj.runtime.common.WebConsolePasswordChangeListenerHolder;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.extensions.logging.LogbackManager;
-import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
 import com.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -34,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.Servlet;
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Utility for performing operations on OSGi {@link ServiceRegistration} instances.
@@ -49,13 +45,10 @@ public enum ServiceRegistrations {
 
     private ServiceRegistration<Servlet> errorHandler;
 
-    private ServiceRegistration<WebConsolePasswordChangeListener> passwordChangeListener;
-
     private ServiceRegistration<LogbackManager> logbackManager;
 
     public void registerErrorHandler(BundleContext systemBundleContext) {
-        List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
-        this.errorHandler = Servlets.osgiErrorServlet(systemBundleContext, new OSGiErrorServlet(), errors);
+        this.errorHandler = Servlets.osgiErrorServlet(systemBundleContext, new OSGiErrorServlet());
     }
 
     public void unregisterErrorHandler() {
@@ -67,25 +60,6 @@ public enum ServiceRegistrations {
                 LOGGER.error(ex.getMessage(), ex);
             }
             this.errorHandler = null;
-        }
-    }
-
-    public void registerWebConsolePasswordChangeListener(BundleContext systemBundleContext) {
-        WebConsolePasswordChangeListener passwordChangeListener = new WebConsolePasswordChangeListener();
-        WebConsolePasswordChangeListenerHolder.getInstance().setPasswordChangeListener(passwordChangeListener);
-        this.passwordChangeListener = systemBundleContext
-                .registerService(WebConsolePasswordChangeListener.class, passwordChangeListener, new Hashtable<>());
-    }
-
-    public void unregisterWebConsolePasswordChangeListener() {
-        if (this.passwordChangeListener != null) {
-            try {
-                LOGGER.info("Removing WebConsolePasswordChangeListener!!");
-                this.passwordChangeListener.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-            this.passwordChangeListener = null;
         }
     }
 

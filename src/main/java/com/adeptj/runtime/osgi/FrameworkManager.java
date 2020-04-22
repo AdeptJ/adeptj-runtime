@@ -84,7 +84,6 @@ public enum FrameworkManager {
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
             ServiceRegistrations.getInstance().registerErrorHandler(systemBundleContext);
-            ServiceRegistrations.getInstance().registerWebConsolePasswordChangeListener(systemBundleContext);
             ServiceRegistrations.getInstance().registerLogbackManager(systemBundleContext);
             this.provisionBundles();
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
@@ -114,7 +113,6 @@ public enum FrameworkManager {
 
     private void removeServicesAndListeners() {
         ServiceRegistrations.getInstance().unregisterErrorHandler();
-        ServiceRegistrations.getInstance().unregisterWebConsolePasswordChangeListener();
         ServiceRegistrations.getInstance().unregisterLogbackManager();
         BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
         if (bundleContext != null) {

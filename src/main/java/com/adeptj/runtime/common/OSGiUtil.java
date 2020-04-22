@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.common;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -28,7 +29,9 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 import java.util.Optional;
+import java.util.jar.Manifest;
 
+import static com.adeptj.runtime.common.Constants.HEADER_SYMBOLIC_NAME;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
@@ -56,6 +59,10 @@ public final class OSGiUtil {
 
     public static boolean isNotFragment(Bundle bundle) {
         return bundle.getHeaders().get(FRAGMENT_HOST) == null;
+    }
+
+    public static boolean isNotBundle(Manifest manifest) {
+        return manifest != null && StringUtils.isEmpty(manifest.getMainAttributes().getValue(HEADER_SYMBOLIC_NAME));
     }
 
     public static Filter filter(BundleContext context, String objectClassFQN) {

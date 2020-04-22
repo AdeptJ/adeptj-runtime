@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.common;
 
+import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.osgi.BridgeHttpSessionAttributeListener;
 import com.adeptj.runtime.osgi.BridgeHttpSessionIdListener;
 import com.adeptj.runtime.osgi.BridgeHttpSessionListener;
@@ -99,34 +100,33 @@ public class Servlets {
     }
 
     public static ServiceRegistration<Servlet> osgiServlet(BundleContext ctx, HttpServlet servlet) {
-        Class<? extends HttpServlet> cls = servlet.getClass();
-        WebServlet webServlet = checkWebServletAnnotation(cls);
+        WebServlet webServlet = checkWebServletAnnotation(servlet);
         Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
         properties.put(HTTP_WHITEBOARD_SERVLET_PATTERN,
                 ArrayUtils.isEmpty(webServlet.urlPatterns()) ? webServlet.value() : webServlet.urlPatterns());
         properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
         handleInitParams(webServlet, properties);
-        String servletName = resolveServletName(cls, webServlet.name(), properties);
+        String servletName = resolveServletName(servlet, webServlet.name(), properties);
         LOGGER.info("Registering OSGi Servlet: [{}]", servletName);
         return ctx.registerService(Servlet.class, servlet, properties);
     }
 
-    public static ServiceRegistration<Servlet> osgiErrorServlet(BundleContext ctx, HttpServlet servlet, List<String> errors) {
-        Class<? extends HttpServlet> cls = servlet.getClass();
-        WebServlet webServlet = checkWebServletAnnotation(cls);
+    public static ServiceRegistration<Servlet> osgiErrorServlet(BundleContext ctx, HttpServlet servlet) {
+        WebServlet webServlet = checkWebServletAnnotation(servlet);
         Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
+        List<String> errors = Configs.of().undertow().getStringList("common.osgi-error-pages");
         properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
         // Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
         properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, ALL_CONTEXT_SELECT_FILTER);
         properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
         handleInitParams(webServlet, properties);
-        String servletName = resolveServletName(cls, webServlet.name(), properties);
+        String servletName = resolveServletName(servlet, webServlet.name(), properties);
         LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletName);
         return ctx.registerService(Servlet.class, servlet, properties);
     }
 
-    private static WebServlet checkWebServletAnnotation(Class<? extends HttpServlet> cls) {
-        return Optional.ofNullable(cls.getAnnotation(WebServlet.class))
+    private static WebServlet checkWebServletAnnotation(HttpServlet servlet) {
+        return Optional.ofNullable(servlet.getClass().getAnnotation(WebServlet.class))
                 .orElseThrow(() ->
                         new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
     }
@@ -137,8 +137,8 @@ public class Servlets {
                         properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value()));
     }
 
-    private static String resolveServletName(Class<? extends HttpServlet> cls, String name, Dictionary<String, Object> props) {
-        String servletName = name.isEmpty() ? cls.getSimpleName() : name;
+    private static String resolveServletName(HttpServlet servlet, String name, Dictionary<String, Object> props) {
+        String servletName = name.isEmpty() ? servlet.getClass().getSimpleName() : name;
         props.put(HTTP_WHITEBOARD_SERVLET_NAME, servletName);
         return servletName;
     }
