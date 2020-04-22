@@ -93,6 +93,7 @@
         <felix.healthcheck.core.version>2.0.6</felix.healthcheck.core.version>
         <felix.healthcheck.generalchecks.version>2.0.4</felix.healthcheck.generalchecks.version>
         <felix.healthcheck.webconsoleplugin.version>2.0.0</felix.healthcheck.webconsoleplugin.version>
+        <felix.configadmin.plugin.interpolation.version>1.1.0</felix.configadmin.plugin.interpolation.version>
 
         <!-- AdeptJ Modules Dependencies -->
         <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
@@ -1084,6 +1085,13 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.healthcheck.webconsoleplugin</artifactId>
             <version>${felix.healthcheck.webconsoleplugin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.configadmin.plugin.interpolation</artifactId>
+            <version>${felix.configadmin.plugin.interpolation.version}</version>
             <scope>provided</scope>
         </dependency>
 
