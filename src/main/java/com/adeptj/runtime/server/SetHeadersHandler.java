@@ -33,19 +33,19 @@ import java.util.Map;
  */
 final class SetHeadersHandler implements HttpHandler {
 
-    private final HttpHandler servletHandler;
+    private final HttpHandler nextHandler;
 
-    private Map<HttpString, String> headers;
+    private final Map<HttpString, String> headers;
 
-    SetHeadersHandler(HttpHandler servletHandler, Map<HttpString, String> headers) {
-        this.servletHandler = servletHandler;
+    SetHeadersHandler(HttpHandler nextHandler, Map<HttpString, String> headers) {
+        this.nextHandler = nextHandler;
         this.headers = headers;
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         this.headers.forEach((name, value) -> exchange.getResponseHeaders().put(name, value));
-        this.servletHandler.handleRequest(exchange);
+        this.nextHandler.handleRequest(exchange);
     }
 
 }

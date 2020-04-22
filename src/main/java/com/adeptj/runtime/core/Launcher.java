@@ -20,7 +20,12 @@
 
 package com.adeptj.runtime.core;
 
-import com.adeptj.runtime.common.*;
+import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.Environment;
+import com.adeptj.runtime.common.Lifecycle;
+import com.adeptj.runtime.common.LogbackManagerHolder;
+import com.adeptj.runtime.common.ShutdownHook;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
@@ -35,7 +40,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import static com.adeptj.runtime.common.Constants.*;
+import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
+import static com.adeptj.runtime.common.Constants.KEY_HTTP;
+import static com.adeptj.runtime.common.Constants.KEY_PORT;
+import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
+import static com.adeptj.runtime.common.Constants.REGEX_EQ;
+import static com.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
@@ -76,8 +86,8 @@ public final class Launcher {
             pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             Map<String, String> runtimeArgs = parseArgs(args);
-            Lifecycle lifecycle = new Server(runtimeArgs);
-            lifecycle.start();
+            Lifecycle lifecycle = new Server();
+            lifecycle.start(runtimeArgs);
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
             launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));

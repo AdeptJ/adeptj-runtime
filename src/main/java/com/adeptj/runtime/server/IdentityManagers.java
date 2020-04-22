@@ -22,8 +22,6 @@ package com.adeptj.runtime.server;
 
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
-import io.undertow.security.idm.PasswordCredential;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
@@ -47,26 +45,20 @@ final class IdentityManagers {
                         && entry.getValue().containsAll(account.getRoles()));
     }
 
-    static Account verifyCredentials(Map<String, List<String>> userRolesMapping, String id, Credential credential) {
-        return userRolesMapping.entrySet()
-                .stream()
-                .filter(entry -> doVerifyCredentials(entry.getKey(), id, credential))
-                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
-                .findFirst()
-                .orElse(null);
-    }
-
     /**
      * Verify the given credentials.
      *
-     * @param username   one from configs.
-     * @param id         one that is submitted by client.
-     * @param credential the submitted user credential.
+     * @param userRolesMapping the user to role mapping from configs.
+     * @param id               one that is submitted by client.
+     * @param credential       the submitted user credential.
      * @return boolean to indicate whether the credentials verification was successful or not.
      */
-    private static boolean doVerifyCredentials(String username, String id, Credential credential) {
-        PasswordCredential pc = (PasswordCredential) credential;
-        return StringUtils.equals(username, id)
-                && ArrayUtils.isNotEmpty(pc.getPassword()) && CredentialMatcher.match(username, pc.getPassword());
+    static Account verifyCredentials(Map<String, List<String>> userRolesMapping, String id, Credential credential) {
+        return userRolesMapping.entrySet()
+                .stream()
+                .filter(entry -> StringUtils.equals(entry.getKey(), id) && CredentialMatcher.match(entry.getKey(), credential))
+                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
+                .findFirst()
+                .orElse(null);
     }
 }

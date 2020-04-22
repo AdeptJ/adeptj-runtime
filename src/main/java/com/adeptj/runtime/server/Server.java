@@ -45,6 +45,8 @@ import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
+import io.undertow.server.handlers.PredicateHandler;
+import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
@@ -58,6 +60,9 @@ import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSessionConfig;
 import io.undertow.util.HttpString;
 import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
+import org.apache.commons.lang3.StringUtils;
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
@@ -69,7 +74,6 @@ import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -83,7 +87,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -96,6 +99,7 @@ import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
+import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
@@ -105,6 +109,7 @@ import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET;
@@ -128,6 +133,7 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUES
 import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_USER_CREDENTIAL_MAPPING;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_CORE_THREADS;
@@ -139,6 +145,7 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_MAX_THREADS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TCP_NO_DELAY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.PWD_START_INDEX;
 import static com.adeptj.runtime.server.ServerConstants.REALM;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
@@ -165,28 +172,19 @@ public final class Server implements Lifecycle {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private final Map<String, String> runtimeArgs;
-
     private Undertow undertow;
 
     private DeploymentManager deploymentManager;
 
     private GracefulShutdownHandler rootHandler;
 
-    private WeakReference<Config> cfgReference;
-
-    public Server(Map<String, String> runtimeArgs) {
-        this.runtimeArgs = runtimeArgs;
-    }
-
     /**
      * Bootstrap Undertow Server and OSGi Framework.
      */
     @Override
-    public void start() {
-        LOGGER.debug("AdeptJ Runtime jvm args: {}", this.runtimeArgs);
-        this.cfgReference = new WeakReference<>(Configs.of().undertow());
-        Config undertowConf = Objects.requireNonNull(this.cfgReference.get());
+    public void start(Map<String, String> runtimeArgs) {
+        LOGGER.debug("AdeptJ Runtime jvm args: {}", runtimeArgs);
+        Config undertowConf = Configs.of().undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
@@ -200,6 +198,7 @@ public final class Server implements Lifecycle {
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();
+            this.populateCredentialsStore(undertowConf);
         } catch (Exception ex) { // NOSONAR
             throw new InitializationException(ex.getMessage(), ex);
         }
@@ -227,6 +226,19 @@ public final class Server implements Lifecycle {
         } finally {
             // Let the Logback cleans up it's state.
             LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
+        }
+    }
+
+    private void populateCredentialsStore(Config undertowConf) {
+        try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
+            MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
+            // put the default password only when it is not set from web console.
+            undertowConf.getObject(KEY_USER_CREDENTIAL_MAPPING)
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> StringUtils.isEmpty(credentials.get(entry.getKey())))
+                    .forEach(entry -> credentials.put(entry.getKey(), ((String) entry.getValue().unwrapped())
+                            .substring(PWD_START_INDEX)));
         }
     }
 
@@ -273,7 +285,7 @@ public final class Server implements Lifecycle {
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
-            Config workerOptions = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_WORKER_OPTIONS);
+            Config workerOptions = Configs.of().undertow().getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
             int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
@@ -297,7 +309,7 @@ public final class Server implements Lifecycle {
 
     private Builder enableHttp2(Builder builder) throws GeneralSecurityException, IOException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = Objects.requireNonNull(this.cfgReference.get()).getConfig(KEY_HTTPS);
+            Config httpsConf = Configs.of().undertow().getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
@@ -369,20 +381,23 @@ public final class Server implements Lifecycle {
      * @return GracefulShutdownHandler as the root handler
      */
     private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler) {
-        Config cfg = Objects.requireNonNull(this.cfgReference.get());
+        Config cfg = Configs.of().undertow();
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
             headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
         }
+        RedirectHandler contextHandler = Handlers.redirect(DEFAULT_LANDING_PAGE_URI);
         HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
                 new SetHeadersHandler(new RequestBufferingHandler(servletInitialHandler,
                         Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
                 new SetHeadersHandler(servletInitialHandler, headers);
-        return Handlers.gracefulShutdown(
-                new RequestLimitingHandler(Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS)),
-                        new AllowedMethodsHandler(Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                                Handlers.redirect(DEFAULT_LANDING_PAGE_URI), headersHandler), this.allowedMethods(cfg))));
+        PredicateHandler predicateHandler = Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
+                contextHandler, headersHandler);
+        AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(predicateHandler, this.allowedMethods(cfg));
+        Integer maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS));
+        RequestLimitingHandler requestLimitingHandler = new RequestLimitingHandler(maxConcurrentRequests, allowedMethodsHandler);
+        return Handlers.gracefulShutdown(requestLimitingHandler);
     }
 
     private Set<HttpString> allowedMethods(Config cfg) {
@@ -473,7 +488,7 @@ public final class Server implements Lifecycle {
     }
 
     private DeploymentInfo deploymentInfo() {
-        Config cfg = Objects.requireNonNull(this.cfgReference.get());
+        Config cfg = Configs.of().undertow();
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)

@@ -27,7 +27,7 @@ package com.adeptj.runtime.common;
  */
 public final class ShutdownHook extends Thread {
 
-    private Lifecycle lifecycle;
+    private final Lifecycle lifecycle;
 
     public ShutdownHook(Lifecycle lifecycle, String threadName) {
         super(threadName);

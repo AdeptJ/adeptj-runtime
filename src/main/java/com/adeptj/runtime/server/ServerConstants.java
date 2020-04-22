@@ -108,6 +108,10 @@ final class ServerConstants {
 
     static final String KEY_ERROR_PAGES = "error-pages";
 
+    static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
+
+    static final int PWD_START_INDEX = 9;
+
     static final long DEFAULT_WAIT_TIME = 60000L;
 
     static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";

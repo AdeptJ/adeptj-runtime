@@ -99,6 +99,10 @@ public final class Constants {
 
     public static final String KEY_HEADER_SERVER = "common.header-server";
 
+    public static final String MV_CREDENTIALS_STORE = "credentials.dat";
+
+    public static final String H2_MAP_ADMIN_CREDENTIALS = "adminCredentials";
+
     static final String FRAMEWORK_CONF_FILE = "framework.properties";
 
     // Configuration Keys constants start.

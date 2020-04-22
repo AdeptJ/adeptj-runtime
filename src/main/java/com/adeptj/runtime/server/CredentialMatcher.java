@@ -20,19 +20,20 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.WebConsolePasswordChangeListenerHolder;
-import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.extensions.webconsole.WebConsolePasswordChangeListener;
+import io.undertow.security.idm.Credential;
+import io.undertow.security.idm.PasswordCredential;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.h2.mvstore.MVStore;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.Base64;
 
+import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
+import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -46,61 +47,28 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 final class CredentialMatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CredentialMatcher.class);
-
-    private static final String SHA256 = "SHA-256";
-
-    private static final String CURLY_BRACE_OPEN = "{";
-
-    private static final String CURLY_BRACE_CLOSE = "}";
-
-    private static final String PREFIX = CURLY_BRACE_OPEN + SHA256.toLowerCase() + CURLY_BRACE_CLOSE;
-
-    private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
-
     private CredentialMatcher() {
     }
 
-    static boolean match(String username, char[] password) {
-        // When OsgiManager.config file is non-existent as configuration was never saved from OSGi console,
-        // make use of default password maintained in provisioning file.
-        WebConsolePasswordChangeListener passwordChangeListener
-                = WebConsolePasswordChangeListenerHolder.getInstance().getPasswordChangeListener();
-        return passwordChangeListener.isPasswordNotEmpty() ?
-                fromOSGiManagerConfig(password, passwordChangeListener) :
-                fromServerConfig(username, password);
-    }
-
-    private static boolean fromServerConfig(String id, char[] password) {
-        return Configs.of().undertow()
-                .getObject(KEY_USER_CREDENTIAL_MAPPING)
-                .unwrapped()
-                .entrySet()
-                .stream()
-                .anyMatch(entry -> StringUtils.equals(entry.getKey(), id)
-                        && Arrays.equals(makeHash(password), ((String) entry.getValue()).toCharArray()));
-    }
-
-    private static boolean fromOSGiManagerConfig(char[] password, WebConsolePasswordChangeListener passwordChangeListener) {
-        try {
-            return Arrays.equals(makeHash(password), passwordChangeListener.getPassword());
-        } catch (Exception ex) { // NOSONAR
-            LOGGER.error(ex.getMessage(), ex);
+    static boolean match(String username, Credential credential) {
+        char[] inputPwd = ((PasswordCredential) credential).getPassword();
+        if (StringUtils.isEmpty(username) || ArrayUtils.isEmpty(inputPwd)) {
+            return false;
         }
-        return false;
-    }
-
-    private static char[] makeHash(char[] password) {
-        if (ArrayUtils.isEmpty(password)) {
-            return null;
+        try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
+            String storedPwd = (String) store.openMap(H2_MAP_ADMIN_CREDENTIALS).get(username);
+            if (StringUtils.isEmpty(storedPwd)) {
+                return false;
+            }
+            ByteBuffer buffer = UTF_8.encode(CharBuffer.wrap(inputPwd));
+            byte[] hash = DigestUtils.sha256(Arrays.copyOf(buffer.array(), buffer.limit()));
+            byte[] inputPwdBytes = Base64.getEncoder().encode(hash);
+            byte[] storedPwdBytes = storedPwd.getBytes(UTF_8);
+            boolean match = Arrays.equals(inputPwdBytes, storedPwdBytes);
+            Arrays.fill(hash, (byte) 0);
+            Arrays.fill(inputPwdBytes, (byte) 0);
+            Arrays.fill(storedPwdBytes, (byte) 0);
+            return match;
         }
-        try {
-            byte[] digest = MessageDigest.getInstance(SHA256).digest(new String(password).getBytes(UTF_8));
-            byte[] encoded = Base64.getEncoder().encode(digest);
-            return (PREFIX + new String(encoded, UTF_8)).toCharArray();
-        } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-        }
-        return null;
     }
 }
