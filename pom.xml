@@ -1494,6 +1494,30 @@
 
         <profile>
 
+            <id>MariaDB</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>org.osgi</groupId>
+                    <artifactId>org.osgi.service.jdbc</artifactId>
+                    <version>1.0.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                    <version>${mariadb-java-client.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
             <id>MongoDB</id>
 
             <dependencies>
