@@ -40,6 +40,8 @@ final class ServerConstants {
 
     static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
 
+    static final String KEY_TCP_NO_DELAY = "tcp-no-delay";
+
     static final String KEY_WORKER_OPTIONS = "worker-options";
 
     static final String KEY_KEYSTORE = "keyStore";

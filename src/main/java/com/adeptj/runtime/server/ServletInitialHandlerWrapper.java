@@ -43,8 +43,8 @@ import io.undertow.servlet.handlers.ServletInitialHandler;
  * 1. OuterHandlerChainWrapper - Run after the servlet initial handler, but before any other handlers.
  * These are only run on REQUEST invocations, they are not invoked on a FORWARD or INCLUDE.
  * <p>
- * 2. InnerHandlerChainWrapper - This handler will be run after the security handler,
- * but before any other servlet handlers, and will be run for every request.
+ * 2. InnerHandlerChainWrapper - This handler will run after the security handler, but before any other
+ * servlet handlers, and will run for every request.
  * <p>
  * 3. InitialHandlerChainWrapper - Run before security and servlet initial handler.
  *

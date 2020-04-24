@@ -27,56 +27,42 @@ import io.undertow.Undertow.Builder;
 import java.util.Map;
 
 /**
- * UNDERTOW Server Options.
+ * Undertow Socket Options.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class ServerOptions extends BaseOptions {
+final class SocketOptions extends BaseOptions {
 
-    private static final String SERVER_OPTIONS = "server-options";
-
-    private static final String OPTIONS_TYPE_STRING = "options-type-string";
+    private static final String SOCKET_OPTIONS = "socket-options";
 
     private static final String OPTIONS_TYPE_INTEGER = "options-type-integer";
-
-    private static final String OPTIONS_TYPE_LONG = "options-type-long";
 
     private static final String OPTIONS_TYPE_BOOLEAN = "options-type-boolean";
 
     /**
-     * Configures the server options dynamically.
+     * Configures the socket options dynamically.
      *
      * @param builder        Undertow.Builder
      * @param undertowConfig Undertow Typesafe Config
      */
     public Builder build(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
-        Config serverOptionsCfg = undertowConfig.getConfig(SERVER_OPTIONS);
-        stringOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_STRING).unwrapped());
-        integerOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped());
-        longOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_LONG).unwrapped());
-        booleanOptions(builder, serverOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
-        this.logger.info("Undertow ServerOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
+        Config socketOptionsCfg = undertowConfig.getConfig(SOCKET_OPTIONS);
+        integerOptions(builder, socketOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped());
+        booleanOptions(builder, socketOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
+        this.logger.info("Undertow SocketOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
         return builder;
     }
 
-    private void buildServerOptions(Builder builder, Map<String, ?> options) {
-        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), optVal));
-    }
-
-    private void stringOptions(Builder builder, Map<String, ?> options) {
-        buildServerOptions(builder, options);
+    private void buildSocketOptions(Builder builder, Map<String, ?> options) {
+        options.forEach((optKey, optVal) -> builder.setSocketOption(toOption(optKey), optVal));
     }
 
     private void integerOptions(Builder builder, Map<String, ?> options) {
-        buildServerOptions(builder, options);
+        buildSocketOptions(builder, options);
     }
 
     private void booleanOptions(Builder builder, Map<String, ?> options) {
-        buildServerOptions(builder, options);
-    }
-
-    private void longOptions(Builder builder, Map<String, ?> options) {
-        options.forEach((optKey, optVal) -> builder.setServerOption(toOption(optKey), Long.valueOf((Integer) optVal)));
+        buildSocketOptions(builder, options);
     }
 }

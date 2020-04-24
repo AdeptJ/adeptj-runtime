@@ -133,6 +133,7 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUES
 import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
+import static com.adeptj.runtime.server.ServerConstants.KEY_TCP_NO_DELAY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USER_CREDENTIAL_MAPPING;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
@@ -162,6 +163,9 @@ import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTI
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
+import static org.xnio.Options.TCP_NODELAY;
+import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
+import static org.xnio.Options.WORKER_TASK_MAX_THREADS;
 
 /**
  * Provisions the Undertow Web Server, start OSGi framework and much more.
@@ -193,7 +197,9 @@ public final class Server implements Lifecycle {
         this.deploymentManager.deploy();
         try {
             this.rootHandler = this.rootHandler(this.deploymentManager.start());
-            this.undertow = this.enableHttp2(ServerOptions.build(this.workerOptions(Undertow.builder()), undertowConf))
+            Builder undertowBuilder = new ServerOptions()
+                    .build(new SocketOptions().build(this.workerOptions(Undertow.builder()), undertowConf), undertowConf);
+            this.undertow = this.enableHttp2(undertowBuilder)
                     .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
@@ -294,14 +300,15 @@ public final class Server implements Lifecycle {
             int calcCoreTaskThreads = availableProcessors *
                     Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
-            builder.setWorkerOption(Options.WORKER_TASK_CORE_THREADS, Math.max(calcCoreTaskThreads, cfgCoreTaskThreads));
+            builder.setWorkerOption(WORKER_TASK_CORE_THREADS, Math.max(calcCoreTaskThreads, cfgCoreTaskThreads));
             // defaults to double of [worker-task-core-threads] i.e 128
             int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
             LOGGER.info("Configured worker task max threads: [{}]", cfgCoreTaskThreads);
             int calcMaxTaskThreads = calcCoreTaskThreads *
                     Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task max threads: [{}]", cfgCoreTaskThreads);
-            builder.setWorkerOption(Options.WORKER_TASK_MAX_THREADS, Math.max(calcMaxTaskThreads, cfgMaxTaskThreads));
+            builder.setWorkerOption(WORKER_TASK_MAX_THREADS, Math.max(calcMaxTaskThreads, cfgMaxTaskThreads));
+            builder.setWorkerOption(TCP_NODELAY, workerOptions.getBoolean(KEY_TCP_NO_DELAY));
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
         return builder;
@@ -469,9 +476,9 @@ public final class Server implements Lifecycle {
         try {
             worker = Xnio.getInstance().createWorker(OptionMap.builder()
                     .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
-                    .set(Options.WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
-                    .set(Options.WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
-                    .set(Options.TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
+                    .set(WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
+                    .set(WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
+                    .set(TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
                     .getMap());
         } catch (IOException ex) {
             LOGGER.error("Can't create XnioWorker!!", ex);
