@@ -19,7 +19,10 @@
 */
 package com.adeptj.runtime.server;
 
+import com.typesafe.config.Config;
+import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Option;
@@ -36,19 +39,16 @@ public abstract class BaseOptions {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    abstract void setOptions(Undertow.Builder builder, Config undertowConfig);
+
     @SuppressWarnings("unchecked")
-    <T> Option<T> toOption(String name) {
+    <T> Option<T> getOption(String name) {
         try {
-            for (Field field : UndertowOptions.class.getFields()) {
-                if (field.getName().equals(name)) {
-                    return (Option<T>) field.get(null);
-                }
+            Field field = FieldUtils.getField(UndertowOptions.class, name);
+            if (field == null) {
+                field = FieldUtils.getField(Options.class, name);
             }
-            for (Field field : Options.class.getFields()) {
-                if (field.getName().equals(name)) {
-                    return (Option<T>) field.get(null);
-                }
-            }
+            return field == null ? null : (Option<T>) field.get(null);
         } catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             this.logger.error("Exception while accessing field: [{}]", name, ex);
         }

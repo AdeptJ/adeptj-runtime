@@ -114,7 +114,7 @@ final class ServerConstants {
 
     static final int PWD_START_INDEX = 9;
 
-    static final long DEFAULT_WAIT_TIME = 60000L;
+    static final long DEFAULT_WAIT_TIME = 30000L;
 
     static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 

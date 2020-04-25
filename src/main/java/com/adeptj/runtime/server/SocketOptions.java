@@ -24,8 +24,6 @@ import com.adeptj.runtime.common.Times;
 import com.typesafe.config.Config;
 import io.undertow.Undertow.Builder;
 
-import java.util.Map;
-
 /**
  * Undertow Socket Options.
  *
@@ -35,34 +33,19 @@ final class SocketOptions extends BaseOptions {
 
     private static final String SOCKET_OPTIONS = "socket-options";
 
-    private static final String OPTIONS_TYPE_INTEGER = "options-type-integer";
-
-    private static final String OPTIONS_TYPE_BOOLEAN = "options-type-boolean";
-
     /**
      * Configures the socket options dynamically.
      *
      * @param builder        Undertow.Builder
      * @param undertowConfig Undertow Typesafe Config
      */
-    public Builder build(Builder builder, Config undertowConfig) {
+    @Override
+    void setOptions(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
-        Config socketOptionsCfg = undertowConfig.getConfig(SOCKET_OPTIONS);
-        integerOptions(builder, socketOptionsCfg.getObject(OPTIONS_TYPE_INTEGER).unwrapped());
-        booleanOptions(builder, socketOptionsCfg.getObject(OPTIONS_TYPE_BOOLEAN).unwrapped());
+        undertowConfig.getConfig(SOCKET_OPTIONS)
+                .entrySet()
+                .forEach(entry -> builder.setSocketOption(this.getOption(entry.getKey()), entry.getValue()
+                        .unwrapped()));
         this.logger.info("Undertow SocketOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
-        return builder;
-    }
-
-    private void buildSocketOptions(Builder builder, Map<String, ?> options) {
-        options.forEach((optKey, optVal) -> builder.setSocketOption(toOption(optKey), optVal));
-    }
-
-    private void integerOptions(Builder builder, Map<String, ?> options) {
-        buildSocketOptions(builder, options);
-    }
-
-    private void booleanOptions(Builder builder, Map<String, ?> options) {
-        buildSocketOptions(builder, options);
     }
 }

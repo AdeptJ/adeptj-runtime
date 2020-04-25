@@ -197,9 +197,11 @@ public final class Server implements Lifecycle {
         this.deploymentManager.deploy();
         try {
             this.rootHandler = this.rootHandler(this.deploymentManager.start());
-            Builder undertowBuilder = new ServerOptions()
-                    .build(new SocketOptions().build(this.workerOptions(Undertow.builder()), undertowConf), undertowConf);
-            this.undertow = this.enableHttp2(undertowBuilder)
+            Builder undertowBuilder = Undertow.builder();
+            this.setWorkerOptions(undertowBuilder);
+            new SocketOptions().setOptions(undertowBuilder, undertowConf);
+            new ServerOptions().setOptions(undertowBuilder, undertowConf);
+            this.undertow = this.addHttpsListener(undertowBuilder)
                     .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
@@ -274,7 +276,7 @@ public final class Server implements Lifecycle {
 
     private void createServerConfFile() {
         if (!Environment.isServerConfFileExists()) {
-            try (InputStream stream = this.getClass().getResourceAsStream("/reference.conf")) {
+            try (InputStream stream = this.getClass().getResourceAsStream("/server.conf")) {
                 Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
                         IOUtils.toBytes(stream), StandardOpenOption.CREATE);
             } catch (IOException ex) {
@@ -283,7 +285,7 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private Builder workerOptions(Builder builder) {
+    private void setWorkerOptions(Builder builder) {
         if (Environment.isProd()) {
             // Note : For a 16 core system, number of worker task core and max threads will be.
             // 1. core task thread: 128 (16[cores] * 8)
@@ -311,10 +313,9 @@ public final class Server implements Lifecycle {
             builder.setWorkerOption(TCP_NODELAY, workerOptions.getBoolean(KEY_TCP_NO_DELAY));
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
         }
-        return builder;
     }
 
-    private Builder enableHttp2(Builder builder) throws GeneralSecurityException, IOException {
+    private Builder addHttpsListener(Builder builder) throws GeneralSecurityException, IOException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Configs.of().undertow().getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));

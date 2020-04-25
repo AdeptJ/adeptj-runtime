@@ -44,7 +44,7 @@
         <xnio.version>3.8.0.Final</xnio.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.5.4.Final</wildfly-common.version>
-        <jboss-threads.version>3.1.0.Final</jboss-threads.version>
+        <jboss-threads.version>3.1.1.Final</jboss-threads.version>
         <jboss-logging.version>3.4.1.Final</jboss-logging.version>
         <jboss-logging-annotations.version>2.2.1.Final</jboss-logging-annotations.version>
         <jboss-logging-processor.version>2.2.1.Final</jboss-logging-processor.version>
@@ -94,21 +94,6 @@
         <felix.healthcheck.generalchecks.version>2.0.4</felix.healthcheck.generalchecks.version>
         <felix.healthcheck.webconsoleplugin.version>2.0.0</felix.healthcheck.webconsoleplugin.version>
         <felix.configadmin.plugin.interpolation.version>1.1.0</felix.configadmin.plugin.interpolation.version>
-
-        <!-- AdeptJ Modules Dependencies -->
-        <adeptj-modules-webconsole-branding.version>1.0.0.Final</adeptj-modules-webconsole-branding.version>
-        <adeptj-modules-webconsole-security.version>1.0.4.Final</adeptj-modules-webconsole-security.version>
-        <adeptj-modules-commons-utils.version>1.1.0.Final</adeptj-modules-commons-utils.version>
-        <adeptj-modules-commons-logging.version>1.0.3.Final</adeptj-modules-commons-logging.version>
-        <adeptj-modules-commons-crypto.version>1.0.0.Final</adeptj-modules-commons-crypto.version>
-        <adeptj-modules-jaxrs-core.version>2.0.0.Final</adeptj-modules-jaxrs-core.version>
-        <adeptj-modules-jaxrs-resteasy.version>2.0.0.Final</adeptj-modules-jaxrs-resteasy.version>
-        <adeptj-modules-data-jpa.version>1.1.0.Final</adeptj-modules-data-jpa.version>
-        <adeptj-modules-commons-jdbc.version>1.0.0.Final</adeptj-modules-commons-jdbc.version>
-        <adeptj-modules-cache-caffeine.version>1.0.0.Final</adeptj-modules-cache-caffeine.version>
-        <adeptj-modules-commons-validator.version>1.0.3.Final</adeptj-modules-commons-validator.version>
-        <adeptj-modules-websecurity-jwt.version>1.1.0.Final</adeptj-modules-websecurity-jwt.version>
-        <adeptj-runtime-extensions.version>1.0.0.Final</adeptj-runtime-extensions.version>
     </properties>
 
     <!-- Project Information -->
@@ -759,18 +744,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2-mvstore</artifactId>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker-qual</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- JAX-B Implementation Dependencies | These are unavailable on JDK11-->
