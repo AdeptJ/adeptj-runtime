@@ -49,7 +49,7 @@ public abstract class BaseOptions {
                 field = FieldUtils.getField(Options.class, name);
             }
             return field == null ? null : (Option<T>) field.get(null);
-        } catch (SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             this.logger.error("Exception while accessing field: [{}]", name, ex);
         }
         return null;
