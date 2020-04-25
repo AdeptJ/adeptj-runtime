@@ -118,11 +118,17 @@ final class ServerConstants {
 
     static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 
-    static final String ERROR_PAGE_SERVLET = "AdeptJ ErrorPageServlet";
+    static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
 
-    static final String ERROR_PAGE_SERVLET_URI = "/error/*";
+    static final String ERROR_URI_401 = "/error/401";
 
-    static final String ADMIN_SERVLET = "AdeptJ AdminServlet";
+    static final String ERROR_URI_403 = "/error/403";
 
-    static final String CRYPTO_SERVLET = "AdeptJ CryptoServlet";
+    static final String ERROR_URI_404 = "/error/404";
+
+    static final String ERROR_URI_500 = "/error/500";
+
+    static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
+
+    static final String CRYPTO_SERVLET_NAME = "AdeptJ CryptoServlet";
 }

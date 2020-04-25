@@ -65,13 +65,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         if (ADMIN_LOGIN_URI.equals(req.getRequestURI())) {
-            TemplateEngine.getInstance()
-                    .render(TemplateEngineContext.builder()
-                            .request(req)
-                            .response(resp)
-                            .template(LOGIN_TEMPLATE)
-                            .locale(req.getLocale())
-                            .build());
+            TemplateEngine.getInstance().render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp).build());
             return;
         }
         if (ADMIN_LOGOUT_URI.equals(req.getRequestURI()) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
@@ -89,11 +83,7 @@ public class AdminServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         // Render login page again with validation message.
         TemplateEngine.getInstance()
-                .render(TemplateEngineContext.builder()
-                        .request(req)
-                        .response(resp)
-                        .template(LOGIN_TEMPLATE)
-                        .locale(req.getLocale())
+                .render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
                         .templateData(new TemplateData()
                                 .with(IS_LOGIN_ERROR, TRUE)
                                 .with(J_USERNAME, req.getParameter(J_USERNAME)))

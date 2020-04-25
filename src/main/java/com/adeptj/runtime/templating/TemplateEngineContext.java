@@ -23,11 +23,7 @@ package com.adeptj.runtime.templating;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Locale;
-
-import static java.util.Locale.ENGLISH;
 
 /**
  * TemplateContext containing required objects for template rendering.
@@ -38,18 +34,12 @@ public final class TemplateEngineContext {
 
     private final String template;
 
-    private final HttpServletRequest request;
-
     private final HttpServletResponse response;
 
     private TemplateData templateData;
 
-    private Locale locale;
-
-    private TemplateEngineContext(String template, HttpServletRequest req, HttpServletResponse resp) {
-        Validate.isTrue(StringUtils.isNotEmpty(template), "Template name can't be null!");
+    private TemplateEngineContext(String template, HttpServletResponse resp) {
         this.template = template;
-        this.request = req;
         this.response = resp;
     }
 
@@ -61,20 +51,12 @@ public final class TemplateEngineContext {
         return templateData;
     }
 
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
     HttpServletResponse getResponse() {
         return response;
     }
 
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(String template, HttpServletResponse resp) {
+        return new Builder(template, resp);
     }
 
     /**
@@ -84,32 +66,16 @@ public final class TemplateEngineContext {
      */
     public static class Builder {
 
-        private String template;
+        private final String template;
 
         private TemplateData templateData;
 
-        private Locale locale;
+        private final HttpServletResponse response;
 
-        private HttpServletRequest request;
-
-        private HttpServletResponse response;
-
-        private Builder() {
-        }
-
-        public Builder request(HttpServletRequest request) {
-            this.request = request;
-            return this;
-        }
-
-        public Builder response(HttpServletResponse response) {
-            this.response = response;
-            return this;
-        }
-
-        public Builder template(String template) {
+        private Builder(String template, HttpServletResponse resp) {
+            Validate.isTrue(StringUtils.isNotEmpty(template), "Template name can't be null!");
             this.template = template;
-            return this;
+            this.response = resp;
         }
 
         public Builder templateData(TemplateData templateData) {
@@ -117,16 +83,9 @@ public final class TemplateEngineContext {
             return this;
         }
 
-        public Builder locale(Locale locale) {
-            this.locale = locale;
-            return this;
-        }
-
         public TemplateEngineContext build() {
-            TemplateEngineContext context = new TemplateEngineContext(this.template, this.request, this.response);
+            TemplateEngineContext context = new TemplateEngineContext(this.template, this.response);
             context.templateData = this.templateData;
-            // English is default Locale if no locale set.
-            context.locale = this.locale == null ? ENGLISH : this.locale;
             return context;
         }
     }

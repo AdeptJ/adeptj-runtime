@@ -23,18 +23,13 @@ package com.adeptj.runtime.templating;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
-import java.lang.invoke.MethodHandles;
-
 import static com.adeptj.runtime.common.Constants.UTF8;
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
 import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
 import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
@@ -50,8 +45,6 @@ import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 public enum TemplateEngine {
 
     INSTANCE;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String TEMPLATE_ENGINE_INIT_MSG = "TemplateEngine initialized in [{}] ms!!";
 
@@ -103,11 +96,9 @@ public enum TemplateEngine {
      */
     public void render(TemplateEngineContext context) {
         try {
-            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            mustache.render(context.getResponse().getWriter(), context.getTemplateData());
+            this.mustacheEngine.getMustache(context.getTemplate())
+                    .render(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR
-            LOGGER.error(ex.getMessage(), ex);
-            context.getRequest().setAttribute(ERROR_EXCEPTION, ex);
             throw new TemplateProcessingException(ex.getMessage(), ex);
         }
     }
