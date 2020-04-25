@@ -21,8 +21,8 @@
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.exception.ServerException;
 import com.typesafe.config.Config;
-import com.adeptj.runtime.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ public final class CryptoSupport {
             return new String(Base64.getEncoder().encode(secretKeyFactory.generateSecret(keySpec).getEncoded()), UTF_8);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             LOGGER.error("Exception while generating hashed text!!", ex);
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 }

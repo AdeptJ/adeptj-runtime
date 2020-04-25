@@ -21,15 +21,15 @@
 package com.adeptj.runtime.exception;
 
 /**
- * InitializationException: Exception thrown by AdeptJ Runtime initialization code.
+ * ServerException: Exception thrown by AdeptJ Runtime.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class InitializationException extends RuntimeException {
+public class ServerException extends RuntimeException {
 
-    private static final long serialVersionUID = 6443421220206654015L;
+    private static final long serialVersionUID = 2206058386357128479L;
 
-    public InitializationException(String message, Throwable cause) {
-        super(message, cause);
+    public ServerException(Throwable cause) {
+        super(cause);
     }
 }

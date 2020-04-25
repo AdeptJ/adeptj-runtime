@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.common;
 
-import com.adeptj.runtime.exception.SystemException;
+import com.adeptj.runtime.exception.ServerException;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public final class ResponseUtil {
             resp.sendError(SC_INTERNAL_SERVER_ERROR);
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 
@@ -52,7 +52,7 @@ public final class ResponseUtil {
             resp.sendError(errorCode);
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 
@@ -61,7 +61,7 @@ public final class ResponseUtil {
             resp.sendError(SC_SERVICE_UNAVAILABLE);
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 
@@ -70,7 +70,7 @@ public final class ResponseUtil {
             resp.sendRedirect(resp.encodeRedirectURL(redirectUrl));
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 
@@ -79,7 +79,7 @@ public final class ResponseUtil {
             resp.getWriter().write(content);
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 }

@@ -30,7 +30,7 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
-import com.adeptj.runtime.exception.InitializationException;
+import com.adeptj.runtime.exception.RuntimeInitializationException;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.CryptoServlet;
@@ -211,7 +211,7 @@ public final class Server implements Lifecycle {
             this.undertow.start();
             this.populateCredentialsStore(undertowConf);
         } catch (Exception ex) { // NOSONAR
-            throw new InitializationException(ex.getMessage(), ex);
+            throw new RuntimeInitializationException(ex);
         }
         this.createServerConfFile();
     }

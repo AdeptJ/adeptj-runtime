@@ -22,7 +22,6 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BridgeServletConfigHolder;
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.osgi.ServiceTrackers;
@@ -79,7 +78,9 @@ public class BridgeServlet extends HttpServlet {
      */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        RequestUtil.logRequestDebug(req, PROCESSING_REQUEST_MSG);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(PROCESSING_REQUEST_MSG, req.getMethod(), req.getRequestURI());
+        }
         HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
         if (dispatcherServlet == null) {
             LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());

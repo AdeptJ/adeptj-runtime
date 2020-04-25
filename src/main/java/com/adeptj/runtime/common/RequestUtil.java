@@ -20,13 +20,12 @@
 
 package com.adeptj.runtime.common;
 
-import com.adeptj.runtime.exception.SystemException;
+import com.adeptj.runtime.exception.ServerException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
@@ -47,24 +46,12 @@ public final class RequestUtil {
         return req.getAttribute(name);
     }
 
-    public static boolean hasException(ServletRequest req) {
-        return req.getAttribute(ERROR_EXCEPTION) != null;
+    public static boolean hasException(HttpServletRequest req) {
+        return getAttribute(req, ERROR_EXCEPTION) != null;
     }
 
     public static String getException(HttpServletRequest req) {
         return ExceptionUtils.getStackTrace((Exception) RequestUtil.getAttribute(req, ERROR_EXCEPTION));
-    }
-
-    public static void logException(ServletRequest req, String message) {
-        if (RequestUtil.hasException(req)) {
-            LOGGER.error(message, (Exception) req.getAttribute(ERROR_EXCEPTION));
-        }
-    }
-
-    public static void logRequestDebug(HttpServletRequest req, String message) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(message, req.getMethod(), req.getRequestURI());
-        }
     }
 
     public static void logout(HttpServletRequest req) {
@@ -72,7 +59,7 @@ public final class RequestUtil {
             req.logout();
         } catch (ServletException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            throw new SystemException(ex.getMessage(), ex);
+            throw new ServerException(ex);
         }
     }
 }

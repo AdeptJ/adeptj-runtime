@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.osgi;
 
-import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +38,9 @@ import java.io.IOException;
  */
 public class DispatcherServletWrapper extends HttpServlet {
 
-	private static final long serialVersionUID = 282686082848634854L;
+    private static final long serialVersionUID = 282686082848634854L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletWrapper.class);
-
-    private static final String FELIX_DISPATCHER_EXCEPTION_MSG = "Exception set by Felix Dispatcher!!";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletWrapper.class);
 
     /**
      * The Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}
@@ -65,7 +62,6 @@ public class DispatcherServletWrapper extends HttpServlet {
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
         this.dispatcherServlet.service(req, res);
-        RequestUtil.logException(req, FELIX_DISPATCHER_EXCEPTION_MSG);
     }
 
     @Override

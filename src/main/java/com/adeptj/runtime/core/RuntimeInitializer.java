@@ -22,7 +22,7 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
-import com.adeptj.runtime.exception.InitializationException;
+import com.adeptj.runtime.exception.RuntimeInitializationException;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
                             ((StartupAware) ConstructorUtils.invokeConstructor(startupAwareClass)).onStartup(context);
                         } catch (Exception ex) { // NOSONAR
                             logger.error("Exception while executing StartupAware#onStartup!!", ex);
-                            throw new InitializationException(ex.getMessage(), ex);
+                            throw new RuntimeInitializationException(ex);
                         }
                     });
             context.addListener(FrameworkShutdownHandler.class);
