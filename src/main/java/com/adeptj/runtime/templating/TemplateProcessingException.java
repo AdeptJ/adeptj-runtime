@@ -29,7 +29,7 @@ final class TemplateProcessingException extends RuntimeException {
 
     private static final long serialVersionUID = -8077495079692215520L;
 
-    TemplateProcessingException(String message, Throwable cause) {
-        super(message, cause);
+    TemplateProcessingException(Throwable cause) {
+        super(cause);
     }
 }

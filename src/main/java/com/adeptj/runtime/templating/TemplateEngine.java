@@ -38,7 +38,7 @@ import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXP
 import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
 
 /**
- * TemplateEngine for rendering the HTML templates.
+ * Trimou based TemplateEngine for rendering the HTML templates.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -92,14 +92,14 @@ public enum TemplateEngine {
      * Renders the template contained by the {@link TemplateEngineContext#getTemplate()}
      *
      * @param context the TemplateEngine context
-     * @throws TemplateProcessingException the {@link TemplateProcessingException}
+     * @throws TemplateProcessingException if there was some issue while rendering the template.
      */
     public void render(TemplateEngineContext context) {
         try {
             this.mustacheEngine.getMustache(context.getTemplate())
                     .render(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR
-            throw new TemplateProcessingException(ex.getMessage(), ex);
+            throw new TemplateProcessingException(ex);
         }
     }
 
