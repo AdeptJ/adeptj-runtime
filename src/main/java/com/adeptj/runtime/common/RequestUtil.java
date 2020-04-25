@@ -21,7 +21,6 @@
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.exception.SystemException;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 /**
  * Utils for {@link HttpServletRequest}
@@ -48,25 +46,13 @@ public final class RequestUtil {
         return req.getAttribute(name);
     }
 
-    public static boolean hasAttribute(HttpServletRequest req, String name) {
-        return getAttribute(req, name) != null;
-    }
-
     public static boolean hasException(ServletRequest req) {
         return req.getAttribute(ERROR_EXCEPTION) != null;
     }
 
-    public static String getException(HttpServletRequest req) {
-        return ExceptionUtils.getStackTrace((Throwable) RequestUtil.getAttribute(req, ERROR_EXCEPTION));
-    }
-
-    public static boolean isInternalServerError(Integer statusCode) {
-        return statusCode != null && SC_INTERNAL_SERVER_ERROR == statusCode;
-    }
-
     public static void logException(ServletRequest req, String message) {
         if (RequestUtil.hasException(req)) {
-            LOGGER.error(message, req.getAttribute(ERROR_EXCEPTION));
+            LOGGER.error(message, (Exception) req.getAttribute(ERROR_EXCEPTION));
         }
     }
 

@@ -29,9 +29,11 @@ import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
@@ -76,20 +78,15 @@ public class BridgeServlet extends HttpServlet {
      * @see class header for detailed description.
      */
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         RequestUtil.logRequestDebug(req, PROCESSING_REQUEST_MSG);
         HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
-        try {
-            if (dispatcherServlet == null) {
-                LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
-                ResponseUtil.unavailable(resp);
-                return;
-            }
-            dispatcherServlet.service(req, resp);
-        } catch (Throwable th) { // NOSONAR
-            LOGGER.error("Exception while processing request: [{}]", req.getRequestURI(), th);
-            ResponseUtil.serverError(resp);
+        if (dispatcherServlet == null) {
+            LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
+            ResponseUtil.unavailable(resp);
+            return;
         }
+        dispatcherServlet.service(req, resp);
     }
 
     /**

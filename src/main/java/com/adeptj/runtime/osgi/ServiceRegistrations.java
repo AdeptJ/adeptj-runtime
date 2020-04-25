@@ -21,15 +21,12 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.extensions.logging.LogbackManager;
-import com.adeptj.runtime.servlet.osgi.OSGiErrorServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.Servlet;
 import java.util.Hashtable;
 
 /**
@@ -43,25 +40,7 @@ public enum ServiceRegistrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistrations.class);
 
-    private ServiceRegistration<Servlet> errorHandler;
-
     private ServiceRegistration<LogbackManager> logbackManager;
-
-    public void registerErrorHandler(BundleContext systemBundleContext) {
-        this.errorHandler = Servlets.osgiErrorServlet(systemBundleContext, new OSGiErrorServlet());
-    }
-
-    public void unregisterErrorHandler() {
-        if (this.errorHandler != null) {
-            try {
-                LOGGER.info("Removing OSGiErrorServlet!!");
-                this.errorHandler.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-            this.errorHandler = null;
-        }
-    }
 
     public void registerLogbackManager(BundleContext systemBundleContext) {
         this.logbackManager = systemBundleContext
