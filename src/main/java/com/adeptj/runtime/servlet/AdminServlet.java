@@ -43,8 +43,6 @@ import static java.lang.Boolean.TRUE;
  * <p>
  * 1. Renders the login page and handles the validation failure on wrong credentials submission.
  * 2. Logout the currently logged in Admin user and renders the login page again.
- * <p>
- * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

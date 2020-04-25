@@ -33,8 +33,6 @@ import static com.adeptj.runtime.common.Constants.CRYPTO_SERVLET_URI;
 
 /**
  * A simple servlet that generates salt and corresponding hashed text.
- * <p>
- * Note: This is independent of OSGi and directly managed by Undertow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -46,7 +44,7 @@ public class CryptoServlet extends HttpServlet {
     private static final String RESP_JSON_FORMAT = "{" + "\"salt\":\"%s\"," + "\"hash\":\"%s\"" + "}";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         String text = req.getParameter("text");
         if (StringUtils.isEmpty(text)) {
             resp.setContentType("text/plain");
