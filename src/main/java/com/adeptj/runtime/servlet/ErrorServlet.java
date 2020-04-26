@@ -61,14 +61,12 @@ public class ErrorServlet extends HttpServlet {
         if (StringUtils.equals(STATUS_500, status)) {
             TemplateEngineContext.Builder builder = TemplateEngineContext.builder(TEMPLATE_500, resp);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
-                builder.templateData(new TemplateData()
-                        .with(KEY_EXCEPTION, RequestUtil.getException(req)));
+                builder.templateData(new TemplateData().with(KEY_EXCEPTION, RequestUtil.getException(req)));
             }
             TemplateEngine.getInstance().render(builder.build());
         } else if (Configs.of().undertow().getStringList(KEY_STATUS_CODES).contains(status)) {
             TemplateEngine.getInstance()
-                    .render(TemplateEngineContext.builder(String.format(TEMPLATE_ERROR_FMT, status), resp)
-                            .build());
+                    .render(TemplateEngineContext.builder(String.format(TEMPLATE_ERROR_FMT, status), resp).build());
         }
     }
 }

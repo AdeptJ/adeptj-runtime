@@ -104,9 +104,9 @@ final class ServerConstants {
 
     static final String KEY_AUTH_ROLES = "common.auth-roles";
 
-    static final String KEY_SECURED_URLS_ALLOWED_METHODS = "common.secured-urls-allowed-methods";
+    static final String KEY_PROTECTED_PATHS = "common.protected-paths";
 
-    static final String KEY_SECURED_URLS = "common.secured-urls";
+    static final String KEY_PROTECTED_PATHS_SECURED_FOR_METHODS = "common.protected-paths-secured-for-methods";
 
     static final String KEY_ERROR_PAGES = "error-pages";
 

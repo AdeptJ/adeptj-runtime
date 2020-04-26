@@ -133,8 +133,8 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_LOCAT
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_SIZE_THRESHOLD;
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_FILE_SIZE;
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUEST_SIZE;
-import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS;
-import static com.adeptj.runtime.server.ServerConstants.KEY_SECURED_URLS_ALLOWED_METHODS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_PROTECTED_PATHS;
+import static com.adeptj.runtime.server.ServerConstants.KEY_PROTECTED_PATHS_SECURED_FOR_METHODS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
 import static com.adeptj.runtime.server.ServerConstants.KEY_TCP_NO_DELAY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USER_CREDENTIAL_MAPPING;
@@ -439,8 +439,8 @@ public final class Server implements Lifecycle {
         return Servlets.securityConstraint()
                 .addRolesAllowed(cfg.getStringList(KEY_AUTH_ROLES))
                 .addWebResourceCollection(Servlets.webResourceCollection()
-                        .addHttpMethods(cfg.getStringList(KEY_SECURED_URLS_ALLOWED_METHODS))
-                        .addUrlPatterns(cfg.getStringList(KEY_SECURED_URLS)));
+                        .addUrlPatterns(cfg.getStringList(KEY_PROTECTED_PATHS))
+                        .addHttpMethods(cfg.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
     }
 
     private List<ServletInfo> servlets() {
