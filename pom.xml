@@ -746,6 +746,16 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bytes</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+        </dependency>
+
         <!-- JAX-B Implementation Dependencies | These are unavailable on JDK11-->
 
         <dependency>
