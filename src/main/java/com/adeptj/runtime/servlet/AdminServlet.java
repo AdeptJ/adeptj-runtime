@@ -75,16 +75,16 @@ public class AdminServlet extends HttpServlet {
     }
 
     /**
-     * Handle "/auth/j_security_check" validation failure.
+     * Handle "/admin/auth/j_security_check" validation failure, render the login page again with validation message.
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        // Render login page again with validation message.
-        TemplateEngine.getInstance()
-                .render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
-                        .templateData(new TemplateData()
-                                .with(IS_LOGIN_ERROR, TRUE)
-                                .with(J_USERNAME, req.getParameter(J_USERNAME)))
-                        .build());
+        TemplateData templateData = new TemplateData()
+                .with(IS_LOGIN_ERROR, TRUE)
+                .with(J_USERNAME, req.getParameter(J_USERNAME));
+        TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
+                .templateData(templateData)
+                .build();
+        TemplateEngine.getInstance().render(templateEngineContext);
     }
 }

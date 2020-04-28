@@ -30,7 +30,7 @@ import org.trimou.engine.MustacheEngineBuilder;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
-import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML;
+import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML_UTF8;
 import static com.adeptj.runtime.common.Constants.UTF8;
 import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
 import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
@@ -98,8 +98,8 @@ public enum TemplateEngine {
      */
     public void render(TemplateEngineContext context) {
         try {
-            // Making sure the content type is always text/html when this method is called.
-            context.getResponse().setContentType(CONTENT_TYPE_HTML);
+            // Making sure the Content-Type will always be text/html;charset=UTF-8.
+            context.getResponse().setContentType(CONTENT_TYPE_HTML_UTF8);
             Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
             mustache.render(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR

@@ -61,7 +61,7 @@ public final class Constants {
 
     public static final String UTF8 = "UTF-8";
 
-    public static final String CONTENT_TYPE_HTML = "text/html;charset=UTF-8";
+    public static final String CONTENT_TYPE_HTML_UTF8 = "text/html;charset=UTF-8";
 
     public static final String KEY_MAX_CONCURRENT_REQS = "common.max-concurrent-requests";
 
