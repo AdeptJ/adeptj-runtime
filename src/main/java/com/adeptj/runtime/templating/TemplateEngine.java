@@ -24,11 +24,13 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.slf4j.LoggerFactory;
+import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
+import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML;
 import static com.adeptj.runtime.common.Constants.UTF8;
 import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
 import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
@@ -96,8 +98,10 @@ public enum TemplateEngine {
      */
     public void render(TemplateEngineContext context) {
         try {
-            this.mustacheEngine.getMustache(context.getTemplate())
-                    .render(context.getResponse().getWriter(), context.getTemplateData());
+            // Making sure the content type is always text/html when this method is called.
+            context.getResponse().setContentType(CONTENT_TYPE_HTML);
+            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
+            mustache.render(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR
             throw new TemplateProcessingException(ex);
         }

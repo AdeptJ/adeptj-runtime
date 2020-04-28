@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * ErrorServlet that serves the error page w.r.t status(401, 403, 404, 500).
+ * ErrorServlet that serves the error page w.r.t error coded(401, 403, 404, 500).
+ * <p>
+ * This servlet is invoked by the container using the servlet error page mechanism therefore should not be called directly.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

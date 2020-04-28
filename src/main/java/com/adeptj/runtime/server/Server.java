@@ -33,7 +33,6 @@ import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
-import com.adeptj.runtime.servlet.CryptoServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
 import com.adeptj.runtime.websocket.ServerLogsWebSocket;
 import com.typesafe.config.Config;
@@ -94,7 +93,6 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
-import static com.adeptj.runtime.common.Constants.CRYPTO_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
@@ -113,7 +111,6 @@ import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET_NAME;
-import static com.adeptj.runtime.server.ServerConstants.CRYPTO_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
 import static com.adeptj.runtime.server.ServerConstants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.ERROR_URI_401;
@@ -452,9 +449,6 @@ public final class Server implements Lifecycle {
         servlets.add(Servlets
                 .servlet(ADMIN_SERVLET_NAME, AdminServlet.class)
                 .addMapping(ADMIN_SERVLET_URI)
-                .setAsyncSupported(true));
-        servlets.add(Servlets.servlet(CRYPTO_SERVLET_NAME, CryptoServlet.class)
-                .addMappings(CRYPTO_SERVLET_URI)
                 .setAsyncSupported(true));
         return servlets;
     }

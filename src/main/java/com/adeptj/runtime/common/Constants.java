@@ -47,11 +47,7 @@ public final class Constants {
 
     public static final String CONTEXT_PATH = "/";
 
-    public static final String SLASH = "/";
-
     public static final String DEFAULT_LANDING_PAGE_URI = "/system/console/bundles";
-
-    public static final String CRYPTO_SERVLET_URI = "/utils/crypto";
 
     public static final String ADMIN_LOGIN_URI = "/admin/login";
 
@@ -64,6 +60,8 @@ public final class Constants {
     public static final String REGEX_EQ = "=";
 
     public static final String UTF8 = "UTF-8";
+
+    public static final String CONTENT_TYPE_HTML = "text/html;charset=UTF-8";
 
     public static final String KEY_MAX_CONCURRENT_REQS = "common.max-concurrent-requests";
 

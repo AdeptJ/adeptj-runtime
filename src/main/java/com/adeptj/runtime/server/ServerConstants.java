@@ -129,6 +129,4 @@ final class ServerConstants {
     static final String ERROR_URI_500 = "/error/500";
 
     static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
-
-    static final String CRYPTO_SERVLET_NAME = "AdeptJ CryptoServlet";
 }
