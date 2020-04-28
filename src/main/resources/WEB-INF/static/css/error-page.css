@@ -1,0 +1,24 @@
+.page-error-message {
+    width: 57%;
+    margin-top: 8%;
+}
+
+.message-detail {
+    font-size: 15px;
+    color: #555;
+    font-weight: bold;
+}
+
+.page-error-message .error-code {
+    font-size: 5rem;
+    font-weight: bolder;
+}
+
+.message-exception-trace {
+    font-size: 11px;
+    font-weight: 300;
+    padding: 10px;
+    word-wrap: break-word;
+    line-height: 2;
+}
+
