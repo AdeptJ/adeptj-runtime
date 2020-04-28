@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>9</version>
+        <version>10</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -125,7 +125,7 @@
             <timezone>+5:30</timezone>
             <properties>
                 <picUrl>
-                    https://pbs.twimg.com/profile_images/1040111465582276608/DorLUu-__200x200.jpg
+                    https://secure.gravatar.com/avatar/be26830472769171a96543880c651dcd
                 </picUrl>
             </properties>
         </developer>
