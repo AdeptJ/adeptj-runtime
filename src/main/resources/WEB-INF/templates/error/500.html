@@ -1,18 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>500 Internal Server Error</title>
+    <link rel="stylesheet" href="/static/css/vendors/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/error-page.css">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
+    <meta content="#fafafa" name="theme-color">
 </head>
 <body>
 <div>
-    <h1>500 Internal Server Error</h1>
-    <div>Oops, Something went wrong!</div>
-    <div>The server encountered an internal error and was unable to complete your request. Please try again later!</div>
-    <div>
-        <p>{{exception}}</p>
-    </div>
+    <main class="page-container error" role="main">
+        <div class="row">
+            <div class="container">
+                <div class="col-12">
+                    <div class="page-error-message wrapper-middle align-items-center text-center">
+                        <h1 class="error-code">500</h1>
+                        <p class="message-detail">Internal Server Error</p>
+                        <p class="message-detail">The server encountered an internal error and was unable to complete your request. Please try again later!</p>
+                        <p class="message-detail">{{exception}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 </body>
 </html>

@@ -1,0 +1,16 @@
+.page-error-message {
+    width: 57%;
+    margin-top: 8%;
+}
+
+.message-detail {
+    font-size: 15px;
+    color: #555;
+    font-weight: bold;
+}
+
+.page-error-message .error-code {
+    font-size: 5rem;
+    font-weight: bolder;
+}
+
