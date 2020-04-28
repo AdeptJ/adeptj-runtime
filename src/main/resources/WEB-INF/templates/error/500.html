@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>500 Internal Server Error</title>
+    <title>{{msg "500.page.title.msg"}}</title>
     <link rel="stylesheet" href="/static/css/vendors/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/error-page.css">
@@ -16,9 +16,9 @@
             <div class="container">
                 <div class="col-12">
                     <div class="page-error-message wrapper-middle align-items-center text-center">
-                        <h1 class="error-code">500</h1>
-                        <p class="message-detail">Internal Server Error</p>
-                        <p class="message-detail">The server encountered an internal error and was unable to complete your request. Please try again later!</p>
+                        <h1 class="error-code">{{msg "500.page.error.code.msg"}}</h1>
+                        <p class="message-detail">{{msg "500.page.error.details.msg"}}</p>
+                        <p class="message-detail">{{msg "500.page.error.extra.details.msg"}}</p>
                         <p class="message-exception-trace">{{exception}}</p>
                     </div>
                 </div>

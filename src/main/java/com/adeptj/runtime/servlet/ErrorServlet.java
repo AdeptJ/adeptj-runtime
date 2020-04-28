@@ -32,6 +32,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.adeptj.runtime.common.Constants.ERROR_URI_401;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_403;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_404;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_500;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
+
 /**
  * ErrorServlet that serves the error page w.r.t error coded(401, 403, 404, 500).
  * <p>
@@ -39,7 +45,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ErrorServlet", urlPatterns = {"/error/401", "/error/403", "/error/404", "/error/500"})
+@WebServlet(name = "AdeptJ ErrorServlet", value = {ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503})
 public class ErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;

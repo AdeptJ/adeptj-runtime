@@ -55,6 +55,16 @@ public final class Constants {
 
     public static final String ADMIN_SERVLET_URI = "/admin/*";
 
+    public static final String ERROR_URI_401 = "/error/401";
+
+    public static final String ERROR_URI_403 = "/error/403";
+
+    public static final String ERROR_URI_404 = "/error/404";
+
+    public static final String ERROR_URI_500 = "/error/500";
+
+    public static final String ERROR_URI_503 = "/error/503";
+
     public static final String BANNER_TXT = "/banner.txt";
 
     public static final String REGEX_EQ = "=";

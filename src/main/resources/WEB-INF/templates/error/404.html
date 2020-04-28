@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>404 Not Found</title>
+    <title>{{msg "404.page.title.msg"}}</title>
     <link rel="stylesheet" href="/static/css/vendors/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/error-page.css">
@@ -10,18 +10,18 @@
     <meta content="#fafafa" name="theme-color">
 </head>
 <body>
-    <main class="page-container error" role="main">
-        <div class="row">
-            <div class="container">
-                <div class="col-12">
-                    <div class="page-error-message wrapper-middle align-items-center text-center">
-                        <h1 class="error-code">404</h1>
-                        <p class="message-detail">Page Not Found</p>
-                        <a href="/" class="btn btn-adeptj-primary" type="submit">Go To Home</a>
-                    </div>
+<main class="page-container error" role="main">
+    <div class="row">
+        <div class="container">
+            <div class="col-12">
+                <div class="page-error-message wrapper-middle align-items-center text-center">
+                    <h1 class="error-code">{{msg "404.page.error.code.msg"}}</h1>
+                    <p class="message-detail">{{msg "404.page.error.details.msg"}}</p>
+                    <a href="/" class="btn btn-adeptj-primary" type="submit">{{msg "go.to.home.msg"}}</a>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 </body>
 </html>

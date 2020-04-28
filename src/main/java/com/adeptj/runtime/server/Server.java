@@ -97,6 +97,11 @@ import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_401;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_403;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_404;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_500;
+import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
 import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
@@ -113,10 +118,6 @@ import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
 import static com.adeptj.runtime.server.ServerConstants.ERROR_SERVLET_NAME;
-import static com.adeptj.runtime.server.ServerConstants.ERROR_URI_401;
-import static com.adeptj.runtime.server.ServerConstants.ERROR_URI_403;
-import static com.adeptj.runtime.server.ServerConstants.ERROR_URI_404;
-import static com.adeptj.runtime.server.ServerConstants.ERROR_URI_500;
 import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
 import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
 import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
@@ -444,7 +445,7 @@ public final class Server implements Lifecycle {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets
                 .servlet(ERROR_SERVLET_NAME, ErrorServlet.class)
-                .addMappings(ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500)
+                .addMappings(ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503)
                 .setAsyncSupported(true));
         servlets.add(Servlets
                 .servlet(ADMIN_SERVLET_NAME, AdminServlet.class)
