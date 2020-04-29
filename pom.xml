@@ -56,7 +56,6 @@
         <jansi.version>1.18</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.5.1</classmate.version>
-        <glassfish.jakarta.inject.osgi.version>2.6.1</glassfish.jakarta.inject.osgi.version>
         <yasson.version>1.0.6</yasson.version>
         <glassfish.jakarta.json.version>1.1.6</glassfish.jakarta.json.version>
         <jakarta.enterprise.concurrent.version>1.1.1</jakarta.enterprise.concurrent.version>
@@ -501,10 +500,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.glassfish.hk2.external</groupId>
-            <artifactId>jakarta.inject</artifactId>
-            <version>${glassfish.jakarta.inject.osgi.version}</version>
-            <scope>provided</scope>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

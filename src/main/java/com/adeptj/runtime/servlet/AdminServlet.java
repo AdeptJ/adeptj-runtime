@@ -79,7 +79,7 @@ public class AdminServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateData templateData = new TemplateData()
+        TemplateData templateData = new TemplateData(req.getLocale())
                 .with(IS_LOGIN_ERROR, TRUE)
                 .with(J_USERNAME, req.getParameter(J_USERNAME));
         TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)

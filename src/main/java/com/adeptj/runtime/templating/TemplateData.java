@@ -24,6 +24,7 @@ import org.trimou.engine.resolver.Mapper;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,15 +35,22 @@ import java.util.Map.Entry;
  */
 public final class TemplateData implements Mapper, Iterable<Entry<String, Object>> {
 
+    private final Locale locale;
+
     private final Map<String, Object> variables;
 
-    public TemplateData() {
+    public TemplateData(Locale locale) {
+        this.locale = locale;
         this.variables = new HashMap<>();
     }
 
     public TemplateData with(String key, Object value) {
         this.variables.put(key, value);
         return this;
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     @Override

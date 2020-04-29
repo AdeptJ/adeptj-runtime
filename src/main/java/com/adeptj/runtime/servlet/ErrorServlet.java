@@ -45,7 +45,10 @@ import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(name = "AdeptJ ErrorServlet", value = {ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503})
+@WebServlet(
+        name = "AdeptJ ErrorServlet",
+        urlPatterns = {ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503}
+)
 public class ErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
@@ -63,7 +66,7 @@ public class ErrorServlet extends HttpServlet {
             String template = String.format(ERROR_TEMPLATE_FMT, status);
             TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
-                builder.templateData(new TemplateData().with(KEY_EXCEPTION, RequestUtil.getException(req)));
+                builder.templateData(new TemplateData(req.getLocale()).with(KEY_EXCEPTION, RequestUtil.getException(req)));
             }
             TemplateEngine.getInstance().render(builder.build());
         }

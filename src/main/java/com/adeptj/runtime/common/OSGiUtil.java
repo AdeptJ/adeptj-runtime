@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.jar.Manifest;
 
 import static com.adeptj.runtime.common.Constants.HEADER_SYMBOLIC_NAME;
+import static org.osgi.framework.Constants.EXTENSION_DIRECTIVE;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
 import static org.osgi.framework.Constants.SERVICE_DESCRIPTION;
@@ -59,6 +60,10 @@ public final class OSGiUtil {
 
     public static boolean isNotFragment(Bundle bundle) {
         return bundle.getHeaders().get(FRAGMENT_HOST) == null;
+    }
+
+    public boolean isSystemBundleFragment(Bundle bundle) {
+        return StringUtils.contains(bundle.getHeaders().get(FRAGMENT_HOST), EXTENSION_DIRECTIVE);
     }
 
     public static boolean isNotBundle(Manifest manifest) {
