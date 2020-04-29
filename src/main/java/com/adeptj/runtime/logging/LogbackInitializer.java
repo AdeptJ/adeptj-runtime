@@ -25,6 +25,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
@@ -146,10 +147,10 @@ public final class LogbackInitializer {
                         .build());
     }
 
-    private static void addAsyncAppender(Config config, Appender<ILoggingEvent> appender) {
+    private static void addAsyncAppender(Config config, FileAppender<ILoggingEvent> appender) {
         if (Boolean.getBoolean(SYS_PROP_LOG_ASYNC)) {
             LogbackManagerHolder.getInstance().getLogbackManager()
-                    .newAsyncAppender(LogbackConfig.builder()
+                    .addAsyncAppender(LogbackConfig.builder()
                             .asyncAppenderName(APPENDER_ASYNC)
                             .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
                             .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
