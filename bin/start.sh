@@ -37,7 +37,7 @@ if [ "${JAVA_VERSION}" -lt 11 ]; then
   exit
 fi
 
-RESTEASY_OPTS=" -Dresteasy.allowGzip=true"
+RESTEASY_OPTS=" -Dresteasy.allowGzip=true -Dresteasy.role.based.security=true"
 
 JVM_MEM_OPTS="-Xms256m -Xmx512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m"
 

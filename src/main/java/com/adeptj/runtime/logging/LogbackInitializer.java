@@ -22,6 +22,7 @@ package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.jul.LevelChangePropagator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
@@ -34,6 +35,7 @@ import com.adeptj.runtime.extensions.logging.LogbackManager;
 import com.adeptj.runtime.extensions.logging.core.LogbackConfig;
 import com.adeptj.runtime.extensions.logging.internal.LogbackManagerImpl;
 import com.typesafe.config.Config;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.List;
 
@@ -110,6 +112,13 @@ public final class LogbackInitializer {
         initRootLogger(context, consoleAppender, loggingCfg);
         addLoggers(loggingCfg, appenderList);
         addAsyncAppender(loggingCfg, fileAppender);
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
+        levelChangePropagator.setResetJUL(true);
+        levelChangePropagator.setContext(context);
+        levelChangePropagator.start();
+        context.addListener(levelChangePropagator);
         context.start();
         context.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
     }
