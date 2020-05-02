@@ -28,6 +28,7 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
@@ -120,6 +121,7 @@ public final class LogbackInitializer {
         levelChangePropagator.start();
         context.addListener(levelChangePropagator);
         context.start();
+        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
         context.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
     }
 
