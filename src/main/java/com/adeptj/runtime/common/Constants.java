@@ -55,15 +55,7 @@ public final class Constants {
 
     public static final String ADMIN_SERVLET_URI = "/admin/*";
 
-    public static final String ERROR_URI_401 = "/error/401";
-
-    public static final String ERROR_URI_403 = "/error/403";
-
-    public static final String ERROR_URI_404 = "/error/404";
-
-    public static final String ERROR_URI_500 = "/error/500";
-
-    public static final String ERROR_URI_503 = "/error/503";
+    public static final String ERROR_SERVLET_URI = "/ErrorHandler";
 
     public static final String BANNER_TXT = "/banner.txt";
 
@@ -78,6 +70,12 @@ public final class Constants {
     public static final String KEY_REQ_BUFF_MAX_BUFFERS = "common.req-buffering-maxBuffers";
 
     public static final String KEY_ALLOWED_METHODS = "common.server-allowed-methods";
+
+    public static final String KEY_ERROR_HANDLER_CODES = "common.error-handler-codes";
+
+    public static final String KEY_ADMIN_SERVLET_PATH = "common.admin-servlet-path";
+
+    public static final String KEY_ERROR_HANDLER_PATH = "common.error-handler-path";
 
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 

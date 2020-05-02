@@ -90,22 +90,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
-import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
 import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_401;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_403;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_404;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_500;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
 import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
+import static com.adeptj.runtime.common.Constants.KEY_ADMIN_SERVLET_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
+import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_CODES;
+import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
@@ -121,7 +118,6 @@ import static com.adeptj.runtime.server.ServerConstants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
 import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
 import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
-import static com.adeptj.runtime.server.ServerConstants.KEY_ERROR_PAGES;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_IGNORE_FLUSH;
@@ -416,11 +412,10 @@ public final class Server implements Lifecycle {
                 .collect(Collectors.toSet());
     }
 
-    private List<ErrorPage> errorPages(Config cfg) {
-        return cfg.getObject(KEY_ERROR_PAGES).unwrapped()
-                .entrySet()
+    private List<ErrorPage> errorPages(Config undertowConf) {
+        return undertowConf.getIntList(KEY_ERROR_HANDLER_CODES)
                 .stream()
-                .map(e -> Servlets.errorPage(String.valueOf(e.getValue()), Integer.parseInt(e.getKey())))
+                .map(code -> Servlets.errorPage(undertowConf.getString(KEY_ERROR_HANDLER_PATH), code))
                 .collect(Collectors.toList());
     }
 
@@ -441,15 +436,15 @@ public final class Server implements Lifecycle {
                         .addHttpMethods(cfg.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
     }
 
-    private List<ServletInfo> servlets() {
+    private List<ServletInfo> servlets(Config undertowConf) {
         List<ServletInfo> servlets = new ArrayList<>();
         servlets.add(Servlets
                 .servlet(ERROR_SERVLET_NAME, ErrorServlet.class)
-                .addMappings(ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503)
+                .addMapping(undertowConf.getString(KEY_ERROR_HANDLER_PATH))
                 .setAsyncSupported(true));
         servlets.add(Servlets
                 .servlet(ADMIN_SERVLET_NAME, AdminServlet.class)
-                .addMapping(ADMIN_SERVLET_URI)
+                .addMapping(undertowConf.getString(KEY_ADMIN_SERVLET_PATH))
                 .setAsyncSupported(true));
         return servlets;
     }
@@ -509,7 +504,7 @@ public final class Server implements Lifecycle {
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addSecurityConstraint(this.securityConstraint(cfg))
-                .addServlets(this.servlets())
+                .addServlets(this.servlets(cfg))
                 .addErrorPages(this.errorPages(cfg))
                 .setDefaultMultipartConfig(this.defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())

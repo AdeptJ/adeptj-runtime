@@ -108,8 +108,6 @@ final class ServerConstants {
 
     static final String KEY_PROTECTED_PATHS_SECURED_FOR_METHODS = "common.protected-paths-secured-for-methods";
 
-    static final String KEY_ERROR_PAGES = "error-pages";
-
     static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
 
     static final int PWD_START_INDEX = 9;

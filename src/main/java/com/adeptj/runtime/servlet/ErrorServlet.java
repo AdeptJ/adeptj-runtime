@@ -32,11 +32,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.adeptj.runtime.common.Constants.ERROR_URI_401;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_403;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_404;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_500;
-import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
+import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_CODES;
 
 /**
  * ErrorServlet that serves the error page w.r.t error coded(401, 403, 404, 500).
@@ -45,24 +42,19 @@ import static com.adeptj.runtime.common.Constants.ERROR_URI_503;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@WebServlet(
-        name = "AdeptJ ErrorServlet",
-        urlPatterns = {ERROR_URI_401, ERROR_URI_403, ERROR_URI_404, ERROR_URI_500, ERROR_URI_503}
-)
+@WebServlet(name = "AdeptJ ErrorServlet", urlPatterns = ERROR_SERVLET_URI)
 public class ErrorServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
     private static final String KEY_EXCEPTION = "exception";
 
-    private static final String KEY_STATUS_CODES = "common.status-codes";
-
     private static final String ERROR_TEMPLATE_FMT = "error/%s";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         int status = resp.getStatus();
-        if (Configs.of().undertow().getIntList(KEY_STATUS_CODES).contains(status)) {
+        if (Configs.of().undertow().getIntList(KEY_ERROR_HANDLER_CODES).contains(status)) {
             String template = String.format(ERROR_TEMPLATE_FMT, status);
             TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
