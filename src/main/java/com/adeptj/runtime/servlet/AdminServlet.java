@@ -70,7 +70,7 @@ public class AdminServlet extends HttpServlet {
             // Invalidate the session.
             RequestUtil.logout(req);
         }
-        // if someone requesting logout URI anonymously, which doesn't make sense. Redirect to /system/console/bundles.
+        // if someone requesting logout URI anonymously, redirect to /system/console/bundles.
         ResponseUtil.redirect(resp, DEFAULT_LANDING_PAGE_URI);
     }
 
