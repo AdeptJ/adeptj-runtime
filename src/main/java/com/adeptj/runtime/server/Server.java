@@ -501,7 +501,6 @@ public final class Server implements Lifecycle {
                 .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSIONID_ON_LOGIN))
                 .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
-                .addAuthenticationMechanism(FORM_AUTH, new ExtendedServletFormAuthenticationMechanismFactory())
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addSecurityConstraint(this.securityConstraint(cfg))
