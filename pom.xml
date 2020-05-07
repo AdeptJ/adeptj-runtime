@@ -782,10 +782,11 @@
 
         <!-- OSGi/Apache Felix Dependencies Start -->
 
-        <!-- Just to mitigate strange compilation error happening while building -->
+        <!-- This is needed because ServiceTracker is annotated with @ConsumerType -->
+
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.annotation</artifactId>
+            <artifactId>org.osgi.annotation.versioning</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -797,13 +798,13 @@
 
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.promise</artifactId>
+            <artifactId>osgi.promise</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.util.function</artifactId>
+            <artifactId>org.osgi.util.pushstream</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -1325,31 +1326,25 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.4 (JPA 2.2) Dependencies -->
-
-                <dependency>
-                    <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.jpa</artifactId>
-                    <version>${eclipselink.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+                <!-- EclipseLink 2.7.6 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
                     <artifactId>jakarta.persistence</artifactId>
+                    <version>${jakarta.persistence-api.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.asm</artifactId>
+                    <artifactId>org.eclipse.persistence.core</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.antlr</artifactId>
+                    <artifactId>org.eclipse.persistence.jpa</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
                 </dependency>
@@ -1363,7 +1358,14 @@
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
-                    <artifactId>org.eclipse.persistence.core</artifactId>
+                    <artifactId>org.eclipse.persistence.asm</artifactId>
+                    <version>${eclipselink.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.antlr</artifactId>
                     <version>${eclipselink.version}</version>
                     <scope>provided</scope>
                 </dependency>
@@ -1429,7 +1431,6 @@
                 <dependency>
                     <groupId>org.osgi</groupId>
                     <artifactId>org.osgi.service.jdbc</artifactId>
-                    <version>1.0.0</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1541,7 +1542,7 @@
                                     </transformers>
                                     <artifactSet>
                                         <excludes>
-                                            <exclude>org.osgi:osgi.annotation</exclude>
+                                            <exclude>org.osgi:org.osgi.annotation.versioning</exclude>
                                             <exclude>org.apache.felix:org.apache.felix.http.base</exclude>
                                         </excludes>
                                     </artifactSet>
@@ -1581,7 +1582,7 @@
                                     <includeScope>runtime</includeScope>
                                     <excludeArtifactIds>
                                         org.apache.felix.http.base,
-                                        osgi.annotation
+                                        org.osgi.annotation.versioning
                                     </excludeArtifactIds>
                                     <!-- All libraries will be copied here -->
                                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
