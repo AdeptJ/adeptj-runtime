@@ -826,7 +826,7 @@
             <artifactId>org.apache.felix.converter</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.cm.json</artifactId>
@@ -1322,6 +1322,23 @@
 
         <profile>
 
+            <id>Sql2o</id>
+
+            <dependencies>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-data-sql2o</artifactId>
+                    <version>1.0.0.Final</version>
+                    <scope>provided</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <profile>
+
             <id>JPA-EclipseLink</id>
 
             <dependencies>
@@ -1462,6 +1479,41 @@
                     <groupId>org.mongodb</groupId>
                     <artifactId>mongodb-driver-core</artifactId>
                     <version>${mongo.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-sync</artifactId>
+                    <version>${mongo.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.mongojack</groupId>
+                    <artifactId>mongojack</artifactId>
+                    <version>${mongojack.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.fasterxml.jackson.core</groupId>
+                            <artifactId>jackson-databind</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>com.fasterxml.jackson.datatype</groupId>
+                            <artifactId>com.fasterxml.jackson.core</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>javax.persistence</groupId>
+                            <artifactId>javax.persistence-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-data-mongodb</artifactId>
+                    <version>1.0.0.Final</version>
                     <scope>provided</scope>
                 </dependency>
 
