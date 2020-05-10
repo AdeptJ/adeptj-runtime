@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.common;
 
+import com.adeptj.runtime.exception.RuntimeInitializationException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -37,12 +39,14 @@ final class KeyStores {
     private KeyStores() {
     }
 
-    static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) throws GeneralSecurityException, IOException {
+    static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
         try (InputStream is = Environment.useProvidedKeyStore() ? Files.newInputStream(Paths.get(keyStoreLoc))
                 : KeyStores.class.getResourceAsStream(keyStoreLoc)) {
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(is, keyStorePwd);
             return keyStore;
+        } catch (IOException | GeneralSecurityException ex) {
+            throw new RuntimeInitializationException(ex);
         }
     }
 }

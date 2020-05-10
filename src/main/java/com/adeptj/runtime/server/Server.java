@@ -315,7 +315,7 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private Builder addHttpsListener(Builder builder) throws GeneralSecurityException, IOException {
+    private Builder addHttpsListener(Builder builder) throws GeneralSecurityException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = Configs.of().undertow().getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));

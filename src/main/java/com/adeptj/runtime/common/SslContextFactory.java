@@ -22,7 +22,6 @@ package com.adeptj.runtime.common;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /**
@@ -35,7 +34,7 @@ public final class SslContextFactory {
     private SslContextFactory() {
     }
 
-    public static SSLContext newSslContext(String defaultTLSVersion) throws GeneralSecurityException, IOException {
+    public static SSLContext newSslContext(String defaultTLSVersion) throws GeneralSecurityException {
         String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
         String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
         String keyPwd = System.getProperty("adeptj.rt.keyPassword");
