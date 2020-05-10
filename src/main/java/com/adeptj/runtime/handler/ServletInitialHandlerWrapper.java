@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.server;
+package com.adeptj.runtime.handler;
 
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
@@ -50,7 +50,7 @@ import io.undertow.servlet.handlers.ServletInitialHandler;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class ServletInitialHandlerWrapper implements HandlerWrapper {
+public final class ServletInitialHandlerWrapper implements HandlerWrapper {
 
     private static final String RESOURCE_PREFIX = "common.static-resource-prefix";
 

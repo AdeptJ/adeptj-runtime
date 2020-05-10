@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.server;
+package com.adeptj.runtime.handler;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -31,13 +31,13 @@ import java.util.Map;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class SetHeadersHandler implements HttpHandler {
+public final class SetHeadersHandler implements HttpHandler {
 
     private final HttpHandler nextHandler;
 
     private final Map<HttpString, String> headers;
 
-    SetHeadersHandler(HttpHandler nextHandler, Map<HttpString, String> headers) {
+    public SetHeadersHandler(HttpHandler nextHandler, Map<HttpString, String> headers) {
         this.nextHandler = nextHandler;
         this.headers = headers;
     }

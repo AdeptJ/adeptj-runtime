@@ -31,6 +31,9 @@ import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
+import com.adeptj.runtime.handler.HealthCheckHandler;
+import com.adeptj.runtime.handler.ServletInitialHandlerWrapper;
+import com.adeptj.runtime.handler.SetHeadersHandler;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
@@ -397,8 +400,9 @@ public final class Server implements Lifecycle {
                 new SetHeadersHandler(new RequestBufferingHandler(servletInitialHandler,
                         Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
                 new SetHeadersHandler(servletInitialHandler, headers);
+        HealthCheckHandler healthCheckHandler = new HealthCheckHandler(headersHandler, cfg);
         PredicateHandler predicateHandler = Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                contextHandler, headersHandler);
+                contextHandler, healthCheckHandler);
         AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(predicateHandler, this.allowedMethods(cfg));
         Integer maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS));
         RequestLimitingHandler requestLimitingHandler = new RequestLimitingHandler(maxConcurrentRequests, allowedMethodsHandler);
