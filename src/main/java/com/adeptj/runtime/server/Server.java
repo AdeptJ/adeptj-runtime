@@ -67,6 +67,7 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.xnio.OptionMap;
 import org.xnio.Options;
 import org.xnio.Xnio;
@@ -232,6 +233,7 @@ public final class Server implements Lifecycle {
         } catch (Throwable ex) { // NOSONAR
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
         } finally {
+            SLF4JBridgeHandler.uninstall();
             // Let the Logback cleans up it's state.
             LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
         }
