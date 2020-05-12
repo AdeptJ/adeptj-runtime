@@ -26,23 +26,15 @@ import ch.qos.logback.classic.jul.LevelChangePropagator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.extensions.logging.LogbackManager;
-import com.adeptj.runtime.extensions.logging.core.LogbackConfig;
-import com.adeptj.runtime.extensions.logging.internal.LogbackManagerImpl;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.util.List;
-
 import static ch.qos.logback.classic.Level.toLevel;
-import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_CONSOLE;
-import static com.adeptj.runtime.extensions.logging.LogbackManager.APPENDER_ROLLING_FILE;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
@@ -64,9 +56,11 @@ public final class LogbackInitializer {
 
     private static final String KEY_ROLLOVER_SERVER_LOG_FILE = "rollover-server-log-file";
 
-    private static final String KEY_LOG_PATTERN_FILE = "log-pattern-file";
+    private static final String KEY_FILE_APPENDER_NAME = "file-appender-name";
 
-    private static final String KEY_LOG_PATTERN_CONSOLE = "log-pattern-console";
+    private static final String KEY_ASYNC_APPENDER_NAME = "async-appender-name";
+
+    private static final String KEY_LOG_PATTERN_FILE = "log-pattern-file";
 
     private static final String KEY_LOG_MAX_HISTORY = "log-max-history";
 
@@ -79,8 +73,6 @@ public final class LogbackInitializer {
     private static final String KEY_LOG_LEVEL = "level";
 
     private static final String KEY_LOG_ADDITIVITY = "additivity";
-
-    private static final String APPENDER_ASYNC = "ASYNC";
 
     private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
 
@@ -101,33 +93,37 @@ public final class LogbackInitializer {
     public static void init() {
         long startTime = System.nanoTime();
         Config loggingCfg = Configs.of().logging();
-        LogbackConfig logbackConfig = newLogbackConfig(loggingCfg);
-        LogbackManager logbackMgr = new LogbackManagerImpl();
-        LogbackManagerHolder.getInstance().setLogbackManager(logbackMgr);
+        LogbackManager logbackMgr = LogbackManagerHolder.getInstance().getLogbackManager();
+        // Create ConsoleAppender.
+        ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr.newConsoleAppender(loggingCfg);
+        logbackMgr.addConsoleAppender(consoleAppender);
+        // Create RollingFileAppender.
+        LogbackConfig logbackConfig = newRollingFileAppenderConfig(loggingCfg);
         RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.newRollingFileAppender(logbackConfig);
-        ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr
-                .newConsoleAppender(APPENDER_CONSOLE, loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE));
-        List<Appender<ILoggingEvent>> appenderList = List.of(consoleAppender, fileAppender);
-        logbackMgr.getAppenders().addAll(appenderList);
+        logbackMgr.addRollingFileAppender(fileAppender);
+        // Add RollingFileAppender Async support.
+        addAsyncAppender(loggingCfg, logbackMgr, fileAppender);
+        // Initialize Root Logger
         LoggerContext context = logbackMgr.getLoggerContext();
-        initRootLogger(context, consoleAppender, loggingCfg);
-        addLoggers(loggingCfg, appenderList);
-        addAsyncAppender(loggingCfg, fileAppender);
+        Logger root = context.getLogger(ROOT_LOGGER_NAME);
+        root.setLevel(toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
+        root.addAppender(consoleAppender);
+        // Add all the loggers defined in server.conf logging section.
+        addLoggers(loggingCfg, logbackMgr);
+        // SLF4J JUL Bridge.
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
-        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
-        levelChangePropagator.setResetJUL(true);
-        levelChangePropagator.setContext(context);
-        levelChangePropagator.start();
-        context.addListener(levelChangePropagator);
+        // LevelChangePropagator - see http://logback.qos.ch/manual/configuration.html#LevelChangePropagator
+        addLevelChangePropagator(context);
+        // Finally start LoggerContext and print status information.
         context.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
         context.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
     }
 
-    private static LogbackConfig newLogbackConfig(Config loggingCfg) {
+    private static LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
         return LogbackConfig.builder()
-                .appenderName(APPENDER_ROLLING_FILE)
+                .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
                 .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
                 .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
                 .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
@@ -137,36 +133,32 @@ public final class LogbackInitializer {
                 .build();
     }
 
-    private static void initRootLogger(LoggerContext context, Appender<ILoggingEvent> appender, Config loggingCfg) {
-        Logger root = context.getLogger(ROOT_LOGGER_NAME);
-        root.setLevel(toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
-        root.addAppender(appender);
-    }
-
-    private static void addLoggers(Config loggingCfg, List<Appender<ILoggingEvent>> appenderList) {
-        loggingCfg.getConfigList(KEY_LOGGERS)
-                .forEach(loggerCfg -> appenderList.forEach(appender -> addLogger(loggerCfg, appender)));
-    }
-
-    private static void addLogger(Config loggerCfg, Appender<ILoggingEvent> appender) {
-        LogbackManagerHolder.getInstance().getLogbackManager()
-                .addLogger(LogbackConfig.builder()
-                        .logger(loggerCfg.getString(KEY_LOG_NAME))
-                        .level(loggerCfg.getString(KEY_LOG_LEVEL))
-                        .additivity(loggerCfg.getBoolean(KEY_LOG_ADDITIVITY))
-                        .appender(appender)
-                        .build());
-    }
-
-    private static void addAsyncAppender(Config config, FileAppender<ILoggingEvent> appender) {
+    private static void addAsyncAppender(Config loggingCfg, LogbackManager logbackMgr, Appender<ILoggingEvent> appender) {
         if (Boolean.getBoolean(SYS_PROP_LOG_ASYNC)) {
-            LogbackManagerHolder.getInstance().getLogbackManager()
-                    .addAsyncAppender(LogbackConfig.builder()
-                            .asyncAppenderName(APPENDER_ASYNC)
-                            .asyncLogQueueSize(config.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
-                            .asyncLogDiscardingThreshold(config.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
-                            .asyncAppender(appender)
-                            .build());
+            logbackMgr.addAsyncAppender(LogbackConfig.builder()
+                    .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
+                    .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
+                    .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
+                    .asyncAppender(appender)
+                    .build());
         }
+    }
+
+    private static void addLoggers(Config loggingCfg, LogbackManager logbackMgr) {
+        for (Config loggerCfg : loggingCfg.getConfigList(KEY_LOGGERS)) {
+            logbackMgr.addLogger(LogbackConfig.builder()
+                    .logger(loggerCfg.getString(KEY_LOG_NAME))
+                    .level(loggerCfg.getString(KEY_LOG_LEVEL))
+                    .additivity(loggerCfg.getBoolean(KEY_LOG_ADDITIVITY))
+                    .build());
+        }
+    }
+
+    private static void addLevelChangePropagator(LoggerContext context) {
+        LevelChangePropagator propagator = new LevelChangePropagator();
+        propagator.setResetJUL(true);
+        propagator.setContext(context);
+        propagator.start();
+        context.addListener(propagator);
     }
 }

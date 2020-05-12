@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.ServiceListener;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
@@ -66,9 +67,13 @@ public enum FrameworkManager {
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
 
+    private static final String LOGGER_CFG_FACTORY_LISTENER_FILTER = "(|(logger.name=*)(logger.level=*))";
+
     private Framework framework;
 
     private FrameworkLifecycleListener frameworkListener;
+
+    private ServiceListener serviceListener;
 
     public void startFramework() {
         try {
@@ -83,7 +88,8 @@ public enum FrameworkManager {
             this.frameworkListener = new FrameworkLifecycleListener();
             systemBundleContext.addFrameworkListener(this.frameworkListener);
             BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
-            ServiceRegistrations.getInstance().registerLogbackManager(systemBundleContext);
+            this.serviceListener = new LoggerConfigFactoryListener();
+            systemBundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_LISTENER_FILTER);
             this.provisionBundles();
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
@@ -111,9 +117,9 @@ public enum FrameworkManager {
     }
 
     private void removeServicesAndListeners() {
-        ServiceRegistrations.getInstance().unregisterLogbackManager();
         BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
         if (bundleContext != null) {
+            bundleContext.removeServiceListener(this.serviceListener);
             try {
                 LOGGER.info("Removing OSGi FrameworkListener!!");
                 bundleContext.removeFrameworkListener(this.frameworkListener);

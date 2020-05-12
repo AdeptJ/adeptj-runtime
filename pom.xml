@@ -1143,12 +1143,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-runtime-extensions</artifactId>
-            <version>${adeptj-runtime-extensions.version}</version>
-        </dependency>
-
         <!-- AdeptJ Dependencies End-->
 
         <!-- Test dependencies -->

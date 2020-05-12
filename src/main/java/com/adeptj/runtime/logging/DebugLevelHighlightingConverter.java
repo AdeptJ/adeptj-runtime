@@ -18,50 +18,26 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.osgi;
+package com.adeptj.runtime.logging;
 
-import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.extensions.logging.LogbackManager;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
-import java.util.Hashtable;
+import static ch.qos.logback.classic.Level.DEBUG_INT;
+import static ch.qos.logback.core.pattern.color.ANSIConstants.YELLOW_FG;
 
 /**
- * Utility for performing operations on OSGi {@link ServiceRegistration} instances.
+ * Extended version of {@link HighlightingCompositeConverter} which prints debug log level in yellow.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum ServiceRegistrations {
+public class DebugLevelHighlightingConverter extends HighlightingCompositeConverter {
 
-    INSTANCE;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistrations.class);
-
-    private ServiceRegistration<LogbackManager> logbackManager;
-
-    public void registerLogbackManager(BundleContext systemBundleContext) {
-        this.logbackManager = systemBundleContext
-                .registerService(LogbackManager.class,
-                        LogbackManagerHolder.getInstance().getLogbackManager(),
-                        new Hashtable<>());
-    }
-
-    public void unregisterLogbackManager() {
-        if (this.logbackManager != null) {
-            try {
-                LOGGER.info("Removing LogbackManager!!");
-                this.logbackManager.unregister();
-            } catch (Exception ex) { // NOSONAR
-                LOGGER.error(ex.getMessage(), ex);
-            }
-            this.logbackManager = null;
+    @Override
+    protected String getForegroundColorCode(ILoggingEvent event) {
+        if (event.getLevel().toInt() == DEBUG_INT) {
+            return YELLOW_FG;
         }
-    }
-
-    public static ServiceRegistrations getInstance() {
-        return INSTANCE;
+        return super.getForegroundColorCode(event);
     }
 }

@@ -18,30 +18,29 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.common;
+package com.adeptj.runtime.logging;
 
-import com.adeptj.runtime.logging.LogbackManager;
+import ch.qos.logback.classic.pattern.ThreadConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * This Enum provides the access to the {@link LogbackManager}.
+ * Extended version of {@link ThreadConverter} which trims the OSGi ConfigAdmin update thread name.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum LogbackManagerHolder {
+public class TrimThreadNameConverter extends ThreadConverter {
 
-    INSTANCE;
-
-    private final LogbackManager logbackManager;
-
-    LogbackManagerHolder() {
-        this.logbackManager = new LogbackManager();
-    }
-
-    public LogbackManager getLogbackManager() {
-        return this.logbackManager;
-    }
-
-    public static LogbackManagerHolder getInstance() {
-        return INSTANCE;
+    @Override
+    public String convert(ILoggingEvent event) {
+        String threadName = super.convert(event);
+        if (StringUtils.startsWith(threadName, "CM Event Dispatcher")) {
+            return "CM Event Dispatcher";
+        } else if (StringUtils.startsWith(threadName, "Background Update")) {
+            return "Background Update";
+        } else if (StringUtils.startsWith(threadName, "Apache Felix Configuration")) {
+            return "Apache Felix Configuration";
+        }
+        return threadName;
     }
 }
