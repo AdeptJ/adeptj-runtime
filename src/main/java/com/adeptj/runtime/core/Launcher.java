@@ -32,6 +32,7 @@ import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.IOException;
 import java.net.URL;
@@ -133,7 +134,8 @@ public final class Launcher {
                     FrameworkManager.getInstance().stopFramework();
                 });
         // Let the LOGBACK cleans up it's state.
-        LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
+        SLF4JBridgeHandler.uninstall();
+        LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
         if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
             System.exit(-1);
         }

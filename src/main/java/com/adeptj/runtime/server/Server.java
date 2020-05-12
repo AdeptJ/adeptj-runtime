@@ -235,7 +235,7 @@ public final class Server implements Lifecycle {
         } finally {
             SLF4JBridgeHandler.uninstall();
             // Let the Logback cleans up it's state.
-            LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
+            LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
         }
     }
 
@@ -346,8 +346,9 @@ public final class Server implements Lifecycle {
         // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side doing this.
         if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
+            SLF4JBridgeHandler.uninstall();
             // Let the LOGBACK cleans up it's state.
-            LogbackManagerHolder.getInstance().getLogbackManager().getLoggerContext().stop();
+            LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
             System.exit(-1); // NOSONAR
         }
         return port;

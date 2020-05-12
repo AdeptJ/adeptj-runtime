@@ -20,9 +20,6 @@
 
 package com.adeptj.runtime.logging;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-
 /**
  * LogbackConfig
  *
@@ -55,8 +52,6 @@ public class LogbackConfig {
     private int asyncLogQueueSize;
 
     private int asyncLogDiscardingThreshold;
-
-    private Appender<ILoggingEvent> asyncAppender;
 
     private LogbackConfig() {
     }
@@ -113,10 +108,6 @@ public class LogbackConfig {
         return asyncLogDiscardingThreshold;
     }
 
-    public Appender<ILoggingEvent> getAsyncAppender() {
-        return asyncAppender;
-    }
-
     public static Builder builder() {
         return new Builder();
     }
@@ -151,8 +142,6 @@ public class LogbackConfig {
         private int asyncLogQueueSize;
 
         private int asyncLogDiscardingThreshold;
-
-        private Appender<ILoggingEvent> asyncAppender;
 
         private Builder() {
         }
@@ -222,11 +211,6 @@ public class LogbackConfig {
             return this;
         }
 
-        public Builder asyncAppender(Appender<ILoggingEvent> asyncAppender) {
-            this.asyncAppender = asyncAppender;
-            return this;
-        }
-
         public LogbackConfig build() {
             LogbackConfig config = new LogbackConfig();
             config.appenderName = this.appenderName;
@@ -242,7 +226,6 @@ public class LogbackConfig {
             config.asyncAppenderName = this.asyncAppenderName;
             config.asyncLogQueueSize = this.asyncLogQueueSize;
             config.asyncLogDiscardingThreshold = this.asyncLogDiscardingThreshold;
-            config.asyncAppender = this.asyncAppender;
             return config;
         }
     }

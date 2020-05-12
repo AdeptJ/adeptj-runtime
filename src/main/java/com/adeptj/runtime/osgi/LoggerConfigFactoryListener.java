@@ -56,7 +56,7 @@ public class LoggerConfigFactoryListener implements ServiceListener {
             case REGISTERED:
                 LOGGER.debug("REGISTERED: {}", reference);
                 LogbackManagerHolder.getInstance().getLogbackManager()
-                        .addLogger(LogbackConfig.builder()
+                        .addOSGiLogger(LogbackConfig.builder()
                                 .logger(logger)
                                 .level(level)
                                 .additivity(additivity)
@@ -65,7 +65,7 @@ public class LoggerConfigFactoryListener implements ServiceListener {
             case UNREGISTERING:
                 LOGGER.debug("UNREGISTERING: {}", reference);
                 LogbackManagerHolder.getInstance().getLogbackManager()
-                        .resetLogger(LogbackConfig.builder()
+                        .resetOSGiLogger(LogbackConfig.builder()
                                 .logger(logger)
                                 .level(level)
                                 .additivity(additivity)
