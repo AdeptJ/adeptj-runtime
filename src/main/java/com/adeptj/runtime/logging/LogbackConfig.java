@@ -47,6 +47,8 @@ public class LogbackConfig {
 
     private boolean immediateFlush;
 
+    private boolean addAsyncAppender;
+
     private String asyncAppenderName;
 
     private int asyncLogQueueSize;
@@ -96,6 +98,10 @@ public class LogbackConfig {
         return immediateFlush;
     }
 
+    public boolean isAddAsyncAppender() {
+        return addAsyncAppender;
+    }
+
     public String getAsyncAppenderName() {
         return asyncAppenderName;
     }
@@ -136,6 +142,8 @@ public class LogbackConfig {
         private boolean additivity;
 
         private boolean immediateFlush;
+
+        private boolean addAsyncAppender;
 
         private String asyncAppenderName;
 
@@ -196,6 +204,11 @@ public class LogbackConfig {
             return this;
         }
 
+        public Builder addAsyncAppender(boolean addAsyncAppender) {
+            this.addAsyncAppender = addAsyncAppender;
+            return this;
+        }
+
         public Builder asyncLogQueueSize(int asyncLogQueueSize) {
             this.asyncLogQueueSize = asyncLogQueueSize;
             return this;
@@ -223,6 +236,7 @@ public class LogbackConfig {
             config.logger = this.logger;
             config.additivity = this.additivity;
             config.immediateFlush = this.immediateFlush;
+            config.addAsyncAppender = this.addAsyncAppender;
             config.asyncAppenderName = this.asyncAppenderName;
             config.asyncLogQueueSize = this.asyncLogQueueSize;
             config.asyncLogDiscardingThreshold = this.asyncLogDiscardingThreshold;

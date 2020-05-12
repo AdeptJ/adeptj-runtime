@@ -22,8 +22,11 @@ package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
@@ -45,7 +48,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class LogbackInitializer {
+public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
     private static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
 
@@ -75,24 +78,22 @@ public final class LogbackInitializer {
 
     private static final String LOGGER_NAME = "com.adeptj.runtime.logging.LogbackInitializer";
 
-    // Utility methods only.
-    private LogbackInitializer() {
-    }
-
-    public static void init() {
+    @Override
+    public void configure(LoggerContext loggerContext) {
         long startTime = System.nanoTime();
         Config loggingCfg = Configs.of().logging();
-        LogbackManager logbackMgr = LogbackManagerHolder.getInstance().getLogbackManager();
+        LogbackManager logbackMgr = new LogbackManager(loggerContext);
+        LogbackManagerHolder.getInstance().setLogbackManager(logbackMgr);
         // Initialize ConsoleAppender.
         ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr.initConsoleAppender(loggingCfg);
         // Initialize RollingFileAppender.
         LogbackConfig rollingFileConfig = newRollingFileAppenderConfig(loggingCfg);
-        logbackMgr.initRollingFileAppender(rollingFileConfig, Boolean.getBoolean(SYS_PROP_LOG_ASYNC));
-        // Initialize Root Logger
-        LoggerContext context = logbackMgr.getLoggerContext();
-        Logger root = context.getLogger(ROOT_LOGGER_NAME);
+        RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.initRollingFileAppender(rollingFileConfig);
+        // Update level and add appenders to ROOT Logger
+        Logger root = loggerContext.getLogger(ROOT_LOGGER_NAME);
         root.setLevel(toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(consoleAppender);
+        root.addAppender(fileAppender);
         // Add all the loggers defined in server.conf logging section.
         logbackMgr.addConfigLoggers(loggingCfg);
         // SLF4J JUL Bridge.
@@ -101,12 +102,12 @@ public final class LogbackInitializer {
         // LevelChangePropagator - see http://logback.qos.ch/manual/configuration.html#LevelChangePropagator
         logbackMgr.initLevelChangePropagator();
         // Finally start LoggerContext and print status information.
-        context.start();
+        loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-        context.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
+        loggerContext.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
     }
 
-    private static LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
+    private LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
         return LogbackConfig.builder()
                 .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
                 .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
@@ -115,6 +116,7 @@ public final class LogbackInitializer {
                 .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
                 .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
                 .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
+                .addAsyncAppender(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
                 .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
                 .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
                 .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))

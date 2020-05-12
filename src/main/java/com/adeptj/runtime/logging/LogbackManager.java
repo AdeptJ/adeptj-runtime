@@ -35,7 +35,6 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.FileSize;
 import com.typesafe.config.Config;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,19 +67,18 @@ public final class LogbackManager {
 
     private static final String THREAD = "thread";
 
+    private static final String LC_NAME = "AdeptJ";
+
     private final List<Appender<ILoggingEvent>> appenders;
 
     private final LoggerContext loggerContext;
 
-    public LogbackManager() {
+    LogbackManager(LoggerContext loggerContext) {
         this.appenders = new ArrayList<>();
-        this.loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        this.loggerContext = loggerContext;
+        this.loggerContext.setName(LC_NAME);
         PatternLayout.defaultConverterMap.put(HIGHLIGHT, DebugLevelHighlightingConverter.class.getName());
         PatternLayout.defaultConverterMap.put(THREAD, TrimThreadNameConverter.class.getName());
-    }
-
-    public LoggerContext getLoggerContext() {
-        return this.loggerContext;
     }
 
     public void stopLoggerContext() {
@@ -124,7 +122,7 @@ public final class LogbackManager {
         return consoleAppender;
     }
 
-    void initRollingFileAppender(LogbackConfig rollingFileConfig, boolean logAsync) {
+    RollingFileAppender<ILoggingEvent> initRollingFileAppender(LogbackConfig rollingFileConfig) {
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
         fileAppender.setContext(this.loggerContext);
         fileAppender.setName(rollingFileConfig.getAppenderName());
@@ -146,10 +144,11 @@ public final class LogbackManager {
         fileAppender.setTriggeringPolicy(rollingPolicy);
         fileAppender.start();
         // Add AsyncAppender support.
-        if (logAsync) {
+        if (rollingFileConfig.isAddAsyncAppender()) {
             this.initAsyncAppender(rollingFileConfig, fileAppender);
         }
         this.appenders.add(fileAppender);
+        return fileAppender;
     }
 
     private PatternLayoutEncoder newLayoutEncoder(String logPattern) {

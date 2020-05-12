@@ -31,10 +31,10 @@ public enum LogbackManagerHolder {
 
     INSTANCE;
 
-    private final LogbackManager logbackManager;
+    private LogbackManager logbackManager;
 
-    LogbackManagerHolder() {
-        this.logbackManager = new LogbackManager();
+    public void setLogbackManager(LogbackManager logbackManager) {
+        this.logbackManager = logbackManager;
     }
 
     public LogbackManager getLogbackManager() {

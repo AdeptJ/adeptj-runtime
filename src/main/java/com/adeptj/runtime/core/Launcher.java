@@ -27,7 +27,6 @@ import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.logging.LogbackInitializer;
 import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.Server;
 import org.slf4j.Logger;
@@ -81,7 +80,6 @@ public final class Launcher {
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
-        LogbackInitializer.init();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         try {
             pauseForDebug();
