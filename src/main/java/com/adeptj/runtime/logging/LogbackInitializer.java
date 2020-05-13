@@ -20,12 +20,8 @@
 
 package com.adeptj.runtime.logging;
 
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.Configurator;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
@@ -33,9 +29,6 @@ import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import static ch.qos.logback.classic.Level.toLevel;
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
  * This Class initializes the Logback logging framework.
@@ -50,31 +43,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  */
 public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
-    private static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
-
-    private static final String KEY_SERVER_LOG_FILE = "server-log-file";
-
-    private static final String KEY_ROLLOVER_SERVER_LOG_FILE = "rollover-server-log-file";
-
-    private static final String KEY_FILE_APPENDER_NAME = "file-appender-name";
-
-    private static final String KEY_ASYNC_APPENDER_NAME = "async-appender-name";
-
-    private static final String KEY_LOG_PATTERN_FILE = "log-pattern-file";
-
-    private static final String KEY_LOG_MAX_HISTORY = "log-max-history";
-
-    private static final String KEY_LOG_MAX_SIZE = "log-max-size";
-
     private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
-
-    private static final String SYS_PROP_LOG_ASYNC = "log.async";
-
-    private static final String KEY_ASYNC_LOG_QUEUE_SIZE = "async-log-queue-size";
-
-    private static final String KEY_ASYNC_LOG_DISCARD_THRESHOLD = "async-log-discardingThreshold";
-
-    private static final String KEY_IMMEDIATE_FLUSH = "file-appender-immediate-flush";
 
     private static final String LOGGER_NAME = "com.adeptj.runtime.logging.LogbackInitializer";
 
@@ -85,15 +54,11 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         LogbackManager logbackMgr = new LogbackManager(loggerContext);
         LogbackManagerHolder.getInstance().setLogbackManager(logbackMgr);
         // Initialize ConsoleAppender.
-        ConsoleAppender<ILoggingEvent> consoleAppender = logbackMgr.initConsoleAppender(loggingCfg);
+        logbackMgr.initConsoleAppender(loggingCfg);
         // Initialize RollingFileAppender.
-        LogbackConfig rollingFileConfig = newRollingFileAppenderConfig(loggingCfg);
-        RollingFileAppender<ILoggingEvent> fileAppender = logbackMgr.initRollingFileAppender(rollingFileConfig);
+        logbackMgr.initRollingFileAppender(loggingCfg);
         // Update level and add appenders to ROOT Logger
-        Logger root = loggerContext.getLogger(ROOT_LOGGER_NAME);
-        root.setLevel(toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
-        root.addAppender(consoleAppender);
-        root.addAppender(fileAppender);
+        logbackMgr.addLevelAndAppendersToRootLogger(loggingCfg);
         // Add all the loggers defined in server.conf logging section.
         logbackMgr.addConfigLoggers(loggingCfg);
         // SLF4J JUL Bridge.
@@ -105,21 +70,5 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
         loggerContext.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
-    }
-
-    private LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
-        return LogbackConfig.builder()
-                .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
-                .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
-                .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
-                .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
-                .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
-                .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
-                .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
-                .addAsyncAppender(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
-                .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
-                .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
-                .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
-                .build();
     }
 }

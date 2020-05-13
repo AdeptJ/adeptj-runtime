@@ -28,19 +28,17 @@ import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.jul.LevelChangePropagator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
+import ch.qos.logback.core.util.ContextUtil;
 import ch.qos.logback.core.util.FileSize;
+import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static ch.qos.logback.classic.Level.INFO;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
  * LogbackManager
@@ -61,6 +59,28 @@ public final class LogbackManager {
 
     private static final String KEY_LOGGER_ADDITIVITY = "additivity";
 
+    private static final String KEY_SERVER_LOG_FILE = "server-log-file";
+
+    private static final String KEY_ROLLOVER_SERVER_LOG_FILE = "rollover-server-log-file";
+
+    private static final String KEY_FILE_APPENDER_NAME = "file-appender-name";
+
+    private static final String KEY_ASYNC_APPENDER_NAME = "async-appender-name";
+
+    private static final String KEY_LOG_PATTERN_FILE = "log-pattern-file";
+
+    private static final String KEY_LOG_MAX_HISTORY = "log-max-history";
+
+    private static final String KEY_LOG_MAX_SIZE = "log-max-size";
+
+    private static final String KEY_ASYNC_LOG_QUEUE_SIZE = "async-log-queue-size";
+
+    private static final String KEY_ASYNC_LOG_DISCARD_THRESHOLD = "async-log-discardingThreshold";
+
+    private static final String KEY_IMMEDIATE_FLUSH = "file-appender-immediate-flush";
+
+    private static final String SYS_PROP_LOG_ASYNC = "log.async";
+
     private static final String SYS_PROP_LOG_IMMEDIATE_FLUSH = "log.immediate.flush";
 
     private static final String HIGHLIGHT = "highlight";
@@ -69,14 +89,20 @@ public final class LogbackManager {
 
     private static final String LC_NAME = "AdeptJ";
 
-    private final List<Appender<ILoggingEvent>> appenders;
+    static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
+
+    private ConsoleAppender<ILoggingEvent> consoleAppender;
+
+    private RollingFileAppender<ILoggingEvent> fileAppender;
 
     private final LoggerContext loggerContext;
 
+    private final ContextUtil contextUtil;
+
     LogbackManager(LoggerContext loggerContext) {
-        this.appenders = new ArrayList<>();
         this.loggerContext = loggerContext;
         this.loggerContext.setName(LC_NAME);
+        this.contextUtil = new ContextUtil(loggerContext);
         PatternLayout.defaultConverterMap.put(HIGHLIGHT, DebugLevelHighlightingConverter.class.getName());
         PatternLayout.defaultConverterMap.put(THREAD, TrimThreadNameConverter.class.getName());
     }
@@ -85,21 +111,30 @@ public final class LogbackManager {
         this.loggerContext.stop();
     }
 
-    public void addOSGiLogger(LogbackConfig logbackConfig) {
-        Logger logger = this.loggerContext.getLogger(logbackConfig.getLogger());
-        logger.setLevel(Level.toLevel(logbackConfig.getLevel()));
-        logger.setAdditive(logbackConfig.isAdditivity());
-        for (Appender<ILoggingEvent> appender : this.appenders) {
-            if (!logger.isAttached(appender)) {
-                logger.addAppender(appender);
-            }
+    public void addOSGiLoggers(LogbackConfig logbackConfig) {
+        for (String category : logbackConfig.getCategories()) {
+            Logger logger = this.loggerContext.getLogger(category);
+            logger.setLevel(logbackConfig.getLevel());
+            logger.setAdditive(logbackConfig.isAdditivity());
+            logger.addAppender(this.consoleAppender);
+            logger.addAppender(this.fileAppender);
         }
     }
 
-    public void resetOSGiLogger(LogbackConfig logbackConfig) {
-        Logger logger = this.loggerContext.getLogger(logbackConfig.getLogger());
-        logger.setLevel(INFO);
-        logger.setAdditive(logbackConfig.isAdditivity());
+    public void reset() {
+        this.loggerContext.reset();
+        this.contextUtil.addInfo("LoggerContext reset!");
+        this.consoleAppender = null;
+        this.fileAppender = null;
+        Config loggingCfg = Configs.of().logging();
+        this.initConsoleAppender(loggingCfg);
+        this.initRollingFileAppender(loggingCfg);
+        this.contextUtil.addInfo("Console and File appenders reinitialized!");
+        this.addLevelAndAppendersToRootLogger(loggingCfg);
+        this.contextUtil.addInfo("ROOT Logger reinitialized!");
+        // Add the server config loggers again.
+        this.addConfigLoggers(loggingCfg);
+        this.contextUtil.addInfo("Server config loggers reconfigured!");
     }
 
     void addConfigLoggers(Config loggingCfg) {
@@ -107,22 +142,30 @@ public final class LogbackManager {
             Logger logger = this.loggerContext.getLogger(loggerCfg.getString(KEY_LOGGER_NAME));
             logger.setLevel(Level.toLevel(loggerCfg.getString(KEY_LOGGER_LEVEL)));
             logger.setAdditive(loggerCfg.getBoolean(KEY_LOGGER_ADDITIVITY));
-            this.appenders.forEach(logger::addAppender);
+            logger.addAppender(this.consoleAppender);
+            logger.addAppender(this.fileAppender);
         }
     }
 
-    ConsoleAppender<ILoggingEvent> initConsoleAppender(Config loggingCfg) {
+    void addLevelAndAppendersToRootLogger(Config loggingCfg) {
+        Logger root = this.loggerContext.getLogger(ROOT_LOGGER_NAME);
+        root.setLevel(Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
+        root.addAppender(this.consoleAppender);
+        root.addAppender(this.fileAppender);
+    }
+
+    void initConsoleAppender(Config loggingCfg) {
         ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
         consoleAppender.setContext(this.loggerContext);
         consoleAppender.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
         consoleAppender.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
         consoleAppender.setWithJansi(true);
         consoleAppender.start();
-        this.appenders.add(consoleAppender);
-        return consoleAppender;
+        this.consoleAppender = consoleAppender;
     }
 
-    RollingFileAppender<ILoggingEvent> initRollingFileAppender(LogbackConfig rollingFileConfig) {
+    void initRollingFileAppender(Config loggingCfg) {
+        LogbackConfig rollingFileConfig = this.newRollingFileAppenderConfig(loggingCfg);
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
         fileAppender.setContext(this.loggerContext);
         fileAppender.setName(rollingFileConfig.getAppenderName());
@@ -147,8 +190,7 @@ public final class LogbackManager {
         if (rollingFileConfig.isAddAsyncAppender()) {
             this.initAsyncAppender(rollingFileConfig, fileAppender);
         }
-        this.appenders.add(fileAppender);
-        return fileAppender;
+        this.fileAppender = fileAppender;
     }
 
     private PatternLayoutEncoder newLayoutEncoder(String logPattern) {
@@ -168,6 +210,22 @@ public final class LogbackManager {
         asyncAppender.setDiscardingThreshold(rollingFileConfig.getAsyncLogDiscardingThreshold());
         asyncAppender.addAppender(fileAppender);
         asyncAppender.start();
+    }
+
+    private LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
+        return LogbackConfig.builder()
+                .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
+                .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
+                .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
+                .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
+                .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
+                .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
+                .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
+                .addAsyncAppender(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
+                .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
+                .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
+                .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
+                .build();
     }
 
     void initLevelChangePropagator() {

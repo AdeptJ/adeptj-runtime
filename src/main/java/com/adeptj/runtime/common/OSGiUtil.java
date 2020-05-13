@@ -28,6 +28,8 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.jar.Manifest;
 
@@ -118,6 +120,18 @@ public final class OSGiUtil {
     }
 
     public static String getServiceDesc(ServiceReference<?> reference) {
-        return String.valueOf(reference.getProperty(SERVICE_DESCRIPTION));
+        return getString(reference, SERVICE_DESCRIPTION);
+    }
+
+    public static String getString(ServiceReference<?> reference, String key) {
+        return (String) reference.getProperty(key);
+    }
+
+    public static boolean getBoolean(ServiceReference<?> reference, String key) {
+        return (boolean) reference.getProperty(key);
+    }
+
+    public static Collection<String> getCollection(ServiceReference<?> reference, String key) {
+        return Arrays.asList((String[]) reference.getProperty(key));
     }
 }

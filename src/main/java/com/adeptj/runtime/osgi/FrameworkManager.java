@@ -67,7 +67,7 @@ public enum FrameworkManager {
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
 
-    private static final String LOGGER_CFG_FACTORY_LISTENER_FILTER = "(|(logger.name=*)(logger.level=*))";
+    private static final String LOGGER_CFG_FACTORY_LISTENER_FILTER = "(|(logger.names=*)(logger.level=*))";
 
     private Framework framework;
 

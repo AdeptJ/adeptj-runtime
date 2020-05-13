@@ -20,6 +20,10 @@
 
 package com.adeptj.runtime.logging;
 
+import ch.qos.logback.classic.Level;
+
+import java.util.Set;
+
 /**
  * LogbackConfig
  *
@@ -29,7 +33,7 @@ public class LogbackConfig {
 
     private String appenderName;
 
-    private String level;
+    private Level level;
 
     private String logFile;
 
@@ -41,7 +45,7 @@ public class LogbackConfig {
 
     private String logMaxSize;
 
-    private String logger;
+    private Set<String> categories;
 
     private boolean additivity;
 
@@ -62,7 +66,7 @@ public class LogbackConfig {
         return appenderName;
     }
 
-    public String getLevel() {
+    public Level getLevel() {
         return level;
     }
 
@@ -86,8 +90,8 @@ public class LogbackConfig {
         return logMaxSize;
     }
 
-    public String getLogger() {
-        return logger;
+    public Set<String> getCategories() {
+        return categories;
     }
 
     public boolean isAdditivity() {
@@ -125,7 +129,7 @@ public class LogbackConfig {
 
         private String appenderName;
 
-        private String level;
+        private Level level;
 
         private String logFile;
 
@@ -137,7 +141,7 @@ public class LogbackConfig {
 
         private String logMaxSize;
 
-        private String logger;
+        private Set<String> categories;
 
         private boolean additivity;
 
@@ -160,7 +164,7 @@ public class LogbackConfig {
         }
 
         public Builder level(String level) {
-            this.level = level;
+            this.level = Level.toLevel(level);
             return this;
         }
 
@@ -189,8 +193,8 @@ public class LogbackConfig {
             return this;
         }
 
-        public Builder logger(String logger) {
-            this.logger = logger;
+        public Builder categories(Set<String> categories) {
+            this.categories = categories;
             return this;
         }
 
@@ -233,7 +237,7 @@ public class LogbackConfig {
             config.pattern = this.pattern;
             config.logMaxHistory = this.logMaxHistory;
             config.logMaxSize = this.logMaxSize;
-            config.logger = this.logger;
+            config.categories = this.categories;
             config.additivity = this.additivity;
             config.immediateFlush = this.immediateFlush;
             config.addAsyncAppender = this.addAsyncAppender;
