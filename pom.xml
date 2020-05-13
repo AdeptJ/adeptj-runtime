@@ -1110,8 +1110,8 @@
 
         <dependency>
             <groupId>com.adeptj</groupId>
-            <artifactId>adeptj-modules-cache-caffeine</artifactId>
-            <version>${adeptj-modules-cache-caffeine.version}</version>
+            <artifactId>adeptj-modules-commons-cache</artifactId>
+            <version>${adeptj-modules-commons-cache.version}</version>
             <scope>provided</scope>
         </dependency>
 
