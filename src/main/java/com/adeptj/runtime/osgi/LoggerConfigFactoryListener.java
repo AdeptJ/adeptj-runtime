@@ -22,6 +22,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.OSGiUtil;
+import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.logging.LogbackConfig;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -99,8 +100,10 @@ public class LoggerConfigFactoryListener implements ServiceListener {
                     break;
                 case UNREGISTERING:
                     if (this.configPids.remove(pid)) {
+                        long startTime = System.nanoTime();
                         LOGGER.info("Removing loggers for categories {} and level {}", categories, level);
-                        LogbackManagerHolder.getInstance().getLogbackManager().reset();
+                        LogbackManagerHolder.getInstance().getLogbackManager().resetLoggerContext();
+                        LOGGER.info("LoggerContext reset took [{}] ms!", Times.elapsedMillis(startTime));
                     }
                     break;
                 default:

@@ -119,4 +119,6 @@ final class ServerConstants {
     static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
 
     static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
+
+    static final String LOGBACK_STATUS_SERVLET_NAME = "Logback ViewStatusMessagesServlet";
 }

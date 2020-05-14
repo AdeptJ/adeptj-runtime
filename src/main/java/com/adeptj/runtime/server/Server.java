@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.server;
 
+import ch.qos.logback.classic.ViewStatusMessagesServlet;
 import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
@@ -110,6 +111,7 @@ import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
+import static com.adeptj.runtime.common.Constants.KEY_LOGBACK_STATUS_SERVLET_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
@@ -147,6 +149,7 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_MAX_THREADS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TCP_NO_DELAY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
+import static com.adeptj.runtime.server.ServerConstants.LOGBACK_STATUS_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.PWD_START_INDEX;
 import static com.adeptj.runtime.server.ServerConstants.REALM;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
@@ -452,6 +455,9 @@ public final class Server implements Lifecycle {
         servlets.add(Servlets
                 .servlet(ADMIN_SERVLET_NAME, AdminServlet.class)
                 .addMapping(undertowConf.getString(KEY_ADMIN_SERVLET_PATH))
+                .setAsyncSupported(true));
+        servlets.add(Servlets.servlet(LOGBACK_STATUS_SERVLET_NAME, ViewStatusMessagesServlet.class)
+                .addMapping(undertowConf.getString(KEY_LOGBACK_STATUS_SERVLET_PATH))
                 .setAsyncSupported(true));
         return servlets;
     }

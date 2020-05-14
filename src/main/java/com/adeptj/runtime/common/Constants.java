@@ -77,6 +77,8 @@ public final class Constants {
 
     public static final String KEY_ERROR_HANDLER_PATH = "common.error-handler-path";
 
+    public static final String KEY_LOGBACK_STATUS_SERVLET_PATH = "common.logback-status-servlet-path";
+
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
     public static final String ARG_OPEN_CONSOLE = "openConsole";

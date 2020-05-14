@@ -47,6 +47,8 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
  */
 public final class LogbackManager {
 
+    static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
+
     private static final String KEY_CONSOLE_APPENDER_NAME = "console-appender-name";
 
     private static final String KEY_LOG_PATTERN_CONSOLE = "log-pattern-console";
@@ -89,8 +91,6 @@ public final class LogbackManager {
 
     private static final String LC_NAME = "AdeptJ";
 
-    static final String KEY_ROOT_LOG_LEVEL = "root-log-level";
-
     private ConsoleAppender<ILoggingEvent> consoleAppender;
 
     private RollingFileAppender<ILoggingEvent> fileAppender;
@@ -121,20 +121,21 @@ public final class LogbackManager {
         }
     }
 
-    public void reset() {
+    public void resetLoggerContext() {
+        this.contextUtil.addInfo(String.format("Resetting LoggerContext %s", this.loggerContext.getName()));
         this.loggerContext.reset();
-        this.contextUtil.addInfo("LoggerContext reset!");
         this.consoleAppender = null;
         this.fileAppender = null;
         Config loggingCfg = Configs.of().logging();
         this.initConsoleAppender(loggingCfg);
         this.initRollingFileAppender(loggingCfg);
-        this.contextUtil.addInfo("Console and File appenders reinitialized!");
-        this.addLevelAndAppendersToRootLogger(loggingCfg);
+        this.contextUtil.addInfo("ConsoleAppender and RollingFileAppender reinitialized!");
+        this.changeLevelAndAddAppendersToRootLogger(loggingCfg);
         this.contextUtil.addInfo("ROOT Logger reinitialized!");
         // Add the server config loggers again.
         this.addConfigLoggers(loggingCfg);
         this.contextUtil.addInfo("Server config loggers reconfigured!");
+        this.contextUtil.addInfo(String.format("Reset of LoggerContext %s done!", this.loggerContext.getName()));
     }
 
     void addConfigLoggers(Config loggingCfg) {
@@ -147,7 +148,7 @@ public final class LogbackManager {
         }
     }
 
-    void addLevelAndAppendersToRootLogger(Config loggingCfg) {
+    void changeLevelAndAddAppendersToRootLogger(Config loggingCfg) {
         Logger root = this.loggerContext.getLogger(ROOT_LOGGER_NAME);
         root.setLevel(Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(this.consoleAppender);
@@ -165,7 +166,7 @@ public final class LogbackManager {
     }
 
     void initRollingFileAppender(Config loggingCfg) {
-        LogbackConfig rollingFileConfig = this.newRollingFileAppenderConfig(loggingCfg);
+        LogbackConfig rollingFileConfig = this.createRollingFileAppenderConfig(loggingCfg);
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
         fileAppender.setContext(this.loggerContext);
         fileAppender.setName(rollingFileConfig.getAppenderName());
@@ -187,7 +188,7 @@ public final class LogbackManager {
         fileAppender.setTriggeringPolicy(rollingPolicy);
         fileAppender.start();
         // Add AsyncAppender support.
-        if (rollingFileConfig.isAddAsyncAppender()) {
+        if (rollingFileConfig.isLogAsync()) {
             this.initAsyncAppender(rollingFileConfig, fileAppender);
         }
         this.fileAppender = fileAppender;
@@ -212,7 +213,7 @@ public final class LogbackManager {
         asyncAppender.start();
     }
 
-    private LogbackConfig newRollingFileAppenderConfig(Config loggingCfg) {
+    private LogbackConfig createRollingFileAppenderConfig(Config loggingCfg) {
         return LogbackConfig.builder()
                 .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
                 .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
@@ -221,7 +222,7 @@ public final class LogbackManager {
                 .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
                 .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
                 .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
-                .addAsyncAppender(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
+                .logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
                 .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
                 .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
                 .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
@@ -230,8 +231,8 @@ public final class LogbackManager {
 
     void initLevelChangePropagator() {
         LevelChangePropagator propagator = new LevelChangePropagator();
-        propagator.setResetJUL(true);
         propagator.setContext(this.loggerContext);
+        propagator.setResetJUL(true);
         propagator.start();
         this.loggerContext.addListener(propagator);
     }

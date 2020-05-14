@@ -47,25 +47,29 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
 
     private static final String LOGGER_NAME = "com.adeptj.runtime.logging.LogbackInitializer";
 
+    /**
+     * @param loggerContext the {@link LoggerContext}
+     * @see class description for details.
+     */
     @Override
     public void configure(LoggerContext loggerContext) {
         long startTime = System.nanoTime();
         Config loggingCfg = Configs.of().logging();
-        LogbackManager logbackMgr = new LogbackManager(loggerContext);
-        LogbackManagerHolder.getInstance().setLogbackManager(logbackMgr);
+        LogbackManager logbackManager = new LogbackManager(loggerContext);
+        LogbackManagerHolder.getInstance().setLogbackManager(logbackManager);
         // Initialize ConsoleAppender.
-        logbackMgr.initConsoleAppender(loggingCfg);
+        logbackManager.initConsoleAppender(loggingCfg);
         // Initialize RollingFileAppender.
-        logbackMgr.initRollingFileAppender(loggingCfg);
+        logbackManager.initRollingFileAppender(loggingCfg);
         // Update level and add appenders to ROOT Logger
-        logbackMgr.addLevelAndAppendersToRootLogger(loggingCfg);
+        logbackManager.changeLevelAndAddAppendersToRootLogger(loggingCfg);
         // Add all the loggers defined in server.conf logging section.
-        logbackMgr.addConfigLoggers(loggingCfg);
+        logbackManager.addConfigLoggers(loggingCfg);
         // SLF4J JUL Bridge.
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
         // LevelChangePropagator - see http://logback.qos.ch/manual/configuration.html#LevelChangePropagator
-        logbackMgr.initLevelChangePropagator();
+        logbackManager.initLevelChangePropagator();
         // Finally start LoggerContext and print status information.
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(context);
