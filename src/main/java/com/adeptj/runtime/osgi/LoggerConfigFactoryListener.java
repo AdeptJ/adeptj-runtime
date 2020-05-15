@@ -21,19 +21,15 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.OSGiUtil;
+import com.adeptj.runtime.logging.LogbackManager;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.osgi.framework.ServiceEvent.REGISTERED;
 import static org.osgi.framework.ServiceEvent.UNREGISTERING;
 
@@ -48,32 +44,21 @@ public class LoggerConfigFactoryListener implements ServiceListener {
 
     private final Lock lock;
 
-    /**
-     * List containing the service pids for which loggers have been configured.
-     */
-    private final List<String> loggerConfiguredPids;
-
-    public LoggerConfigFactoryListener() {
+    LoggerConfigFactoryListener() {
         this.lock = new ReentrantLock();
-        this.loggerConfiguredPids = new ArrayList<>();
     }
 
     @Override
     public void serviceChanged(ServiceEvent event) {
         this.lock.tryLock();
         try {
-            ServiceReference<?> reference = event.getServiceReference();
-            String pid = OSGiUtil.getString(reference, SERVICE_PID);
+            LogbackManager logbackManager = LogbackManagerHolder.getInstance().getLogbackManager();
             switch (event.getType()) {
                 case REGISTERED:
-                    if (LogbackManagerHolder.getInstance().getLogbackManager().addOSGiLoggers(reference)) {
-                        this.loggerConfiguredPids.add(pid);
-                    }
+                    logbackManager.addOSGiLoggers(event.getServiceReference());
                     break;
                 case UNREGISTERING:
-                    if (this.loggerConfiguredPids.remove(pid)) {
-                        LogbackManagerHolder.getInstance().getLogbackManager().resetLoggerContext(reference);
-                    }
+                    logbackManager.resetLoggers(event.getServiceReference());
                     break;
                 default:
                     LOGGER.warn("Ignored ServiceEvent: [{}]", event.getType());

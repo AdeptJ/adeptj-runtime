@@ -20,20 +20,14 @@
 
 package com.adeptj.runtime.logging;
 
-import ch.qos.logback.classic.Level;
-
-import java.util.Set;
-
 /**
- * LogbackConfig
+ * Configurations for creating a RollingFileAppender.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class LogbackConfig {
+class FileAppenderConfig {
 
     private String appenderName;
-
-    private Level level;
 
     private String logFile;
 
@@ -45,10 +39,6 @@ public class LogbackConfig {
 
     private String logMaxSize;
 
-    private Set<String> categories;
-
-    private boolean additivity;
-
     private boolean immediateFlush;
 
     private boolean logAsync;
@@ -59,15 +49,11 @@ public class LogbackConfig {
 
     private int asyncLogDiscardingThreshold;
 
-    private LogbackConfig() {
+    private FileAppenderConfig() {
     }
 
     public String getAppenderName() {
         return appenderName;
-    }
-
-    public Level getLevel() {
-        return level;
     }
 
     public String getLogFile() {
@@ -88,14 +74,6 @@ public class LogbackConfig {
 
     public String getLogMaxSize() {
         return logMaxSize;
-    }
-
-    public Set<String> getCategories() {
-        return categories;
-    }
-
-    public boolean isAdditivity() {
-        return additivity;
     }
 
     public boolean isImmediateFlush() {
@@ -123,13 +101,11 @@ public class LogbackConfig {
     }
 
     /**
-     * Convenient builder to create {@link LogbackConfig} instances.
+     * Convenient builder to create {@link FileAppenderConfig} instances.
      */
-    public static class Builder {
+    static class Builder {
 
         private String appenderName;
-
-        private Level level;
 
         private String logFile;
 
@@ -140,10 +116,6 @@ public class LogbackConfig {
         private int logMaxHistory;
 
         private String logMaxSize;
-
-        private Set<String> categories;
-
-        private boolean additivity;
 
         private boolean immediateFlush;
 
@@ -160,11 +132,6 @@ public class LogbackConfig {
 
         public Builder appenderName(String appenderName) {
             this.appenderName = appenderName;
-            return this;
-        }
-
-        public Builder level(String level) {
-            this.level = Level.toLevel(level);
             return this;
         }
 
@@ -193,16 +160,6 @@ public class LogbackConfig {
             return this;
         }
 
-        public Builder categories(Set<String> categories) {
-            this.categories = categories;
-            return this;
-        }
-
-        public Builder additivity(boolean additivity) {
-            this.additivity = additivity;
-            return this;
-        }
-
         public Builder immediateFlush(boolean immediateFlush) {
             this.immediateFlush = immediateFlush;
             return this;
@@ -228,17 +185,14 @@ public class LogbackConfig {
             return this;
         }
 
-        public LogbackConfig build() {
-            LogbackConfig config = new LogbackConfig();
+        public FileAppenderConfig build() {
+            FileAppenderConfig config = new FileAppenderConfig();
             config.appenderName = this.appenderName;
-            config.level = this.level;
             config.logFile = this.logFile;
             config.rolloverFile = this.rolloverFile;
             config.pattern = this.pattern;
             config.logMaxHistory = this.logMaxHistory;
             config.logMaxSize = this.logMaxSize;
-            config.categories = this.categories;
-            config.additivity = this.additivity;
             config.immediateFlush = this.immediateFlush;
             config.logAsync = this.logAsync;
             config.asyncAppenderName = this.asyncAppenderName;

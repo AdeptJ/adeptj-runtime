@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -18,46 +18,45 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.osgi;
+package com.adeptj.runtime.logging;
 
-import java.util.stream.Stream;
+import java.util.Set;
 
 /**
- * OSGi Framework event code to string mapping.
+ * Configurations for creating a Logback Logger.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public enum FrameworkEvents {
+class LoggerConfig {
 
-    STARTED(1),
+    private final String configPid;
 
-    ERROR(2),
+    private final Set<String> categories;
 
-    PACKAGES_REFRESHED(4),
+    private final String level;
 
-    STOPPED(64),
+    private final boolean additivity;
 
-    STOPPED_UPDATE(128),
-
-    WAIT_TIMED_OUT(512),
-
-    UNKNOWN(-1);
-
-    private final int code;
-
-    FrameworkEvents(int code) {
-        this.code = code;
+    LoggerConfig(String configPid, Set<String> categories, String level, boolean additivity) {
+        this.configPid = configPid;
+        this.categories = categories;
+        this.level = level;
+        this.additivity = additivity;
     }
 
-    public int getCode() {
-        return code;
+    public String getConfigPid() {
+        return configPid;
     }
 
-    public static String asString(int code) {
-        return Stream.of(values())
-                .filter(fe -> code == fe.getCode())
-                .findFirst()
-                .orElse(UNKNOWN)
-                .toString();
+    public Set<String> getCategories() {
+        return this.categories;
+    }
+
+    public String getLevel() {
+        return this.level;
+    }
+
+    public boolean isAdditivity() {
+        return this.additivity;
     }
 }

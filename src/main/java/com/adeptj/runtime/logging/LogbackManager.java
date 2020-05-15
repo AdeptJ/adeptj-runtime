@@ -40,9 +40,12 @@ import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.osgi.framework.ServiceReference;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
@@ -110,49 +113,67 @@ public final class LogbackManager {
 
     private final ContextUtil contextUtil;
 
+    private final Map<String, LoggerConfig> configByPid;
+
+    private final Map<String, LoggerConfig> configByCategory;
+
     LogbackManager(LoggerContext loggerContext) {
         this.loggerContext = loggerContext;
         this.loggerContext.setName(LC_NAME);
         this.contextUtil = new ContextUtil(loggerContext);
         PatternLayout.defaultConverterMap.put(HIGHLIGHT, DebugLevelHighlightingConverter.class.getName());
         PatternLayout.defaultConverterMap.put(THREAD, TrimThreadNameConverter.class.getName());
+        this.configByPid = new ConcurrentHashMap<>();
+        this.configByCategory = new ConcurrentHashMap<>();
     }
 
     public void stopLoggerContext() {
         this.loggerContext.stop();
     }
 
-    public boolean addOSGiLoggers(ServiceReference<?> reference) {
+    public void addOSGiLoggers(ServiceReference<?> reference) {
         Logger logger = this.loggerContext.getLogger(this.getClass());
-        Set<String> categories = OSGiUtil.asSet(reference, KEY_OSGI_LOGGER_NAMES);
+        Set<String> categories = OSGiUtil.arrayToSet(reference, KEY_OSGI_LOGGER_NAMES);
         int size = categories.size();
+        // <<---------------------------- Validations Start ---------------------------->>
         if (size == 0) {
             logger.warn("Can't add loggers because logger.names array property is empty!!");
-            return false;
+            return;
         }
         if (size == 1 && categories.contains(ROOT_LOGGER_NAME)) {
             logger.warn("Adding a ROOT logger is prohibited!!");
-            return false;
+            return;
         }
         if (categories.remove(ROOT_LOGGER_NAME)) {
             logger.warn("Removed ROOT logger from the categories as adding a ROOT logger is prohibited!!");
         }
-        String level = OSGiUtil.getString(reference, KEY_OSGI_LOGGER_LEVEL);
-        logger.info("Adding loggers for categories {} with level {}", categories, level);
-        boolean additivity = OSGiUtil.getBoolean(reference, KEY_OSGI_LOGGER_ADDITIVITY);
         for (String category : categories) {
-            this.addLogger(category, level, additivity);
+            LoggerConfig config = this.configByCategory.get(category);
+            if (config != null) {
+                logger.error("Category [{}] already defined by configuration {}", category, config.getConfigPid());
+                return;
+            }
         }
-        return true;
+        // <<---------------------------- Validations End ---------------------------->>
+        String pid = OSGiUtil.getString(reference, SERVICE_PID);
+        String level = OSGiUtil.getString(reference, KEY_OSGI_LOGGER_LEVEL);
+        boolean additivity = OSGiUtil.getBoolean(reference, KEY_OSGI_LOGGER_ADDITIVITY);
+        LoggerConfig config = new LoggerConfig(pid, categories, level, additivity);
+        categories.forEach(category -> this.configByCategory.put(category, config));
+        this.configByPid.put(pid, config);
+        logger.info("Adding loggers for categories {} with level {}", categories, level);
+        categories.forEach(category -> this.addLogger(category, level, additivity));
     }
 
-    public void resetLoggerContext(ServiceReference<?> reference) {
+    public void resetLoggers(ServiceReference<?> reference) {
+        LoggerConfig config = this.configByPid.remove(OSGiUtil.getString(reference, SERVICE_PID));
+        if (config == null) {
+            return;
+        }
         long startTime = System.nanoTime();
-        Set<String> categories = OSGiUtil.asSet(reference, KEY_OSGI_LOGGER_NAMES);
-        categories.remove(ROOT_LOGGER_NAME);
-        String level = OSGiUtil.getString(reference, KEY_OSGI_LOGGER_LEVEL);
+        this.configByCategory.keySet().removeAll(config.getCategories());
         Logger logger = this.loggerContext.getLogger(this.getClass());
-        logger.info("Removing loggers for categories {} with level {}", categories, level);
+        logger.info("Removing loggers for categories {} with level {}", config.getCategories(), config.getLevel());
         this.contextUtil.addInfo(String.format("Resetting LoggerContext %s", this.loggerContext.getName()));
         this.loggerContext.reset();
         this.consoleAppender = null;
@@ -165,17 +186,23 @@ public final class LogbackManager {
         this.contextUtil.addInfo("ROOT Logger reinitialized!");
         // Add the server config loggers again.
         this.addServerConfigLoggers(loggingCfg);
+        // Reconfigure other OSGi loggers.
+        this.configByPid.values().forEach(cfg -> {
+            Set<String> categories = cfg.getCategories();
+            String level = cfg.getLevel();
+            logger.info("Adding loggers for categories {} with level {}", categories, level);
+            categories.forEach(category -> this.addLogger(category, level, cfg.isAdditivity()));
+        });
         this.contextUtil.addInfo("Server config loggers reconfigured!");
         this.contextUtil.addInfo(String.format("Reset of LoggerContext %s done!", this.loggerContext.getName()));
         logger.info("LoggerContext reset took [{}] ms!", Times.elapsedMillis(startTime));
     }
 
     void addServerConfigLoggers(Config loggingCfg) {
-        for (Config loggerCfg : loggingCfg.getConfigList(KEY_LOGGERS)) {
-            this.addLogger(loggerCfg.getString(KEY_LOGGER_NAME).trim(),
-                    loggerCfg.getString(KEY_LOGGER_LEVEL).trim(),
-                    loggerCfg.getBoolean(KEY_LOGGER_ADDITIVITY));
-        }
+        loggingCfg.getConfigList(KEY_LOGGERS)
+                .forEach(loggerCfg -> this.addLogger(loggerCfg.getString(KEY_LOGGER_NAME).trim(),
+                        loggerCfg.getString(KEY_LOGGER_LEVEL).trim(),
+                        loggerCfg.getBoolean(KEY_LOGGER_ADDITIVITY)));
     }
 
     private void addLogger(String name, String level, boolean additivity) {
@@ -204,30 +231,30 @@ public final class LogbackManager {
     }
 
     void initRollingFileAppender(Config loggingCfg) {
-        LogbackConfig rollingFileConfig = this.createRollingFileAppenderConfig(loggingCfg);
+        FileAppenderConfig appenderConfig = this.createFileAppenderConfig(loggingCfg);
         RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
         fileAppender.setContext(this.loggerContext);
-        fileAppender.setName(rollingFileConfig.getAppenderName());
-        fileAppender.setFile(rollingFileConfig.getLogFile());
+        fileAppender.setName(appenderConfig.getAppenderName());
+        fileAppender.setFile(appenderConfig.getLogFile());
         fileAppender.setAppend(true);
-        fileAppender.setEncoder(this.newLayoutEncoder(rollingFileConfig.getPattern()));
+        fileAppender.setEncoder(this.newLayoutEncoder(appenderConfig.getPattern()));
         fileAppender.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
         if (!fileAppender.isImmediateFlush()) {
-            fileAppender.setImmediateFlush(rollingFileConfig.isImmediateFlush());
+            fileAppender.setImmediateFlush(appenderConfig.isImmediateFlush());
         }
         SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new SizeAndTimeBasedRollingPolicy<>();
         rollingPolicy.setContext(this.loggerContext);
         rollingPolicy.setParent(fileAppender);
-        rollingPolicy.setMaxFileSize(FileSize.valueOf(rollingFileConfig.getLogMaxSize()));
-        rollingPolicy.setFileNamePattern(rollingFileConfig.getRolloverFile());
-        rollingPolicy.setMaxHistory(rollingFileConfig.getLogMaxHistory());
+        rollingPolicy.setMaxFileSize(FileSize.valueOf(appenderConfig.getLogMaxSize()));
+        rollingPolicy.setFileNamePattern(appenderConfig.getRolloverFile());
+        rollingPolicy.setMaxHistory(appenderConfig.getLogMaxHistory());
         rollingPolicy.start();
         fileAppender.setRollingPolicy(rollingPolicy);
         fileAppender.setTriggeringPolicy(rollingPolicy);
         fileAppender.start();
         // Add AsyncAppender support.
-        if (rollingFileConfig.isLogAsync()) {
-            this.initAsyncAppender(rollingFileConfig, fileAppender);
+        if (appenderConfig.isLogAsync()) {
+            this.initAsyncAppender(appenderConfig, fileAppender);
         }
         this.fileAppender = fileAppender;
     }
@@ -241,7 +268,7 @@ public final class LogbackManager {
         return layoutEncoder;
     }
 
-    private void initAsyncAppender(LogbackConfig rollingFileConfig, FileAppender<ILoggingEvent> fileAppender) {
+    private void initAsyncAppender(FileAppenderConfig rollingFileConfig, FileAppender<ILoggingEvent> fileAppender) {
         AsyncAppender asyncAppender = new AsyncAppender();
         asyncAppender.setContext(this.loggerContext);
         asyncAppender.setName(rollingFileConfig.getAsyncAppenderName());
@@ -251,8 +278,8 @@ public final class LogbackManager {
         asyncAppender.start();
     }
 
-    private LogbackConfig createRollingFileAppenderConfig(Config loggingCfg) {
-        return LogbackConfig.builder()
+    private FileAppenderConfig createFileAppenderConfig(Config loggingCfg) {
+        return FileAppenderConfig.builder()
                 .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
                 .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
                 .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))

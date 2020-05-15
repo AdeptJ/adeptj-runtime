@@ -28,10 +28,11 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.EXTENSION_DIRECTIVE;
@@ -131,14 +132,11 @@ public final class OSGiUtil {
         return (boolean) reference.getProperty(key);
     }
 
-    public static Set<String> asSet(ServiceReference<?> reference, String key) {
-        String[] multiValueProperty = (String[]) reference.getProperty(key);
-        Set<String> configValues = new HashSet<>(multiValueProperty.length);
-        for (String value : multiValueProperty) {
-            if (StringUtils.isNotBlank(value)) {
-                configValues.add(value.trim());
-            }
-        }
-        return configValues;
+    public static Set<String> arrayToSet(ServiceReference<?> reference, String key) {
+        // Not doing any type check as the property has to be an array type suggested by method name itself.
+        return Stream.of((String[]) reference.getProperty(key))
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .collect(Collectors.toSet());
     }
 }
