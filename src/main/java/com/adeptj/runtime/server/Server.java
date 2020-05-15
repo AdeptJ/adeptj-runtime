@@ -43,7 +43,6 @@ import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
-import io.undertow.Version;
 import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
@@ -109,6 +108,7 @@ import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_CODES;
 import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
+import static com.adeptj.runtime.common.Constants.KEY_HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_LOGBACK_STATUS_SERVLET_PATH;
@@ -399,7 +399,7 @@ public final class Server implements Lifecycle {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
-            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), Version.getFullVersionString());
+            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), cfg.getString(KEY_HEADER_X_POWERED_BY));
         }
         RedirectHandler contextHandler = Handlers.redirect(DEFAULT_LANDING_PAGE_URI);
         HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
