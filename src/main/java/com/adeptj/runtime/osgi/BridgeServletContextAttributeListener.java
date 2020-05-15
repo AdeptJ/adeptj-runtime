@@ -30,9 +30,9 @@ import javax.servlet.ServletContextAttributeListener;
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 
 /**
- * A {@link ServletContextAttributeListener} which initializes the {@link EventDispatcherTracker} when {@link BundleContext}
- * is being set as a {@link javax.servlet.ServletContext} attribute and again closes and opens when {@link BundleContext} is
- * replaced as a {@link javax.servlet.ServletContext} attribute.
+ * A {@link ServletContextAttributeListener} which initializes the {@link EventDispatcherTracker}
+ * when {@link BundleContext} is being set as a {@link javax.servlet.ServletContext} attribute and again closes
+ * and opens when {@link BundleContext} is replaced as a {@link javax.servlet.ServletContext} attribute.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -54,7 +54,7 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
              * BundleContextHolder after being set in FrameworkLifecycleListener.
              *
              * Rationale: If we use the BundleContext contained in the passed event which is a stale
-             * BundleContext in case of a framework restart event and results in a IllegalStateException.
+             * BundleContext in case of a framework restart event and results in an IllegalStateException.
              */
             ServiceTrackers.getInstance()
                     .openEventDispatcherTracker(BundleContextHolder.getInstance().getBundleContext());

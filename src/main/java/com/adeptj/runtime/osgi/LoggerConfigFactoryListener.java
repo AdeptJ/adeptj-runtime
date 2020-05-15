@@ -22,8 +22,6 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.OSGiUtil;
-import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.logging.LogbackConfig;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -31,17 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.osgi.framework.ServiceEvent.REGISTERED;
 import static org.osgi.framework.ServiceEvent.UNREGISTERING;
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 /**
  * OSGi {@link ServiceListener} for getting logger config properties from LoggerConfigFactory services.
@@ -52,19 +46,16 @@ public class LoggerConfigFactoryListener implements ServiceListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggerConfigFactoryListener.class);
 
-    private static final String KEY_LOGGER_NAMES = "logger.names";
-
-    private static final String KEY_LOGGER_LEVEL = "logger.level";
-
-    private static final String KEY_LOGGER_ADDITIVITY = "logger.additivity";
-
     private final Lock lock;
 
-    private final List<String> configPids;
+    /**
+     * List containing the service pids for which loggers have been configured.
+     */
+    private final List<String> loggerConfiguredPids;
 
     public LoggerConfigFactoryListener() {
         this.lock = new ReentrantLock();
-        this.configPids = new ArrayList<>();
+        this.loggerConfiguredPids = new ArrayList<>();
     }
 
     @Override
@@ -72,38 +63,16 @@ public class LoggerConfigFactoryListener implements ServiceListener {
         this.lock.tryLock();
         try {
             ServiceReference<?> reference = event.getServiceReference();
-            Set<String> categories = new HashSet<>(OSGiUtil.getCollection(reference, KEY_LOGGER_NAMES));
-            String level = OSGiUtil.getString(reference, KEY_LOGGER_LEVEL);
             String pid = OSGiUtil.getString(reference, SERVICE_PID);
             switch (event.getType()) {
                 case REGISTERED:
-                    int size = categories.size();
-                    if (size == 0 || categories.remove(EMPTY)) {
-                        LOGGER.warn("Can't add loggers because logger.names array property is empty!!");
-                        return;
+                    if (LogbackManagerHolder.getInstance().getLogbackManager().addOSGiLoggers(reference)) {
+                        this.loggerConfiguredPids.add(pid);
                     }
-                    if (size == 1 && categories.contains(ROOT_LOGGER_NAME)) {
-                        LOGGER.warn("Adding a ROOT logger is not allowed!!");
-                        return;
-                    }
-                    if (categories.remove(ROOT_LOGGER_NAME)) {
-                        LOGGER.warn("Removed ROOT logger from the categories!!");
-                    }
-                    LOGGER.info("Adding loggers for categories {} and level {}", categories, level);
-                    LogbackManagerHolder.getInstance().getLogbackManager()
-                            .addOSGiLoggers(LogbackConfig.builder()
-                                    .categories(categories)
-                                    .level(level)
-                                    .additivity(OSGiUtil.getBoolean(reference, KEY_LOGGER_ADDITIVITY))
-                                    .build());
-                    this.configPids.add(pid);
                     break;
                 case UNREGISTERING:
-                    if (this.configPids.remove(pid)) {
-                        long startTime = System.nanoTime();
-                        LOGGER.info("Removing loggers for categories {} and level {}", categories, level);
-                        LogbackManagerHolder.getInstance().getLogbackManager().resetLoggerContext();
-                        LOGGER.info("LoggerContext reset took [{}] ms!", Times.elapsedMillis(startTime));
+                    if (this.loggerConfiguredPids.remove(pid)) {
+                        LogbackManagerHolder.getInstance().getLogbackManager().resetLoggerContext(reference);
                     }
                     break;
                 default:

@@ -28,12 +28,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.jar.Manifest;
 
-import static com.adeptj.runtime.common.Constants.HEADER_SYMBOLIC_NAME;
+import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
 import static org.osgi.framework.Constants.EXTENSION_DIRECTIVE;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
@@ -69,7 +69,7 @@ public final class OSGiUtil {
     }
 
     public static boolean isNotBundle(Manifest manifest) {
-        return manifest != null && StringUtils.isEmpty(manifest.getMainAttributes().getValue(HEADER_SYMBOLIC_NAME));
+        return manifest != null && StringUtils.isEmpty(manifest.getMainAttributes().getValue(BUNDLE_SYMBOLICNAME));
     }
 
     public static Filter filter(BundleContext context, String objectClassFQN) {
@@ -131,7 +131,14 @@ public final class OSGiUtil {
         return (boolean) reference.getProperty(key);
     }
 
-    public static Collection<String> getCollection(ServiceReference<?> reference, String key) {
-        return Arrays.asList((String[]) reference.getProperty(key));
+    public static Set<String> asSet(ServiceReference<?> reference, String key) {
+        String[] multiValueProperty = (String[]) reference.getProperty(key);
+        Set<String> configValues = new HashSet<>(multiValueProperty.length);
+        for (String value : multiValueProperty) {
+            if (StringUtils.isNotBlank(value)) {
+                configValues.add(value.trim());
+            }
+        }
+        return configValues;
     }
 }

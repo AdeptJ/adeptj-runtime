@@ -61,12 +61,12 @@ public abstract class BridgeServiceTracker<T> extends ServiceTracker<T, T> {
      */
     @Override
     public T addingService(ServiceReference<T> reference) {
-        T service = null;
-        if (!this.serviceRemoved.get()) {
-            LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
-            service = this.addingService(super.addingService(reference));
+        // If the service has been removed due to the OSGi Framework restart then return null right away.
+        if (this.serviceRemoved.get()) {
+            return null;
         }
-        return this.serviceRemoved.get() ? null : service;
+        LOGGER.info("Adding OSGi service [{}]", OSGiUtil.getServiceDesc(reference));
+        return this.addingService(super.addingService(reference));
     }
 
     /**

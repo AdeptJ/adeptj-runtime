@@ -67,7 +67,7 @@ public enum FrameworkManager {
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
 
-    private static final String LOGGER_CFG_FACTORY_LISTENER_FILTER = "(|(logger.names=*)(logger.level=*))";
+    private static final String LOGGER_CFG_FACTORY_FILTER = "(|(logger.names=*)(logger.level=*))";
 
     private Framework framework;
 
@@ -84,15 +84,15 @@ public enum FrameworkManager {
             long startTimeFramework = System.nanoTime();
             this.framework.start();
             LOGGER.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
-            BundleContext systemBundleContext = this.framework.getBundleContext();
+            BundleContext bundleContext = this.framework.getBundleContext();
             this.frameworkListener = new FrameworkLifecycleListener();
-            systemBundleContext.addFrameworkListener(this.frameworkListener);
-            BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
+            bundleContext.addFrameworkListener(this.frameworkListener);
             this.serviceListener = new LoggerConfigFactoryListener();
-            systemBundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_LISTENER_FILTER);
+            bundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_FILTER);
+            BundleContextHolder.getInstance().setBundleContext(bundleContext);
             this.provisionBundles();
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
-                    systemBundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
+                    bundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Failed to start OSGi Framework!!", ex);
             // Stop the Framework if the Bundles throws exception.

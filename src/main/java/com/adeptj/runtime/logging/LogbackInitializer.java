@@ -43,13 +43,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
-    private static final String INIT_MSG = "Logback initialized in [{}] ms!!";
-
-    private static final String LOGGER_NAME = "com.adeptj.runtime.logging.LogbackInitializer";
+    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
 
     /**
+     * See class description for details.
+     *
      * @param loggerContext the {@link LoggerContext}
-     * @see class description for details.
      */
     @Override
     public void configure(LoggerContext loggerContext) {
@@ -64,7 +63,7 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // Update level and add appenders to ROOT Logger
         logbackManager.changeLevelAndAddAppendersToRootLogger(loggingCfg);
         // Add all the loggers defined in server.conf logging section.
-        logbackManager.addConfigLoggers(loggingCfg);
+        logbackManager.addServerConfigLoggers(loggingCfg);
         // SLF4J JUL Bridge.
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
@@ -72,7 +71,7 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         logbackManager.initLevelChangePropagator();
         // Finally start LoggerContext and print status information.
         loggerContext.start();
-        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-        loggerContext.getLogger(LOGGER_NAME).info(INIT_MSG, Times.elapsedMillis(startTime));
+        StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
+        loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
     }
 }

@@ -29,8 +29,12 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
+import static org.osgi.framework.FrameworkEvent.ERROR;
 import static org.osgi.framework.FrameworkEvent.STARTED;
+import static org.osgi.framework.FrameworkEvent.STOPPED;
 import static org.osgi.framework.FrameworkEvent.STOPPED_UPDATE;
 
 /**
@@ -56,20 +60,24 @@ public class FrameworkLifecycleListener implements FrameworkListener {
         switch (event.getType()) {
             case STARTED:
                 LOGGER.info("Handling OSGi Framework Restart!!");
-                BundleContext systemBundleContext = event.getBundle().getBundleContext();
-                BundleContextHolder.getInstance().setBundleContext(systemBundleContext);
+                BundleContext bundleContext = event.getBundle().getBundleContext();
+                BundleContextHolder.getInstance().setBundleContext(bundleContext);
                 // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
                 ServletContextHolder.getInstance()
-                        .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, systemBundleContext);
+                        .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, bundleContext);
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                ServiceTrackers.getInstance().openDispatcherServletTracker(systemBundleContext);
+                ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
                 break;
+            case STOPPED:
             case STOPPED_UPDATE:
                 LOGGER.info("Closing DispatcherServletTracker!!");
                 ServiceTrackers.getInstance().closeDispatcherServletTracker();
                 LOGGER.info("Closing EventDispatcherTracker!!");
                 ServiceTrackers.getInstance().closeEventDispatcherTracker();
+                break;
+            case ERROR:
+                Optional.ofNullable(event.getThrowable()).ifPresent(th -> LOGGER.error(th.getMessage(), th));
                 break;
             default:
                 // log it and ignore as we are not interested in any other event.

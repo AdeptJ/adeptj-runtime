@@ -42,10 +42,9 @@ final class SocketOptions extends BaseOptions {
     @Override
     void setOptions(Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
-        undertowConfig.getConfig(SOCKET_OPTIONS)
-                .entrySet()
-                .forEach(entry -> builder.setSocketOption(this.getOption(entry.getKey()), entry.getValue()
-                        .unwrapped()));
+        undertowConfig.getObject(SOCKET_OPTIONS)
+                .unwrapped()
+                .forEach((key, val) -> builder.setSocketOption(this.getOption(key), val));
         this.logger.info("Undertow SocketOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 }
