@@ -1323,7 +1323,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-sql2o</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.0</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1507,7 +1507,7 @@
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-mongodb</artifactId>
-                    <version>1.0.0.Final</version>
+                    <version>1.0.0</version>
                     <scope>provided</scope>
                 </dependency>
 
