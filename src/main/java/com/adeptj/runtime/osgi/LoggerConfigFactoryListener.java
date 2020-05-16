@@ -50,7 +50,7 @@ public class LoggerConfigFactoryListener implements ServiceListener {
 
     @Override
     public void serviceChanged(ServiceEvent event) {
-        this.lock.tryLock();
+        this.lock.lock();
         try {
             LogbackManager logbackManager = LogbackManagerHolder.getInstance().getLogbackManager();
             switch (event.getType()) {

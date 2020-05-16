@@ -34,7 +34,9 @@ public enum BridgeServletConfigHolder {
     private ServletConfig bridgeServletConfig;
 
     public void setBridgeServletConfig(ServletConfig bridgeServletConfig) { // NOSONAR
-        this.bridgeServletConfig = bridgeServletConfig;
+        if (this.bridgeServletConfig == null) {
+            this.bridgeServletConfig = bridgeServletConfig;
+        }
     }
 
     public ServletConfig getBridgeServletConfig() {

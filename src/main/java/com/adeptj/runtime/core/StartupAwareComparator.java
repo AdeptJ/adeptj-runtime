@@ -22,6 +22,7 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.StartupOrder;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -29,7 +30,9 @@ import java.util.Comparator;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class StartupAwareComparator implements Comparator<Class<?>> {
+public class StartupAwareComparator implements Comparator<Class<?>>, Serializable {
+
+    private static final long serialVersionUID = -5354300390947831684L;
 
     @Override
     public int compare(Class<?> startupAwareFirst, Class<?> startupAwareSecond) {
