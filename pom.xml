@@ -457,6 +457,7 @@
         <dependency>
             <groupId>jakarta.enterprise.concurrent</groupId>
             <artifactId>jakarta.enterprise.concurrent-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -483,6 +484,7 @@
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
             <version>${jakarta.xml.bind-api.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -549,12 +551,14 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -636,6 +640,7 @@
             <groupId>org.trimou</groupId>
             <artifactId>trimou-core</artifactId>
             <version>${trimou-core.version}</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -648,16 +653,6 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.errorprone</groupId>
-                    <artifactId>error_prone_annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.checkerframework</groupId>
-                    <artifactId>checker-qual</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -671,32 +666,12 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml</groupId>
-                    <artifactId>classmate</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.microprofile.config</groupId>
             <artifactId>microprofile-config-api</artifactId>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.annotation.versioning</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.enterprise</groupId>
-                    <artifactId>cdi-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -747,11 +722,13 @@
         <dependency>
             <groupId>at.favre.lib</groupId>
             <artifactId>bytes</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>at.favre.lib</groupId>
             <artifactId>bcrypt</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JAX-B Implementation Dependencies | These are unavailable on JDK11-->
@@ -760,18 +737,21 @@
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
             <version>${jaxb-runtime.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.sun.istack</groupId>
             <artifactId>istack-commons-runtime</artifactId>
             <version>${istack-commons-runtime.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>txw2</artifactId>
             <version>${txw2.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Misc Dependencies End -->
@@ -790,11 +770,18 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.framework.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi.promise</artifactId>
+            <artifactId>org.osgi.util.function</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.util.promise</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -900,16 +887,6 @@
             <artifactId>org.apache.felix.webconsole</artifactId>
             <version>${felix.webconsole.version}</version>
             <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.compendium</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -1184,6 +1161,7 @@
                     <groupId>org.fusesource.jansi</groupId>
                     <artifactId>jansi</artifactId>
                     <version>${jansi.version}</version>
+                    <scope>compile</scope>
                 </dependency>
 
             </dependencies>
@@ -1260,12 +1238,6 @@
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jsr353</artifactId>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>javax.json</groupId>
-                            <artifactId>javax.json-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
             </dependencies>
@@ -1397,14 +1369,12 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                    <version>${mysql-connector-java.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>com.google.protobuf</groupId>
                     <artifactId>protobuf-java</artifactId>
-                    <version>${protobuf-java.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1421,7 +1391,6 @@
                 <dependency>
                     <groupId>org.postgresql</groupId>
                     <artifactId>postgresql</artifactId>
-                    <version>${postgresql.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1444,7 +1413,6 @@
                 <dependency>
                     <groupId>org.mariadb.jdbc</groupId>
                     <artifactId>mariadb-java-client</artifactId>
-                    <version>${mariadb-java-client.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1461,49 +1429,31 @@
                 <dependency>
                     <groupId>org.mongodb</groupId>
                     <artifactId>bson</artifactId>
-                    <version>${mongo.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mongodb</groupId>
                     <artifactId>mongodb-driver-core</artifactId>
-                    <version>${mongo.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mongodb</groupId>
                     <artifactId>mongodb-driver-sync</artifactId>
-                    <version>${mongo.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mongojack</groupId>
                     <artifactId>mongojack</artifactId>
-                    <version>${mongojack.version}</version>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.fasterxml.jackson.core</groupId>
-                            <artifactId>jackson-databind</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>com.fasterxml.jackson.datatype</groupId>
-                            <artifactId>com.fasterxml.jackson.core</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>javax.persistence</groupId>
-                            <artifactId>javax.persistence-api</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
                 <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-mongodb</artifactId>
-                    <version>1.0.0</version>
+                    <version>${adeptj-modules-data-mongodb.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1545,12 +1495,6 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-email</artifactId>
                     <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>com.sun.mail</groupId>
-                            <artifactId>javax.mail</artifactId>
-                        </exclusion>
-                    </exclusions>
                 </dependency>
 
             </dependencies>
