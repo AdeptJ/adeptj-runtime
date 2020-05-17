@@ -796,6 +796,12 @@
             <artifactId>org.apache.felix.systemready</artifactId>
             <version>${felix.systemready.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ops4j.pax.url</groupId>
+                    <artifactId>pax-url-aether</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -896,12 +902,8 @@
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.osgi</groupId>
-                    <artifactId>org.osgi.compendium</artifactId>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -1568,7 +1570,8 @@
                                     <includeScope>runtime</includeScope>
                                     <excludeArtifactIds>
                                         org.apache.felix.http.base,
-                                        org.osgi.annotation.versioning
+                                        org.osgi.annotation.versioning,
+                                        animal-sniffer-annotations
                                     </excludeArtifactIds>
                                     <!-- All libraries will be copied here -->
                                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
