@@ -27,8 +27,11 @@
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
+            <!-- This is to exclude adeptj-runtime.jar to be added in the lib itself. -->
             <excludes>
                 <exclude>${project.groupId}:${project.artifactId}:jar:*</exclude>
+                <exclude>org.codehaus.mojo:animal-sniffer-annotations:jar:*</exclude>
+                <exclude>org.osgi:org.osgi.annotation.versioning:jar:*</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

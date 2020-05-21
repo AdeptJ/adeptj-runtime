@@ -50,9 +50,9 @@
         <jboss-logging-processor.version>2.2.1.Final</jboss-logging-processor.version>
         <jdeparser.version>2.0.3.Final</jdeparser.version>
         <jboss-classfilewriter.version>1.2.4.Final</jboss-classfilewriter.version>
-        <maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
+        <maven-shade-plugin.version>3.2.3</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
-        <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <jansi.version>1.18</jansi.version>
         <trimou-core.version>2.5.0.Final</trimou-core.version>
         <classmate.version>1.5.1</classmate.version>
@@ -1286,14 +1286,13 @@
 
         <profile>
 
-            <id>Sql2o</id>
+            <id>MyBatis</id>
 
             <dependencies>
 
                 <dependency>
-                    <groupId>com.adeptj</groupId>
-                    <artifactId>adeptj-modules-data-sql2o</artifactId>
-                    <version>1.0.0</version>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
                     <scope>provided</scope>
                 </dependency>
 
@@ -1307,7 +1306,7 @@
 
             <dependencies>
 
-                <!-- EclipseLink 2.7.6 (JPA 2.2) Dependencies -->
+                <!-- EclipseLink 2.7.7 (JPA 2.2) Dependencies -->
 
                 <dependency>
                     <groupId>org.eclipse.persistence</groupId>
