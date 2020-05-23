@@ -192,7 +192,7 @@ public final class LogbackManager {
         this.initConsoleAppender(loggingCfg);
         this.initRollingFileAppender(loggingCfg);
         this.contextUtil.addInfo(APPENDERS_REINITIALIZED_MSG);
-        this.changeLevelAndAddAppendersToRootLogger(loggingCfg);
+        this.configureRootLogger(loggingCfg);
         this.contextUtil.addInfo(ROOT_REINITIALIZED_MSG);
         // Reconfigure server config loggers.
         this.addServerConfigLoggers(loggingCfg);
@@ -263,7 +263,7 @@ public final class LogbackManager {
         logger.addAppender(this.fileAppender);
     }
 
-    void changeLevelAndAddAppendersToRootLogger(Config loggingCfg) {
+    void configureRootLogger(Config loggingCfg) {
         Logger root = this.loggerContext.getLogger(ROOT_LOGGER_NAME);
         root.setLevel(Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
         root.addAppender(this.consoleAppender);

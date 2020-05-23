@@ -61,7 +61,7 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // Initialize RollingFileAppender.
         logbackManager.initRollingFileAppender(loggingCfg);
         // Update level and add appenders to ROOT Logger
-        logbackManager.changeLevelAndAddAppendersToRootLogger(loggingCfg);
+        logbackManager.configureRootLogger(loggingCfg);
         // Add all the loggers defined in server.conf logging section.
         logbackManager.addServerConfigLoggers(loggingCfg);
         // SLF4J JUL Bridge.

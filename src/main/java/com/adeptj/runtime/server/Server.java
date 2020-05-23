@@ -28,7 +28,6 @@ import com.adeptj.runtime.common.Lifecycle;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.SslContextFactory;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.common.Verb;
 import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
@@ -122,7 +121,7 @@ import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
 import static com.adeptj.runtime.server.ServerConstants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
-import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSIONID_ON_LOGIN;
+import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSION_ID_ON_LOGIN;
 import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
@@ -262,7 +261,7 @@ public final class Server implements Lifecycle {
                 LOGGER.debug("Completed remaining requests successfully!!");
             }
         } catch (InterruptedException ie) {
-            LOGGER.error("Error while waiting for pending request to complete!!", ie);
+            LOGGER.error("Error while waiting for pending request(s) to complete!!", ie);
             // SONAR - "InterruptedException" should not be ignored
             // Can't really rethrow it as we are yet to stop the server and anyway it's a shutdown hook
             // and JVM itself will be shutting down shortly.
@@ -418,7 +417,7 @@ public final class Server implements Lifecycle {
     private Set<HttpString> allowedMethods(Config cfg) {
         return cfg.getStringList(KEY_ALLOWED_METHODS)
                 .stream()
-                .map(Verb::from)
+                .map(HttpString::tryFromString)
                 .collect(Collectors.toSet());
     }
 
@@ -511,7 +510,7 @@ public final class Server implements Lifecycle {
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
                 .setDefaultSessionTimeout(this.sessionTimeout(cfg))
-                .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSIONID_ON_LOGIN))
+                .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN))
                 .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
                 .setIdentityManager(new SimpleIdentityManager(cfg))
                 .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))

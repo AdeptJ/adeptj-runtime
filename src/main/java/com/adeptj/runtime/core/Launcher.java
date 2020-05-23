@@ -58,8 +58,6 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
  */
 public final class Launcher {
 
-    private static final String SYS_PROP_ENABLE_SYSTEM_EXIT = "enable.system.exit";
-
     // Deny direct instantiation.
     private Launcher() {
     }
@@ -81,22 +79,23 @@ public final class Launcher {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
+        Launcher launcher = new Launcher();
         try {
-            pauseForDebug();
+            launcher.pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            Map<String, String> runtimeArgs = parseArgs(args);
+            Map<String, String> runtimeArgs = launcher.parseArgs(args);
             Lifecycle lifecycle = new Server();
             lifecycle.start(runtimeArgs);
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
-            launchBrowser(runtimeArgs);
+            launcher.launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
-            shutdownJvm();
+            launcher.shutdownJvm(logger);
         }
     }
 
-    private static void pauseForDebug() throws InterruptedException {
+    private void pauseForDebug() throws InterruptedException {
         // Useful for debugging the server startup in development mode.
         if (Environment.isDev()) {
             Integer waitTime = Integer.getInteger("wait.time.for.debug.attach", 10);
@@ -105,13 +104,13 @@ public final class Launcher {
         }
     }
 
-    private static Map<String, String> parseArgs(String[] args) {
+    private Map<String, String> parseArgs(String[] args) {
         return Stream.of(args)
                 .map(cmd -> cmd.split(REGEX_EQ))
                 .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
     }
 
-    private static void launchBrowser(Map<String, String> commands) {
+    private void launchBrowser(Map<String, String> commands) {
         if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
             try {
                 Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL,
@@ -123,8 +122,7 @@ public final class Launcher {
         }
     }
 
-    private static void shutdownJvm() {
-        Logger logger = LoggerFactory.getLogger(Launcher.class);
+    private void shutdownJvm(Logger logger) {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
                 .ifPresent(context -> {
@@ -134,8 +132,6 @@ public final class Launcher {
         // Let the LOGBACK cleans up it's state.
         SLF4JBridgeHandler.uninstall();
         LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
-        if (Boolean.getBoolean(SYS_PROP_ENABLE_SYSTEM_EXIT)) {
-            System.exit(-1);
-        }
+        System.exit(-1); // NOSONAR
     }
 }

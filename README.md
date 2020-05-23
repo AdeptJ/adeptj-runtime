@@ -4,8 +4,8 @@
    <img src="https://img.shields.io/badge/license-Apache%202-blue.svg">  
   </a>
   
-  <a href="http://osgi.org">
-   <img src="https://img.shields.io/badge/OSGi-R6-f08d1c.svg?style=flat">
+  <a href="https://docs.osgi.org/specification/#release-7">
+   <img src="https://img.shields.io/badge/OSGi-R7-orange?style=flat">
   </a>
   
   <a href="https://travis-ci.org/AdeptJ/adeptj-runtime/builds">
@@ -36,52 +36,50 @@
 
 **AdeptJ Runtime**
 
-**Highly performant, dynamic, modular(OSGi based) runtime for developing/deploying modern WebApps and MicroServices.**
+**Highly performant, dynamic, modular(OSGi based) runtime for developing modern RESTful applications.**
 
 **Built upon**
 
 1. High performance [Undertow](http://undertow.io/) web server.
 2. [OSGi](https://www.osgi.org) Framework R7(Apache [Felix](http://felix.apache.org/) as implementation).
 
-**Uber Jar is ~30MB in size with below mentioned modules, starts in ~1500ms and low on resources**
-
-**Minimal runtime(OSGi, Undertow and some supporting bundles) is ~10MB, starts in ~800ms**
+**Minimal runnable jar is ~30MB in size with below mentioned modules, starts in ~2500ms and low on resources**
 
 **Modules:**
 
-1. DI (OSGi Declarative Services)
-2. JAX-RS 2.0 (RESTEasy) with JWT support
-3. Web Security Framework
-   - Apache Shiro
-   - ESAPI and related modules - (Only if template engine is opted)
-4. Persistence(SQL/NOSQL)
-   - JPA or MongoDB
-5. Hikari Datasource/JDBC Connection Pool Provider(Only if JPA is opted)
-6. HTML Template Engine - Trimou/Thymeleaf (Optional)
-7. I18n/ResourceBundle Support
+1. Dependency Injection (OSGi Declarative Services).
+2. JAX-RS 2.1 (RESTEasy v4.5.3) with JWT support.
+3. JWT module for creating and verifying the JWTs.
+4. Persistence(SQL/NO-SQL) layer - JPA(EclipseLink v2.7.7) or MyBatis v3.5.4 or MongoDB v4.0.2.
+5. Hikari JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
+6. Caffeine cache.
+7. Logback loggers - add or remove loggers in running server which will survive the server restart.
+8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256 or 384 or 512) and encryption/decryption with (AES/GCM/NoPadding).
+9. Java Bean Validation(Hibernate Validator).
 
+Most of the services are highly configurable using OSGi Configuration Admin.
 
 The platform embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Make sure you have JDK 8+ and Apache Maven 3.2.5+ installed
-2. Now clone adeptj-runtime
-2. cd adeptj-runtime
-3. From adeptj-runtime directory itself execute - ./etc/build.sh
-4. Above step will create AdeptJ Runtime Uber jar.
-4. Now from adeptj-runtime directory itself execute - ./bin/start.sh
-5. Start script will work on Jdk8, 9, 10 and so on.
-6. Go to [AdeptJ Tools Dashboard](http://localhost:9007/tools/dashboard) or [AdeptJ OSGi Console](http://localhost:9007/system/console)
+1. Make sure you have JDK 11+ and Apache Maven 3.6.x+ installed
+2. Since adeptj-runtime needs adeptj-modules therefore clone [adeptj-modules](https://github.com/AdeptJ/adeptj-modules) and build it locally by running mvn clean install in adeptj-modules base directory.
+2. Now come back to the adeptj-runtime directory.
+3. From adeptj-runtime directory itself execute this command ./etc/build.sh
+4. Above step will create AdeptJ Runtime Uber jar with the /lib directory on the classpath.
+4. Now from adeptj-runtime directory itself execute this command ./bin/start.sh
+5. Start script will work on JDK 10 and so on.
+6. Go to [AdeptJ OSGi WebConsole](http://localhost:8080/system/console) to configure the services.
 7. System will ask for username/password, provide the default ones [admin/admin]
 
 **Debug options:**
 
-If the AdeptJ Runtime was started using the script provided then it runs in debug mode by default.
+Start AdeptJ Runtime with jpda option to run it in debug mode(port 8000) i.e ./bin/start.sh jpda
 
-Start Parameters and VM arguments. Most of them provided in start script.
+Start Parameters and VM arguments, most of these provided in start script.
 
-1. For specifying port: -Dadeptj.rt.port=9007
+1. For specifying port: -Dadeptj.rt.port=8080
 2. For checking port eagerly: -Dadeptj.rt.port.check=true
 3. Enable AJP: -Denable.ajp=true
 4. Enable HTTP2: -Denable.http2=true
@@ -91,6 +89,16 @@ Start Parameters and VM arguments. Most of them provided in start script.
 8. Command line argument for launching browser when server starts: launchBrowser=true
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
+
+**Roadmap**:
+
+1. Extensive code coverage for AdeptJ Runtime and Modules.
+2. Modules for popular NoSQL databases.
+3. OAuth2(client and server) modules.
+
+**Want to contribute**:
+
+Please feel free to fork the repos or drop a note to me @ irakeshkAToutlookDOTcom
 
 **Sponsors**:
 

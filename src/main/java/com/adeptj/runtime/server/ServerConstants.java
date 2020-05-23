@@ -74,7 +74,7 @@ final class ServerConstants {
 
     static final String KEY_HTTP_ONLY = "common.session-cookie-httpOnly";
 
-    static final String KEY_CHANGE_SESSIONID_ON_LOGIN = "common.change-sessionId-on-login";
+    static final String KEY_CHANGE_SESSION_ID_ON_LOGIN = "common.change-sessionId-on-login";
 
     static final String KEY_INVALIDATE_SESSION_ON_LOGOUT = "common.invalidate-session-on-logout";
 
