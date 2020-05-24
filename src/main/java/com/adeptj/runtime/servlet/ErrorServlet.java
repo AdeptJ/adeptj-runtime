@@ -22,7 +22,6 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.RequestUtil;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.templating.TemplateData;
 import com.adeptj.runtime.templating.TemplateEngine;
 import com.adeptj.runtime.templating.TemplateEngineContext;
@@ -33,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
-import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_CODES;
+import static javax.servlet.DispatcherType.ERROR;
 
 /**
  * ErrorServlet that serves the error page w.r.t error coded(401, 403, 404, 500).
@@ -53,9 +52,9 @@ public class ErrorServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
-        int status = resp.getStatus();
-        if (Configs.of().undertow().getIntList(KEY_ERROR_HANDLER_CODES).contains(status)) {
-            String template = String.format(ERROR_TEMPLATE_FMT, status);
+        // Make sure the below code is invoked only on an error dispatch.
+        if (req.getDispatcherType() == ERROR) {
+            String template = String.format(ERROR_TEMPLATE_FMT, resp.getStatus());
             TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
                 builder.templateData(new TemplateData(req.getLocale()).with(KEY_EXCEPTION, RequestUtil.getException(req)));

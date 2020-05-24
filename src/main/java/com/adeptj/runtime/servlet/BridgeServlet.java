@@ -53,7 +53,7 @@ public class BridgeServlet extends HttpServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServlet.class);
 
-    private static final String UNAVAILABLE_MSG = "Can't process request: [{}], DispatcherServlet is unavailable!!";
+    private static final String UNAVAILABLE_MSG = "Can't process request: [{} {}], DispatcherServlet is unavailable!!";
 
     private static final String PROCESSING_REQUEST_MSG = "Processing [{}] request for [{}]";
 
@@ -83,7 +83,7 @@ public class BridgeServlet extends HttpServlet {
         }
         HttpServlet dispatcherServlet = ServiceTrackers.getInstance().getDispatcherServlet();
         if (dispatcherServlet == null) {
-            LOGGER.error(UNAVAILABLE_MSG, req.getRequestURI());
+            LOGGER.error(UNAVAILABLE_MSG, req.getMethod(), req.getRequestURI());
             ResponseUtil.unavailable(resp);
             return;
         }

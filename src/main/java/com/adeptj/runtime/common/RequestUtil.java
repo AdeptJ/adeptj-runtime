@@ -51,7 +51,7 @@ public final class RequestUtil {
     }
 
     public static String getException(HttpServletRequest req) {
-        return ExceptionUtils.getStackTrace((Exception) RequestUtil.getAttribute(req, ERROR_EXCEPTION));
+        return ExceptionUtils.getStackTrace((Throwable) RequestUtil.getAttribute(req, ERROR_EXCEPTION));
     }
 
     public static void logout(HttpServletRequest req) {
