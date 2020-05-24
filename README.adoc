@@ -36,7 +36,7 @@
 
 **AdeptJ Runtime**
 
-**Highly performant, dynamic, modular(OSGi based) runtime for developing modern RESTful applications.**
+**High performance, dynamic, modular runtime for RESTful APIs, MicroServices and WebApps.**
 
 **Built upon**
 
@@ -63,15 +63,17 @@ The platform embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Make sure you have JDK 11+ and Apache Maven 3.6.x+ installed
-2. Since adeptj-runtime needs adeptj-modules therefore clone [adeptj-modules](https://github.com/AdeptJ/adeptj-modules) and build it locally by running mvn clean install in adeptj-modules base directory.
-2. Now come back to the adeptj-runtime directory.
-3. From adeptj-runtime directory itself execute this command ./etc/build.sh
-4. Above step will create AdeptJ Runtime Uber jar with the /lib directory on the classpath.
-4. Now from adeptj-runtime directory itself execute this command ./bin/start.sh
-5. Start script will work on JDK 10 and so on.
-6. Go to [AdeptJ OSGi WebConsole](http://localhost:8080/system/console) to configure the services.
-7. System will ask for username/password, provide the default ones [admin/admin]
+1. Make sure you have JDK 11+ and Apache Maven 3.6.x+ installed.
+2. Clone [adeptj-parent](https://github.com/AdeptJ/adeptj-parent) and run **mvn clean install** to have the current parent version in local .m2
+3. Since adeptj-runtime needs adeptj-modules therefore clone [adeptj-modules](https://github.com/AdeptJ/adeptj-modules) and build it locally by running **mvn clean install** in adeptj-modules base directory.
+4. Now clone [adeptj-runtime](https://github.com/AdeptJ/adeptj-runtime).
+5. From adeptj-runtime directory itself execute this command ./etc/build.sh
+6. Above step will create AdeptJ Runtime Uber jar with the /lib directory on the classpath.
+7. Now from adeptj-runtime directory itself execute this command ./bin/start.sh
+8. Start script will work on JDK 10 and so on.
+9. Go to [AdeptJ OSGi WebConsole](http://localhost:8080/system/console) to configure the services.
+10. System will ask for username/password, provide the default ones [admin/admin]
+11. For examples on how to consume the modules please look into [adeptj-modules-examples](https://github.com/AdeptJ/adeptj-modules-examples)
 
 **Debug options:**
 
@@ -85,7 +87,7 @@ Start Parameters and VM arguments, most of these provided in start script.
 4. Enable HTTP2: -Denable.http2=true
 5. Enable Async Logging: -Dasync.logging=true
 6. Felix Logging Level: -Dfelix.log.level=3
-7. For providing server mode: -Dadeptj.rt.mode=PROD or mode [DEV] is default
+7. For providing server mode: -Dadeptj.rt.mode=PROD or DEV, PROD is default
 8. Command line argument for launching browser when server starts: launchBrowser=true
 
 **NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
@@ -98,7 +100,7 @@ Start Parameters and VM arguments, most of these provided in start script.
 
 **Want to contribute**:
 
-Please feel free to fork the repos or drop a note to me @ irakeshkAToutlookDOTcom
+Please feel free to fork the repos or drop a note to me @ irakeshkAToutlookDOTcom so that I could add you to the AdeptJ organization.
 
 **Sponsors**:
 
