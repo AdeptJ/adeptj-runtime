@@ -68,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.xnio.OptionMap;
-import org.xnio.Options;
 import org.xnio.Xnio;
 import org.xnio.XnioWorker;
 
@@ -167,6 +166,7 @@ import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.xnio.Options.TCP_NODELAY;
+import static org.xnio.Options.WORKER_IO_THREADS;
 import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
 import static org.xnio.Options.WORKER_TASK_MAX_THREADS;
 
@@ -196,15 +196,15 @@ public final class Server implements Lifecycle {
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo());
+        this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo(undertowConf));
         this.deploymentManager.deploy();
         try {
-            this.rootHandler = this.rootHandler(this.deploymentManager.start());
+            this.rootHandler = this.rootHandler(this.deploymentManager.start(), undertowConf);
             Builder undertowBuilder = Undertow.builder();
-            this.setWorkerOptions(undertowBuilder);
+            this.setWorkerOptions(undertowBuilder, undertowConf);
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
             new ServerOptions().setOptions(undertowBuilder, undertowConf);
-            this.undertow = this.addHttpsListener(undertowBuilder)
+            this.undertow = this.addHttpsListener(undertowBuilder, undertowConf)
                     .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
@@ -289,7 +289,7 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private void setWorkerOptions(Builder builder) {
+    private void setWorkerOptions(Builder builder, Config undertowConf) {
         if (Environment.isProd()) {
             // Note : For a 16 core system, number of worker task core and max threads will be.
             // 1. core task thread: 128 (16[cores] * 8)
@@ -297,7 +297,7 @@ public final class Server implements Lifecycle {
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
-            Config workerOptions = Configs.of().undertow().getConfig(KEY_WORKER_OPTIONS);
+            Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
             int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
             LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
@@ -319,9 +319,9 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private Builder addHttpsListener(Builder builder) throws GeneralSecurityException {
+    private Builder addHttpsListener(Builder builder, Config undertowConf) throws GeneralSecurityException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = Configs.of().undertow().getConfig(KEY_HTTPS);
+            Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
             if (!Environment.useProvidedKeyStore()) {
                 System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
@@ -391,10 +391,10 @@ public final class Server implements Lifecycle {
      * 5. And Finally ServletInitialHandler
      *
      * @param servletInitialHandler the {@link io.undertow.servlet.handlers.ServletInitialHandler}
+     * @param cfg                   the undertow server config object.
      * @return GracefulShutdownHandler as the root handler
      */
-    private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler) {
-        Config cfg = Configs.of().undertow();
+    private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
@@ -481,7 +481,7 @@ public final class Server implements Lifecycle {
         XnioWorker worker = null;
         try {
             worker = Xnio.getInstance().createWorker(OptionMap.builder()
-                    .set(Options.WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
+                    .set(WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
                     .set(WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
                     .set(WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
                     .set(TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
@@ -500,8 +500,7 @@ public final class Server implements Lifecycle {
         return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
     }
 
-    private DeploymentInfo deploymentInfo() {
-        Config cfg = Configs.of().undertow();
+    private DeploymentInfo deploymentInfo(Config cfg) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(CONTEXT_PATH)
