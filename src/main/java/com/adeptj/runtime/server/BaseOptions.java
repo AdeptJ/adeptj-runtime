@@ -41,18 +41,29 @@ public abstract class BaseOptions {
 
     abstract void setOptions(Undertow.Builder builder, Config undertowConfig);
 
+    /**
+     * Search the given {@link Option} first in UndertowOptions class and if not found then Options class.
+     *
+     * @param name the option name
+     * @param <T>  the option type
+     * @return Option of correct resolved type as per the field type.
+     */
     @SuppressWarnings("unchecked")
     <T> Option<T> getOption(String name) {
+        Option<T> option = null;
         try {
-            Field field = FieldUtils.getField(UndertowOptions.class, name);
+            Field field = FieldUtils.getDeclaredField(UndertowOptions.class, name);
             if (field == null) {
-                field = FieldUtils.getField(Options.class, name);
+                field = FieldUtils.getDeclaredField(Options.class, name);
             }
-            return field == null ? null : (Option<T>) field.get(null);
+            if (field == null) {
+                this.logger.error("[{}] field is not found either in class UndertowOptions or Options", name);
+            }
+            option = (field == null ? null : (Option<T>) field.get(null));
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             this.logger.error("Exception while accessing field: [{}]", name, ex);
         }
-        return null;
+        return option;
     }
 
 }

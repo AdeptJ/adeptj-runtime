@@ -309,10 +309,10 @@ public final class Server implements Lifecycle {
             builder.setWorkerOption(WORKER_TASK_CORE_THREADS, Math.max(calcCoreTaskThreads, cfgCoreTaskThreads));
             // defaults to double of [worker-task-core-threads] i.e 128
             int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
-            LOGGER.info("Configured worker task max threads: [{}]", cfgCoreTaskThreads);
+            LOGGER.info("Configured worker task max threads: [{}]", cfgMaxTaskThreads);
             int calcMaxTaskThreads = calcCoreTaskThreads *
                     Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
-            LOGGER.info("Calculated worker task max threads: [{}]", cfgCoreTaskThreads);
+            LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
             builder.setWorkerOption(WORKER_TASK_MAX_THREADS, Math.max(calcMaxTaskThreads, cfgMaxTaskThreads));
             builder.setWorkerOption(TCP_NODELAY, workerOptions.getBoolean(KEY_TCP_NO_DELAY));
             LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
