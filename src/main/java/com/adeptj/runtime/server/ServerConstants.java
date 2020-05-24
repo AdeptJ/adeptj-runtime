@@ -36,11 +36,9 @@ final class ServerConstants {
 
     static final int WORKER_TASK_THREAD_MULTIPLIER = 8;
 
-    static final String KEY_WORKER_TASK_MAX_THREADS = "worker-task-max-threads";
+    static final String KEY_WORKER_TASK_MAX_THREADS = "WORKER_TASK_MAX_THREADS";
 
-    static final String KEY_WORKER_TASK_CORE_THREADS = "worker-task-core-threads";
-
-    static final String KEY_TCP_NO_DELAY = "tcp-no-delay";
+    static final String KEY_WORKER_TASK_CORE_THREADS = "WORKER_TASK_CORE_THREADS";
 
     static final String KEY_WORKER_OPTIONS = "worker-options";
 
@@ -65,6 +63,8 @@ final class ServerConstants {
     static final String SYS_PROP_REQ_BUFF_MAX_BUFFERS = "req.buff.maxBuffers";
 
     static final String SYS_PROP_MAX_CONCUR_REQ = "max.concurrent.requests";
+
+    static final String SYS_PROP_REQ_LIMIT_QUEUE_SIZE = "req.limit.queue.size";
 
     static final String SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER = "worker.task.thread.multiplier";
 

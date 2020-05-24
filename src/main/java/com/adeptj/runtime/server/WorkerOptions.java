@@ -20,31 +20,34 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.Times;
 import com.typesafe.config.Config;
 import io.undertow.Undertow.Builder;
+import org.xnio.Option;
 
 /**
- * Undertow Socket Options.
+ * Undertow Worker Options.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class SocketOptions extends BaseOptions {
+final class WorkerOptions extends BaseOptions {
 
-    private static final String SOCKET_OPTIONS = "socket-options";
+    private static final String WORKER_OPTIONS = "worker-options";
 
     /**
-     * Configures the socket options dynamically.
+     * Configures the worker options dynamically.
      *
      * @param builder        Undertow.Builder
      * @param undertowConfig Undertow Typesafe Config
      */
     @Override
     void setOptions(Builder builder, Config undertowConfig) {
-        long startTime = System.nanoTime();
-        undertowConfig.getObject(SOCKET_OPTIONS)
+        undertowConfig.getObject(WORKER_OPTIONS)
                 .unwrapped()
-                .forEach((key, val) -> builder.setSocketOption(this.getOption(key), val));
-        this.logger.info("Undertow SocketOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
+                .forEach((key, val) -> builder.setWorkerOption(this.getOption(key), val));
+    }
+
+    <T> WorkerOptions overrideOption(Builder builder, Option<T> option, T value) {
+        builder.setWorkerOption(option, value);
+        return this;
     }
 }

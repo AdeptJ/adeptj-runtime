@@ -49,6 +49,7 @@ import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
+import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.CrawlerSessionManagerConfig;
@@ -110,9 +111,10 @@ import static com.adeptj.runtime.common.Constants.KEY_HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_LOGBACK_STATUS_SERVLET_PATH;
-import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQS;
+import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQUESTS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.common.Constants.KEY_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
@@ -134,7 +136,6 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_REQUES
 import static com.adeptj.runtime.server.ServerConstants.KEY_PROTECTED_PATHS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_PROTECTED_PATHS_SECURED_FOR_METHODS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_SESSION_TIMEOUT;
-import static com.adeptj.runtime.server.ServerConstants.KEY_TCP_NO_DELAY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USER_CREDENTIAL_MAPPING;
 import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECHANISM;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
@@ -155,6 +156,7 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SERVER_HTTPS_PORT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
@@ -196,10 +198,11 @@ public final class Server implements Lifecycle {
         int httpPort = this.handlePortAvailability(httpConf);
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
-        this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo(undertowConf));
-        this.deploymentManager.deploy();
         try {
-            this.rootHandler = this.rootHandler(this.deploymentManager.start(), undertowConf);
+            this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo(undertowConf));
+            this.deploymentManager.deploy();
+            HttpHandler servletHandler = this.deploymentManager.start();
+            this.rootHandler = this.createHandlerChain(servletHandler, undertowConf);
             Builder undertowBuilder = Undertow.builder();
             this.setWorkerOptions(undertowBuilder, undertowConf);
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
@@ -291,31 +294,33 @@ public final class Server implements Lifecycle {
 
     private void setWorkerOptions(Builder builder, Config undertowConf) {
         if (Environment.isProd()) {
+            long startTime = System.nanoTime();
             // Note : For a 16 core system, number of worker task core and max threads will be.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 * 2 = 256
             // Default settings would have set the following.
             // 1. core task thread: 128 (16[cores] * 8)
             // 2. max task thread: 128 (Same as core task thread)
-            Config workerOptions = undertowConf.getConfig(KEY_WORKER_OPTIONS);
+            Config config = undertowConf.getConfig(KEY_WORKER_OPTIONS);
             // defaults to 64
-            int cfgCoreTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_CORE_THREADS);
+            int cfgCoreTaskThreads = config.getInt(KEY_WORKER_TASK_CORE_THREADS);
             LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
             int availableProcessors = Runtime.getRuntime().availableProcessors();
             LOGGER.info("No. of CPU available: [{}]", availableProcessors);
             int calcCoreTaskThreads = availableProcessors *
                     Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
-            builder.setWorkerOption(WORKER_TASK_CORE_THREADS, Math.max(calcCoreTaskThreads, cfgCoreTaskThreads));
             // defaults to double of [worker-task-core-threads] i.e 128
-            int cfgMaxTaskThreads = workerOptions.getInt(KEY_WORKER_TASK_MAX_THREADS);
+            int cfgMaxTaskThreads = config.getInt(KEY_WORKER_TASK_MAX_THREADS);
             LOGGER.info("Configured worker task max threads: [{}]", cfgMaxTaskThreads);
             int calcMaxTaskThreads = calcCoreTaskThreads *
                     Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
             LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
-            builder.setWorkerOption(WORKER_TASK_MAX_THREADS, Math.max(calcMaxTaskThreads, cfgMaxTaskThreads));
-            builder.setWorkerOption(TCP_NODELAY, workerOptions.getBoolean(KEY_TCP_NO_DELAY));
-            LOGGER.info("Undertow Worker Options optimized for AdeptJ Runtime [PROD] mode.");
+            WorkerOptions options = new WorkerOptions();
+            options.setOptions(builder, undertowConf);
+            options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
+                    .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
+            LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
         }
     }
 
@@ -386,15 +391,15 @@ public final class Server implements Lifecycle {
      * 1. GracefulShutdownHandler
      * 2. RequestLimitingHandler
      * 3. AllowedMethodsHandler
-     * 4. PredicateHandler which resolves to either RedirectHandler or SetHeadersHandler
+     * 4. PredicateHandler which resolves to either RedirectHandler or HealthCheckHandler
      * 5. RequestBufferingHandler if request buffering is enabled, wrapped in SetHeadersHandler
      * 5. And Finally ServletInitialHandler
      *
-     * @param servletInitialHandler the {@link io.undertow.servlet.handlers.ServletInitialHandler}
-     * @param cfg                   the undertow server config object.
+     * @param servletHandler the {@link io.undertow.servlet.handlers.ServletInitialHandler}
+     * @param cfg            the undertow server config object.
      * @return GracefulShutdownHandler as the root handler
      */
-    private GracefulShutdownHandler rootHandler(HttpHandler servletInitialHandler, Config cfg) {
+    private GracefulShutdownHandler createHandlerChain(HttpHandler servletHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
@@ -402,15 +407,18 @@ public final class Server implements Lifecycle {
         }
         RedirectHandler contextHandler = Handlers.redirect(DEFAULT_LANDING_PAGE_URI);
         HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
-                new SetHeadersHandler(new RequestBufferingHandler(servletInitialHandler,
+                new SetHeadersHandler(new RequestBufferingHandler(servletHandler,
                         Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
-                new SetHeadersHandler(servletInitialHandler, headers);
+                new SetHeadersHandler(servletHandler, headers);
         HealthCheckHandler healthCheckHandler = new HealthCheckHandler(headersHandler, cfg);
         PredicateHandler predicateHandler = Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                contextHandler, healthCheckHandler);
+                contextHandler,
+                healthCheckHandler);
         AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(predicateHandler, this.allowedMethods(cfg));
-        Integer maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQS));
-        RequestLimitingHandler requestLimitingHandler = new RequestLimitingHandler(maxConcurrentRequests, allowedMethodsHandler);
+        int maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQUESTS));
+        int queueSize = Integer.getInteger(SYS_PROP_REQ_LIMIT_QUEUE_SIZE, cfg.getInt(KEY_REQ_LIMIT_QUEUE_SIZE));
+        RequestLimit limit = new RequestLimit(maxConcurrentRequests, queueSize);
+        RequestLimitingHandler requestLimitingHandler = Handlers.requestLimitingHandler(limit, allowedMethodsHandler);
         return Handlers.gracefulShutdown(requestLimitingHandler);
     }
 

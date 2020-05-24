@@ -63,7 +63,9 @@ public final class Constants {
 
     public static final String CONTENT_TYPE_HTML_UTF8 = "text/html;charset=UTF-8";
 
-    public static final String KEY_MAX_CONCURRENT_REQS = "common.max-concurrent-requests";
+    public static final String KEY_MAX_CONCURRENT_REQUESTS = "common.max-concurrent-requests";
+
+    public static final String KEY_REQ_LIMIT_QUEUE_SIZE = "common.req-limit-queue-size";
 
     public static final String KEY_REQ_BUFF_MAX_BUFFERS = "common.req-buffering-maxBuffers";
 

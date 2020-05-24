@@ -53,6 +53,6 @@ final class ServerOptions extends BaseOptions {
         serverOptionsCfg.getObject(OPTIONS_TYPE_LONG)
                 .unwrapped()
                 .forEach((key, val) -> builder.setServerOption(this.getOption(key), Long.valueOf((Integer) val)));
-        this.logger.info("Undertow ServerOptions set in [{}] ms!!", Times.elapsedMillis(startTime));
+        this.logger.info("Undertow ServerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 }
