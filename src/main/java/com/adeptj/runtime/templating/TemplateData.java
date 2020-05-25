@@ -37,14 +37,16 @@ public final class TemplateData implements Mapper, Iterable<Entry<String, Object
 
     private final Locale locale;
 
-    private final Map<String, Object> variables;
+    private Map<String, Object> variables;
 
     public TemplateData(Locale locale) {
         this.locale = locale;
-        this.variables = new HashMap<>();
     }
 
     public TemplateData with(String key, Object value) {
+        if (this.variables == null) {
+            this.variables = new HashMap<>(8);
+        }
         this.variables.put(key, value);
         return this;
     }
