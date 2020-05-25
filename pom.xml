@@ -1296,6 +1296,13 @@
                     <scope>provided</scope>
                 </dependency>
 
+                <dependency>
+                    <groupId>com.adeptj</groupId>
+                    <artifactId>adeptj-modules-data-mybatis</artifactId>
+                    <version>${adeptj-modules-data-mybatis.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+
             </dependencies>
 
         </profile>
