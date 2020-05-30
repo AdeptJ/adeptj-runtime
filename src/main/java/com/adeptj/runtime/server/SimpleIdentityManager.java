@@ -29,8 +29,10 @@ import io.undertow.security.idm.IdentityManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.Map.Entry;
 
@@ -47,16 +49,16 @@ final class SimpleIdentityManager implements IdentityManager {
     /**
      * User to Roles mapping.
      */
-    private final Map<String, List<String>> userRolesMapping;
+    private final Map<String, Set<String>> rolesByUser;
 
     SimpleIdentityManager(Config cfg) {
-        this.userRolesMapping = new HashMap<>();
+        this.rolesByUser = new HashMap<>();
         for (Entry<String, ConfigValue> entry : cfg.getObject(KEY_USER_ROLES_MAPPING).entrySet()) {
-            List<String> roles = new ArrayList<>();
+            Set<String> roles = new HashSet<>();
             for (ConfigValue role : (ConfigList) entry.getValue()) {
                 roles.add((String) role.unwrapped());
             }
-            this.userRolesMapping.put(entry.getKey(), roles);
+            this.rolesByUser.put(entry.getKey(), roles);
         }
     }
 
@@ -67,7 +69,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(Account account) {
-        return IdentityManagers.verifyAccount(this.userRolesMapping, account) ? account : null;
+        return IdentityManagers.verifyAccount(this.rolesByUser, account) ? account : null;
     }
 
     /**
@@ -75,7 +77,7 @@ final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        return IdentityManagers.verifyCredentials(this.userRolesMapping, id, credential);
+        return IdentityManagers.verifyCredentials(this.rolesByUser, id, credential);
     }
 
     /**

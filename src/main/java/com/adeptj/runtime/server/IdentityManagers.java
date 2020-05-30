@@ -24,9 +24,8 @@ import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility methods for {@link io.undertow.security.idm.IdentityManager}.
@@ -38,8 +37,8 @@ final class IdentityManagers {
     private IdentityManagers() {
     }
 
-    static boolean verifyAccount(Map<String, List<String>> userRolesMapping, Account account) {
-        return userRolesMapping.entrySet()
+    static boolean verifyAccount(Map<String, Set<String>> rolesByUser, Account account) {
+        return rolesByUser.entrySet()
                 .stream()
                 .anyMatch(entry -> StringUtils.equals(entry.getKey(), account.getPrincipal().getName())
                         && entry.getValue().containsAll(account.getRoles()));
@@ -48,16 +47,16 @@ final class IdentityManagers {
     /**
      * Verify the given credentials.
      *
-     * @param userRolesMapping the user to role mapping from configs.
-     * @param id               one that is submitted by client.
-     * @param credential       the submitted user credential.
-     * @return boolean to indicate whether the credentials verification was successful or not.
+     * @param rolesByUser the user to roles mapping from configs.
+     * @param id          one that is submitted by client.
+     * @param credential  the submitted user credential.
+     * @return an Account composed with the Principal and associated roles.
      */
-    static Account verifyCredentials(Map<String, List<String>> userRolesMapping, String id, Credential credential) {
-        return userRolesMapping.entrySet()
+    static Account verifyCredentials(Map<String, Set<String>> rolesByUser, String id, Credential credential) {
+        return rolesByUser.entrySet()
                 .stream()
                 .filter(entry -> StringUtils.equals(entry.getKey(), id) && CredentialMatcher.match(entry.getKey(), credential))
-                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), new HashSet<>(entry.getValue())))
+                .map(entry -> new SimpleAccount(new SimplePrincipal(entry.getKey()), entry.getValue()))
                 .findFirst()
                 .orElse(null);
     }

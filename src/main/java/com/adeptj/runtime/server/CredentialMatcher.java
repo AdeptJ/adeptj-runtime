@@ -29,6 +29,7 @@ import org.h2.mvstore.MVStore;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -55,20 +56,33 @@ final class CredentialMatcher {
         if (StringUtils.isEmpty(username) || ArrayUtils.isEmpty(inputPwd)) {
             return false;
         }
+        byte[] digest = null;
+        byte[] inputPwdBytes = null;
+        byte[] encodedInputPwdBytes = null;
+        byte[] storedPwdBytes = null;
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
             String storedPwd = (String) store.openMap(H2_MAP_ADMIN_CREDENTIALS).get(username);
             if (StringUtils.isEmpty(storedPwd)) {
                 return false;
             }
             ByteBuffer buffer = UTF_8.encode(CharBuffer.wrap(inputPwd));
-            byte[] hash = DigestUtils.sha256(Arrays.copyOf(buffer.array(), buffer.limit()));
-            byte[] inputPwdBytes = Base64.getEncoder().encode(hash);
-            byte[] storedPwdBytes = storedPwd.getBytes(UTF_8);
-            boolean match = Arrays.equals(inputPwdBytes, storedPwdBytes);
-            Arrays.fill(hash, (byte) 0);
-            Arrays.fill(inputPwdBytes, (byte) 0);
-            Arrays.fill(storedPwdBytes, (byte) 0);
-            return match;
+            inputPwdBytes = new byte[buffer.limit()];
+            buffer.get(inputPwdBytes);
+            digest = DigestUtils.sha256(inputPwdBytes);
+            encodedInputPwdBytes = Base64.getEncoder().encode(digest);
+            storedPwdBytes = storedPwd.getBytes(UTF_8);
+            return MessageDigest.isEqual(encodedInputPwdBytes, storedPwdBytes);
+        } finally {
+            nullSafeWipe(digest);
+            nullSafeWipe(inputPwdBytes);
+            nullSafeWipe(encodedInputPwdBytes);
+            nullSafeWipe(storedPwdBytes);
+        }
+    }
+
+    private static void nullSafeWipe(byte[] data) {
+        if (ArrayUtils.isNotEmpty(data)) {
+            Arrays.fill(data, (byte) 0);
         }
     }
 }
