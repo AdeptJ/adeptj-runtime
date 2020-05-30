@@ -1453,6 +1453,12 @@
                 </dependency>
 
                 <dependency>
+                    <groupId>org.mongojack</groupId>
+                    <artifactId>mongojack</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
                     <groupId>com.adeptj</groupId>
                     <artifactId>adeptj-modules-data-mongodb</artifactId>
                     <version>${adeptj-modules-data-mongodb.version}</version>
