@@ -38,11 +38,8 @@ import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * CredentialMatcher, Logic for creating password hash and comparing submitted credential is same as implemented
- * in [org.apache.felix.webconsole.internal.servlet.Password]
- * <p>
- * Because, we want to be consistent with the hashing mechanism used by OSGi Web Console configuration management,
- * but supporting classes available there are package private and therefore can't be accessible to outside world.
+ * CredentialMatcher - utility creates an SHA-256 digest of the supplied password and matches with the one stored
+ * in MVStore.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -56,9 +53,8 @@ final class CredentialMatcher {
         if (StringUtils.isEmpty(username) || ArrayUtils.isEmpty(inputPwd)) {
             return false;
         }
-        byte[] digest = null;
         byte[] inputPwdBytes = null;
-        byte[] encodedInputPwdBytes = null;
+        byte[] digest = null;
         byte[] storedPwdBytes = null;
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
             String storedPwd = (String) store.openMap(H2_MAP_ADMIN_CREDENTIALS).get(username);
@@ -68,14 +64,12 @@ final class CredentialMatcher {
             ByteBuffer buffer = UTF_8.encode(CharBuffer.wrap(inputPwd));
             inputPwdBytes = new byte[buffer.limit()];
             buffer.get(inputPwdBytes);
-            digest = DigestUtils.sha256(inputPwdBytes);
-            encodedInputPwdBytes = Base64.getEncoder().encode(digest);
+            digest = Base64.getEncoder().encode(DigestUtils.sha256(inputPwdBytes));
             storedPwdBytes = storedPwd.getBytes(UTF_8);
-            return MessageDigest.isEqual(encodedInputPwdBytes, storedPwdBytes);
+            return MessageDigest.isEqual(digest, storedPwdBytes);
         } finally {
-            nullSafeWipe(digest);
             nullSafeWipe(inputPwdBytes);
-            nullSafeWipe(encodedInputPwdBytes);
+            nullSafeWipe(digest);
             nullSafeWipe(storedPwdBytes);
         }
     }
