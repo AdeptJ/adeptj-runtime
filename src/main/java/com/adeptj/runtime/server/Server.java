@@ -240,7 +240,7 @@ public final class Server implements Lifecycle {
         } finally {
             SLF4JBridgeHandler.uninstall();
             // Let the Logback cleans up it's state.
-            LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
+            LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
         }
     }
 
@@ -355,7 +355,7 @@ public final class Server implements Lifecycle {
             LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
             SLF4JBridgeHandler.uninstall();
             // Let the LOGBACK cleans up it's state.
-            LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
+            LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
             System.exit(-1); // NOSONAR
         }
         return port;

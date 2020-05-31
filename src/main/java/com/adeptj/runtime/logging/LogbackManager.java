@@ -141,10 +141,8 @@ public final class LogbackManager {
 
     private final ContextUtil contextUtil;
 
-    // These map instances are only initialized when logger config is added first time from OSGi.
-    private Map<String, LoggerConfig> pidConfigMapping;
-
-    private Map<String, LoggerConfig> categoryConfigMapping;
+    // This map instance is only initialized when logger config is added first time from OSGi.
+    private Map<String, LoggerConfig> configByPid;
 
     LogbackManager(LoggerContext loggerContext) {
         this.loggerContext = loggerContext;
@@ -154,7 +152,7 @@ public final class LogbackManager {
         PatternLayout.defaultConverterMap.put(THREAD, TrimThreadNameConverter.class.getName());
     }
 
-    public void stopLoggerContext() {
+    public void stopLogback() {
         this.loggerContext.stop();
     }
 
@@ -164,25 +162,25 @@ public final class LogbackManager {
             String pid = OSGiUtil.getString(reference, SERVICE_PID);
             String level = OSGiUtil.getString(reference, KEY_OSGI_LOGGER_LEVEL);
             boolean additivity = OSGiUtil.getBoolean(reference, KEY_OSGI_LOGGER_ADDITIVITY);
-            LoggerConfig config = new LoggerConfig(pid, categories, level, additivity);
-            categories.forEach(category -> this.categoryConfigMapping.put(category, config));
-            this.pidConfigMapping.put(pid, config);
+            this.configByPid.put(pid, new LoggerConfig(pid, categories, level, additivity));
             this.loggerContext.getLogger(this.getClass()).info(ADDING_LOGGERS_MSG, categories, level);
-            categories.forEach(category -> this.addLogger(category, level, additivity));
+            for (String category : categories) {
+                this.addLogger(category, level, additivity);
+            }
         }
     }
 
     public void resetLoggers(ServiceReference<?> reference) {
         Logger logger = this.loggerContext.getLogger(this.getClass());
         String pid = OSGiUtil.getString(reference, SERVICE_PID);
-        LoggerConfig config = this.pidConfigMapping.remove(pid);
-        // There is no need to reset LoggerContext as logger config was never captured for this pid.
+        LoggerConfig config = this.configByPid.remove(pid);
+        // If LoggerConfig is null for the given pid then there is no need to reset LoggerContext.
+        // It also means that the logger config was never captured for this pid, log and return right away.
         if (config == null) {
             logger.info(NO_LOGGER_CFG_FOR_PID_MSG, pid);
             return;
         }
         long startTime = System.nanoTime();
-        this.categoryConfigMapping.keySet().removeAll(config.getCategories());
         logger.info(REMOVING_LOGGERS_MSG, config.getCategories(), config.getLevel());
         this.contextUtil.addInfo(String.format(RESETTING_LC_MSG, this.loggerContext.getName()));
         this.loggerContext.reset();
@@ -204,35 +202,35 @@ public final class LogbackManager {
     }
 
     private boolean validateCategories(Set<String> categories) {
-        // Lazy initialization of config map instances, don't think we still need a CHM as this method is called
-        // under a ReentrantLock in LoggerConfigFactoryListener.
-        if (this.pidConfigMapping == null) {
-            this.pidConfigMapping = new HashMap<>();
-        }
-        if (this.categoryConfigMapping == null) {
-            this.categoryConfigMapping = new HashMap<>();
-        }
         Logger logger = this.loggerContext.getLogger(this.getClass());
-        // If no categories defined then log as warning and return right away.
+        // If no categories defined then log as warning and return false right away.
         if (categories.isEmpty()) {
             logger.warn(EMPTY_LOGGER_NAMES_MSG);
             return false;
         }
-        // If ROOT is the only element in the category Set then log as warning and return right away.
-        if (categories.size() == 1 && categories.contains(ROOT_LOGGER_NAME)) {
-            logger.warn(ROOT_PROHIBITED_MSG);
-            return false;
-        }
-        // If ROOT is one of the element in the category Set then remove it and log as warning.
         if (categories.remove(ROOT_LOGGER_NAME)) {
+            if (categories.isEmpty()) {
+                // Means ROOT was the only element in the category Set, log as warning and return false right away.
+                logger.warn(ROOT_PROHIBITED_MSG);
+                return false;
+            }
+            // Means ROOT was one of the element in the category Set and it is already removed, just log as warning.
             logger.warn(ROOT_REMOVED_MSG);
         }
-        // If category from current config is already defined in another config then log as error and return right away.
-        for (String category : categories) {
-            LoggerConfig config = this.categoryConfigMapping.get(category);
-            if (config != null) {
-                logger.error(CATEGORY_ALREADY_DEFINED_MSG, category, config.getConfigPid());
-                return false;
+        // Lazy initialization of configByPid map, don't think we still need a CHM as this method is called
+        // under a ReentrantLock in LoggerConfigFactoryListener.
+        if (this.configByPid == null) {
+            this.configByPid = new HashMap<>();
+            // No need to check the categories if configByPid map is initialized first time, return true right away.
+            return true;
+        }
+        for (LoggerConfig config : this.configByPid.values()) {
+            for (String category : categories) {
+                // If a category is already defined in another pid config then log as error and return false right away.
+                if (config.getCategories().contains(category)) {
+                    logger.error(CATEGORY_ALREADY_DEFINED_MSG, category, config.getConfigPid());
+                    return false;
+                }
             }
         }
         return true;
@@ -240,10 +238,12 @@ public final class LogbackManager {
 
     private void reconfigureOSGiLoggers() {
         Logger logger = this.loggerContext.getLogger(this.getClass());
-        for (LoggerConfig config : this.pidConfigMapping.values()) {
+        for (LoggerConfig config : this.configByPid.values()) {
             Set<String> categories = config.getCategories();
             String level = config.getLevel();
-            categories.forEach(category -> this.addLogger(category, level, config.isAdditivity()));
+            for (String category : categories) {
+                this.addLogger(category, level, config.isAdditivity());
+            }
             logger.info(OSGI_LOGGERS_RECONFIGURED_MSG, categories, level);
         }
     }

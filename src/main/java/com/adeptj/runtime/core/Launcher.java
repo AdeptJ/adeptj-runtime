@@ -131,7 +131,7 @@ public final class Launcher {
                 });
         // Let the LOGBACK cleans up it's state.
         SLF4JBridgeHandler.uninstall();
-        LogbackManagerHolder.getInstance().getLogbackManager().stopLoggerContext();
+        LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
         System.exit(-1); // NOSONAR
     }
 }
