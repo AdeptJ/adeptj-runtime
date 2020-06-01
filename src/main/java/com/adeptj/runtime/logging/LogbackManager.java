@@ -225,14 +225,15 @@ public final class LogbackManager {
             return true;
         }
         for (LoggerConfig config : this.configByPid.values()) {
-            for (String category : categories) {
-                // If a category is already defined in another pid config then log as error and return false right away.
-                if (config.getCategories().contains(category)) {
+            // If a category is already defined in current LoggerConfig then log as error and return false right away.
+            for (String category : config.getCategories()) {
+                if (categories.contains(category)) {
                     logger.error(CATEGORY_ALREADY_DEFINED_MSG, category, config.getConfigPid());
                     return false;
                 }
             }
         }
+        // If we are here then it means all went well above, return true.
         return true;
     }
 
