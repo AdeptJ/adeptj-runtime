@@ -601,6 +601,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Apache Commons Dependencies End -->
 
         <!-- Misc Dependencies Start -->
