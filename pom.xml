@@ -54,7 +54,7 @@
         <maven-dependency-plugin.version>3.1.2</maven-dependency-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <jansi.version>1.18</jansi.version>
-        <trimou-core.version>2.5.0.Final</trimou-core.version>
+        <trimou-core.version>2.5.1.Final</trimou-core.version>
         <classmate.version>1.5.1</classmate.version>
         <yasson.version>1.0.6</yasson.version>
         <glassfish.jakarta.json.version>1.1.6</glassfish.jakarta.json.version>
