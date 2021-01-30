@@ -83,7 +83,8 @@ ADEPTJ_RUNTIME_OPTS="${JVM_OPTS} ${RESTEASY_OPTS}
  -Dadeptj.rt.keyStore=path-to-local-java-keystore \
  -Dadeptj.rt.keyStorePassword=java-keystore-password \
  -Dadeptj.rt.keyPassword=key-password \
- -Denable.eclipselink.exceptionhandler.logging=false"
+ -Denable.eclipselink.exceptionhandler.logging=false \
+ -Dorg.jboss.logging.provider=slf4j"
 
 cd target || exit
 

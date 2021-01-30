@@ -34,8 +34,6 @@ import java.util.Optional;
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static org.osgi.framework.FrameworkEvent.ERROR;
 import static org.osgi.framework.FrameworkEvent.STARTED;
-import static org.osgi.framework.FrameworkEvent.STOPPED;
-import static org.osgi.framework.FrameworkEvent.STOPPED_UPDATE;
 
 /**
  * OSGi FrameworkListener which takes care of OSGi framework restart.
@@ -69,13 +67,6 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
                 ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
                 break;
-            case STOPPED:
-            case STOPPED_UPDATE:
-                LOGGER.info("Closing DispatcherServletTracker!!");
-                ServiceTrackers.getInstance().closeDispatcherServletTracker();
-                LOGGER.info("Closing EventDispatcherTracker!!");
-                ServiceTrackers.getInstance().closeEventDispatcherTracker();
-                break;
             case ERROR:
                 Optional.ofNullable(event.getThrowable()).ifPresent(th -> LOGGER.error(th.getMessage(), th));
                 break;
@@ -85,7 +76,6 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 if (!StringUtils.equals(FrameworkEvents.UNKNOWN.toString(), eventType)) {
                     LOGGER.debug("Ignoring the OSGi FrameworkEvent: [{}]", eventType);
                 }
-                break;
         }
     }
 
