@@ -70,7 +70,7 @@ final class BundleInstaller {
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
-        this.collect(Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY))
+        this.collect(Configs.of().common().getString(BUNDLES_ROOT_DIR_KEY), this.getClass().getClassLoader())
                 .map(url -> this.install(url, counter))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(Bundle::getBundleId))
@@ -79,13 +79,13 @@ final class BundleInstaller {
         LOGGER.info(BUNDLE_PROVISIONED_MSG, counter.get(), Times.elapsedMillis(startTime));
     }
 
-    private Stream<URL> collect(String bundlesDir) throws IOException {
+    private Stream<URL> collect(String bundlesDir, ClassLoader cl) throws IOException {
         Pattern pattern = Pattern.compile("^bundles.*\\.jar$");
         return ((JarURLConnection) this.getClass().getResource(bundlesDir).openConnection())
                 .getJarFile()
                 .stream()
                 .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
-                .map(jarEntry -> this.getClass().getClassLoader().getResource(jarEntry.getName()))
+                .map(jarEntry -> cl.getResource(jarEntry.getName()))
                 .filter(Objects::nonNull);
     }
 
