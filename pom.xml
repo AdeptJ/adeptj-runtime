@@ -681,6 +681,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.eclipse.microprofile.rest.client</groupId>
+            <artifactId>microprofile-rest-client-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-core</artifactId>
             <version>${mime4j.version}</version>
@@ -1384,6 +1390,17 @@
                     <artifactId>mysql-connector-java</artifactId>
                     <scope>provided</scope>
                 </dependency>
+
+            </dependencies>
+
+        </profile>
+
+        <!-- Protobuf is only needed in case of MySQL XDev APi usage-->
+        <profile>
+
+            <id>MySQL-Protobuf</id>
+
+            <dependencies>
 
                 <dependency>
                     <groupId>com.google.protobuf</groupId>

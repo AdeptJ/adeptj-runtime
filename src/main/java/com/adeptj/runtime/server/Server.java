@@ -199,7 +199,7 @@ public final class Server implements Lifecycle {
         LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
         this.printBanner();
         try {
-            this.deploymentManager = Servlets.newContainer().addDeployment(this.deploymentInfo(undertowConf));
+            this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf));
             this.deploymentManager.deploy();
             HttpHandler servletHandler = this.deploymentManager.start();
             this.rootHandler = this.createHandlerChain(servletHandler, undertowConf);
