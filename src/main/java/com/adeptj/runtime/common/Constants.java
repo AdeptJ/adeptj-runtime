@@ -43,10 +43,6 @@ public final class Constants {
 
     public static final String LOGGING_CONF_SECTION = "logging";
 
-    public static final String CONTEXT_PATH = "/";
-
-    public static final String DEFAULT_LANDING_PAGE_URI = "/system/console/bundles";
-
     public static final String ADMIN_LOGIN_URI = "/admin/login";
 
     public static final String ADMIN_LOGOUT_URI = "/admin/logout";
@@ -114,6 +110,8 @@ public final class Constants {
     public static final String MV_CREDENTIALS_STORE = "credentials.dat";
 
     public static final String H2_MAP_ADMIN_CREDENTIALS = "adminCredentials";
+
+    public static final String KEY_SYSTEM_CONSOLE_PATH = "common.system-console-path";
 
     static final String FRAMEWORK_CONF_FILE = "framework.properties";
 

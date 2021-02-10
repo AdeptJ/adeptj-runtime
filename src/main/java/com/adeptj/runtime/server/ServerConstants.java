@@ -121,4 +121,8 @@ final class ServerConstants {
     static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
 
     static final String LOGBACK_STATUS_SERVLET_NAME = "Logback ViewStatusMessagesServlet";
+
+    static final String KEY_HEALTH_CHECK_HANDLER_PATH = "common.health-check-handler-path";
+
+    static final String KEY_CONTEXT_PATH = "common.context-path";
 }

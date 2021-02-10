@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import static java.nio.file.StandardOpenOption.CREATE;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -183,7 +184,7 @@ public enum FrameworkManager {
 
     private void createFrameworkPropertiesFile(Path frameworkConfPath) {
         try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
-            Files.write(frameworkConfPath, IOUtils.toByteArray(is));
+            Files.write(frameworkConfPath, IOUtils.toByteArray(is), CREATE);
         } catch (IOException ex) {
             LOGGER.error("IOException!!", ex);
         }

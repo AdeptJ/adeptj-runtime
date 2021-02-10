@@ -17,24 +17,26 @@
 #                                                                             #
 ###############################################################################
 */
+package com.adeptj.runtime.predicate;
 
-package com.adeptj.runtime.handler;
-
-import io.undertow.server.HttpHandler;
+import io.undertow.predicate.Predicate;
 import io.undertow.server.HttpServerExchange;
 
-import static io.undertow.util.StatusCodes.OK;
-
 /**
- * Just returns a 200 OK for a health check request and simply terminate the request.
+ * Predicate just checks if the request path is / i.e. root
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class HealthCheckHandler implements HttpHandler {
+public class ContextPathPredicate implements Predicate {
+
+    private final String contextPath;
+
+    public ContextPathPredicate(String contextPath) {
+        this.contextPath = contextPath;
+    }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) {
-        exchange.setStatusCode(OK);
-        exchange.endExchange();
+    public boolean resolve(HttpServerExchange value) {
+        return value.getRequestPath().equals(this.contextPath);
     }
 }

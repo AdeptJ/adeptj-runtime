@@ -35,6 +35,7 @@ import com.adeptj.runtime.handler.HealthCheckHandler;
 import com.adeptj.runtime.handler.ServletInitialHandlerWrapper;
 import com.adeptj.runtime.handler.SetHeadersHandler;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
+import com.adeptj.runtime.predicate.ContextPathPredicate;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
 import com.adeptj.runtime.websocket.ServerLogsWebSocket;
@@ -46,6 +47,7 @@ import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
+import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
@@ -82,7 +84,6 @@ import java.net.ServerSocket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,8 +95,6 @@ import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
-import static com.adeptj.runtime.common.Constants.CONTEXT_PATH;
-import static com.adeptj.runtime.common.Constants.DEFAULT_LANDING_PAGE_URI;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
@@ -115,6 +114,7 @@ import static com.adeptj.runtime.common.Constants.KEY_MAX_CONCURRENT_REQUESTS;
 import static com.adeptj.runtime.common.Constants.KEY_PORT;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_LIMIT_QUEUE_SIZE;
+import static com.adeptj.runtime.common.Constants.KEY_SYSTEM_CONSOLE_PATH;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
@@ -123,7 +123,9 @@ import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
 import static com.adeptj.runtime.server.ServerConstants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.KEY_AUTH_ROLES;
 import static com.adeptj.runtime.server.ServerConstants.KEY_CHANGE_SESSION_ID_ON_LOGIN;
+import static com.adeptj.runtime.server.ServerConstants.KEY_CONTEXT_PATH;
 import static com.adeptj.runtime.server.ServerConstants.KEY_DEFAULT_ENCODING;
+import static com.adeptj.runtime.server.ServerConstants.KEY_HEALTH_CHECK_HANDLER_PATH;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_IGNORE_FLUSH;
@@ -165,6 +167,7 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THR
 import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
+import static java.nio.file.StandardOpenOption.CREATE;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.xnio.Options.TCP_NODELAY;
@@ -201,8 +204,8 @@ public final class Server implements Lifecycle {
         try {
             this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf));
             this.deploymentManager.deploy();
-            HttpHandler servletHandler = this.deploymentManager.start();
-            this.rootHandler = this.createHandlerChain(servletHandler, undertowConf);
+            HttpHandler httpContinueReadHandler = this.deploymentManager.start();
+            this.rootHandler = this.createHandlerChain(httpContinueReadHandler, undertowConf);
             Builder undertowBuilder = Undertow.builder();
             this.setWorkerOptions(undertowBuilder, undertowConf);
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
@@ -283,9 +286,9 @@ public final class Server implements Lifecycle {
 
     private void createServerConfFile() {
         if (!Environment.isServerConfFileExists()) {
-            try (InputStream stream = this.getClass().getResourceAsStream("/server.conf")) {
+            try (InputStream stream = this.getClass().getResourceAsStream("/" + SERVER_CONF_FILE)) {
                 Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
-                        IOUtils.toBytes(stream), StandardOpenOption.CREATE);
+                        IOUtils.toBytes(stream), CREATE);
             } catch (IOException ex) {
                 LOGGER.error("Exception while creating server conf file!!", ex);
             }
@@ -391,30 +394,30 @@ public final class Server implements Lifecycle {
      * 1. GracefulShutdownHandler
      * 2. RequestLimitingHandler
      * 3. AllowedMethodsHandler
-     * 4. PredicateHandler which resolves to either RedirectHandler or HealthCheckHandler
+     * 4. PathHandler which resolves to either PredicateHandler or HealthCheckHandler
      * 5. RequestBufferingHandler if request buffering is enabled, wrapped in SetHeadersHandler
-     * 5. And Finally ServletInitialHandler
+     * 5. And Finally HttpContinueReadHandler
      *
-     * @param servletHandler the {@link io.undertow.servlet.handlers.ServletInitialHandler}
-     * @param cfg            the undertow server config object.
+     * @param httpContinueReadHandler the {@link io.undertow.server.handlers.HttpContinueReadHandler}
+     * @param cfg                     the undertow server config object.
      * @return GracefulShutdownHandler as the root handler
      */
-    private GracefulShutdownHandler createHandlerChain(HttpHandler servletHandler, Config cfg) {
+    private GracefulShutdownHandler createHandlerChain(HttpHandler httpContinueReadHandler, Config cfg) {
         Map<HttpString, String> headers = new HashMap<>();
         headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
         if (Environment.isDev()) {
             headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), cfg.getString(KEY_HEADER_X_POWERED_BY));
         }
-        RedirectHandler contextHandler = Handlers.redirect(DEFAULT_LANDING_PAGE_URI);
+        RedirectHandler contextHandler = Handlers.redirect(cfg.getString(KEY_SYSTEM_CONSOLE_PATH));
         HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
-                new SetHeadersHandler(new RequestBufferingHandler(servletHandler,
+                new SetHeadersHandler(new RequestBufferingHandler(httpContinueReadHandler,
                         Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
-                new SetHeadersHandler(servletHandler, headers);
-        HealthCheckHandler healthCheckHandler = new HealthCheckHandler(headersHandler, cfg);
-        PredicateHandler predicateHandler = Handlers.predicate(exchange -> CONTEXT_PATH.equals(exchange.getRequestURI()),
-                contextHandler,
-                healthCheckHandler);
-        AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(predicateHandler, this.allowedMethods(cfg));
+                new SetHeadersHandler(httpContinueReadHandler, headers);
+        ContextPathPredicate contextPathPredicate = new ContextPathPredicate(cfg.getString(KEY_CONTEXT_PATH));
+        PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler, headersHandler);
+        PathHandler pathHandler = Handlers.path(predicateHandler)
+                .addPrefixPath(cfg.getString(KEY_HEALTH_CHECK_HANDLER_PATH), new HealthCheckHandler());
+        AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(pathHandler, this.allowedMethods(cfg));
         int maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQUESTS));
         int queueSize = Integer.getInteger(SYS_PROP_REQ_LIMIT_QUEUE_SIZE, cfg.getInt(KEY_REQ_LIMIT_QUEUE_SIZE));
         RequestLimit limit = new RequestLimit(maxConcurrentRequests, queueSize);
@@ -478,7 +481,7 @@ public final class Server implements Lifecycle {
 
     private WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
         Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
-        return new WebSocketDeploymentInfo()
+        return new WebSocketDeploymentInfo().setDispatchToWorkerThread(true)
                 .setWorker(this.webSocketWorker(wsOptions))
                 .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
                         wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
@@ -511,7 +514,7 @@ public final class Server implements Lifecycle {
     private DeploymentInfo deploymentInfo(Config cfg) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
-                .setContextPath(CONTEXT_PATH)
+                .setContextPath(cfg.getString(KEY_CONTEXT_PATH))
                 .setClassLoader(Server.class.getClassLoader())
                 .addServletContainerInitializer(this.sciInfo())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
