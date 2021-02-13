@@ -515,7 +515,7 @@ public final class Server implements Lifecycle {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(cfg.getString(KEY_CONTEXT_PATH))
-                .setClassLoader(Server.class.getClassLoader())
+                .setClassLoader(this.getClass().getClassLoader())
                 .addServletContainerInitializer(this.sciInfo())
                 .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
                 .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
