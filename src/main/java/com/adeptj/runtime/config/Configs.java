@@ -54,23 +54,23 @@ public enum Configs {
     }
 
     public Config undertow() {
-        return this.main.getConfig(UNDERTOW_CONF_SECTION);
+        return this.main().getConfig(UNDERTOW_CONF_SECTION);
     }
 
     public Config felix() {
-        return this.main.getConfig(FELIX_CONF_SECTION);
+        return this.main().getConfig(FELIX_CONF_SECTION);
     }
 
     public Config common() {
-        return this.main.getConfig(COMMON_CONF_SECTION);
+        return this.main().getConfig(COMMON_CONF_SECTION);
     }
 
     public Config logging() {
-        return this.main.getConfig(LOGGING_CONF_SECTION);
+        return this.main().getConfig(LOGGING_CONF_SECTION);
     }
 
     public Config trimou() {
-        return this.main.getConfig(TRIMOU_CONF_SECTION);
+        return this.main().getConfig(TRIMOU_CONF_SECTION);
     }
 
     private Config loadConf() {
