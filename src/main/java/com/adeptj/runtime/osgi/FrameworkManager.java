@@ -38,12 +38,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import static com.adeptj.runtime.osgi.BundleInstaller.CFG_KEY_FELIX_CM_DIR;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
@@ -62,8 +62,6 @@ public enum FrameworkManager {
 
     private static final String FELIX_CM_DIR = "felix.cm.dir";
 
-    private static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
-
     private static final String MEM_DUMP_LOC = "felix.memoryusage.dump.location";
 
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
@@ -80,8 +78,9 @@ public enum FrameworkManager {
         try {
             long startTime = System.nanoTime();
             LOGGER.info("Starting the OSGi Framework!!");
+            Config felixConf = Configs.of().felix();
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
-            this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs());
+            this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs(felixConf));
             long startTimeFramework = System.nanoTime();
             this.framework.start();
             LOGGER.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
@@ -91,7 +90,7 @@ public enum FrameworkManager {
             this.serviceListener = new LoggerConfigFactoryListener();
             bundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_FILTER);
             BundleContextHolder.getInstance().setBundleContext(bundleContext);
-            this.provisionBundles();
+            new BundleInstaller().installAndStartBundles(felixConf);
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     bundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -130,19 +129,8 @@ public enum FrameworkManager {
         }
     }
 
-    private void provisionBundles() throws IOException {
-        // config directory will not yet be created if framework is being provisioned first time.
-        if (!Boolean.getBoolean("provision.bundles.explicitly")
-                && Paths.get(Configs.of().felix().getString(CFG_KEY_FELIX_CM_DIR)).toFile().exists()) {
-            LOGGER.info("As per configuration, bundles provisioning is skipped on server restart!!");
-        } else {
-            new BundleInstaller().installAndStartBundles();
-        }
-    }
-
-    private Map<String, String> newFrameworkConfigs() {
+    private Map<String, String> newFrameworkConfigs(Config felixConf) {
         Map<String, String> configs = this.loadFrameworkProperties();
-        Config felixConf = Configs.of().felix();
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
         String felixLogLevel = System.getProperty(LOG_LEVEL_PROP);
