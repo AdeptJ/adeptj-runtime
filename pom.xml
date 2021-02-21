@@ -90,7 +90,7 @@
         <felix.healthcheck.core.version>2.0.8</felix.healthcheck.core.version>
         <felix.healthcheck.generalchecks.version>2.0.6</felix.healthcheck.generalchecks.version>
         <felix.healthcheck.webconsoleplugin.version>2.0.2</felix.healthcheck.webconsoleplugin.version>
-        <felix.configadmin.plugin.interpolation.version>1.1.0</felix.configadmin.plugin.interpolation.version>
+        <felix.configadmin.plugin.interpolation.version>1.1.2</felix.configadmin.plugin.interpolation.version>
     </properties>
 
     <!-- Project Information -->
