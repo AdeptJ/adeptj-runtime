@@ -70,6 +70,10 @@
         <istack-commons-runtime.version>3.0.11</istack-commons-runtime.version>
         <txw2.version>2.3.3</txw2.version>
 
+        <!-- AdeptJ Modules Dependencies Start -->
+        <adeptj-modules-webconsole-plugins.version>1.0.0</adeptj-modules-webconsole-plugins.version>
+        <!-- AdeptJ Modules Dependencies End -->
+
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>7.0.0</felix.framework.version>
         <felix.webconsole.plugins.packageadmin.version>1.0.4</felix.webconsole.plugins.packageadmin.version>
@@ -1075,6 +1079,13 @@
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-webconsole-security</artifactId>
             <version>${adeptj-modules-webconsole-security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-webconsole-plugins</artifactId>
+            <version>${adeptj-modules-webconsole-plugins.version}</version>
             <scope>provided</scope>
         </dependency>
 
