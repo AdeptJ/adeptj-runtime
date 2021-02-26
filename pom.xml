@@ -1133,6 +1133,13 @@
 
         <dependency>
             <groupId>com.adeptj</groupId>
+            <artifactId>adeptj-modules-jaxrs-api</artifactId>
+            <version>${adeptj-modules-jaxrs-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.adeptj</groupId>
             <artifactId>adeptj-modules-jaxrs-core</artifactId>
             <version>${adeptj-modules-jaxrs-core.version}</version>
             <scope>provided</scope>
