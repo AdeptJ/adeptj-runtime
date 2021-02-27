@@ -4,8 +4,8 @@
    <img src="https://img.shields.io/badge/license-Apache%202-blue.svg">  
   </a>
   
-  <a href="https://docs.osgi.org/specification/#release-7">
-   <img src="https://img.shields.io/badge/OSGi-R7-orange?style=flat">
+  <a href="https://docs.osgi.org/specification/#release-8">
+   <img src="https://img.shields.io/badge/OSGi-R8-orange?style=flat">
   </a>
   
   <a href="https://travis-ci.org/AdeptJ/adeptj-runtime/builds">
@@ -41,21 +41,21 @@
 **Built upon**
 
 1. High performance [Undertow](http://undertow.io/) web server.
-2. [OSGi](https://www.osgi.org) Framework R7(Apache [Felix](http://felix.apache.org/) as implementation).
+2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix](http://felix.apache.org/) as implementation).
 
 **Minimal runnable jar is ~30MB in size with below mentioned modules, starts in ~2500ms and low on resources**
 
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services).
-2. JAX-RS 2.1 (RESTEasy v4.5.3) with JWT support.
+2. JAX-RS 2.1 (RESTEasy v4.6.0) with JWT support.
 3. JWT module for creating and verifying the JWTs.
-4. Persistence(SQL/NO-SQL) layer - JPA(EclipseLink v2.7.7) or MyBatis v3.5.4 or MongoDB v4.0.2.
-5. Hikari JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
-6. Caffeine cache.
+4. Persistence(SQL/NO-SQL) layer - JPA(EclipseLink v2.7.8) or MyBatis v3.5.6 or MongoDB v4.4.3.
+5. Hikari(v4.0.2) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
+6. Caffeine(v3.0) cache.
 7. Logback loggers - add or remove loggers in running server which will survive the server restart.
 8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256 or 384 or 512) and encryption/decryption with (AES/GCM/NoPadding).
-9. Java Bean Validation(Hibernate Validator).
+9. Java Bean Validation(Hibernate Validator v6.0.2).
 
 Most of the services are highly configurable using OSGi Configuration Admin.
 
@@ -70,7 +70,7 @@ The platform embeds OSGi and Undertow with modules described above.
 5. From adeptj-runtime directory itself execute this command ./etc/build.sh
 6. Above step will create AdeptJ Runtime Uber jar with the /lib directory on the classpath.
 7. Now from adeptj-runtime directory itself execute this command ./bin/start.sh
-8. Start script will work on JDK 10 and so on.
+8. Start script will work on JDK 11 and so on.
 9. Go to [AdeptJ OSGi WebConsole](http://localhost:8080/system/console) to configure the services.
 10. System will ask for username/password, provide the default ones [admin/admin]
 11. For examples on how to consume the modules please look into [adeptj-modules-examples](https://github.com/AdeptJ/adeptj-modules-examples)
