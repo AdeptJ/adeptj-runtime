@@ -83,19 +83,22 @@ final class BundleInstaller {
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
-        this.collect(felixConf.getString(BUNDLES_ROOT_DIR_KEY), this.getClass().getClassLoader())
+        this.collect(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
                 .map(url -> this.install(url, counter))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Bundle::getBundleId))
+                .sorted(Comparator.comparing(Bundle::getBundleId)) // start bundles in ascending order of bundle id.
                 .filter(OSGiUtil::isNotFragment)
                 .forEach(this::start);
         LOGGER.info(BUNDLE_PROVISIONED_MSG, counter.get(), Times.elapsedMillis(startTime));
     }
 
-    private Stream<URL> collect(String bundlesDir, ClassLoader cl) throws IOException {
+    private Stream<URL> collect(String bundlesDir) throws IOException {
         Pattern pattern = Pattern.compile(BUNDLES_DIR_REGEX);
-        return ((JarURLConnection) Objects.requireNonNull(this.getClass().getResource(bundlesDir)).openConnection())
-                .getJarFile()
+        ClassLoader cl = this.getClass().getClassLoader();
+        URL resource = cl.getResource(bundlesDir);
+        // Will the cast be successful on other JVMs?
+        JarURLConnection connection = (JarURLConnection) Objects.requireNonNull(resource).openConnection();
+        return connection.getJarFile()
                 .stream()
                 .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
                 .map(jarEntry -> cl.getResource(jarEntry.getName()))
@@ -107,7 +110,7 @@ final class BundleInstaller {
         Bundle bundle = null;
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
             if (OSGiUtil.isNotBundle(jis.getManifest())) {
-                LOGGER.warn("Artifact [{}] is not a Bundle, skipping install!!", url);
+                LOGGER.error("Artifact [{}] is not a Bundle, skipping install!!", url);
             } else {
                 bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toString());
                 counter.getAndIncrement();
