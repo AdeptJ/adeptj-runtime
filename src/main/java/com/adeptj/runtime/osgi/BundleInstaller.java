@@ -99,7 +99,7 @@ final class BundleInstaller {
         if (resource == null) {
             throw new IllegalStateException(String.format("Could not obtain bundles from location [%s]", bundlesDir));
         }
-        // Will the cast be successful on other JVMs? Not doing a type check because we need a JarURLConnection?
+        // Will the cast be successful on other JVMs? Not doing a type check because we need a JarURLConnection.
         JarURLConnection connection = (JarURLConnection) resource.openConnection();
         return connection.getJarFile()
                 .stream()
