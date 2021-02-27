@@ -96,8 +96,11 @@ final class BundleInstaller {
         Pattern pattern = Pattern.compile(BUNDLES_DIR_REGEX);
         ClassLoader cl = this.getClass().getClassLoader();
         URL resource = cl.getResource(bundlesDir);
-        // Will the cast be successful on other JVMs?
-        JarURLConnection connection = (JarURLConnection) Objects.requireNonNull(resource).openConnection();
+        if (resource == null) {
+            throw new IllegalStateException(String.format("Could not obtain bundles from location [%s]", bundlesDir));
+        }
+        // Will the cast be successful on other JVMs? Not doing a type check because we need a JarURLConnection?
+        JarURLConnection connection = (JarURLConnection) resource.openConnection();
         return connection.getJarFile()
                 .stream()
                 .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
