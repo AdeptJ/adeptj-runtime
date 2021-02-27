@@ -290,6 +290,12 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <scope>compile</scope>
@@ -354,6 +360,7 @@
             <artifactId>org.apache.felix.http.bridge</artifactId>
             <version>${felix.http.bridge.version}</version>
             <scope>provided</scope>
+            <classifier>light</classifier>
         </dependency>
 
         <dependency>
