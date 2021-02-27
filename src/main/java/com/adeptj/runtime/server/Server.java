@@ -78,10 +78,6 @@ import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.nio.channels.ServerSocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -153,7 +149,6 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTION
 import static com.adeptj.runtime.server.ServerConstants.LOGBACK_STATUS_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.PWD_START_INDEX;
 import static com.adeptj.runtime.server.ServerConstants.REALM;
-import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_CHECK_PORT;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
@@ -198,8 +193,8 @@ public final class Server implements Lifecycle {
         LOGGER.debug("AdeptJ Runtime jvm args: {}", runtimeArgs);
         Config undertowConf = Configs.of().undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
-        int httpPort = this.handlePortAvailability(httpConf);
-        LOGGER.info("Starting AdeptJ Runtime @port: [{}]", httpPort);
+        int port = this.resolvePort(httpConf);
+        LOGGER.info("Starting AdeptJ Runtime @port: [{}]", port);
         this.printBanner();
         try {
             this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf));
@@ -211,7 +206,7 @@ public final class Server implements Lifecycle {
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
             new ServerOptions().setOptions(undertowBuilder, undertowConf);
             this.undertow = this.addHttpsListener(undertowBuilder, undertowConf)
-                    .addHttpListener(httpPort, httpConf.getString(KEY_HOST))
+                    .addHttpListener(port, httpConf.getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();
@@ -343,49 +338,14 @@ public final class Server implements Lifecycle {
         return builder;
     }
 
-    private int handlePortAvailability(Config httpConf) {
+    private int resolvePort(Config httpConf) {
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
             LOGGER.info("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
                     httpConf.getInt(KEY_PORT));
             port = httpConf.getInt(KEY_PORT);
         }
-        // Note: Shall we do it ourselves or let server do it later? Problem may arise in OSGi Framework provisioning
-        // as it is being started already and another server start(from same location) will again start new OSGi
-        // Framework which may interfere with already started OSGi Framework as the bundle deployment, heap dump,
-        // OSGi configurations directory is common, this is unknown at this moment but just to be on safer side doing this.
-        if (Boolean.getBoolean(SYS_PROP_CHECK_PORT) && !isPortAvailable(port)) {
-            LOGGER.error("Port: [{}] already used, shutting down JVM!!", port);
-            SLF4JBridgeHandler.uninstall();
-            // Let the LOGBACK cleans up it's state.
-            LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
-            System.exit(-1); // NOSONAR
-        }
         return port;
-    }
-
-    private boolean isPortAvailable(int port) {
-        boolean portAvailable = false;
-        ServerSocket socket = null;
-        try (ServerSocketChannel socketChannel = ServerSocketChannel.open()) {
-            socket = socketChannel.socket();
-            socket.setReuseAddress(true);
-            socket.bind(new InetSocketAddress(port));
-            portAvailable = true;
-        } catch (BindException ex) {
-            LOGGER.error("BindException while acquiring port: [{}], cause:", port, ex);
-        } catch (IOException ex) {
-            LOGGER.error("IOException while acquiring port: [{}], cause:", port, ex);
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException ex) {
-                    LOGGER.error("IOException while closing socket!!", ex);
-                }
-            }
-        }
-        return portAvailable;
     }
 
     /**
