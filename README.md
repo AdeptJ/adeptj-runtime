@@ -43,8 +43,6 @@
 1. High performance [Undertow](http://undertow.io/) web server.
 2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix](http://felix.apache.org/) as implementation).
 
-**Minimal runnable jar is ~30MB in size with below mentioned modules, starts in ~2500ms and low on resources**
-
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services).
@@ -63,44 +61,18 @@ AdeptJ Maven Plugin for bundle deployment to boost developer productivity.
 
 Most of the services are highly configurable using OSGi Configuration Admin.
 
-The runtime embeds OSGi and Undertow with modules described above.
+The runtime embeds OSGi Framework and Undertow with modules described above.
 
 **Steps to build and run:**
 
-1. Make sure you have JDK 11+ and Apache Maven 3.6.x+ installed.
-2. Clone [adeptj-parent](https://github.com/AdeptJ/adeptj-parent) and run **mvn clean install** to have the current parent version in local .m2
-3. Since adeptj-runtime needs adeptj-modules therefore clone [adeptj-modules](https://github.com/AdeptJ/adeptj-modules) and build it locally by running **mvn clean install** in adeptj-modules base directory.
-4. Now clone [adeptj-runtime](https://github.com/AdeptJ/adeptj-runtime).
-5. From adeptj-runtime directory itself execute this command ./etc/build.sh
-6. Above step will create AdeptJ Runtime Uber jar with the /lib directory on the classpath.
-7. Now from adeptj-runtime directory itself execute this command ./bin/start.sh
-8. Start script will work on JDK 11 and so on.
-9. Go to [AdeptJ OSGi WebConsole](http://localhost:8080/system/console) to configure the services.
-10. System will ask for username/password, provide the default ones [admin/admin]
-11. For examples on how to consume the modules please look into [adeptj-modules-examples](https://github.com/AdeptJ/adeptj-modules-examples)
-
-**Debug options:**
-
-Start AdeptJ Runtime with jpda option to run it in debug mode(port 8000) i.e ./bin/start.sh jpda
-
-Start Parameters and VM arguments, most of these provided in start script.
-
-1. For specifying port: -Dadeptj.rt.port=8080
-2. For checking port eagerly: -Dadeptj.rt.port.check=true
-3. Enable AJP: -Denable.ajp=true
-4. Enable HTTP2: -Denable.http2=true
-5. Enable Async Logging: -Dasync.logging=true
-6. Felix Logging Level: -Dfelix.log.level=3
-7. For providing server mode: -Dadeptj.rt.mode=PROD or DEV, PROD is default
-8. Command line argument for launching browser when server starts: launchBrowser=true
-
-**NOTE**: For few modules, work still is in progress. We are pushing hard to complete ASAP.
+Please check [AdeptJ Runtime Launcher](https://github.com/AdeptJ/adeptj-runtime-launcher.git) for full instructions.
 
 **Roadmap**:
 
 1. Extensive code coverage for AdeptJ Runtime and Modules.
 2. Modules for popular NoSQL databases.
 3. OAuth2(client and server) modules.
+4. Embedding the servers such as Tomcat, Jetty etc.
 
 **Want to contribute**:
 
