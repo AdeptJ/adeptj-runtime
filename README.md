@@ -54,8 +54,8 @@
 5. Hikari(v4.0.2) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
 6. Caffeine(v3.0) cache.
 7. Logback loggers - add or remove loggers in running server which will survive the server restart.
-8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256 or 384 or 512) and encryption/decryption with (AES/GCM/NoPadding).
-9. Java Bean Validation(Hibernate Validator v6.0.2).
+8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256/384/512) and encryption/decryption with (AES/GCM/NoPadding).
+9. Java Bean Validation(Hibernate Validator v6.2.0).
 
 Most of the services are highly configurable using OSGi Configuration Admin.
 
