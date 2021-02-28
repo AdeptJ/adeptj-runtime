@@ -57,9 +57,13 @@
 8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256/384/512) and encryption/decryption with (AES/GCM/NoPadding).
 9. Java Bean Validation(Hibernate Validator v6.2.0).
 
+**Toolchain:**
+
+AdeptJ Maven Plugin for bundle deployment to boost developer productivity.
+
 Most of the services are highly configurable using OSGi Configuration Admin.
 
-The platform embeds OSGi and Undertow with modules described above.
+The runtime embeds OSGi and Undertow with modules described above.
 
 **Steps to build and run:**
 
