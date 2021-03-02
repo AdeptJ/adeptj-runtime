@@ -36,8 +36,8 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
@@ -61,7 +61,7 @@ final class BundleInstaller {
 
     private static final String SYS_PROP_PROVISION_BUNDLES_EXPLICITLY = "provision.bundles.explicitly";
 
-    private static final String BUNDLES_DIR_REGEX = "^bundles.*\\.jar$";
+    private static final String DOT_JAR = ".jar";
 
     /**
      * Provision the Bundles.
@@ -93,7 +93,6 @@ final class BundleInstaller {
     }
 
     private Stream<URL> collect(String bundlesDir) throws IOException {
-        Pattern pattern = Pattern.compile(BUNDLES_DIR_REGEX);
         ClassLoader cl = this.getClass().getClassLoader();
         URL resource = cl.getResource(bundlesDir);
         if (resource == null) {
@@ -103,9 +102,14 @@ final class BundleInstaller {
         JarURLConnection connection = (JarURLConnection) resource.openConnection();
         return connection.getJarFile()
                 .stream()
-                .filter(jarEntry -> pattern.matcher(jarEntry.getName()).matches())
+                .filter(jarEntry -> this.isJarEntryFromBundlesDir(jarEntry, bundlesDir))
                 .map(jarEntry -> cl.getResource(jarEntry.getName()))
                 .filter(Objects::nonNull);
+    }
+
+    private boolean isJarEntryFromBundlesDir(JarEntry jarEntry, String bundlesDir) {
+        String name = jarEntry.getName();
+        return name.startsWith(bundlesDir) && name.endsWith(DOT_JAR);
     }
 
     private Bundle install(URL url, AtomicInteger counter) {
