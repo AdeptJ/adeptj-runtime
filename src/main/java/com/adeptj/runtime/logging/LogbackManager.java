@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -198,7 +199,7 @@ public final class LogbackManager {
         this.reconfigureOSGiLoggers();
         this.contextUtil.addInfo(SERVER_CONFIG_LOGGERS_RECONFIGURED_MSG);
         this.contextUtil.addInfo(String.format(RESET_LC_DONE_MSG, this.loggerContext.getName()));
-        logger.info(LC_RESET_TIME_MSG, Times.elapsedMillis(startTime));
+        this.loggerContext.getLogger(this.getClass()).info(LC_RESET_TIME_MSG, Times.elapsedMillis(startTime));
     }
 
     private boolean validateCategories(Set<String> categories) {
@@ -276,7 +277,10 @@ public final class LogbackManager {
         consoleAppender.setContext(this.loggerContext);
         consoleAppender.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
         consoleAppender.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
-        consoleAppender.setWithJansi(true);
+        // we assume Jansi lib is on classpath, use the Jansi maven profile while building runtime.
+        if (IS_OS_WINDOWS) {
+            consoleAppender.setWithJansi(true);
+        }
         consoleAppender.start();
         this.consoleAppender = consoleAppender;
     }
