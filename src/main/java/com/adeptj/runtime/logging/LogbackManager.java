@@ -38,6 +38,7 @@ import com.adeptj.runtime.common.OSGiUtil;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
+import org.apache.commons.lang3.SystemUtils;
 import org.osgi.framework.ServiceReference;
 
 import java.util.HashMap;
@@ -45,7 +46,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -278,7 +278,7 @@ public final class LogbackManager {
         consoleAppender.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
         consoleAppender.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
         // we assume Jansi lib is on classpath, use the Jansi maven profile while building runtime.
-        if (IS_OS_WINDOWS) {
+        if (SystemUtils.IS_OS_WINDOWS) {
             consoleAppender.setWithJansi(true);
         }
         consoleAppender.start();

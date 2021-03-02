@@ -21,6 +21,7 @@
 package com.adeptj.runtime.common;
 
 import com.adeptj.runtime.config.Configs;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,9 +37,6 @@ import static com.adeptj.runtime.common.Constants.MAC_BROWSER_LAUNCH_CMD;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_MODE;
 import static com.adeptj.runtime.common.Constants.WIN_BROWSER_LAUNCH_CMD;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_UNIX;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
 /**
@@ -77,11 +75,11 @@ public final class Environment {
     }
 
     public static void launchBrowser(URL url) throws IOException {
-        if (IS_OS_MAC) {
+        if (SystemUtils.IS_OS_MAC) {
             Runtime.getRuntime().exec(MAC_BROWSER_LAUNCH_CMD + url);
-        } else if (IS_OS_WINDOWS) {
+        } else if (SystemUtils.IS_OS_WINDOWS) {
             Runtime.getRuntime().exec(WIN_BROWSER_LAUNCH_CMD + url);
-        } else if (IS_OS_UNIX) {
+        } else if (SystemUtils.IS_OS_UNIX) {
             StringBuilder cmdBuilder = new StringBuilder();
             int index = OFFSET;
             for (String browser : Configs.of().common().getStringList(KEY_BROWSERS)) {
