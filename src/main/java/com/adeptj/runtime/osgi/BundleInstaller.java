@@ -25,6 +25,7 @@ import com.adeptj.runtime.common.OSGiUtil;
 import com.adeptj.runtime.common.Times;
 import com.typesafe.config.Config;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +83,10 @@ final class BundleInstaller {
         }
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
+        BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
         this.collect(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
-                .map(url -> this.install(url, counter))
+                .map(url -> this.install(url, bundleContext, counter))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(Bundle::getBundleId)) // start bundles in ascending order of bundle id.
                 .filter(OSGiUtil::isNotFragment)
@@ -112,14 +114,14 @@ final class BundleInstaller {
         return name.startsWith(bundlesDir) && name.endsWith(DOT_JAR);
     }
 
-    private Bundle install(URL url, AtomicInteger counter) {
+    private Bundle install(URL url, BundleContext bundleContext, AtomicInteger counter) {
         LOGGER.debug("Installing Bundle from location: [{}]", url);
         Bundle bundle = null;
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
             if (OSGiUtil.isNotBundle(jis.getManifest())) {
                 LOGGER.error("Artifact [{}] is not a Bundle, skipping install!!", url);
             } else {
-                bundle = BundleContextHolder.getInstance().getBundleContext().installBundle(url.toString());
+                bundle = bundleContext.installBundle(url.toExternalForm());
                 counter.getAndIncrement();
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
