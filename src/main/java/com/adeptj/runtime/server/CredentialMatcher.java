@@ -22,7 +22,6 @@ package com.adeptj.runtime.server;
 
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.PasswordCredential;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.mvstore.MVStore;
@@ -30,6 +29,7 @@ import org.h2.mvstore.MVStore;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -44,6 +44,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author Rakesh.Kumar, AdeptJ
  */
 final class CredentialMatcher {
+
+    private static final String SHA_256 = "SHA-256";
 
     private CredentialMatcher() {
     }
@@ -64,13 +66,21 @@ final class CredentialMatcher {
             ByteBuffer buffer = UTF_8.encode(CharBuffer.wrap(inputPwd));
             inputPwdBytes = new byte[buffer.limit()];
             buffer.get(inputPwdBytes);
-            digest = Base64.getEncoder().encode(DigestUtils.sha256(inputPwdBytes));
+            digest = Base64.getEncoder().encode(sha256(inputPwdBytes));
             storedPwdBytes = storedPwd.getBytes(UTF_8);
             return MessageDigest.isEqual(digest, storedPwdBytes);
         } finally {
             nullSafeWipe(inputPwdBytes);
             nullSafeWipe(digest);
             nullSafeWipe(storedPwdBytes);
+        }
+    }
+
+    private static byte[] sha256(byte[] inputPwdBytes) {
+        try {
+            return MessageDigest.getInstance(SHA_256).digest(inputPwdBytes);
+        } catch (final NoSuchAlgorithmException ex) {
+            throw new IllegalArgumentException(ex);
         }
     }
 
