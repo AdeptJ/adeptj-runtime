@@ -21,6 +21,7 @@
 package com.adeptj.runtime.server;
 
 import ch.qos.logback.classic.ViewStatusMessagesServlet;
+import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
@@ -76,6 +77,7 @@ import org.xnio.XnioWorker;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -90,6 +92,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
+import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
@@ -126,7 +129,6 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_HTTPS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_HTTP_ONLY;
 import static com.adeptj.runtime.server.ServerConstants.KEY_IGNORE_FLUSH;
 import static com.adeptj.runtime.server.ServerConstants.KEY_INVALIDATE_SESSION_ON_LOGOUT;
-import static com.adeptj.runtime.server.ServerConstants.KEY_KEYSTORE;
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_LOCATION;
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_FILE_SIZE_THRESHOLD;
 import static com.adeptj.runtime.server.ServerConstants.KEY_MULTIPART_MAX_FILE_SIZE;
@@ -199,6 +201,11 @@ public final class Server implements Lifecycle {
         try {
             this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf));
             this.deploymentManager.deploy();
+            this.createServerConfFile();
+            // Now the Felix is completely initialized, therefore set the System Bundle's BundleContext
+            // as a ServletContext attribute per the Felix HttpBridge Specification.
+            ServletContext servletContext = this.deploymentManager.getDeployment().getServletContext();
+            servletContext.setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
             HttpHandler httpContinueReadHandler = this.deploymentManager.start();
             this.rootHandler = this.createHandlerChain(httpContinueReadHandler, undertowConf);
             Builder undertowBuilder = Undertow.builder();
@@ -214,7 +221,6 @@ public final class Server implements Lifecycle {
         } catch (Exception ex) { // NOSONAR
             throw new RuntimeInitializationException(ex);
         }
-        this.createServerConfFile();
     }
 
     /**
@@ -326,14 +332,9 @@ public final class Server implements Lifecycle {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
-            if (!Environment.useProvidedKeyStore()) {
-                System.setProperty("adeptj.rt.keyStore", httpsConf.getString(KEY_KEYSTORE));
-                System.setProperty("adeptj.rt.keyStorePassword", httpsConf.getString("keyStorePwd"));
-                System.setProperty("adeptj.rt.keyPassword", httpsConf.getString("keyPwd"));
-                LOGGER.info("HTTP2 enabled @ port: [{}] using bundled KeyStore.", httpsPort);
-            }
-            SSLContext sslContext = SslContextFactory.newSslContext(httpsConf.getString("tlsVersion"));
+            SSLContext sslContext = SslContextFactory.newSslContext(httpsConf);
             builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
+            LOGGER.info("HTTP2 enabled @ port: {}.", httpsPort);
         }
         return builder;
     }

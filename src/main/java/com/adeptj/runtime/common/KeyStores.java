@@ -39,11 +39,11 @@ final class KeyStores {
     private KeyStores() {
     }
 
-    static KeyStore getKeyStore(String keyStoreLoc, char[] keyStorePwd) {
-        try (InputStream is = Environment.useProvidedKeyStore() ? Files.newInputStream(Paths.get(keyStoreLoc))
-                : KeyStores.class.getResourceAsStream(keyStoreLoc)) {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(is, keyStorePwd);
+    static KeyStore getKeyStore(boolean p12FileExternal, String type, String p12Loc, char[] p12Pwd) {
+        try (InputStream is = p12FileExternal
+                ? Files.newInputStream(Paths.get(p12Loc)) : KeyStores.class.getResourceAsStream(p12Loc)) {
+            KeyStore keyStore = KeyStore.getInstance(type);
+            keyStore.load(is, p12Pwd);
             return keyStore;
         } catch (IOException | GeneralSecurityException ex) {
             throw new RuntimeInitializationException(ex);

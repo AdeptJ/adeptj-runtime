@@ -20,9 +20,21 @@
 
 package com.adeptj.runtime.common;
 
+import com.typesafe.config.Config;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+
+import static com.adeptj.runtime.common.Constants.KEY_KEYSTORE_TYPE;
+import static com.adeptj.runtime.common.Constants.KEY_P12_FILE_LOCATION;
+import static com.adeptj.runtime.common.Constants.KEY_P12_PASSWORD;
+import static com.adeptj.runtime.common.Constants.KEY_TLS_VERSION;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_FILE_EXTERNAL;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_FILE_LOCATION;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_PASSWORD;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_TLS_VERSION;
 
 /**
  * Utilities for SSL/TLS.
@@ -34,13 +46,24 @@ public final class SslContextFactory {
     private SslContextFactory() {
     }
 
-    public static SSLContext newSslContext(String defaultTLSVersion) throws GeneralSecurityException {
-        String keyStoreLoc = System.getProperty("adeptj.rt.keyStore");
-        String keyStorePwd = System.getProperty("adeptj.rt.keyStorePassword");
-        String keyPwd = System.getProperty("adeptj.rt.keyPassword");
+    public static SSLContext newSslContext(Config httpsConf) throws GeneralSecurityException {
+        String p12Loc;
+        char[] p12Pwd;
+        boolean p12FileExternal = Boolean.getBoolean(SYS_PROP_P12_FILE_EXTERNAL);
+        if (p12FileExternal) {
+            p12Loc = System.getProperty(SYS_PROP_P12_FILE_LOCATION);
+            p12Pwd = System.getProperty(SYS_PROP_P12_PASSWORD).toCharArray();
+        } else {
+            p12Loc = httpsConf.getString(KEY_P12_FILE_LOCATION);
+            p12Pwd = httpsConf.getString(KEY_P12_PASSWORD).toCharArray();
+        }
+        String keyStoreType = httpsConf.getString(KEY_KEYSTORE_TYPE);
+        KeyStore keyStore = KeyStores.getKeyStore(p12FileExternal, keyStoreType, p12Loc, p12Pwd);
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(KeyStores.getKeyStore(keyStoreLoc, keyStorePwd.toCharArray()), keyPwd.toCharArray());
-        SSLContext sslContext = SSLContext.getInstance(System.getProperty("tls.version", defaultTLSVersion));
+        kmf.init(keyStore, p12Pwd);
+        String protocol = System.getProperty(SYS_PROP_TLS_VERSION, httpsConf.getString(KEY_TLS_VERSION));
+        SSLContext sslContext = SSLContext.getInstance(protocol);
+        // tm is initialized by SSLContext impl, that's why passing a null.
         sslContext.init(kmf.getKeyManagers(), null, null);
         return sslContext;
     }

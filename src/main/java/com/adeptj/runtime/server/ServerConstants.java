@@ -42,15 +42,11 @@ final class ServerConstants {
 
     static final String KEY_WORKER_OPTIONS = "worker-options";
 
-    static final String KEY_KEYSTORE = "keyStore";
-
     static final String KEY_HTTPS = "https";
 
     static final String SYS_PROP_ENABLE_HTTP2 = "enable.http2";
 
     static final String SYS_PROP_SERVER_HTTPS_PORT = "adeptj.rt.https.port";
-
-    static final String SYS_PROP_CHECK_PORT = "adeptj.rt.port.check";
 
     static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
 

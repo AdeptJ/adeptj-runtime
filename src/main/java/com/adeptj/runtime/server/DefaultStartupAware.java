@@ -47,8 +47,6 @@ public class DefaultStartupAware implements StartupAware {
         Logger logger = LoggerFactory.getLogger(DefaultStartupAware.class);
         Servlets.registerBridgeListeners(servletContext);
         logger.info("OSGi bridge listeners registered successfully!!");
-        // Set the System Bundle's BundleContext as a ServletContext attribute per the Felix HttpBridge Specification.
-        servletContext.setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
         Servlets.registerBridgeServlet(servletContext);
         logger.info("BridgeServlet registered successfully!!");
     }

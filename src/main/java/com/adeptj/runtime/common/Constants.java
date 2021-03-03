@@ -129,6 +129,22 @@ public final class Constants {
 
     // Configuration Keys constants ends.
 
+    public static final String KEY_P12_FILE_LOCATION = "p12-file-location";
+
+    public static final String KEY_P12_PASSWORD = "p12-password";
+
+    public static final String SYS_PROP_P12_FILE_LOCATION = "adeptj.rt.p12-file-location";
+
+    public static final String SYS_PROP_P12_PASSWORD = "adeptj.rt.p12-password";
+
+    public static final String SYS_PROP_P12_FILE_EXTERNAL = "adeptj.rt.p12-file-external";
+
+    public static final String SYS_PROP_TLS_VERSION = "tls.version";
+
+    static final String KEY_TLS_VERSION = "tlsVersion";
+
+    static final String KEY_KEYSTORE_TYPE = "keystore-type";
+
     /**
      * Deny direct instantiation.
      */

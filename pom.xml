@@ -38,6 +38,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
+        <codename>Virgo</codename>
         <!-- Common Dependencies -->
         <undertow.version>2.2.4.Final</undertow.version>
         <xnio.version>3.8.4.Final</xnio.version>
