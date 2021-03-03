@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.server;
 
-import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Servlets;
 import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.core.StartupAware;
@@ -28,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-
-import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 
 /**
  * DefaultStartupAware is a {@link StartupAware} that registers the bridge listeners and servlet.
