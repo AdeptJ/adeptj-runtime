@@ -26,6 +26,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 
 /**
@@ -59,7 +60,8 @@ public class DispatcherServletTracker extends BridgeServiceTracker<HttpServlet> 
     protected HttpServlet addingService(HttpServlet dispatcherServlet) {
         this.dispatcherServletWrapper = new DispatcherServletWrapper(dispatcherServlet);
         try {
-            this.dispatcherServletWrapper.init(BridgeServletConfigHolder.getInstance().getBridgeServletConfig());
+            ServletConfig bridgeServletConfig = BridgeServletConfigHolder.getInstance().getBridgeServletConfig();
+            this.dispatcherServletWrapper.init(new DispatcherServletConfig(bridgeServletConfig));
         } catch (Exception ex) { // NOSONAR
             /*
              * If the init method failed above then DispatcherServlet won't be usable at all.

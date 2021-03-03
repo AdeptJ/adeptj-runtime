@@ -36,7 +36,7 @@ import static org.osgi.framework.FrameworkEvent.ERROR;
 import static org.osgi.framework.FrameworkEvent.STARTED;
 
 /**
- * OSGi FrameworkListener which takes care of OSGi framework restart.
+ * OSGi FrameworkListener which takes care of OSGi framework restart from Felix WebConsole.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
