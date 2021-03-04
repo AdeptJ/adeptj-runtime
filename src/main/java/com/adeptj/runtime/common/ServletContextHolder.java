@@ -34,7 +34,9 @@ public enum ServletContextHolder {
     private ServletContext context;
 
     public void setServletContext(ServletContext context) { // NOSONAR
-        this.context = context;
+        if (this.context == null) {
+            this.context = context;
+        }
     }
 
     public ServletContext getServletContext() {

@@ -34,7 +34,9 @@ public enum LogbackManagerHolder {
     private LogbackManager logbackManager;
 
     public void setLogbackManager(LogbackManager logbackManager) {
-        this.logbackManager = logbackManager;
+        if (this.logbackManager == null) {
+            this.logbackManager = logbackManager;
+        }
     }
 
     public LogbackManager getLogbackManager() {

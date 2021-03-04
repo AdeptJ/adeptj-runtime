@@ -91,7 +91,7 @@ public final class Launcher {
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
-            launcher.shutdownJvm(logger);
+            launcher.cleanup(logger);
         }
     }
 
@@ -122,7 +122,7 @@ public final class Launcher {
         }
     }
 
-    private void shutdownJvm(Logger logger) {
+    private void cleanup(Logger logger) {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
         Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
                 .ifPresent(context -> {
