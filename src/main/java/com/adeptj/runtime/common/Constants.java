@@ -97,6 +97,8 @@ public final class Constants {
 
     public static final String SERVER_CONF_FILE = "server.conf";
 
+    public static final String SERVER_CONF_CP_RESOURCE = "/server.conf";
+
     public static final String KEY_HOST = "host";
 
     public static final String KEY_PORT = "port";

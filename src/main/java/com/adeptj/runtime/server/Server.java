@@ -81,6 +81,7 @@ import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -115,6 +116,7 @@ import static com.adeptj.runtime.common.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.common.Constants.KEY_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.common.Constants.KEY_SYSTEM_CONSOLE_PATH;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
+import static com.adeptj.runtime.common.Constants.SERVER_CONF_CP_RESOURCE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET_NAME;
@@ -154,6 +156,7 @@ import static com.adeptj.runtime.server.ServerConstants.REALM;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
+import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SERVER_HTTPS_PORT;
@@ -164,7 +167,6 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THR
 import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
-import static java.nio.file.StandardOpenOption.CREATE;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.xnio.Options.TCP_NODELAY;
@@ -201,7 +203,7 @@ public final class Server implements Lifecycle {
         try {
             this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf));
             this.deploymentManager.deploy();
-            this.createServerConfFile();
+            this.createOrUpdateServerConfFile();
             // Now the Felix is completely initialized, therefore set the System Bundle's BundleContext
             // as a ServletContext attribute per the Felix HttpBridge Specification.
             ServletContext servletContext = this.deploymentManager.getDeployment().getServletContext();
@@ -285,14 +287,22 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private void createServerConfFile() {
-        if (!Environment.isServerConfFileExists()) {
-            try (InputStream stream = this.getClass().getResourceAsStream("/" + SERVER_CONF_FILE)) {
-                Files.write(Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE),
-                        IOUtils.toBytes(stream), CREATE);
-            } catch (IOException ex) {
-                LOGGER.error("Exception while creating server conf file!!", ex);
+    private void createOrUpdateServerConfFile() {
+        if (Environment.isServerConfFileExists()) {
+            if (Boolean.getBoolean(SYS_PROP_OVERWRITE_SERVER_CONF)) {
+                this.doCreateOrUpdateServerConfFile();
             }
+        } else {
+            this.doCreateOrUpdateServerConfFile();
+        }
+    }
+
+    private void doCreateOrUpdateServerConfFile() {
+        try (InputStream stream = this.getClass().getResourceAsStream(SERVER_CONF_CP_RESOURCE)) {
+            Path path = Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
+            Files.write(path, IOUtils.toBytes(stream));
+        } catch (IOException ex) {
+            LOGGER.error("Exception while creating server conf file!!", ex);
         }
     }
 

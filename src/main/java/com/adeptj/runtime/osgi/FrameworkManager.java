@@ -21,10 +21,10 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.Environment;
+import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
@@ -34,6 +34,7 @@ import org.osgi.framework.launch.FrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -44,7 +45,6 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.osgi.BundleInstaller.CFG_KEY_FELIX_CM_DIR;
-import static java.nio.file.StandardOpenOption.CREATE;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -58,7 +58,7 @@ public enum FrameworkManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkManager.class);
 
-    private static final String FRAMEWORK_PROPERTIES = "/framework.properties";
+    private static final String FRAMEWORK_PROPERTIES_CP_RESOURCE = "/framework.properties";
 
     private static final String FELIX_CM_DIR = "felix.cm.dir";
 
@@ -67,6 +67,8 @@ public enum FrameworkManager {
     private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
 
     private static final String LOGGER_CFG_FACTORY_FILTER = "(|(logger.names=*)(logger.level=*))";
+
+    private static final String SYS_PROP_OVERWRITE_FRAMEWORK_CONF = "overwrite.framework.conf.file";
 
     private Framework framework;
 
@@ -142,39 +144,49 @@ public enum FrameworkManager {
     }
 
     private Map<String, String> loadFrameworkProperties() {
-        Properties props = new Properties();
         Map<String, String> configs = new HashMap<>();
         Path frameworkConfPath = Environment.getFrameworkConfPath();
         if (Environment.isFrameworkConfFileExists()) {
-            try (InputStream is = Files.newInputStream(frameworkConfPath)) {
-                props.load(is);
-                props.forEach((key, val) -> configs.put((String) key, (String) val));
-            } catch (IOException ex) {
-                LOGGER.error("IOException while loading framework.properties from file system!!", ex);
-                // Fallback is try to load the classpath framework.properties
-                this.loadClasspathFrameworkProperties(props, configs);
+            if (Boolean.getBoolean(SYS_PROP_OVERWRITE_FRAMEWORK_CONF)) {
+                this.createOrUpdateFrameworkPropertiesFile(configs, frameworkConfPath);
+            } else {
+                try (InputStream stream = Files.newInputStream(frameworkConfPath)) {
+                    this.populateFrameworkConfigs(stream, configs);
+                } catch (IOException ex) {
+                    LOGGER.error("IOException while loading framework.properties from file system!!", ex);
+                    // Fallback is try to load the classpath framework.properties
+                    this.loadClasspathFrameworkProperties(configs);
+                }
             }
         } else {
-            this.loadClasspathFrameworkProperties(props, configs);
-            this.createFrameworkPropertiesFile(frameworkConfPath);
+            this.createOrUpdateFrameworkPropertiesFile(configs, frameworkConfPath);
         }
         return configs;
     }
 
-    private void loadClasspathFrameworkProperties(Properties props, Map<String, String> configs) {
-        try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
-            props.load(is);
-            props.forEach((key, val) -> configs.put((String) key, (String) val));
+    private void loadClasspathFrameworkProperties(Map<String, String> configs) {
+        try (InputStream stream = this.getClass().getResourceAsStream(FRAMEWORK_PROPERTIES_CP_RESOURCE)) {
+            this.populateFrameworkConfigs(stream, configs);
         } catch (IOException exception) {
             LOGGER.error("IOException while loading framework.properties from classpath!!", exception);
         }
     }
 
-    private void createFrameworkPropertiesFile(Path frameworkConfPath) {
-        try (InputStream is = FrameworkManager.class.getResourceAsStream(FRAMEWORK_PROPERTIES)) {
-            Files.write(frameworkConfPath, IOUtils.toByteArray(is), CREATE);
+    private void createOrUpdateFrameworkPropertiesFile(Map<String, String> configs, Path frameworkConfPath) {
+        try (InputStream stream = this.getClass().getResourceAsStream(FRAMEWORK_PROPERTIES_CP_RESOURCE)) {
+            byte[] bytes = IOUtils.toBytes(stream);
+            this.populateFrameworkConfigs(new ByteArrayInputStream(bytes), configs);
+            Files.write(frameworkConfPath, bytes);
         } catch (IOException ex) {
-            LOGGER.error("IOException!!", ex);
+            LOGGER.error(ex.getMessage(), ex);
+        }
+    }
+
+    private void populateFrameworkConfigs(InputStream stream, Map<String, String> configs) throws IOException {
+        Properties props = new Properties();
+        props.load(stream);
+        for (String key : props.stringPropertyNames()) {
+            configs.put(key, props.getProperty(key));
         }
     }
 
