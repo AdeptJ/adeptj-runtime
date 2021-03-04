@@ -352,9 +352,8 @@ public final class Server implements Lifecycle {
     private int resolvePort(Config httpConf) {
         Integer port = Integer.getInteger(SYS_PROP_SERVER_PORT);
         if (port == null) {
-            LOGGER.info("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT,
-                    httpConf.getInt(KEY_PORT));
             port = httpConf.getInt(KEY_PORT);
+            LOGGER.info("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
         }
         return port;
     }
