@@ -105,7 +105,7 @@ public enum FrameworkManager {
     public void stopFramework() {
         try {
             if (this.framework == null) {
-                LOGGER.info("OSGi Framework not started yet, nothing to stop!!");
+                LOGGER.warn("OSGi Framework not started yet, nothing to stop!!");
             } else {
                 this.removeServicesAndListeners();
                 this.framework.stop();

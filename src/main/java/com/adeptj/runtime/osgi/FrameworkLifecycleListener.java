@@ -29,8 +29,6 @@ import org.osgi.framework.FrameworkListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static org.osgi.framework.FrameworkEvent.ERROR;
 import static org.osgi.framework.FrameworkEvent.STARTED;
@@ -43,6 +41,8 @@ import static org.osgi.framework.FrameworkEvent.STARTED;
 public class FrameworkLifecycleListener implements FrameworkListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FrameworkLifecycleListener.class);
+
+    private static final String SYS_PROP_LOG_FRAMEWORK_ERROR = "adeptj.rt.log.framework.error";
 
     /**
      * Handles OSGi Framework restart, does following on System Bundle STARTED event.
@@ -68,7 +68,12 @@ public class FrameworkLifecycleListener implements FrameworkListener {
                 ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
                 break;
             case ERROR:
-                Optional.ofNullable(event.getThrowable()).ifPresent(th -> LOGGER.error(th.getMessage(), th));
+                if (Boolean.getBoolean(SYS_PROP_LOG_FRAMEWORK_ERROR)) {
+                    Throwable th = event.getThrowable();
+                    if (th != null) {
+                        LOGGER.error(th.getMessage(), th);
+                    }
+                }
                 break;
             default:
                 // log it and ignore as we are not interested in any other event.
