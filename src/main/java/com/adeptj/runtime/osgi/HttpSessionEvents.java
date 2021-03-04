@@ -116,14 +116,17 @@ public enum HttpSessionEvents {
     }
 
     private static Optional<HttpSessionListener> sessionListener() {
-        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionListener());
+        EventDispatcherTracker tracker = tracker();
+        return Optional.ofNullable(tracker == null ? null : tracker.getHttpSessionListener());
     }
 
     private static Optional<HttpSessionIdListener> sessionIdListener() {
-        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionIdListener());
+        EventDispatcherTracker tracker = tracker();
+        return Optional.ofNullable(tracker == null ? null : tracker.getHttpSessionIdListener());
     }
 
     private static Optional<HttpSessionAttributeListener> sessionAttributeListener() {
-        return Optional.ofNullable(tracker() == null ? null : tracker().getHttpSessionAttributeListener());
+        EventDispatcherTracker tracker = tracker();
+        return Optional.ofNullable(tracker == null ? null : tracker.getHttpSessionAttributeListener());
     }
 }
