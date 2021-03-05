@@ -40,7 +40,7 @@
         <skipTests>true</skipTests>
         <codename>Virgo</codename>
         <!-- Common Dependencies -->
-        <undertow.version>2.2.4.Final</undertow.version>
+        <undertow.version>2.2.5.Final</undertow.version>
         <xnio.version>3.8.4.Final</xnio.version>
         <trimou-core.version>2.5.1.Final</trimou-core.version>
 
@@ -283,6 +283,12 @@
         <!-- SLF4J/Logback Dependencies End -->
 
         <!-- Apache Commons Dependencies Start -->
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>

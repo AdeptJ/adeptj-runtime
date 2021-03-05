@@ -57,15 +57,17 @@ public class FrameworkLifecycleListener implements FrameworkListener {
     public void frameworkEvent(FrameworkEvent event) {
         switch (event.getType()) {
             case STARTED:
-                LOGGER.info("Handling OSGi Framework Restart!!");
-                BundleContext bundleContext = event.getBundle().getBundleContext();
-                BundleContextHolder.getInstance().setBundleContext(bundleContext);
-                // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
-                ServletContextHolder.getInstance()
-                        .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, bundleContext);
-                ServiceTrackers.getInstance().closeDispatcherServletTracker();
-                LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
+                if (ServiceTrackers.getInstance().isDispatcherServletTrackerOpened()) {
+                    LOGGER.info("Handling OSGi Framework Restart!!");
+                    BundleContext bundleContext = event.getBundle().getBundleContext();
+                    BundleContextHolder.getInstance().setBundleContext(bundleContext);
+                    // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
+                    ServletContextHolder.getInstance()
+                            .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, bundleContext);
+                    ServiceTrackers.getInstance().closeDispatcherServletTracker();
+                    LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
+                    ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
+                }
                 break;
             case ERROR:
                 if (Boolean.getBoolean(SYS_PROP_LOG_FRAMEWORK_ERROR)) {

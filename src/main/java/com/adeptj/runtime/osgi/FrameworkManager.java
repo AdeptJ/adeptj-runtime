@@ -83,16 +83,22 @@ public enum FrameworkManager {
             Config felixConf = Configs.of().felix();
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
             this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs(felixConf));
-            long startTimeFramework = System.nanoTime();
-            this.framework.start();
-            LOGGER.info("OSGi Framework creation took [{}] ms!!", Times.elapsedMillis(startTimeFramework));
+            this.framework.init();
             BundleContext bundleContext = this.framework.getBundleContext();
+            boolean restartFramework = new BundleInstaller().installAndStartBundles(felixConf, bundleContext);
+            if (restartFramework) {
+                LOGGER.info("Restarting OSGi Framework!");
+                this.stopFramework();
+                this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs(felixConf));
+                this.framework.init();
+                bundleContext = this.framework.getBundleContext();
+            }
+            BundleContextHolder.getInstance().setBundleContext(bundleContext);
             this.frameworkListener = new FrameworkLifecycleListener();
             bundleContext.addFrameworkListener(this.frameworkListener);
             this.serviceListener = new LoggerConfigFactoryListener();
             bundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_FILTER);
-            BundleContextHolder.getInstance().setBundleContext(bundleContext);
-            new BundleInstaller().installAndStartBundles(felixConf);
+            this.framework.start();
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     bundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
@@ -145,12 +151,12 @@ public enum FrameworkManager {
 
     private Map<String, String> loadFrameworkProperties() {
         Map<String, String> configs = new HashMap<>();
-        Path frameworkConfPath = Environment.getFrameworkConfPath();
-        if (Environment.isFrameworkConfFileExists()) {
+        Path confPath = Environment.getFrameworkConfPath();
+        if (confPath.toFile().exists()) {
             if (Boolean.getBoolean(SYS_PROP_OVERWRITE_FRAMEWORK_CONF)) {
-                this.createOrUpdateFrameworkPropertiesFile(configs, frameworkConfPath);
+                this.createOrUpdateFrameworkPropertiesFile(configs, confPath);
             } else {
-                try (InputStream stream = Files.newInputStream(frameworkConfPath)) {
+                try (InputStream stream = Files.newInputStream(confPath)) {
                     this.populateFrameworkConfigs(stream, configs);
                 } catch (IOException ex) {
                     LOGGER.error("IOException while loading framework.properties from file system!!", ex);
@@ -159,7 +165,7 @@ public enum FrameworkManager {
                 }
             }
         } else {
-            this.createOrUpdateFrameworkPropertiesFile(configs, frameworkConfPath);
+            this.createOrUpdateFrameworkPropertiesFile(configs, confPath);
         }
         return configs;
     }
@@ -172,11 +178,11 @@ public enum FrameworkManager {
         }
     }
 
-    private void createOrUpdateFrameworkPropertiesFile(Map<String, String> configs, Path frameworkConfPath) {
+    private void createOrUpdateFrameworkPropertiesFile(Map<String, String> configs, Path confPath) {
         try (InputStream stream = this.getClass().getResourceAsStream(FRAMEWORK_PROPERTIES_CP_RESOURCE)) {
             byte[] bytes = IOUtils.toBytes(stream);
             this.populateFrameworkConfigs(new ByteArrayInputStream(bytes), configs);
-            Files.write(frameworkConfPath, bytes);
+            Files.write(confPath, bytes);
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

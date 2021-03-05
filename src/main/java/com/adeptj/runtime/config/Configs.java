@@ -24,13 +24,14 @@ import com.adeptj.runtime.common.Environment;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
 
@@ -74,15 +75,21 @@ public enum Configs {
     }
 
     private Config loadConf() {
-        Path configFile = Environment.getServerConfFile();
-        if (configFile.toFile().exists()) {
-            return ConfigFactory.parseFile(configFile.toFile())
-                    .withFallback(ConfigFactory.systemProperties())
-                    .resolve()
-                    .getConfig(MAIN_CONF_SECTION);
+        Config config;
+        File configFile = Environment.getServerConfPath().toFile();
+        if (configFile.exists()) {
+            // if overwrite.server.conf.file system property is provided, then load the configs from classpath.
+            if (Boolean.getBoolean(SYS_PROP_OVERWRITE_SERVER_CONF)) {
+                config = ConfigFactory.load(SERVER_CONF_FILE);
+            } else {
+                config = ConfigFactory.parseFile(configFile)
+                        .withFallback(ConfigFactory.systemProperties())
+                        .resolve();
+            }
         } else {
-            return ConfigFactory.load(SERVER_CONF_FILE).getConfig(MAIN_CONF_SECTION);
+            config = ConfigFactory.load(SERVER_CONF_FILE);
         }
+        return config.getConfig(MAIN_CONF_SECTION);
     }
 
     public static Configs of() {

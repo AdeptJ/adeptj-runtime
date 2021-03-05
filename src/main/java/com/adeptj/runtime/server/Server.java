@@ -82,7 +82,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,8 +95,6 @@ import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
-import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
-import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
 import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
@@ -117,7 +114,7 @@ import static com.adeptj.runtime.common.Constants.KEY_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.common.Constants.KEY_SYSTEM_CONSOLE_PATH;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_CP_RESOURCE;
-import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_PORT;
 import static com.adeptj.runtime.server.ServerConstants.ADMIN_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.DEFAULT_WAIT_TIME;
@@ -156,7 +153,6 @@ import static com.adeptj.runtime.server.ServerConstants.REALM;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
-import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SERVER_HTTPS_PORT;
@@ -168,7 +164,6 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLI
 import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
-import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 import static org.xnio.Options.TCP_NODELAY;
 import static org.xnio.Options.WORKER_IO_THREADS;
 import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
@@ -288,19 +283,19 @@ public final class Server implements Lifecycle {
     }
 
     private void createOrUpdateServerConfFile() {
-        if (Environment.isServerConfFileExists()) {
+        Path confPath = Environment.getServerConfPath();
+        if (confPath.toFile().exists()) {
             if (Boolean.getBoolean(SYS_PROP_OVERWRITE_SERVER_CONF)) {
-                this.doCreateOrUpdateServerConfFile();
+                this.doCreateOrUpdateServerConfFile(confPath);
             }
         } else {
-            this.doCreateOrUpdateServerConfFile();
+            this.doCreateOrUpdateServerConfFile(confPath);
         }
     }
 
-    private void doCreateOrUpdateServerConfFile() {
+    private void doCreateOrUpdateServerConfFile(Path confFile) {
         try (InputStream stream = this.getClass().getResourceAsStream(SERVER_CONF_CP_RESOURCE)) {
-            Path path = Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
-            Files.write(path, IOUtils.toBytes(stream));
+            Files.write(confFile, IOUtils.toBytes(stream));
         } catch (IOException ex) {
             LOGGER.error("Exception while creating server conf file!!", ex);
         }

@@ -52,17 +52,17 @@ public enum TemplateEngine {
 
     private static final String RB_HELPER_NAME = "msg";
 
-    private static final String KEY_RB_BASE_NAME = "resourceBundleBasename";
+    private static final String KEY_RB_BASE_NAME = "resource-bundle-basename";
 
-    private static final String KEY_START_DELIMITER = "startDelimiter";
+    private static final String KEY_START_DELIMITER = "start-delimiter";
 
-    private static final String KEY_END_DELIMITER = "endDelimiter";
+    private static final String KEY_END_DELIMITER = "end-delimiter";
 
-    private static final String KEY_CACHE_ENABLED = "cacheEnabled";
+    private static final String KEY_CACHE_ENABLED = "cache-enabled";
 
-    private static final String KEY_CACHE_EXPIRATION = "cacheExpiration";
+    private static final String KEY_CACHE_EXPIRATION = "cache-expiration";
 
-    private static final String KEY_TEMPLATE_LOCATOR_PRIORITY = "templateLocatorPriority";
+    private static final String KEY_TEMPLATE_LOCATOR_PRIORITY = "template-locator-priority";
 
     private static final String KEY_PREFIX = "prefix";
 

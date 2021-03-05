@@ -90,19 +90,11 @@ public final class Environment {
         }
     }
 
-    public static Path getServerConfFile() {
+    public static Path getServerConfPath() {
         return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
-    }
-
-    public static boolean isServerConfFileExists() {
-        return getServerConfFile().toFile().exists();
     }
 
     public static Path getFrameworkConfPath() {
         return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, FRAMEWORK_CONF_FILE);
-    }
-
-    public static boolean isFrameworkConfFileExists() {
-        return getFrameworkConfPath().toFile().exists();
     }
 }

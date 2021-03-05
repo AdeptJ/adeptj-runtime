@@ -53,6 +53,10 @@ public enum ServiceTrackers {
         return this.dispatcherServletTracker.getDispatcherServlet();
     }
 
+    public boolean isDispatcherServletTrackerOpened() {
+        return this.dispatcherServletTracker != null;
+    }
+
     public void closeDispatcherServletTracker() {
         LOGGER.info("Closing DispatcherServletTracker!!");
         this.closeServiceTracker(this.dispatcherServletTracker);

@@ -48,8 +48,6 @@ final class ServerConstants {
 
     static final String SYS_PROP_SERVER_HTTPS_PORT = "adeptj.rt.https.port";
 
-    static final String SYS_PROP_OVERWRITE_SERVER_CONF = "overwrite.server.conf.file";
-
     static final String KEY_DEFAULT_ENCODING = "common.default-encoding";
 
     static final String REALM = "AdeptJ Realm";

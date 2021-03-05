@@ -147,6 +147,8 @@ public final class Constants {
 
     static final String KEY_KEYSTORE_TYPE = "keystore-type";
 
+    public static final String SYS_PROP_OVERWRITE_SERVER_CONF = "overwrite.server.conf.file";
+
     /**
      * Deny direct instantiation.
      */
