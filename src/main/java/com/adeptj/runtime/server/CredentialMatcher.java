@@ -70,9 +70,7 @@ final class CredentialMatcher {
             storedPwdBytes = storedPwd.getBytes(UTF_8);
             return MessageDigest.isEqual(digest, storedPwdBytes);
         } finally {
-            nullSafeWipe(inputPwdBytes);
-            nullSafeWipe(digest);
-            nullSafeWipe(storedPwdBytes);
+            nullSafeWipe(inputPwdBytes, digest, storedPwdBytes);
         }
     }
 
@@ -84,9 +82,11 @@ final class CredentialMatcher {
         }
     }
 
-    private static void nullSafeWipe(byte[] data) {
-        if (ArrayUtils.isNotEmpty(data)) {
-            Arrays.fill(data, (byte) 0);
+    private static void nullSafeWipe(byte[]... arrays) {
+        if (arrays != null) {
+            for (byte[] array : arrays) {
+                Arrays.fill(array, (byte) 0);
+            }
         }
     }
 }
