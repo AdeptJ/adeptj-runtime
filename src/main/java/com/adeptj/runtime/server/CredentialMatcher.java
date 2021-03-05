@@ -83,8 +83,8 @@ final class CredentialMatcher {
     }
 
     private static void nullSafeWipe(byte[]... arrays) {
-        if (arrays != null) {
-            for (byte[] array : arrays) {
+        for (byte[] array : arrays) {
+            if (array != null) {
                 Arrays.fill(array, (byte) 0);
             }
         }
