@@ -261,11 +261,9 @@ public final class Server implements Lifecycle {
     private void gracefulShutdown() {
         try {
             this.rootHandler.shutdown();
-            if (this.rootHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME))) {
-                LOGGER.debug("Completed remaining requests successfully!!");
-            }
+            this.rootHandler.awaitShutdown(Long.getLong(SYS_PROP_SHUTDOWN_WAIT_TIME, DEFAULT_WAIT_TIME));
         } catch (InterruptedException ie) {
-            LOGGER.error("Error while waiting for pending request(s) to complete!!", ie);
+            LOGGER.error("Error while waiting for GracefulShutdownHandler to shutdown!!", ie);
             // SONAR - "InterruptedException" should not be ignored
             // Can't really rethrow it as we are yet to stop the server and anyway it's a shutdown hook
             // and JVM itself will be shutting down shortly.
