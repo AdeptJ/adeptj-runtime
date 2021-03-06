@@ -150,7 +150,9 @@ final class BundleInstaller {
     }
 
     private Bundle install(URL url, BundleContext bundleContext, AtomicInteger counter) {
-        LOGGER.debug("Installing Bundle from location: [{}]", url);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Installing Bundle from location: [{}]", url);
+        }
         Bundle bundle = null;
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
             if (OSGiUtil.isNotBundle(jis.getManifest())) {

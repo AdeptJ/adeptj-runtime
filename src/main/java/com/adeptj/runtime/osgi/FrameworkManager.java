@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -156,7 +157,7 @@ public enum FrameworkManager {
             configs.put(LOG_LEVEL_PROP, felixLogLevel);
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("OSGi Framework Configurations: {}", configs);
+            this.printFrameworkConfigs(configs);
         }
         return configs;
     }
@@ -206,6 +207,24 @@ public enum FrameworkManager {
         for (String key : props.stringPropertyNames()) {
             configs.put(key, props.getProperty(key));
         }
+    }
+
+    private void printFrameworkConfigs(Map<String, String> configs) {
+        StringBuilder builder = new StringBuilder();
+        Iterator<Map.Entry<String, String>> iterator = configs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            builder.append(entry.getKey());
+            builder.append('=').append('"');
+            if (!StringUtils.startsWith(entry.getKey(), "crypto")) {
+                builder.append(entry.getValue());
+            }
+            builder.append('"');
+            if (iterator.hasNext()) {
+                builder.append(',').append('\n');
+            }
+        }
+        LOGGER.debug("OSGi Framework Configurations-\n{}", builder);
     }
 
     public static FrameworkManager getInstance() {
