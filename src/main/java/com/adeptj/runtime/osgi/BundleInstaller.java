@@ -85,7 +85,7 @@ final class BundleInstaller {
      *
      * @throws IOException exception thrown by provisioning mechanism.
      */
-    boolean installAndStartBundles(Config felixConf, BundleContext bundleContext) throws IOException {
+    boolean installUpdateBundles(Config felixConf, BundleContext bundleContext) throws IOException {
         // config directory will not yet be created if framework is being provisioned first time.
         File frameworkConfigDir = Paths.get(felixConf.getString(CFG_KEY_FELIX_CM_DIR)).toFile();
         if (frameworkConfigDir.exists()) {
@@ -140,7 +140,6 @@ final class BundleInstaller {
         if (resource == null) {
             throw new IllegalStateException(String.format("Could not obtain bundles from location [%s]", bundlesDir));
         }
-        // Will the cast be successful on other JVMs? Not doing a type check because we need a JarURLConnection.
         JarURLConnection connection = (JarURLConnection) resource.openConnection();
         return connection.getJarFile();
     }
@@ -204,13 +203,13 @@ final class BundleInstaller {
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
             Manifest manifest = jis.getManifest();
             if (manifest == null) {
-                LOGGER.error("Manifest missing for url: {}, skipping it!!", url);
+                LOGGER.error("Manifest missing for artifact [{}]", url);
                 return false;
             }
             Attributes mainAttributes = manifest.getMainAttributes();
             String symbolicName = mainAttributes.getValue(BUNDLE_SYMBOLICNAME);
             if (StringUtils.isEmpty(symbolicName)) {
-                LOGGER.error("Artifact [{}] is not a Bundle, skipping it!!", url);
+                LOGGER.error("Artifact [{}] is not an OSGi Bundle, can't be installed.", url);
                 return false;
             }
             Bundle installedBundle = bundles.get(symbolicName);
@@ -224,8 +223,12 @@ final class BundleInstaller {
             Version installedVersion = OSGiUtil.getBundleVersion(installedBundle);
             if (newVersion.compareTo(installedVersion) > 0) {
                 restartFramework = OSGiUtil.isSystemBundleFragment(installedBundle);
+                if (restartFramework) {
+                    LOGGER.info("Update for System Bundle fragment, OSGi Framework will be restarted!");
+                }
                 installedBundle.update(url.openStream());
-                LOGGER.info("Updated bundle: {}", installedBundle);
+                LOGGER.info("Updated OSGi Bundle: {}, old version was {} and new version is {}",
+                        installedBundle, installedVersion, newVersion);
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
             LOGGER.error("Exception while installing Bundle: [{}]. Cause:", url, ex);

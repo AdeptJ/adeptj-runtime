@@ -27,7 +27,9 @@ import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
@@ -82,22 +84,16 @@ public enum FrameworkManager {
             LOGGER.info("Starting the OSGi Framework!!");
             Config felixConf = Configs.of().felix();
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
-            this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs(felixConf));
-            this.framework.init();
-            BundleContext bundleContext = this.framework.getBundleContext();
-            boolean restartFramework = new BundleInstaller().installAndStartBundles(felixConf, bundleContext);
+            Map<String, String> frameworkConfigs = this.newFrameworkConfigs(felixConf);
+            BundleContext bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);
+            boolean restartFramework = new BundleInstaller().installUpdateBundles(felixConf, bundleContext);
             if (restartFramework) {
                 LOGGER.info("Restarting OSGi Framework!");
                 this.stopFramework();
-                this.framework = frameworkFactory.newFramework(this.newFrameworkConfigs(felixConf));
-                this.framework.init();
-                bundleContext = this.framework.getBundleContext();
+                bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);
             }
             BundleContextHolder.getInstance().setBundleContext(bundleContext);
-            this.frameworkListener = new FrameworkLifecycleListener();
-            bundleContext.addFrameworkListener(this.frameworkListener);
-            this.serviceListener = new LoggerConfigFactoryListener();
-            bundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_FILTER);
+            this.addListeners(bundleContext);
             this.framework.start();
             LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
                     bundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
@@ -113,7 +109,7 @@ public enum FrameworkManager {
             if (this.framework == null) {
                 LOGGER.warn("OSGi Framework not started yet, nothing to stop!!");
             } else {
-                this.removeServicesAndListeners();
+                this.removeListeners();
                 this.framework.stop();
                 // A value of zero will wait indefinitely.
                 FrameworkEvent event = this.framework.waitForStop(0);
@@ -124,11 +120,25 @@ public enum FrameworkManager {
         }
     }
 
-    private void removeServicesAndListeners() {
+    private BundleContext initFramework(FrameworkFactory frameworkFactory,
+                                        Map<String, String> frameworkConfigs) throws BundleException {
+        this.framework = frameworkFactory.newFramework(frameworkConfigs);
+        this.framework.init();
+        return this.framework.getBundleContext();
+    }
+
+    private void addListeners(BundleContext bundleContext) throws InvalidSyntaxException {
+        this.frameworkListener = new FrameworkLifecycleListener();
+        bundleContext.addFrameworkListener(this.frameworkListener);
+        this.serviceListener = new LoggerConfigFactoryListener();
+        bundleContext.addServiceListener(this.serviceListener, LOGGER_CFG_FACTORY_FILTER);
+    }
+
+    private void removeListeners() {
         BundleContext bundleContext = BundleContextHolder.getInstance().getBundleContext();
         if (bundleContext != null) {
-            bundleContext.removeServiceListener(this.serviceListener);
             try {
+                bundleContext.removeServiceListener(this.serviceListener);
                 LOGGER.info("Removing OSGi FrameworkListener!!");
                 bundleContext.removeFrameworkListener(this.frameworkListener);
             } catch (Exception ex) { // NOSONAR
@@ -145,7 +155,9 @@ public enum FrameworkManager {
         if (StringUtils.isNotEmpty(felixLogLevel)) {
             configs.put(LOG_LEVEL_PROP, felixLogLevel);
         }
-        LOGGER.debug("OSGi Framework Configurations: {}", configs);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("OSGi Framework Configurations: {}", configs);
+        }
         return configs;
     }
 
