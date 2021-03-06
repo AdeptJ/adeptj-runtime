@@ -27,17 +27,14 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Version;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
-import static org.osgi.framework.Constants.BUNDLE_VERSION;
 import static org.osgi.framework.Constants.EXTENSION_DIRECTIVE;
 import static org.osgi.framework.Constants.FRAGMENT_HOST;
 import static org.osgi.framework.Constants.OBJECTCLASS;
@@ -66,14 +63,6 @@ public final class OSGiUtil {
 
     public static boolean isNotFragment(Bundle bundle) {
         return bundle.getHeaders().get(FRAGMENT_HOST) == null;
-    }
-
-    public static Version getBundleVersion(Bundle bundle) {
-        return Version.parseVersion(bundle.getHeaders().get(BUNDLE_VERSION));
-    }
-
-    public static Version getBundleVersion(Attributes mainAttributes) {
-        return Version.parseVersion(mainAttributes.getValue(BUNDLE_VERSION));
     }
 
     public static boolean isSystemBundleFragment(Bundle bundle) {

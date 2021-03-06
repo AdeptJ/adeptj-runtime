@@ -53,9 +53,12 @@ import java.util.stream.Stream;
 
 import static com.adeptj.runtime.common.Constants.BUNDLES_ROOT_DIR_KEY;
 import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
+import static org.osgi.framework.Constants.BUNDLE_VERSION;
 
 /**
  * Find, install and start the Bundles from given location using the System Bundle's BundleContext.
+ * <p>
+ * Note: The OSGi Bundles provisioning is inspired by Sling Launchpad. Thank you Sling Dev Team!
  *
  * @author Rakesh.Kumar, AdeptJ
  */
@@ -217,19 +220,21 @@ final class BundleInstaller {
             Bundle installedBundle = bundles.get(symbolicName);
             if (installedBundle == null) {
                 // Install
-                newBundles.add(bundleContext.installBundle(url.toExternalForm()));
+                Bundle bundle = bundleContext.installBundle(url.toExternalForm());
+                newBundles.add(bundle);
+                LOGGER.info("Installed new Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
                 return false;
             }
             // Update - only when new bundle has higher version than the installed one.
-            Version newVersion = OSGiUtil.getBundleVersion(mainAttributes);
-            Version installedVersion = OSGiUtil.getBundleVersion(installedBundle);
+            Version newVersion = Version.parseVersion(mainAttributes.getValue(BUNDLE_VERSION));
+            Version installedVersion = installedBundle.getVersion();
             if (newVersion.compareTo(installedVersion) > 0) {
                 restartFramework = OSGiUtil.isSystemBundleFragment(installedBundle);
                 if (restartFramework) {
                     LOGGER.info("Update for System Bundle fragment, OSGi Framework will be restarted!");
                 }
                 installedBundle.update(url.openStream());
-                LOGGER.info("Updated OSGi Bundle: {}, old version was {} and new version is {}",
+                LOGGER.info("Updated Bundle: {}, old version was {} and new version is {}",
                         installedBundle, installedVersion, newVersion);
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
