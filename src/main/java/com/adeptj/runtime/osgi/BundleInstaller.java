@@ -238,7 +238,7 @@ final class BundleInstaller {
                         installedBundle, installedVersion, newVersion);
             }
         } catch (BundleException | IllegalStateException | SecurityException | IOException ex) {
-            LOGGER.error("Exception while installing Bundle: [{}]. Cause:", url, ex);
+            LOGGER.error("Exception while installing/updating Bundle: [{}]. Cause:", url, ex);
         }
         return restartFramework;
     }
