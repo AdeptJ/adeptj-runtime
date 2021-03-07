@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -72,6 +73,8 @@ public enum FrameworkManager {
     private static final String LOGGER_CFG_FACTORY_FILTER = "(|(logger.names=*)(logger.level=*))";
 
     private static final String SYS_PROP_OVERWRITE_FRAMEWORK_CONF = "overwrite.framework.conf.file";
+
+    private final static String FILE_INSTALL_DIR = "felix.fileinstall.dir";
 
     private Framework framework;
 
@@ -179,6 +182,13 @@ public enum FrameworkManager {
             }
         } else {
             this.createOrUpdateFrameworkPropertiesFile(configs, confPath);
+            // Create the file install directory upfront otherwise we will run into issues.
+            // https://issues.apache.org/jira/browse/FELIX-6393
+            try {
+                Files.createDirectories(Paths.get(configs.get(FILE_INSTALL_DIR)));
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage(), ex);
+            }
         }
         return configs;
     }
