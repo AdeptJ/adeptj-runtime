@@ -44,14 +44,21 @@ public enum Configs {
 
     INSTANCE;
 
-    private final Config main;
+    /**
+     * This will include system properties as well.
+     */
+    private final Config root;
 
     Configs() {
-        this.main = this.loadConf();
+        this.root = this.loadConf();
+    }
+
+    public Config root() {
+        return this.root;
     }
 
     public Config main() {
-        return this.main;
+        return this.root.getConfig(MAIN_CONF_SECTION);
     }
 
     public Config undertow() {
@@ -89,7 +96,7 @@ public enum Configs {
         } else {
             config = ConfigFactory.load(SERVER_CONF_FILE);
         }
-        return config.getConfig(MAIN_CONF_SECTION);
+        return config;
     }
 
     public static Configs of() {
