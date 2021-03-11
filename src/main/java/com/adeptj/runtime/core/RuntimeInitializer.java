@@ -48,28 +48,20 @@ public class RuntimeInitializer implements ServletContainerInitializer {
      */
     @Override
     public void onStartup(Set<Class<?>> startupAwareClasses, ServletContext context) {
+        ServletContextHolder.getInstance().setServletContext(context);
         Logger logger = LoggerFactory.getLogger(this.getClass());
-        if (startupAwareClasses == null || startupAwareClasses.isEmpty()) {
-            logger.error("No @HandlesTypes(StartupAware) on classpath!!");
-            throw new IllegalStateException("No @HandlesTypes(StartupAware) on classpath!!");
-        } else {
-            ServletContextHolder.getInstance().setServletContext(context);
-            startupAwareClasses
-                    .stream()
-                    .sorted(new StartupAwareComparator())
-                    .forEach(clazz -> {
-                        logger.info("@HandlesTypes: [{}]", clazz);
-                        try {
-                            StartupAware startupAware = (StartupAware) clazz.getConstructor().newInstance();
-                            startupAware.onStartup(context);
-                        } catch (Exception ex) { // NOSONAR
-                            logger.error("Exception while executing StartupAware#onStartup!!", ex);
-                            throw new RuntimeInitializationException(ex);
-                        }
-                    });
-            context.addListener(FrameworkShutdownHandler.class);
-            this.handleServiceLoaderBasedStartupAware(context, logger);
+        for (Class<?> startupAwareClass : startupAwareClasses) {
+            logger.info("@HandlesTypes: [{}]", startupAwareClass);
+            try {
+                StartupAware startupAware = (StartupAware) startupAwareClass.getConstructor().newInstance();
+                startupAware.onStartup(context);
+            } catch (Exception ex) { // NOSONAR
+                logger.error("Exception while executing StartupAware#onStartup!!", ex);
+                throw new RuntimeInitializationException(ex);
+            }
         }
+        context.addListener(FrameworkShutdownHandler.class);
+        this.handleServiceLoaderBasedStartupAware(context, logger);
     }
 
     private void handleServiceLoaderBasedStartupAware(ServletContext context, Logger logger) {
