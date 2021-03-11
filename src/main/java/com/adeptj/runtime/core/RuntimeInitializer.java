@@ -21,15 +21,15 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
-import org.apache.commons.lang3.reflect.ConstructorUtils;
+import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.HandlesTypes;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -40,6 +40,8 @@ import java.util.Set;
  */
 @HandlesTypes(StartupAware.class)
 public class RuntimeInitializer implements ServletContainerInitializer {
+
+    private static final String SYS_PROP_SCAN_STARTUP_AWARE_CLASSES = "scan.startup.aware.classes";
 
     /**
      * {@inheritDoc}
@@ -55,16 +57,31 @@ public class RuntimeInitializer implements ServletContainerInitializer {
             startupAwareClasses
                     .stream()
                     .sorted(new StartupAwareComparator())
-                    .forEach(startupAwareClass -> {
-                        logger.info("@HandlesTypes: [{}]", startupAwareClass);
+                    .forEach(clazz -> {
+                        logger.info("@HandlesTypes: [{}]", clazz);
                         try {
-                            ((StartupAware) ConstructorUtils.invokeConstructor(startupAwareClass)).onStartup(context);
+                            StartupAware startupAware = (StartupAware) clazz.getConstructor().newInstance();
+                            startupAware.onStartup(context);
                         } catch (Exception ex) { // NOSONAR
                             logger.error("Exception while executing StartupAware#onStartup!!", ex);
                             throw new RuntimeInitializationException(ex);
                         }
                     });
             context.addListener(FrameworkShutdownHandler.class);
+            this.handleServiceLoaderBasedStartupAware(context, logger);
+        }
+    }
+
+    private void handleServiceLoaderBasedStartupAware(ServletContext context, Logger logger) {
+        if (Boolean.getBoolean(SYS_PROP_SCAN_STARTUP_AWARE_CLASSES)) {
+            for (StartupAware startupAware : ServiceLoader.load(StartupAware.class)) {
+                logger.info("Found ServiceLoader based StartupAware: [{}]", startupAware);
+                try {
+                    startupAware.onStartup(context);
+                } catch (Exception ex) { // NOSONAR
+                    logger.error("Exception while executing ServiceLoader based StartupAware#onStartup!!", ex);
+                }
+            }
         }
     }
 }
