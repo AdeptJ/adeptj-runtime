@@ -43,6 +43,7 @@
         <undertow.version>2.2.5.Final</undertow.version>
         <xnio.version>3.8.4.Final</xnio.version>
         <trimou-core.version>2.5.1.Final</trimou-core.version>
+        <jcommander.version>1.81</jcommander.version>
 
         <!-- Apache Felix and OSGi Dependencies Version -->
         <felix.framework.version>7.0.0</felix.framework.version>
@@ -322,6 +323,13 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2-mvstore</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>${jcommander.version}</version>
             <scope>compile</scope>
         </dependency>
 
