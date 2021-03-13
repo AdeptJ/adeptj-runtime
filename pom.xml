@@ -44,11 +44,6 @@
         <xnio.version>3.8.4.Final</xnio.version>
         <trimou-core.version>2.5.1.Final</trimou-core.version>
         <jcommander.version>1.81</jcommander.version>
-
-        <!-- Apache Felix and OSGi Dependencies Version -->
-        <felix.framework.version>7.0.0</felix.framework.version>
-        <felix.http.bridge.version>4.1.2</felix.http.bridge.version>
-        <felix.http.base.version>4.1.2</felix.http.base.version>
     </properties>
 
     <!-- Project Information -->
@@ -347,22 +342,16 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.framework.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.base</artifactId>
-            <version>${felix.http.base.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.http.bridge</artifactId>
-            <version>${felix.http.bridge.version}</version>
-            <scope>provided</scope>
             <classifier>light</classifier>
         </dependency>
 
