@@ -363,10 +363,6 @@
 
         <!-- Apache Felix Dependencies End -->
 
-        <!-- AdeptJ Dependencies Start-->
-
-        <!-- AdeptJ Dependencies End-->
-
         <!-- Test dependencies -->
 
         <dependency>
