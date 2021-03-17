@@ -103,7 +103,7 @@ final class BundleInstaller {
         long startTime = System.nanoTime();
         LOGGER.info("Bundles provisioning start!!");
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
-        this.collect(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
+        this.collectAsStream(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
                 .map(url -> this.install(url, bundleContext, counter))
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(Bundle::getBundleId)) // start bundles in ascending order of bundle id.
@@ -113,7 +113,7 @@ final class BundleInstaller {
         return false;
     }
 
-    private Stream<URL> collect(String bundlesDir) throws IOException {
+    private Stream<URL> collectAsStream(String bundlesDir) throws IOException {
         ClassLoader cl = this.getClass().getClassLoader();
         return this.getJarFile(bundlesDir, cl)
                 .stream()
@@ -187,22 +187,22 @@ final class BundleInstaller {
 
     private boolean handleUpdate(Config felixConf, BundleContext bundleContext) throws IOException {
         boolean restartFramework = false;
-        Map<String, Bundle> bundles = Stream.of(bundleContext.getBundles())
+        Map<String, Bundle> existingBundles = Stream.of(bundleContext.getBundles())
                 .collect(Collectors.toMap(Bundle::getSymbolicName, bundle -> bundle));
         List<Bundle> newBundles = new ArrayList<>();
         for (URL url : this.collectAsList(felixConf.getString(BUNDLES_ROOT_DIR_KEY))) {
-            restartFramework |= this.doHandleUpdate(url, bundles, newBundles, bundleContext);
+            restartFramework |= this.doHandleUpdate(url, existingBundles, newBundles, bundleContext);
         }
         // start the newly installed bundles.
         for (Bundle bundle : newBundles) {
-            if (bundle != null && OSGiUtil.isNotFragment(bundle)) {
+            if (OSGiUtil.isNotFragment(bundle)) {
                 this.start(bundle);
             }
         }
         return restartFramework;
     }
 
-    private boolean doHandleUpdate(URL url, Map<String, Bundle> bundles,
+    private boolean doHandleUpdate(URL url, Map<String, Bundle> existingBundles,
                                    List<Bundle> newBundles, BundleContext bundleContext) {
         boolean restartFramework = false;
         try (JarInputStream jis = new JarInputStream(url.openStream(), false)) {
@@ -217,7 +217,7 @@ final class BundleInstaller {
                 LOGGER.error("Artifact [{}] is not an OSGi Bundle, can't be installed.", url);
                 return false;
             }
-            Bundle installedBundle = bundles.get(symbolicName);
+            Bundle installedBundle = existingBundles.get(symbolicName);
             if (installedBundle == null) {
                 // Install
                 Bundle bundle = bundleContext.installBundle(url.toExternalForm());
