@@ -99,7 +99,8 @@ public enum FrameworkManager {
             BundleContextHolder.getInstance().setBundleContext(bundleContext);
             this.addListeners(bundleContext);
             this.framework.start();
-            LOGGER.info("OSGi Framework [Apache Felix v{}] started in [{}] ms!!",
+            LOGGER.info("OSGi Framework [{} v{}] started in [{}] ms!!",
+                    bundleContext.getBundle().getSymbolicName(),
                     bundleContext.getBundle().getVersion(), Times.elapsedMillis(startTime));
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Failed to start OSGi Framework!!", ex);
