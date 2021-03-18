@@ -20,9 +20,6 @@
 package com.adeptj.runtime.cli;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.converters.FileConverter;
-
-import java.io.File;
 
 /**
  * Program arguments holder.
@@ -85,11 +82,9 @@ public class MainArgs {
     @Parameter(names = "-tls", description = "TLS version")
     public String tlsVersion;
 
+    @Parameter(names = "-p12File", description = "Absolute path of the p12 file")
+    public String p12File;
+
     @Parameter(names = "-p12Password", description = "p12 password")
     public String p12Password;
-
-    // File types
-    @Parameter(names = "-p12File",
-            converter = FileConverter.class, description = "Absolute path of the p12 file")
-    public File p12File;
 }
