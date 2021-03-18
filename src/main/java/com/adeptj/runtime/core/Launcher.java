@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
@@ -81,7 +80,6 @@ public final class Launcher {
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         Launcher launcher = new Launcher();
         try {
-            launcher.pauseForDebug();
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             Map<String, String> runtimeArgs = launcher.parseArgs(args);
             Lifecycle lifecycle = new Server();
@@ -92,15 +90,6 @@ public final class Launcher {
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
-        }
-    }
-
-    private void pauseForDebug() throws InterruptedException {
-        // Useful for debugging the server startup in development mode.
-        if (Environment.isDev()) {
-            Integer waitTime = Integer.getInteger("wait.time.for.debug.attach", 10);
-            LoggerFactory.getLogger(Launcher.class).info("Waiting [{}] seconds for debugger to attach!", waitTime);
-            TimeUnit.SECONDS.sleep(waitTime);
         }
     }
 

@@ -68,13 +68,9 @@ final class BundleInstaller {
 
     public static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
 
-    private static final String BUNDLE_STARTED_MSG = "Started Bundle [{}, Version: {}] in [{}] ms!";
-
     private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
 
-    private static final String BENCHMARK_BUNDLE_START = "benchmark.bundle.start";
-
-    private static final String SYS_PROP_PROVISION_BUNDLES_EXPLICITLY = "provision.bundles.explicitly";
+    private static final String SYS_PROP_FORCE_PROVISION_BUNDLES = "force.provision.bundles";
 
     private static final String DOT_JAR = ".jar";
 
@@ -92,7 +88,7 @@ final class BundleInstaller {
         // config directory will not yet be created if framework is being provisioned first time.
         File frameworkConfigDir = Paths.get(felixConf.getString(CFG_KEY_FELIX_CM_DIR)).toFile();
         if (frameworkConfigDir.exists()) {
-            if (Boolean.getBoolean(SYS_PROP_PROVISION_BUNDLES_EXPLICITLY)) {
+            if (Boolean.getBoolean(SYS_PROP_FORCE_PROVISION_BUNDLES)) {
                 // Update
                 return this.handleUpdate(felixConf, bundleContext);
             }
@@ -101,7 +97,7 @@ final class BundleInstaller {
         }
         // Install
         long startTime = System.nanoTime();
-        LOGGER.info("Bundles provisioning start!!");
+        LOGGER.info("Bundles provisioning start - OSGi framework's first bootstrap!!");
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
         this.collectAsStream(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
                 .map(url -> this.install(url, bundleContext, counter))
@@ -172,14 +168,8 @@ final class BundleInstaller {
 
     private void start(Bundle bundle) {
         try {
-            if (Boolean.getBoolean(BENCHMARK_BUNDLE_START)) {
-                long startTime = System.nanoTime();
-                bundle.start();
-                LOGGER.info(BUNDLE_STARTED_MSG, bundle, bundle.getVersion(), Times.elapsedMillis(startTime));
-            } else {
-                bundle.start();
-                LOGGER.info("Started Bundle: [{}, Version: {}]", bundle, bundle.getVersion());
-            }
+            bundle.start();
+            LOGGER.info("Started Bundle [{}, Version: {}]", bundle, bundle.getVersion());
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
         }
@@ -214,7 +204,7 @@ final class BundleInstaller {
             Attributes mainAttributes = manifest.getMainAttributes();
             String symbolicName = mainAttributes.getValue(BUNDLE_SYMBOLICNAME);
             if (StringUtils.isEmpty(symbolicName)) {
-                LOGGER.error("Artifact [{}] is not an OSGi Bundle, can't be installed.", url);
+                LOGGER.error("Artifact [{}] is not an OSGi Bundle!!", url);
                 return false;
             }
             Bundle installedBundle = existingBundles.get(symbolicName);
