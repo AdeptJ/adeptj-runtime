@@ -85,8 +85,6 @@ public final class Constants {
 
     public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
 
-    public static final String HEADER_X_POWERED_BY = "X-Powered-By";
-
     public static final String HEADER_SERVER = "Server";
 
     public static final String OSGI_ADMIN_ROLE = "OSGiAdmin";
@@ -106,8 +104,6 @@ public final class Constants {
     public static final String KEY_HTTP = "http";
 
     public static final String KEY_HEADER_SERVER = "common.header-server";
-
-    public static final String KEY_HEADER_X_POWERED_BY = "common.header-x-powered-by";
 
     public static final String MV_CREDENTIALS_STORE = "credentials.dat";
 

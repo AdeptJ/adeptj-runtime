@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,35 +17,30 @@
 #                                                                             #
 ###############################################################################
 */
-
-package com.adeptj.runtime.handler;
-
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.HttpString;
-
-import java.util.Map;
+package com.adeptj.runtime.cli;
 
 /**
- * Sets the given headers in the response header map on each request, then call the next handler.
+ * The {@link MainArgs} holder.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public final class SetHeadersHandler implements HttpHandler {
+public enum MainArgsHolder {
 
-    private final HttpHandler nextHandler;
+    INSTANCE;
 
-    private final Map<HttpString, String> headers;
+    private MainArgs mainArgs;
 
-    public SetHeadersHandler(HttpHandler nextHandler, Map<HttpString, String> headers) {
-        this.nextHandler = nextHandler;
-        this.headers = headers;
+    public MainArgs getMainArgs() {
+        return mainArgs;
     }
 
-    @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
-        this.headers.forEach((name, value) -> exchange.getResponseHeaders().put(name, value));
-        this.nextHandler.handleRequest(exchange);
+    public void setMainArgs(MainArgs mainArgs) {
+        if (this.mainArgs == null) {
+            this.mainArgs = mainArgs;
+        }
     }
 
+    public static MainArgsHolder getInstance() {
+        return INSTANCE;
+    }
 }

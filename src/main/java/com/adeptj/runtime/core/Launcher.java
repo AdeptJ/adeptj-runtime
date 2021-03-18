@@ -21,31 +21,19 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.Lifecycle;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.osgi.FrameworkManager;
 import com.adeptj.runtime.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static com.adeptj.runtime.common.Constants.ARG_OPEN_CONSOLE;
-import static com.adeptj.runtime.common.Constants.KEY_HTTP;
-import static com.adeptj.runtime.common.Constants.KEY_PORT;
-import static com.adeptj.runtime.common.Constants.OSGI_CONSOLE_URL;
-import static com.adeptj.runtime.common.Constants.REGEX_EQ;
 import static com.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -81,33 +69,13 @@ public final class Launcher {
         Launcher launcher = new Launcher();
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            Map<String, String> runtimeArgs = launcher.parseArgs(args);
             Lifecycle lifecycle = new Server();
-            lifecycle.start(runtimeArgs);
+            lifecycle.start(null);
             Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
-            launcher.launchBrowser(runtimeArgs);
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
-        }
-    }
-
-    private Map<String, String> parseArgs(String[] args) {
-        return Stream.of(args)
-                .map(cmd -> cmd.split(REGEX_EQ))
-                .collect(toMap(cmdArray -> cmdArray[0], cmdArray -> cmdArray[1]));
-    }
-
-    private void launchBrowser(Map<String, String> commands) {
-        if (Boolean.parseBoolean(commands.get(ARG_OPEN_CONSOLE))) {
-            try {
-                Environment.launchBrowser(new URL(String.format(OSGI_CONSOLE_URL,
-                        Configs.of().undertow().getConfig(KEY_HTTP).getInt(KEY_PORT))));
-            } catch (IOException ex) {
-                // Just log it, its okay if browser is not launched.
-                LoggerFactory.getLogger(Launcher.class).error("Exception while launching browser!!", ex);
-            }
         }
     }
 

@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.common;
 
-import java.util.Map;
+import com.adeptj.runtime.cli.MainArgs;
 
 /**
  * Anything that want to be stopped as a result of shutdown hook can implement this interface.
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public interface Lifecycle {
 
-    void start(Map<String, String> runtimeArgs);
+    void start(MainArgs mainArgs);
 
     void stop();
 }

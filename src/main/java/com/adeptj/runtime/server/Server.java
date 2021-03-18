@@ -21,6 +21,7 @@
 package com.adeptj.runtime.server;
 
 import ch.qos.logback.classic.ViewStatusMessagesServlet;
+import com.adeptj.runtime.cli.MainArgs;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
@@ -34,7 +35,6 @@ import com.adeptj.runtime.core.RuntimeInitializer;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
 import com.adeptj.runtime.handler.HealthCheckHandler;
 import com.adeptj.runtime.handler.ServletInitialHandlerWrapper;
-import com.adeptj.runtime.handler.SetHeadersHandler;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.predicate.ContextPathPredicate;
 import com.adeptj.runtime.servlet.AdminServlet;
@@ -54,6 +54,7 @@ import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
+import io.undertow.server.handlers.SetHeaderHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.CrawlerSessionManagerConfig;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -84,10 +85,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -96,14 +95,11 @@ import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
-import static com.adeptj.runtime.common.Constants.HEADER_SERVER;
-import static com.adeptj.runtime.common.Constants.HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_ADMIN_SERVLET_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_CODES;
 import static com.adeptj.runtime.common.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.common.Constants.KEY_HEADER_SERVER;
-import static com.adeptj.runtime.common.Constants.KEY_HEADER_X_POWERED_BY;
 import static com.adeptj.runtime.common.Constants.KEY_HOST;
 import static com.adeptj.runtime.common.Constants.KEY_HTTP;
 import static com.adeptj.runtime.common.Constants.KEY_LOGBACK_STATUS_SERVLET_PATH;
@@ -162,6 +158,7 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_SYS_TASK_THREAD
 import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
+import static io.undertow.util.Headers.SERVER_STRING;
 import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.xnio.Options.TCP_NODELAY;
@@ -188,8 +185,7 @@ public final class Server implements Lifecycle {
      * Bootstrap Undertow Server and OSGi Framework.
      */
     @Override
-    public void start(Map<String, String> runtimeArgs) {
-        LOGGER.debug("AdeptJ Runtime jvm args: {}", runtimeArgs);
+    public void start(MainArgs mainArgs) {
         Config undertowConf = Configs.of().undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         int port = this.resolvePort(httpConf);
@@ -300,35 +296,33 @@ public final class Server implements Lifecycle {
     }
 
     private void setWorkerOptions(Builder builder, Config undertowConf) {
-        if (Environment.isProd()) {
-            long startTime = System.nanoTime();
-            // Note : For a 16 core system, number of worker task core and max threads will be.
-            // 1. core task thread: 128 (16[cores] * 8)
-            // 2. max task thread: 128 * 2 = 256
-            // Default settings would have set the following.
-            // 1. core task thread: 128 (16[cores] * 8)
-            // 2. max task thread: 128 (Same as core task thread)
-            Config config = undertowConf.getConfig(KEY_WORKER_OPTIONS);
-            // defaults to 64
-            int cfgCoreTaskThreads = config.getInt(KEY_WORKER_TASK_CORE_THREADS);
-            LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
-            int availableProcessors = Runtime.getRuntime().availableProcessors();
-            LOGGER.info("No. of CPU available: [{}]", availableProcessors);
-            int calcCoreTaskThreads = availableProcessors *
-                    Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
-            LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
-            // defaults to double of [worker-task-core-threads] i.e 128
-            int cfgMaxTaskThreads = config.getInt(KEY_WORKER_TASK_MAX_THREADS);
-            LOGGER.info("Configured worker task max threads: [{}]", cfgMaxTaskThreads);
-            int calcMaxTaskThreads = calcCoreTaskThreads *
-                    Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
-            LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
-            WorkerOptions options = new WorkerOptions();
-            options.setOptions(builder, undertowConf);
-            options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
-                    .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
-            LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
-        }
+        long startTime = System.nanoTime();
+        // Note : For a 16 core system, number of worker task core and max threads will be.
+        // 1. core task thread: 128 (16[cores] * 8)
+        // 2. max task thread: 128 * 2 = 256
+        // Default settings would have set the following.
+        // 1. core task thread: 128 (16[cores] * 8)
+        // 2. max task thread: 128 (Same as core task thread)
+        Config config = undertowConf.getConfig(KEY_WORKER_OPTIONS);
+        // defaults to 64
+        int cfgCoreTaskThreads = config.getInt(KEY_WORKER_TASK_CORE_THREADS);
+        LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        LOGGER.info("No. of CPU available: [{}]", availableProcessors);
+        int calcCoreTaskThreads = availableProcessors *
+                Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
+        LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
+        // defaults to double of [worker-task-core-threads] i.e 128
+        int cfgMaxTaskThreads = config.getInt(KEY_WORKER_TASK_MAX_THREADS);
+        LOGGER.info("Configured worker task max threads: [{}]", cfgMaxTaskThreads);
+        int calcMaxTaskThreads = calcCoreTaskThreads *
+                Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
+        LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
+        WorkerOptions options = new WorkerOptions();
+        options.setOptions(builder, undertowConf);
+        options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
+                .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
+        LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
     private Builder addHttpsListener(Builder builder, Config undertowConf) throws GeneralSecurityException {
@@ -366,16 +360,12 @@ public final class Server implements Lifecycle {
      * @return GracefulShutdownHandler as the root handler
      */
     private GracefulShutdownHandler createHandlerChain(HttpHandler httpContinueReadHandler, Config cfg) {
-        Map<HttpString, String> headers = new HashMap<>();
-        headers.put(HttpString.tryFromString(HEADER_SERVER), cfg.getString(KEY_HEADER_SERVER));
-        if (Environment.isDev()) {
-            headers.put(HttpString.tryFromString(HEADER_X_POWERED_BY), cfg.getString(KEY_HEADER_X_POWERED_BY));
-        }
         RedirectHandler contextHandler = Handlers.redirect(cfg.getString(KEY_SYSTEM_CONSOLE_PATH));
+        RequestBufferingHandler requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler,
+                Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
         HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
-                new SetHeadersHandler(new RequestBufferingHandler(httpContinueReadHandler,
-                        Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS))), headers) :
-                new SetHeadersHandler(httpContinueReadHandler, headers);
+                new SetHeaderHandler(requestBufferingHandler, SERVER_STRING, cfg.getString(KEY_HEADER_SERVER)) :
+                new SetHeaderHandler(httpContinueReadHandler, SERVER_STRING, cfg.getString(KEY_HEADER_SERVER));
         ContextPathPredicate contextPathPredicate = new ContextPathPredicate(cfg.getString(KEY_CONTEXT_PATH));
         PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler, headersHandler);
         PathHandler pathHandler = Handlers.path(predicateHandler)
