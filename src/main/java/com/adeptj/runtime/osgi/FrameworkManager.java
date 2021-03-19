@@ -183,15 +183,20 @@ public enum FrameworkManager {
             }
         } else {
             this.createOrUpdateFrameworkPropertiesFile(configs, confPath);
-            // Create the file install directory upfront otherwise we will run into issues.
-            // https://issues.apache.org/jira/browse/FELIX-6393
-            try {
-                Files.createDirectories(Paths.get(configs.get(FILE_INSTALL_DIR)));
-            } catch (IOException ex) {
-                LOGGER.error(ex.getMessage(), ex);
-            }
+            this.createFileInstallDirectory(configs.get(FILE_INSTALL_DIR));
         }
         return configs;
+    }
+
+    private void createFileInstallDirectory(String dir) {
+        // Create the file install directory upfront otherwise we will run into issues.
+        // https://issues.apache.org/jira/browse/FELIX-6393
+        try {
+            Files.createDirectories(Paths.get(dir));
+        } catch (IOException ex) {
+            // Gulp the exception as it should not stop framework bootstrapping.
+            LOGGER.error(ex.getMessage(), ex);
+        }
     }
 
     private void loadClasspathFrameworkProperties(Map<String, String> configs) {

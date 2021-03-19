@@ -33,7 +33,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 /**
  * This Class initializes the Logback logging framework.
  * <p>
- * Usually Logback is initialized via logback.xml logFile on CLASSPATH.
+ * Usually Logback is initialized via logback.xml file on CLASSPATH.
  * But using that approach Logback takes longer to initialize(5+ seconds) which is reduced drastically
  * to ~ 200 milliseconds using programmatic approach.
  * <p>
