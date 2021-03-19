@@ -87,4 +87,29 @@ public class MainArgs {
 
     @Parameter(names = "-p12Password", description = "p12 password")
     public String p12Password;
+
+    @Override
+    public String toString() {
+        return "MainArgs{" +
+                "port=" + port +
+                ", httpsPort=" + httpsPort +
+                ", shutdownWaitTime=" + shutdownWaitTime +
+                ", sessionTimeout=" + sessionTimeout +
+                ", maxConcurrentRequests=" + maxConcurrentRequests +
+                ", requestBufferingMaxBuffer=" + requestBufferingMaxBuffer +
+                ", felixLogLevel=" + felixLogLevel +
+                ", dev=" + dev +
+                ", scanStartupAwareClasses=" + scanStartupAwareClasses +
+                ", logAsync=" + logAsync +
+                ", logImmediateFlush=" + logImmediateFlush +
+                ", forceProvisionBundles=" + forceProvisionBundles +
+                ", requestBuffering=" + requestBuffering +
+                ", overwriteServerConf=" + overwriteServerConf +
+                ", overwriteFrameworkConf=" + overwriteFrameworkConf +
+                ", logFrameworkError=" + logFrameworkError +
+                ", tlsVersion='" + tlsVersion + '\'' +
+                ", p12File='" + p12File + '\'' +
+                ", p12Password='" + p12Password + '\'' +
+                '}';
+    }
 }

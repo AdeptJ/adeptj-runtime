@@ -53,8 +53,6 @@ public final class Constants {
 
     public static final String BANNER_TXT = "/banner.txt";
 
-    public static final String REGEX_EQ = "=";
-
     public static final String UTF8 = "UTF-8";
 
     public static final String CONTENT_TYPE_HTML_UTF8 = "text/html;charset=UTF-8";
@@ -77,15 +75,9 @@ public final class Constants {
 
     public static final String SYS_PROP_SERVER_PORT = "adeptj.rt.port";
 
-    public static final String ARG_OPEN_CONSOLE = "openConsole";
-
     public static final String SERVER_STOP_THREAD_NAME = "AdeptJ Terminator";
 
     public static final String DEPLOYMENT_NAME = "AdeptJ Runtime Deployment";
-
-    public static final String OSGI_CONSOLE_URL = "http://localhost:%s/system/console";
-
-    public static final String HEADER_SERVER = "Server";
 
     public static final String OSGI_ADMIN_ROLE = "OSGiAdmin";
 
@@ -113,19 +105,7 @@ public final class Constants {
 
     static final String FRAMEWORK_CONF_FILE = "framework.properties";
 
-    // Configuration Keys constants start.
-
-    static final String KEY_BROWSERS = "browsers";
-
-    static final String WIN_BROWSER_LAUNCH_CMD = "rundll32 url.dll,FileProtocolHandler ";
-
-    static final String MAC_BROWSER_LAUNCH_CMD = "open ";
-
     static final String SYS_PROP_SERVER_MODE = "adeptj.rt.mode";
-
-    static final String EMPTY = "";
-
-    // Configuration Keys constants ends.
 
     public static final String KEY_P12_FILE_LOCATION = "p12-file-location";
 

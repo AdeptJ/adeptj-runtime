@@ -21,7 +21,6 @@
 package com.adeptj.runtime.server;
 
 import ch.qos.logback.classic.ViewStatusMessagesServlet;
-import com.adeptj.runtime.cli.MainArgs;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
@@ -185,7 +184,7 @@ public final class Server implements Lifecycle {
      * Bootstrap Undertow Server and OSGi Framework.
      */
     @Override
-    public void start(MainArgs mainArgs) {
+    public void start(String[] args) {
         Config undertowConf = Configs.of().undertow();
         Config httpConf = undertowConf.getConfig(KEY_HTTP);
         int port = this.resolvePort(httpConf);

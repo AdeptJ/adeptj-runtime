@@ -100,9 +100,7 @@ public final class LogbackManager {
 
     private static final String SYS_PROP_LOG_IMMEDIATE_FLUSH = "log.immediate.flush";
 
-    private static final String HIGHLIGHT = "highlight";
-
-    private static final String THREAD = "thread";
+    private static final String HIGHLIGHT_EXT = "highlight_ext";
 
     private static final String LC_NAME = "AdeptJ";
 
@@ -149,8 +147,7 @@ public final class LogbackManager {
         this.loggerContext = loggerContext;
         this.loggerContext.setName(LC_NAME);
         this.contextUtil = new ContextUtil(loggerContext);
-        PatternLayout.defaultConverterMap.put(HIGHLIGHT, DebugLevelHighlightingConverter.class.getName());
-        PatternLayout.defaultConverterMap.put(THREAD, TrimThreadNameConverter.class.getName());
+        PatternLayout.defaultConverterMap.put(HIGHLIGHT_EXT, DebugLevelHighlightingConverter.class.getName());
     }
 
     public void stopLogback() {

@@ -62,9 +62,9 @@ import static org.osgi.framework.Constants.BUNDLE_VERSION;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-final class BundleInstaller {
+final class BundleProvisioner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BundleInstaller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvisioner.class);
 
     public static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
 
@@ -97,7 +97,7 @@ final class BundleInstaller {
         }
         // Install
         long startTime = System.nanoTime();
-        LOGGER.info("Bundles provisioning start - OSGi framework's first bootstrap!!");
+        LOGGER.info("Starting provisioning of bundles on OSGi framework's first bootstrap!!");
         AtomicInteger counter = new AtomicInteger(1); // add the system bundle to the total count
         this.collectAsStream(felixConf.getString(BUNDLES_ROOT_DIR_KEY))
                 .map(url -> this.install(url, bundleContext, counter))
@@ -169,7 +169,7 @@ final class BundleInstaller {
     private void start(Bundle bundle) {
         try {
             bundle.start();
-            LOGGER.info("Started Bundle [{}, Version: {}]", bundle, bundle.getVersion());
+            LOGGER.info("Started Bundle [{}, v{}]", bundle, bundle.getVersion());
         } catch (Exception ex) { // NOSONAR
             LOGGER.error("Exception while starting Bundle: [{}, Version: {}]", bundle, bundle.getVersion(), ex);
         }

@@ -28,7 +28,7 @@
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
-    <version>1.0.14-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>High performance, dynamic, modular runtime for RESTful APIs, MicroServices and WebApps.</description>

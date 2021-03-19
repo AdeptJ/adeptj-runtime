@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
-import static com.adeptj.runtime.osgi.BundleInstaller.CFG_KEY_FELIX_CM_DIR;
+import static com.adeptj.runtime.osgi.BundleProvisioner.CFG_KEY_FELIX_CM_DIR;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -90,7 +90,7 @@ public enum FrameworkManager {
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
             Map<String, String> frameworkConfigs = this.newFrameworkConfigs(felixConf);
             BundleContext bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);
-            boolean restartFramework = new BundleInstaller().installUpdateBundles(felixConf, bundleContext);
+            boolean restartFramework = new BundleProvisioner().installUpdateBundles(felixConf, bundleContext);
             if (restartFramework) {
                 LOGGER.info("Restarting OSGi Framework!");
                 this.stopFramework();

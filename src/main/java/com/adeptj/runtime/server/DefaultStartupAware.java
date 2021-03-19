@@ -21,7 +21,6 @@
 package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Servlets;
-import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.core.StartupAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import javax.servlet.ServletContext;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(1)
 public class DefaultStartupAware implements StartupAware {
 
     /**

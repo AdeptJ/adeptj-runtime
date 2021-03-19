@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.osgi;
 
-import com.adeptj.runtime.common.StartupOrder;
 import com.adeptj.runtime.core.StartupAware;
 
 import javax.servlet.ServletContext;
@@ -30,7 +29,6 @@ import javax.servlet.ServletContext;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-@StartupOrder(0)
 public class FrameworkLauncher implements StartupAware {
 
     /**
