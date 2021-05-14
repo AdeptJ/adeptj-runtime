@@ -352,12 +352,6 @@
             <classifier>light</classifier>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.healthcheck.annotation</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- Apache Felix Dependencies End -->
 
         <!-- Test dependencies -->
