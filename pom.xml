@@ -32,7 +32,7 @@
     <packaging>jar</packaging>
     <name>AdeptJ Runtime</name>
     <description>High performance, dynamic, modular runtime for RESTful APIs, MicroServices and WebApps.</description>
-    <url>http://www.adeptj.com</url>
+    <url>https://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
     <properties>
@@ -48,13 +48,13 @@
     <!-- Project Information -->
     <organization>
         <name>AdeptJ</name>
-        <url>http://www.adeptj.com</url>
+        <url>https://www.adeptj.com</url>
     </organization>
 
     <licenses>
         <license>
             <name>Apache License Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -66,7 +66,7 @@
             <email>irakeshk@outlook.com</email>
             <url>https://www.linkedin.com/in/rakeshk15</url>
             <organization>AdeptJ</organization>
-            <organizationUrl>http://www.adeptj.com</organizationUrl>
+            <organizationUrl>https://www.adeptj.com</organizationUrl>
             <roles>
                 <role>architect</role>
                 <role>lead developer</role>
