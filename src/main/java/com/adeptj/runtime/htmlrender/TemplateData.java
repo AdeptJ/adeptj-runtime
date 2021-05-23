@@ -18,18 +18,50 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.templating;
+package com.adeptj.runtime.htmlrender;
+
+import org.trimou.engine.resolver.Mapper;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * The {@link TemplateProcessingException} thrown when an exception occurred while processing a given template.
+ * TemplateData object for storing variables used in template rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-final class TemplateProcessingException extends RuntimeException {
+public final class TemplateData implements Mapper, Iterable<Entry<String, Object>> {
 
-    private static final long serialVersionUID = -8077495079692215520L;
+    private final Locale locale;
 
-    TemplateProcessingException(Throwable cause) {
-        super(cause);
+    private Map<String, Object> variables;
+
+    public TemplateData(Locale locale) {
+        this.locale = locale;
+    }
+
+    public TemplateData with(String key, Object value) {
+        if (this.variables == null) {
+            this.variables = new HashMap<>(8);
+        }
+        this.variables.put(key, value);
+        return this;
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    @Override
+    public Object get(String key) {
+        return this.variables.get(key);
+    }
+
+    @Override
+    public Iterator<Entry<String, Object>> iterator() {
+        return this.variables.entrySet().iterator();
     }
 }

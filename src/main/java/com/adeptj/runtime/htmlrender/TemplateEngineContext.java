@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.templating;
+package com.adeptj.runtime.htmlrender;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;

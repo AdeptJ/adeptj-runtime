@@ -23,9 +23,9 @@ package com.adeptj.runtime.servlet;
 import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.config.Configs;
-import com.adeptj.runtime.templating.TemplateData;
-import com.adeptj.runtime.templating.TemplateEngine;
-import com.adeptj.runtime.templating.TemplateEngineContext;
+import com.adeptj.runtime.htmlrender.TemplateData;
+import com.adeptj.runtime.htmlrender.TemplateEngine;
+import com.adeptj.runtime.htmlrender.TemplateEngineContext;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
