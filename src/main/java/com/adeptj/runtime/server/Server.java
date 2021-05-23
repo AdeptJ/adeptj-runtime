@@ -38,12 +38,10 @@ import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.predicate.ContextPathPredicate;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
-import com.adeptj.runtime.websocket.ServerLogsWebSocket;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.Undertow.Builder;
-import io.undertow.server.DefaultByteBufferPool;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
@@ -64,16 +62,12 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSessionConfig;
 import io.undertow.util.HttpString;
-import io.undertow.websockets.jsr.WebSocketDeploymentInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.xnio.OptionMap;
-import org.xnio.Xnio;
-import org.xnio.XnioWorker;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.MultipartConfigElement;
@@ -135,13 +129,6 @@ import static com.adeptj.runtime.server.ServerConstants.KEY_USE_CACHED_AUTH_MECH
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_OPTIONS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_CORE_THREADS;
 import static com.adeptj.runtime.server.ServerConstants.KEY_WORKER_TASK_MAX_THREADS;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_BUFFER_SIZE;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_IO_THREADS;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_CORE_THREADS;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TASK_MAX_THREADS;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_TCP_NO_DELAY;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_USE_DIRECT_BUFFER;
-import static com.adeptj.runtime.server.ServerConstants.KEY_WS_WEB_SOCKET_OPTIONS;
 import static com.adeptj.runtime.server.ServerConstants.LOGBACK_STATUS_SERVLET_NAME;
 import static com.adeptj.runtime.server.ServerConstants.PWD_START_INDEX;
 import static com.adeptj.runtime.server.ServerConstants.REALM;
@@ -158,10 +145,7 @@ import static com.adeptj.runtime.server.ServerConstants.SYS_PROP_WORKER_TASK_THR
 import static com.adeptj.runtime.server.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.server.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
 import static io.undertow.util.Headers.SERVER_STRING;
-import static io.undertow.websockets.jsr.WebSocketDeploymentInfo.ATTRIBUTE_NAME;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
-import static org.xnio.Options.TCP_NODELAY;
-import static org.xnio.Options.WORKER_IO_THREADS;
 import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
 import static org.xnio.Options.WORKER_TASK_MAX_THREADS;
 
@@ -431,30 +415,6 @@ public final class Server implements Lifecycle {
                 cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
-    private WebSocketDeploymentInfo webSocketDeploymentInfo(Config cfg) {
-        Config wsOptions = cfg.getConfig(KEY_WS_WEB_SOCKET_OPTIONS);
-        return new WebSocketDeploymentInfo().setDispatchToWorkerThread(true)
-                .setWorker(this.webSocketWorker(wsOptions))
-                .setBuffers(new DefaultByteBufferPool(wsOptions.getBoolean(KEY_WS_USE_DIRECT_BUFFER),
-                        wsOptions.getInt(KEY_WS_BUFFER_SIZE)))
-                .addEndpoint(ServerLogsWebSocket.class);
-    }
-
-    private XnioWorker webSocketWorker(Config wsOptions) {
-        XnioWorker worker = null;
-        try {
-            worker = Xnio.getInstance().createWorker(OptionMap.builder()
-                    .set(WORKER_IO_THREADS, wsOptions.getInt(KEY_WS_IO_THREADS))
-                    .set(WORKER_TASK_CORE_THREADS, wsOptions.getInt(KEY_WS_TASK_CORE_THREADS))
-                    .set(WORKER_TASK_MAX_THREADS, wsOptions.getInt(KEY_WS_TASK_MAX_THREADS))
-                    .set(TCP_NODELAY, wsOptions.getBoolean(KEY_WS_TCP_NO_DELAY))
-                    .getMap());
-        } catch (IOException ex) {
-            LOGGER.error("Can't create XnioWorker!!", ex);
-        }
-        return worker;
-    }
-
     private int sessionTimeout(Config cfg) {
         return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, cfg.getInt(KEY_SESSION_TIMEOUT));
     }
@@ -482,7 +442,6 @@ public final class Server implements Lifecycle {
                 .addErrorPages(this.errorPages(cfg))
                 .setDefaultMultipartConfig(this.defaultMultipartConfig(cfg))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
-                .addServletContextAttribute(ATTRIBUTE_NAME, this.webSocketDeploymentInfo(cfg))
                 .setServletSessionConfig(this.sessionConfig(cfg))
                 .setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
     }

@@ -76,20 +76,6 @@ final class ServerConstants {
 
     static final String KEY_USE_CACHED_AUTH_MECHANISM = "common.use-cached-auth-mechanism";
 
-    static final String KEY_WS_IO_THREADS = "io-threads";
-
-    static final String KEY_WS_TASK_CORE_THREADS = "task-core-threads";
-
-    static final String KEY_WS_TASK_MAX_THREADS = "task-max-threads";
-
-    static final String KEY_WS_TCP_NO_DELAY = "tcp-no-delay";
-
-    static final String KEY_WS_WEB_SOCKET_OPTIONS = "webSocket-options";
-
-    static final String KEY_WS_USE_DIRECT_BUFFER = "use-direct-buffer";
-
-    static final String KEY_WS_BUFFER_SIZE = "buffer-size";
-
     static final String KEY_MULTIPART_FILE_LOCATION = "common.multipart-file-location";
 
     static final String KEY_MULTIPART_MAX_FILE_SIZE = "common.multipart-max-file-size";
