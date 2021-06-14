@@ -22,7 +22,6 @@ package com.adeptj.runtime.server;
 
 import ch.qos.logback.classic.ViewStatusMessagesServlet;
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.DefaultExecutorService;
 import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.Lifecycle;
@@ -213,7 +212,6 @@ public final class Server implements Lifecycle {
             // Calls contextDestroyed on all registered ServletContextListener and performs other cleanup tasks.
             this.deploymentManager.undeploy();
             this.undertow.stop();
-            DefaultExecutorService.getInstance().shutdown();
             LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable ex) { // NOSONAR
             LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
