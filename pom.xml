@@ -196,8 +196,8 @@
             <version>${undertow.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.jboss.xnio</groupId>
-                    <artifactId>xnio-api</artifactId>
+                    <groupId>org.jboss.threads</groupId>
+                    <artifactId>jboss-threads</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
