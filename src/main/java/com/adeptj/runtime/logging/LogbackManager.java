@@ -147,7 +147,7 @@ public final class LogbackManager {
         this.loggerContext = loggerContext;
         this.loggerContext.setName(LC_NAME);
         this.contextUtil = new ContextUtil(loggerContext);
-        PatternLayout.defaultConverterMap.put(HIGHLIGHT_EXT, DebugLevelHighlightingConverter.class.getName());
+        PatternLayout.DEFAULT_CONVERTER_MAP.put(HIGHLIGHT_EXT, DebugLevelHighlightingConverter.class.getName());
     }
 
     public void stopLogback() {
