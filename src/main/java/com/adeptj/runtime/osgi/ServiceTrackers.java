@@ -63,7 +63,7 @@ public enum ServiceTrackers {
         this.dispatcherServletTracker = null;
     }
 
-    protected void openEventDispatcherTracker(BundleContext bundleContext) {
+    void openEventDispatcherTracker(BundleContext bundleContext) {
         if (this.eventDispatcherTracker == null) {
             LOGGER.info("Opening EventDispatcherTracker!!");
             this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
@@ -71,11 +71,11 @@ public enum ServiceTrackers {
         }
     }
 
-    protected EventDispatcherTracker getEventDispatcherTracker() {
+    EventDispatcherTracker getEventDispatcherTracker() {
         return this.eventDispatcherTracker;
     }
 
-    protected void closeEventDispatcherTracker() {
+    void closeEventDispatcherTracker() {
         LOGGER.info("Closing EventDispatcherTracker!!");
         this.closeServiceTracker(this.eventDispatcherTracker);
         this.eventDispatcherTracker = null;
