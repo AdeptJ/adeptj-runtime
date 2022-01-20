@@ -71,7 +71,7 @@ public class AdminServlet extends HttpServlet {
             // Invalidate the session.
             RequestUtil.logout(req);
         }
-        // if someone requesting logout URI anonymously, redirect to /system/console/bundles.
+        // if someone is requesting logout URI anonymously, redirect to /system/console/bundles.
         ResponseUtil.redirect(resp, Configs.of().undertow().getString(KEY_SYSTEM_CONSOLE_PATH));
     }
 
