@@ -47,11 +47,6 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
     private HttpSessionIdListener sessionIdListener;
 
     /**
-     * Just in case someone implements {@link HttpSessionAttributeListener} OSGi service, track that as well.
-     */
-    private HttpSessionAttributeListener sessionAttributeListener;
-
-    /**
      * Create the {@link org.osgi.util.tracker.ServiceTracker} for {@link EventListener}
      *
      * @param context the {@link BundleContext}
@@ -73,9 +68,6 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
         if (eventListener instanceof HttpSessionIdListener) {
             this.sessionIdListener = (HttpSessionIdListener) eventListener;
         }
-        if (eventListener instanceof HttpSessionAttributeListener) {
-            this.sessionAttributeListener = (HttpSessionAttributeListener) eventListener;
-        }
         return eventListener;
     }
 
@@ -92,9 +84,6 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
         if (eventListener instanceof HttpSessionIdListener) {
             this.sessionIdListener = null;
         }
-        if (eventListener instanceof HttpSessionAttributeListener) {
-            this.sessionAttributeListener = null;
-        }
     }
 
     HttpSessionListener getHttpSessionListener() {
@@ -103,9 +92,5 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
 
     HttpSessionIdListener getHttpSessionIdListener() {
         return this.sessionIdListener;
-    }
-
-    HttpSessionAttributeListener getHttpSessionAttributeListener() {
-        return this.sessionAttributeListener;
     }
 }

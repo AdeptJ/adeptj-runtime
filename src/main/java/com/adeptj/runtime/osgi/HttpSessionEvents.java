@@ -24,8 +24,6 @@ import com.adeptj.runtime.common.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
@@ -42,13 +40,7 @@ public enum HttpSessionEvents {
 
     SESSION_CREATED,
 
-    SESSION_DESTROYED,
-
-    SESSION_ATTRIBUTE_ADDED,
-
-    SESSION_ATTRIBUTE_REMOVED,
-
-    SESSION_ATTRIBUTE_REPLACED;
+    SESSION_DESTROYED;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionEvents.class);
 
@@ -74,25 +66,6 @@ public enum HttpSessionEvents {
 
     public static void handleSessionIdChangedEvent(HttpSessionEvent event, String oldSessionId) {
         sessionIdListener().ifPresent(listener -> listener.sessionIdChanged(event, oldSessionId));
-    }
-
-    // <<---------- HttpSessionAttributeListener ---------->>
-
-    public static void handleHttpSessionBindingEvent(HttpSessionEvents type, HttpSessionBindingEvent bindingEvent) {
-        switch (type) {
-            case SESSION_ATTRIBUTE_ADDED:
-                sessionAttributeListener().ifPresent(listener -> listener.attributeAdded(bindingEvent));
-                break;
-            case SESSION_ATTRIBUTE_REMOVED:
-                sessionAttributeListener().ifPresent(listener -> listener.attributeRemoved(bindingEvent));
-                break;
-            case SESSION_ATTRIBUTE_REPLACED:
-                sessionAttributeListener().ifPresent(listener -> listener.attributeReplaced(bindingEvent));
-                break;
-            default:
-                // NO-OP
-                break;
-        }
     }
 
     private static void logSessionCreated(HttpSessionEvent event) {
@@ -123,10 +96,5 @@ public enum HttpSessionEvents {
     private static Optional<HttpSessionIdListener> sessionIdListener() {
         EventDispatcherTracker tracker = tracker();
         return Optional.ofNullable(tracker == null ? null : tracker.getHttpSessionIdListener());
-    }
-
-    private static Optional<HttpSessionAttributeListener> sessionAttributeListener() {
-        EventDispatcherTracker tracker = tracker();
-        return Optional.ofNullable(tracker == null ? null : tracker.getHttpSessionAttributeListener());
     }
 }

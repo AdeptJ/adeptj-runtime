@@ -212,7 +212,7 @@ public final class LogbackManager {
                 logger.warn(ROOT_PROHIBITED_MSG);
                 return false;
             }
-            // Means ROOT was one of the element in the category Set and it is already removed, just log as warning.
+            // Means ROOT was one of the element in the category Set, as it is already removed then just log as warning.
             logger.warn(ROOT_REMOVED_MSG);
         }
         // Lazy initialization of configByPid map, don't think we still need a CHM as this method is called

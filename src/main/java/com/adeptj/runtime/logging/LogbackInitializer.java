@@ -69,7 +69,7 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         SLF4JBridgeHandler.install();
         // LevelChangePropagator - see http://logback.qos.ch/manual/configuration.html#LevelChangePropagator
         logbackManager.initLevelChangePropagator();
-        // Finally start LoggerContext and print status information.
+        // Finally, start LoggerContext and print status information.
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
         loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
