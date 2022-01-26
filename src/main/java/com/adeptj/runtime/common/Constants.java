@@ -37,6 +37,8 @@ public final class Constants {
 
     public static final String TRIMOU_CONF_SECTION = "trimou";
 
+    public static final String RESTEASY_CONF_SECTION = "resteasy";
+
     public static final String FELIX_CONF_SECTION = "felix";
 
     public static final String COMMON_CONF_SECTION = "common";

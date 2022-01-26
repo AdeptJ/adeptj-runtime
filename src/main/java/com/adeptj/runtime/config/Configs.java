@@ -30,6 +30,7 @@ import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
+import static com.adeptj.runtime.common.Constants.RESTEASY_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
@@ -79,6 +80,10 @@ public enum Configs {
 
     public Config trimou() {
         return this.main().getConfig(TRIMOU_CONF_SECTION);
+    }
+
+    public Config resteasy() {
+        return this.main().getConfig(RESTEASY_CONF_SECTION);
     }
 
     private Config loadConf() {
