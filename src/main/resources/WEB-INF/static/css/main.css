@@ -20,10 +20,7 @@ body {
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  margin-top: 3%;
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: auto;
+  margin: 3% auto auto;
   padding: 77px 55px 33px;
   box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
   -moz-box-shadow: 0 5px 10px 0 rgba(0,0,0,.1);
