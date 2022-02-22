@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>17</version>
+        <version>18</version>
         <relativePath/>
     </parent>
     <artifactId>adeptj-runtime</artifactId>
@@ -176,7 +176,6 @@
         <dependency>
             <groupId>org.jboss.xnio</groupId>
             <artifactId>xnio-api</artifactId>
-            <version>${xnio.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.threads</groupId>
@@ -188,7 +187,6 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
-            <version>${undertow.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.threads</groupId>
@@ -200,7 +198,6 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-servlet</artifactId>
-            <version>${undertow.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.spec.javax.annotation</groupId>
