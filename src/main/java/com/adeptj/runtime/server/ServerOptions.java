@@ -22,7 +22,7 @@ package com.adeptj.runtime.server;
 
 import com.adeptj.runtime.common.Times;
 import com.typesafe.config.Config;
-import io.undertow.Undertow.Builder;
+import io.undertow.Undertow;
 
 /**
  * UNDERTOW Server Options.
@@ -44,7 +44,7 @@ final class ServerOptions extends BaseOptions {
      * @param undertowConfig Undertow Typesafe Config
      */
     @Override
-    void setOptions(Builder builder, Config undertowConfig) {
+    void setOptions(Undertow.Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
         Config serverOptionsCfg = undertowConfig.getConfig(SERVER_OPTIONS);
         serverOptionsCfg.getObject(OPTIONS_TYPE_OTHERS)

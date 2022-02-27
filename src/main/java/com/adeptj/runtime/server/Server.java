@@ -40,7 +40,6 @@ import com.adeptj.runtime.servlet.ErrorServlet;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
-import io.undertow.Undertow.Builder;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
@@ -183,7 +182,7 @@ public final class Server implements Lifecycle {
             servletContext.setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
             HttpHandler httpContinueReadHandler = this.deploymentManager.start();
             this.rootHandler = this.createHandlerChain(httpContinueReadHandler, undertowConf);
-            Builder undertowBuilder = Undertow.builder();
+            Undertow.Builder undertowBuilder = Undertow.builder();
             this.setWorkerOptions(undertowBuilder, undertowConf);
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
             new ServerOptions().setOptions(undertowBuilder, undertowConf);
@@ -276,7 +275,7 @@ public final class Server implements Lifecycle {
         }
     }
 
-    private void setWorkerOptions(Builder builder, Config undertowConf) {
+    private void setWorkerOptions(Undertow.Builder builder, Config undertowConf) {
         long startTime = System.nanoTime();
         // Note : For a 16 core system, number of worker task core and max threads will be.
         // 1. core task thread: 128 (16[cores] * 8)
@@ -306,7 +305,7 @@ public final class Server implements Lifecycle {
         LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
-    private Builder addHttpsListener(Builder builder, Config undertowConf) throws GeneralSecurityException {
+    private Undertow.Builder addHttpsListener(Undertow.Builder builder, Config undertowConf) throws GeneralSecurityException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
             Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));

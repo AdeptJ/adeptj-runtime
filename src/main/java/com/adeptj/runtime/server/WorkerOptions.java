@@ -21,7 +21,7 @@
 package com.adeptj.runtime.server;
 
 import com.typesafe.config.Config;
-import io.undertow.Undertow.Builder;
+import io.undertow.Undertow;
 import org.xnio.Option;
 
 /**
@@ -40,13 +40,13 @@ final class WorkerOptions extends BaseOptions {
      * @param undertowConfig Undertow Typesafe Config
      */
     @Override
-    void setOptions(Builder builder, Config undertowConfig) {
+    void setOptions(Undertow.Builder builder, Config undertowConfig) {
         undertowConfig.getObject(WORKER_OPTIONS)
                 .unwrapped()
                 .forEach((key, val) -> builder.setWorkerOption(this.getOption(key), val));
     }
 
-    <T> WorkerOptions overrideOption(Builder builder, Option<T> option, T value) {
+    <T> WorkerOptions overrideOption(Undertow.Builder builder, Option<T> option, T value) {
         builder.setWorkerOption(option, value);
         return this;
     }
