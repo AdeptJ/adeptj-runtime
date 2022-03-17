@@ -1,6 +1,6 @@
 <p>
   
-  <a href="http://www.apache.org/licenses/LICENSE-2.0">
+  <a href="https://www.apache.org/licenses/LICENSE-2.0">
    <img src="https://img.shields.io/badge/license-Apache%202-blue.svg">  
   </a>
   
@@ -46,14 +46,14 @@
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services).
-2. JAX-RS 2.1 (RESTEasy v4.6.0) with JWT support.
+2. JAX-RS 2.1 (RESTEasy v5.0.2) with JWT support.
 3. JWT module for creating and verifying the JWTs.
-4. Persistence(SQL/NO-SQL) layer - JPA(EclipseLink v2.7.8) or MyBatis v3.5.6 or MongoDB v4.4.3.
-5. Hikari(v4.0.2) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
-6. Caffeine(v3.0) cache.
+4. Persistence(SQL/NO-SQL) layer - JPA(EclipseLink v2.7.10) or MyBatis v3.5.9 or MongoDB v4.5.0.
+5. Hikari(v5.0.1) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
+6. Caffeine(v3.0.5) cache.
 7. Logback loggers - add or remove loggers in running server which will survive the server restart.
-8. Crypto module for hashing(BCrypt,PBKDF2WithHmacSHA256/384/512) and encryption/decryption with (AES/GCM/NoPadding).
-9. Java Bean Validation(Hibernate Validator v6.2.0).
+8. Crypto module for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
+9. Java Bean Validation(Hibernate Validator v6.2.3).
 
 **Toolchain:**
 
@@ -80,25 +80,23 @@ Please feel free to fork the repos or drop a note to me @ irakeshkAToutlookDOTco
 
 **Sponsors**:
 
-The AdeptJ Team uses the [Yourkit Java Profiler](https://www.yourkit.com/) when working on the AdeptJ Runtime project.
+The AdeptJ Team uses the [IntelliJ Idea Ultimate](https://www.jetbrains.com/idea/) when working on the AdeptJ Runtime project.
 
-Many thanks to YourKit for sponsoring our Open Source projects with a license!
+Many thanks to JetBrains for generously sponsoring our Open Source projects with an all products license!
 
-<a href="https://www.yourkit.com/">
-    <img src="https://www.yourkit.com/images/yklogo.png"> 
+<a href="https://www.jetbrains.com">
+    <img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg"> 
 </a>
-
-YourKit supports open source projects with its full-featured Java Profiler. YourKit, LLC is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/) and [YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/), innovative and intelligent tools for profiling Java and .NET applications.
 
 **LICENSE**
 
-   Copyright 2016, AdeptJ (http://www.adeptj.com)
+   Copyright 2016-2022, AdeptJ (https://www.adeptj.com)
    
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
  
-       http://www.apache.org/licenses/LICENSE-2.0
+       https://www.apache.org/licenses/LICENSE-2.0
  
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
