@@ -66,7 +66,7 @@ final class BundleProvisioner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BundleProvisioner.class);
 
-    public static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
+    private static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
 
     private static final String BUNDLE_PROVISIONED_MSG = "Provisioned [{}] Bundles in: [{}] ms!!";
 

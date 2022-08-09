@@ -48,7 +48,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
-import static com.adeptj.runtime.osgi.BundleProvisioner.CFG_KEY_FELIX_CM_DIR;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -68,13 +67,31 @@ public enum FrameworkManager {
 
     private static final String MEM_DUMP_LOC = "felix.memoryusage.dump.location";
 
-    private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
-
     private static final String LOGGER_CFG_FACTORY_FILTER = "(|(logger.names=*)(logger.level=*))";
 
     private static final String SYS_PROP_OVERWRITE_FRAMEWORK_CONF = "overwrite.framework.conf.file";
 
+    private static final String SYS_PROP_ENABLE_FELIX_FILE_INSTALL = "enable.felix.fileinstall";
+
+    private static final String CFG_KEY_FELIX_CM_DIR = "felix-cm-dir";
+
+    private static final String CFG_KEY_MEM_DUMP_LOC = "memoryusage-dump-loc";
+
+    private static final String CFG_KEY_FILE_INSTALL_DIR = "felix-fileinstall-dir";
+
+    private static final String CFG_KEY_FILE_INSTALL_POL_INTERVAL = "felix-fileinstall-poll";
+
+    private static final String CFG_KEY_FILE_INSTALL_ENCODING = "felix-fileinstall-config-encoding";
+
+    private static final String CFG_KEY_FILE_INSTALL_LOG_LEVEL = "felix-fileinstall-log-level";
+
     private final static String FILE_INSTALL_DIR = "felix.fileinstall.dir";
+
+    private final static String FILE_INSTALL_POLL_INTERVAL = "felix.fileinstall.poll";
+
+    private final static String FILE_INSTALL_CONFIG_ENCODING = "felix.fileinstall.configEncoding";
+
+    private final static String FILE_INSTALL_LOG_LEVEL = "felix.fileinstall.log.level";
 
     private Framework framework;
 
@@ -153,7 +170,7 @@ public enum FrameworkManager {
     }
 
     private Map<String, String> newFrameworkConfigs(Config felixConf) {
-        Map<String, String> configs = this.loadFrameworkProperties();
+        Map<String, String> configs = this.loadFrameworkProperties(felixConf);
         configs.put(FELIX_CM_DIR, felixConf.getString(CFG_KEY_FELIX_CM_DIR));
         configs.put(MEM_DUMP_LOC, felixConf.getString(CFG_KEY_MEM_DUMP_LOC));
         String felixLogLevel = System.getProperty(LOG_LEVEL_PROP);
@@ -166,7 +183,7 @@ public enum FrameworkManager {
         return configs;
     }
 
-    private Map<String, String> loadFrameworkProperties() {
+    private Map<String, String> loadFrameworkProperties(Config felixConf) {
         Map<String, String> configs = new HashMap<>();
         Path confPath = Environment.getFrameworkConfPath();
         if (confPath.toFile().exists()) {
@@ -183,19 +200,30 @@ public enum FrameworkManager {
             }
         } else {
             this.createOrUpdateFrameworkPropertiesFile(configs, confPath);
-            this.createFileInstallDirectory(configs.get(FILE_INSTALL_DIR));
         }
+        this.createFileInstallDirectory(configs, felixConf);
         return configs;
     }
 
-    private void createFileInstallDirectory(String dir) {
-        // Create the file install directory upfront otherwise we will run into issues.
-        // https://issues.apache.org/jira/browse/FELIX-6393
-        try {
-            Files.createDirectories(Paths.get(dir));
-        } catch (IOException ex) {
-            // Gulp the exception as it should not stop framework bootstrapping.
-            LOGGER.error(ex.getMessage(), ex);
+    private void createFileInstallDirectory(Map<String, String> configs, Config felixConf) {
+        if (Boolean.getBoolean(SYS_PROP_ENABLE_FELIX_FILE_INSTALL)) {
+            String installDir = felixConf.getString(CFG_KEY_FILE_INSTALL_DIR);
+            Path path = Paths.get(installDir);
+            LOGGER.info("Felix FileInstall will be configured for directory [{}]", path);
+            // Create the file install directory upfront otherwise we will run into issues.
+            // https://issues.apache.org/jira/browse/FELIX-6393
+            if (!path.toFile().exists()) {
+                try {
+                    Files.createDirectories(path);
+                } catch (IOException ex) {
+                    // Gulp the exception as it should not stop framework bootstrapping.
+                    LOGGER.error(ex.getMessage(), ex);
+                }
+            }
+            configs.put(FILE_INSTALL_DIR, installDir);
+            configs.put(FILE_INSTALL_POLL_INTERVAL, felixConf.getString(CFG_KEY_FILE_INSTALL_POL_INTERVAL));
+            configs.put(FILE_INSTALL_CONFIG_ENCODING, felixConf.getString(CFG_KEY_FILE_INSTALL_ENCODING));
+            configs.put(FILE_INSTALL_LOG_LEVEL, felixConf.getString(CFG_KEY_FILE_INSTALL_LOG_LEVEL));
         }
     }
 
