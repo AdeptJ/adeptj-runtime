@@ -21,19 +21,26 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Lifecycle;
 import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.ShutdownHook;
 import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.kernel.SciInfo;
+import com.adeptj.runtime.kernel.Server;
+import com.adeptj.runtime.kernel.ServerName;
+import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.osgi.FrameworkManager;
-import com.adeptj.runtime.server.Server;
+import com.adeptj.runtime.server.DefaultStartupAware;
+import com.adeptj.runtime.servlet.AdminServlet;
+import com.adeptj.runtime.servlet.ErrorServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.Set;
 
-import static com.adeptj.runtime.common.Constants.SERVER_STOP_THREAD_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -69,9 +76,30 @@ public final class Launcher {
         Launcher launcher = new Launcher();
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            Lifecycle lifecycle = new Server();
-            lifecycle.start(args);
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
+            //Lifecycle lifecycle = new Server();
+            //lifecycle.start(args);
+            //Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
+            for (Server server : ServiceLoader.load(Server.class)) {
+                logger.info("Found ServiceLoader based Server: [{}]", server);
+                try {
+                    Set<Class<?>> classes = new LinkedHashSet<>();
+                    classes.add(FrameworkLauncher.class);
+                    classes.add(DefaultStartupAware.class);
+                    if (server.getName() == ServerName.TOMCAT) {
+                        server.start(args, new SciInfo(new RuntimeInitializer(), classes));
+                        server.registerServlets(new AdminServlet(), new ErrorServlet());
+                    } else if (server.getName() == ServerName.JETTY) {
+                        server.start(args, new SciInfo(new RuntimeInitializer(), classes));
+                        server.registerServlets(List.of(AdminServlet.class, ErrorServlet.class));
+                    } else if (server.getName() == ServerName.UNDERTOW) {
+                        server.start(args, new SciInfo(RuntimeInitializer.class, classes));
+                        server.registerServlets(List.of(AdminServlet.class, ErrorServlet.class));
+                    }
+                    server.postStart();
+                } catch (Exception ex) { // NOSONAR
+                    logger.error("Exception while executing ServiceLoader based StartupAware#onStartup!!", ex);
+                }
+            }
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
