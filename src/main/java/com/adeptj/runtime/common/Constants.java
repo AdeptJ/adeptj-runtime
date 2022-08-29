@@ -49,9 +49,14 @@ public final class Constants {
 
     public static final String ADMIN_LOGOUT_URI = "/admin/logout";
 
+    public static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
+
     public static final String ADMIN_SERVLET_URI = "/admin/*";
 
     public static final String ERROR_SERVLET_URI = "/ErrorHandler";
+
+
+    public static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
 
     public static final String BANNER_TXT = "/banner.txt";
 

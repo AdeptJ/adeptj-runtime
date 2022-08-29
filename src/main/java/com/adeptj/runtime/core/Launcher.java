@@ -23,27 +23,19 @@ package com.adeptj.runtime.core;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
-import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.Server;
-import com.adeptj.runtime.kernel.ServerName;
-import com.adeptj.runtime.kernel.ServletDeployment;
-import com.adeptj.runtime.kernel.ServletInfo;
-import com.adeptj.runtime.osgi.FrameworkLauncher;
+import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.osgi.FrameworkManager;
-import com.adeptj.runtime.server.DefaultStartupAware;
-import com.adeptj.runtime.servlet.AdminServlet;
-import com.adeptj.runtime.servlet.ErrorServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.ServiceLoader;
-import java.util.Set;
 
-import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
-import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
+import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
+import static com.adeptj.runtime.kernel.ServerRuntime.TOMCAT;
+import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -83,42 +75,22 @@ public final class Launcher {
             //lifecycle.start(args);
             //Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
             for (Server server : ServiceLoader.load(Server.class)) {
-                logger.info("Found ServiceLoader based Server: [{}]", server);
+                ServerRuntime runtime = server.getRuntime();
+                logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
                 try {
-                    Set<Class<?>> classes = new LinkedHashSet<>();
-                    classes.add(FrameworkLauncher.class);
-                    classes.add(DefaultStartupAware.class);
-                    if (server.getName() == ServerName.TOMCAT) {
-                        ServletDeployment deployment = new ServletDeployment(new SciInfo(new RuntimeInitializer(), classes));
-                        ServletInfo adminServletInfo = new ServletInfo("AdeptJ AdminServlet", ADMIN_SERVLET_URI);
-                        adminServletInfo.setServletInstance(new AdminServlet());
-                        ServletInfo errorServletInfo = new ServletInfo("AdeptJ ErrorServlet", ERROR_SERVLET_URI);
-                        errorServletInfo.setServletInstance(new ErrorServlet());
-                        deployment.addServletInfo(adminServletInfo).addServletInfo(errorServletInfo);
-                        server.start(args, deployment);
-                    } else if (server.getName() == ServerName.JETTY) {
-                        ServletDeployment deployment = new ServletDeployment(new SciInfo(new RuntimeInitializer(), classes));
-                        ServletInfo adminServletInfo = new ServletInfo("AdeptJ AdminServlet", ADMIN_SERVLET_URI);
-                        adminServletInfo.setServletClass(AdminServlet.class);
-                        ServletInfo errorServletInfo = new ServletInfo("AdeptJ ErrorServlet", ERROR_SERVLET_URI);
-                        errorServletInfo.setServletClass(ErrorServlet.class);
-                        deployment.addServletInfo(adminServletInfo).addServletInfo(errorServletInfo);
-                        server.start(args, deployment);
-                    } else if (server.getName() == ServerName.UNDERTOW) {
-                        ServletDeployment deployment = new ServletDeployment(new SciInfo(RuntimeInitializer.class, classes));
-                        ServletInfo adminServletInfo = new ServletInfo("AdeptJ AdminServlet", ADMIN_SERVLET_URI);
-                        adminServletInfo.setServletClass(AdminServlet.class);
-                        ServletInfo errorServletInfo = new ServletInfo("AdeptJ ErrorServlet", ERROR_SERVLET_URI);
-                        errorServletInfo.setServletClass(ErrorServlet.class);
-                        deployment.addServletInfo(adminServletInfo).addServletInfo(errorServletInfo);
-                        server.start(args, deployment);
+                    if (runtime == TOMCAT) {
+                        new TomcatBootstrapper().bootstrap(server, args);
+                    } else if (runtime == JETTY) {
+                        new JettyBootstrapper().bootstrap(server, args);
+                    } else if (runtime == UNDERTOW) {
+                        new UndertowBootstrapper().bootstrap(server, args);
                     }
-                    server.postStart();
                 } catch (Exception ex) { // NOSONAR
                     logger.error("Exception while executing ServiceLoader based StartupAware#onStartup!!", ex);
                 }
+                logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
+                server.postStart();
             }
-            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
