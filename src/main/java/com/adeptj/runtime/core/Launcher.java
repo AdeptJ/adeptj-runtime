@@ -21,6 +21,7 @@
 package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
+import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.kernel.Server;
@@ -30,9 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
 import static com.adeptj.runtime.kernel.ServerRuntime.TOMCAT;
 import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
@@ -69,6 +73,7 @@ public final class Launcher {
         long startTime = System.nanoTime();
         Logger logger = LoggerFactory.getLogger(Launcher.class);
         Launcher launcher = new Launcher();
+        launcher.printBanner(logger);
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
             //Lifecycle lifecycle = new Server();
@@ -108,5 +113,14 @@ public final class Launcher {
         SLF4JBridgeHandler.uninstall();
         LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
         System.exit(-1); // NOSONAR
+    }
+
+    private void printBanner(Logger logger) {
+        try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
+            logger.info(IOUtils.toString(stream)); // NOSONAR
+        } catch (IOException ex) {
+            // Just log it, its not critical.
+            logger.error("Exception while printing server banner!!", ex);
+        }
     }
 }
