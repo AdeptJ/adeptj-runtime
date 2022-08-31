@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
 import static com.adeptj.runtime.kernel.ServerRuntime.TOMCAT;
@@ -90,6 +91,7 @@ public final class Launcher {
                     } else if (runtime == UNDERTOW) {
                         new UndertowBootstrapper().bootstrap(server, args);
                     }
+                    server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
                 } catch (Exception ex) { // NOSONAR
                     logger.error("Exception while executing ServiceLoader based StartupAware#onStartup!!", ex);
                 }
