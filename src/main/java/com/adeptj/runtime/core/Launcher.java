@@ -24,9 +24,14 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.kernel.Server;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.osgi.FrameworkManager;
+import com.typesafe.config.Config;
+import org.apache.commons.lang3.StringUtils;
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -38,6 +43,8 @@ import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
+import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
+import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
 import static com.adeptj.runtime.kernel.ServerRuntime.TOMCAT;
 import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
@@ -55,6 +62,10 @@ public final class Launcher {
     // Deny direct instantiation.
     private Launcher() {
     }
+
+    private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
+
+    private static final int PWD_START_INDEX = 9;
 
     /**
      * Entry point for initializing the AdeptJ Runtime.
@@ -83,6 +94,7 @@ public final class Launcher {
             for (Server server : ServiceLoader.load(Server.class)) {
                 ServerRuntime runtime = server.getRuntime();
                 logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
+                launcher.populateCredentialsStore(Configs.of().undertow());
                 try {
                     if (runtime == TOMCAT) {
                         new TomcatBootstrapper().bootstrap(server, args);
@@ -121,8 +133,21 @@ public final class Launcher {
         try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
             logger.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
-            // Just log it, its not critical.
+            // Just log it, it's not critical.
             logger.error("Exception while printing server banner!!", ex);
+        }
+    }
+
+    private void populateCredentialsStore(Config undertowConf) {
+        try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
+            MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
+            // put the default password only when it is not set from web console.
+            undertowConf.getObject(KEY_USER_CREDENTIAL_MAPPING)
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> StringUtils.isEmpty(credentials.get(entry.getKey())))
+                    .forEach(entry -> credentials.put(entry.getKey(), ((String) entry.getValue().unwrapped())
+                            .substring(PWD_START_INDEX)));
         }
     }
 }
