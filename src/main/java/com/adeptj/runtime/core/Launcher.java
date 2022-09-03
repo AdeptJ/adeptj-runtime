@@ -91,25 +91,20 @@ public final class Launcher {
             //Lifecycle lifecycle = new Server();
             //lifecycle.start(args);
             //Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
-            for (Server server : ServiceLoader.load(Server.class)) {
-                ServerRuntime runtime = server.getRuntime();
-                logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
-                launcher.populateCredentialsStore(Configs.of().undertow());
-                try {
-                    if (runtime == TOMCAT) {
-                        new TomcatBootstrapper().bootstrap(server, args);
-                    } else if (runtime == JETTY) {
-                        new JettyBootstrapper().bootstrap(server, args);
-                    } else if (runtime == UNDERTOW) {
-                        new UndertowBootstrapper().bootstrap(server, args);
-                    }
-                    server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
-                } catch (Exception ex) { // NOSONAR
-                    logger.error("Exception while executing ServiceLoader based StartupAware#onStartup!!", ex);
-                }
-                logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
-                server.postStart();
+            Server server = ServiceLoader.load(Server.class).iterator().next();
+            ServerRuntime runtime = server.getRuntime();
+            logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
+            launcher.populateCredentialsStore(Configs.of().undertow());
+            if (runtime == TOMCAT) {
+                new TomcatBootstrapper().bootstrap(server, args);
+            } else if (runtime == JETTY) {
+                new JettyBootstrapper().bootstrap(server, args);
+            } else if (runtime == UNDERTOW) {
+                new UndertowBootstrapper().bootstrap(server, args);
             }
+            server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
+            logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
+            server.postStart();
         } catch (Throwable th) { // NOSONAR
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
