@@ -1,5 +1,6 @@
 package com.adeptj.runtime.kernel.security;
 
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.UserManager;
 import com.adeptj.runtime.kernel.util.PasswordEncoder;
 import org.apache.commons.lang3.ArrayUtils;
@@ -62,7 +63,7 @@ public class MVStoreUserManager implements UserManager {
 
     @Override
     public List<String> getRoles(String username) {
-        return List.of("OSGiAdmin");
+        return ConfigProvider.getInstance().getMainConfig().getStringList("common.user-roles-mapping." + username);
     }
 
     private static byte[] toByteArray(char[] chars) {

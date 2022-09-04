@@ -1,33 +1,45 @@
 package com.adeptj.runtime.tomcat;
 
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.UserManager;
+import com.typesafe.config.Config;
 import org.apache.catalina.authenticator.FormAuthenticator;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
+import java.util.List;
+
 public class SecurityConfigurer {
 
     public void configure(StandardContext context, UserManager userManager) {
+        Config commonCfg = ConfigProvider.getInstance().getMainConfig().getConfig("common");
         // SecurityConstraint
         SecurityConstraint constraint = new SecurityConstraint();
-        constraint.addAuthRole("OSGiAdmin");
+        List<String> authRoles = commonCfg.getStringList("auth-roles");
+        for (String authRole : authRoles) {
+            constraint.addAuthRole(authRole);
+        }
         SecurityCollection collection = new SecurityCollection();
-        collection.addPattern("/system/console/*");
+        List<String> protectedPaths = commonCfg.getStringList("protected-paths");
+        for (String protectedPath : protectedPaths) {
+            collection.addPattern(protectedPath);
+        }
         constraint.addCollection(collection);
         context.addConstraint(constraint);
         // LoginConfig
+        Config formAuthCfg = commonCfg.getConfig("form-auth");
         LoginConfig loginConfig = new LoginConfig();
-        loginConfig.setAuthMethod("FORM");
-        loginConfig.setLoginPage("/admin/login");
-        loginConfig.setErrorPage("/admin/login");
-        loginConfig.setRealmName("AdeptJ Realm");
+        loginConfig.setAuthMethod(formAuthCfg.getString("method"));
+        loginConfig.setLoginPage(formAuthCfg.getString("login-url"));
+        loginConfig.setErrorPage(formAuthCfg.getString("error-url"));
+        loginConfig.setRealmName(formAuthCfg.getString("realm"));
         context.setLoginConfig(loginConfig);
         // Form Auth
         FormAuthenticator valve = new FormAuthenticator();
         valve.setLandingPage("/");
-        valve.setCharacterEncoding("UTF-8");
+        valve.setCharacterEncoding(commonCfg.getString("default-encoding"));
         context.addValve(valve);
         // Realm and CredentialHandler
         MVStoreRealm realm = new MVStoreRealm(userManager);
