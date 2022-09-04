@@ -20,9 +20,5 @@ public class ResourceServlet extends DefaultServlet {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-        // Fallback
-        if (!resp.isCommitted()) {
-            new FallbackResourceHandler().handle(req, resp);
-        }
     }
 }

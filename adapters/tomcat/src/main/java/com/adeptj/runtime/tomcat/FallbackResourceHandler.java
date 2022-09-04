@@ -14,7 +14,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 public class FallbackResourceHandler {
 
     public void handle(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        URL resource = this.getClass().getResource("/WEB-INF" + req.getRequestURI());
+        URL resource = this.getClass().getResource("/webapp" + req.getRequestURI());
         if (resource == null) {
             resp.sendError(SC_NOT_FOUND);
             return;

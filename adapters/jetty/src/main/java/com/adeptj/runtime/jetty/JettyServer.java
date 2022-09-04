@@ -90,7 +90,7 @@ public class JettyServer extends AbstractServer {
         resourceHandler.setDirectoriesListed(false);
         ContextHandler staticResourceContext = new ContextHandler();
         staticResourceContext.setContextPath("/static");
-        staticResourceContext.setBaseResource(Resource.newClassPathResource("/WEB-INF/static"));
+        staticResourceContext.setBaseResource(Resource.newClassPathResource("/webapp/static"));
         staticResourceContext.setHandler(resourceHandler);
         return staticResourceContext;
     }

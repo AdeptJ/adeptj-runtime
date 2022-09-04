@@ -115,7 +115,7 @@ public class TomcatServer extends AbstractServer {
                 .ifPresent(jar -> {
                     JarResourceSet resourceSet = new JarResourceSet();
                     resourceSet.setBase(jar.getAbsolutePath());
-                    resourceSet.setInternalPath("/WEB-INF");
+                    resourceSet.setInternalPath("/webapp");
                     resourceSet.setWebAppMount("/");
                     context.getResources().addJarResources(resourceSet);
                 });
