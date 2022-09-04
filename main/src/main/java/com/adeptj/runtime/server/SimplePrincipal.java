@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,49 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.server;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.Objects;
 
-    </modules>
+/**
+ * SimplePrincipal.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+final class SimplePrincipal implements Principal, Serializable {
 
-</project>
+    private static final long serialVersionUID = 7723547817002486608L;
+
+    private final String name;
+
+    SimplePrincipal(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimplePrincipal that = (SimplePrincipal) o;
+        return Objects.equals(this.name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.name);
+    }
+
+    @Override
+    public String toString() {
+        return "SimplePrincipal [name=" + this.name + "]";
+    }
+}

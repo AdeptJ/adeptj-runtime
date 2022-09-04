@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,47 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.logging;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import java.util.Set;
 
-    </modules>
+/**
+ * Configurations for creating a Logback Logger.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+class LoggerConfig {
 
-</project>
+    private final String configPid;
+
+    private final Set<String> categories;
+
+    private final String level;
+
+    private final boolean additivity;
+
+    LoggerConfig(String configPid, Set<String> categories, String level, boolean additivity) {
+        this.configPid = configPid;
+        this.categories = categories;
+        this.level = level;
+        this.additivity = additivity;
+    }
+
+    public String getConfigPid() {
+        return configPid;
+    }
+
+    public Set<String> getCategories() {
+        return this.categories;
+    }
+
+    public String getLevel() {
+        return this.level;
+    }
+
+    public boolean isAdditivity() {
+        return this.additivity;
+    }
+}

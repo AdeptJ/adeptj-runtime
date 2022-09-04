@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,27 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
+package com.adeptj.runtime.predicate;
 
-    <modules>
+import io.undertow.predicate.Predicate;
+import io.undertow.server.HttpServerExchange;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+/**
+ * Predicate just checks if the request path is / i.e. root
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class ContextPathPredicate implements Predicate {
 
-    </modules>
+    private final String contextPath;
 
-</project>
+    public ContextPathPredicate(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
+    @Override
+    public boolean resolve(HttpServerExchange value) {
+        return value.getRequestPath().equals(this.contextPath);
+    }
+}

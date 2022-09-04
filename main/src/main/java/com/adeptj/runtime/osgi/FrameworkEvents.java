@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,48 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.osgi;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import java.util.stream.Stream;
 
-    </modules>
+/**
+ * OSGi Framework event code to string mapping.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum FrameworkEvents {
 
-</project>
+    STARTED(1),
+
+    ERROR(2),
+
+    PACKAGES_REFRESHED(4),
+
+    STOPPED(64),
+
+    STOPPED_UPDATE(128),
+
+    WAIT_TIMED_OUT(512),
+
+    UNKNOWN(-1);
+
+    private final int code;
+
+    FrameworkEvents(int code) {
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public static String asString(int code) {
+        return Stream.of(values())
+                .filter(fe -> code == fe.getCode())
+                .findFirst()
+                .orElse(UNKNOWN)
+                .toString();
+    }
+}

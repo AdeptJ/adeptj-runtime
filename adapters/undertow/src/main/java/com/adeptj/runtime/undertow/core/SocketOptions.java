@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,35 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.undertow.core;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import com.adeptj.runtime.kernel.util.Times;
+import com.typesafe.config.Config;
+import io.undertow.Undertow;
 
-    </modules>
+/**
+ * Undertow Socket Options.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public final class SocketOptions extends BaseOptions {
 
-</project>
+    private static final String SOCKET_OPTIONS = "socket-options";
+
+    /**
+     * Configures the socket options dynamically.
+     *
+     * @param builder        Undertow.Builder
+     * @param undertowConfig Undertow Typesafe Config
+     */
+    @Override
+    public void setOptions(Undertow.Builder builder, Config undertowConfig) {
+        long startTime = System.nanoTime();
+        undertowConfig.getObject(SOCKET_OPTIONS)
+                .unwrapped()
+                .forEach((key, val) -> builder.setSocketOption(this.getOption(key), val));
+        this.logger.info("Undertow SocketOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
+    }
+}

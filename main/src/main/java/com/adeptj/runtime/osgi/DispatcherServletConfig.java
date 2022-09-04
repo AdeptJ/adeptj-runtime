@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,43 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
+package com.adeptj.runtime.osgi;
 
-    <modules>
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import java.util.Enumeration;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+/**
+ * {@link ServletConfig} for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class DispatcherServletConfig implements ServletConfig {
 
-    </modules>
+    private final ServletConfig bridgeServletConfig;
 
-</project>
+    public DispatcherServletConfig(ServletConfig bridgeServletConfig) {
+        this.bridgeServletConfig = bridgeServletConfig;
+    }
+
+    @Override
+    public String getServletName() {
+        return "Felix DispatcherServlet in Bridge Mode";
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return this.bridgeServletConfig.getServletContext();
+    }
+
+    @Override
+    public String getInitParameter(String name) {
+        return this.bridgeServletConfig.getInitParameter(name);
+    }
+
+    @Override
+    public Enumeration<String> getInitParameterNames() {
+        return this.bridgeServletConfig.getInitParameterNames();
+    }
+}

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,38 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.server;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import com.typesafe.config.Config;
+import io.undertow.Undertow;
+import org.xnio.Option;
 
-    </modules>
+/**
+ * Undertow Worker Options.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+final class WorkerOptions extends BaseOptions {
 
-</project>
+    private static final String WORKER_OPTIONS = "worker-options";
+
+    /**
+     * Configures the worker options dynamically.
+     *
+     * @param builder        Undertow.Builder
+     * @param undertowConfig Undertow Typesafe Config
+     */
+    @Override
+    void setOptions(Undertow.Builder builder, Config undertowConfig) {
+        undertowConfig.getObject(WORKER_OPTIONS)
+                .unwrapped()
+                .forEach((key, val) -> builder.setWorkerOption(this.getOption(key), val));
+    }
+
+    <T> WorkerOptions overrideOption(Undertow.Builder builder, Option<T> option, T value) {
+        builder.setWorkerOption(option, value);
+        return this;
+    }
+}

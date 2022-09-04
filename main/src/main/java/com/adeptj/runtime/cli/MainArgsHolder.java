@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,31 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
+package com.adeptj.runtime.cli;
 
-    <modules>
+/**
+ * The {@link MainArgs} holder.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum MainArgsHolder {
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+    INSTANCE;
 
-    </modules>
+    private MainArgs mainArgs;
 
-</project>
+    public MainArgs getMainArgs() {
+        return mainArgs;
+    }
+
+    public void setMainArgs(MainArgs mainArgs) {
+        if (this.mainArgs == null) {
+            this.mainArgs = mainArgs;
+        }
+    }
+
+    public static MainArgsHolder getInstance() {
+        return INSTANCE;
+    }
+}

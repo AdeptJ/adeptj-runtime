@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,32 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.common;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import org.osgi.framework.BundleContext;
 
-    </modules>
+/**
+ * This Enum provides the access to the OSGi System Bundle {@link BundleContext}.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public enum BundleContextHolder {
 
-</project>
+    INSTANCE;
+
+    private BundleContext bundleContext;
+
+    public BundleContext getBundleContext() {
+        return this.bundleContext;
+    }
+
+    public void setBundleContext(BundleContext bundleContext) { // NOSONAR
+        this.bundleContext = bundleContext;
+    }
+
+    public static BundleContextHolder getInstance() {
+        return INSTANCE;
+    }
+}

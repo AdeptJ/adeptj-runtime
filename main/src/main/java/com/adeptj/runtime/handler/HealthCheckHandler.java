@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,25 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.handler;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import io.undertow.server.HttpHandler;
+import io.undertow.server.HttpServerExchange;
 
-    </modules>
+import static io.undertow.util.StatusCodes.OK;
 
-</project>
+/**
+ * Just returns a 200 OK for a health check request and simply terminate the request.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class HealthCheckHandler implements HttpHandler {
+
+    @Override
+    public void handleRequest(HttpServerExchange exchange) {
+        exchange.setStatusCode(OK);
+        exchange.endExchange();
+    }
+}

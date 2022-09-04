@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,20 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.htmlrender;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+/**
+ * The {@link TemplateProcessingException} thrown when an exception occurred while processing a given template.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+final class TemplateProcessingException extends RuntimeException {
 
-    </modules>
+    private static final long serialVersionUID = -8077495079692215520L;
 
-</project>
+    TemplateProcessingException(Throwable cause) {
+        super(cause);
+    }
+}

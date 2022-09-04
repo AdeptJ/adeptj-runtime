@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,41 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.common;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-    </modules>
+/**
+ * Utility for providing execution time in different {@link java.util.concurrent.TimeUnit}.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public final class Times {
 
-</project>
+    // No instances, just utility methods.
+    private Times() {
+    }
+
+    /**
+     * Returns elapsed time in milliseconds from the provided time in nanoseconds.
+     *
+     * @param startTime time in nanoseconds
+     * @return elapsed time in milliseconds
+     */
+    public static long elapsedMillis(final long startTime) {
+        return NANOSECONDS.toMillis(System.nanoTime() - startTime);
+    }
+
+    /**
+     * Returns elapsed time in seconds from the provided time in milliseconds.
+     *
+     * @param startTime time in milliseconds
+     * @return elapsed time in seconds
+     */
+    public static long elapsedSeconds(final long startTime) {
+        return MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
+    }
+}

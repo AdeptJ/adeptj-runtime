@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,42 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.common;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import org.xnio.streams.Streams;
 
-    </modules>
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-</project>
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+/**
+ * Common utility methods.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public final class IOUtils {
+
+    /**
+     * Deny direct instantiation.
+     */
+    private IOUtils() {
+    }
+
+    public static String toString(InputStream input) throws IOException {
+        return toByteArrayOutputStream(input).toString(UTF_8);
+    }
+
+    public static byte[] toBytes(InputStream input) throws IOException {
+        return toByteArrayOutputStream(input).toByteArray();
+    }
+
+    private static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Streams.copyStream(source, out, false);
+        return out;
+    }
+}

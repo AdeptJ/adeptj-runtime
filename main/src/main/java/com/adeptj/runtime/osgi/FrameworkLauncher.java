@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,28 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.osgi;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import com.adeptj.runtime.core.StartupAware;
 
-    </modules>
+import javax.servlet.ServletContext;
 
-</project>
+/**
+ * FrameworkLauncher is a {@link StartupAware} that launches the OSGi Framework.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class FrameworkLauncher implements StartupAware {
+
+    /**
+     * This method will be called by the ServletContainerInitializer while startup is in progress.
+     *
+     * @param servletContext the {@link ServletContext}
+     */
+    @Override
+    public void onStartup(ServletContext servletContext) {
+        FrameworkManager.getInstance().startFramework();
+    }
+}

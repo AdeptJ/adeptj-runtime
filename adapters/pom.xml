@@ -22,19 +22,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
+    <artifactId>adeptj-runtime-adapters-reactor</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
+    <name>AdeptJ Runtime :: Server Adapters :: Reactor</name>
+    <description>Maven reactor project for AdeptJ Runtime server adapters.</description>
     <url>https://www.adeptj.com</url>
     <inceptionYear>2016</inceptionYear>
 
     <modules>
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+        <module>jetty</module>
+        <module>tomcat</module>
+        <module>undertow</module>
 
     </modules>
 

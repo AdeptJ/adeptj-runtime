@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,42 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.common;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-    </modules>
+import static com.adeptj.runtime.common.Constants.DIR_ADEPTJ_RUNTIME;
+import static com.adeptj.runtime.common.Constants.DIR_DEPLOYMENT;
+import static com.adeptj.runtime.common.Constants.FRAMEWORK_CONF_FILE;
+import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
+import static com.adeptj.runtime.common.Constants.SYS_PROP_SERVER_MODE;
+import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
-</project>
+/**
+ * Utility methods for getting environment details AdeptJ Runtime is running in.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+public final class Environment {
+
+    /**
+     * Deny direct instantiation.
+     */
+    private Environment() {
+    }
+
+    public static boolean isDev() {
+        return ServerMode.DEV.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
+    }
+
+    public static Path getServerConfPath() {
+        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
+    }
+
+    public static Path getFrameworkConfPath() {
+        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, FRAMEWORK_CONF_FILE);
+    }
+}

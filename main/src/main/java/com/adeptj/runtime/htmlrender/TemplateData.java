@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
 #                                                                             # 
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
@@ -17,25 +16,52 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.htmlrender;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import org.trimou.engine.resolver.Mapper;
 
-    </modules>
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
-</project>
+/**
+ * TemplateData object for storing variables used in template rendering.
+ *
+ * @author Rakesh.Kumar, AdeptJ.
+ */
+public final class TemplateData implements Mapper, Iterable<Entry<String, Object>> {
+
+    private final Locale locale;
+
+    private Map<String, Object> variables;
+
+    public TemplateData(Locale locale) {
+        this.locale = locale;
+    }
+
+    public TemplateData with(String key, Object value) {
+        if (this.variables == null) {
+            this.variables = new HashMap<>(8);
+        }
+        this.variables.put(key, value);
+        return this;
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    @Override
+    public Object get(String key) {
+        return this.variables.get(key);
+    }
+
+    @Override
+    public Iterator<Entry<String, Object>> iterator() {
+        return this.variables.entrySet().iterator();
+    }
+}

@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,33 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.server;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import com.adeptj.runtime.common.Servlets;
+import com.adeptj.runtime.core.StartupAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    </modules>
+import javax.servlet.ServletContext;
 
-</project>
+/**
+ * DefaultStartupAware is a {@link StartupAware} that registers the bridge listeners and servlet.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class DefaultStartupAware implements StartupAware {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStartup(ServletContext servletContext) {
+        Logger logger = LoggerFactory.getLogger(DefaultStartupAware.class);
+        Servlets.registerBridgeListeners(servletContext);
+        logger.info("OSGi bridge listeners registered successfully!!");
+        Servlets.registerBridgeServlet(servletContext);
+        logger.info("BridgeServlet registered successfully!!");
+    }
+}

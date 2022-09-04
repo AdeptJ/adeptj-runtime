@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--  
+/*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -17,25 +16,28 @@
 #    limitations under the License.                                           #
 #                                                                             #
 ###############################################################################
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.adeptj</groupId>
-    <artifactId>adeptj-runtime-reactor</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>AdeptJ Runtime :: Reactor</name>
-    <description>AdeptJ Runtime :: Reactor</description>
-    <url>https://www.adeptj.com</url>
-    <inceptionYear>2016</inceptionYear>
+*/
 
-    <modules>
+package com.adeptj.runtime.logging;
 
-        <module>kernel</module>
-        <module>adapters</module>
-        <module>main</module>
+import ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
-    </modules>
+import static ch.qos.logback.classic.Level.DEBUG_INT;
+import static ch.qos.logback.core.pattern.color.ANSIConstants.YELLOW_FG;
 
-</project>
+/**
+ * Extended version of {@link HighlightingCompositeConverter} which prints debug log level in yellow.
+ *
+ * @author Rakesh.Kumar, AdeptJ
+ */
+public class DebugLevelHighlightingConverter extends HighlightingCompositeConverter {
+
+    @Override
+    protected String getForegroundColorCode(ILoggingEvent event) {
+        if (event.getLevel().toInt() == DEBUG_INT) {
+            return YELLOW_FG;
+        }
+        return super.getForegroundColorCode(event);
+    }
+}
