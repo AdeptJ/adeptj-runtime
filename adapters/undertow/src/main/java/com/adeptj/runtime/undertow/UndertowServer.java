@@ -128,9 +128,7 @@ public class UndertowServer extends AbstractServer {
     @Override
     public void start(String[] args, ServletDeployment deployment) {
         Config undertowConf = ConfigProvider.getInstance().getServerConfig(this.getRuntime());
-        Config httpConf = undertowConf.getConfig(Constants.KEY_HTTP);
-        int port = this.resolvePort(httpConf);
-        LOGGER.info("Starting AdeptJ Runtime @port: [{}]", port);
+        int port = this.resolvePort(ConfigProvider.getInstance().getApplicationConfig());
         try {
             this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf, deployment));
             this.deploymentManager.deploy();
@@ -142,7 +140,7 @@ public class UndertowServer extends AbstractServer {
             new SocketOptions().setOptions(undertowBuilder, undertowConf);
             new ServerOptions().setOptions(undertowBuilder, undertowConf);
             this.undertow = this.addHttpsListener(undertowBuilder, undertowConf)
-                    .addHttpListener(port, httpConf.getString(KEY_HOST))
+                    .addHttpListener(port, undertowConf.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();

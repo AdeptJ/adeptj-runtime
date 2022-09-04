@@ -52,18 +52,27 @@ public abstract class AbstractServer implements Server {
 
     protected abstract void doRegisterFilter(FilterInfo info);
 
-    protected int resolvePort(Config config) {
-        String serverName = this.getRuntime().getName();
-        int port = Integer.getInteger("adeptj.rt.port");
-        if (port == 0) {
-            port = config.getInt(serverName.toLowerCase() + ".port");
+    protected int resolvePort(Config appConfig) {
+        ServerRuntime runtime = this.getRuntime();
+        Integer port = Integer.getInteger("adeptj.rt.port");
+        if (port == null || port == 0) {
+            this.logger.info("No port specified via system property: [{}], will resolve port from configs", SYS_PROP_SERVER_PORT);
+            Config serverConfig = appConfig.getConfig(runtime.getName().toLowerCase());
+            if (runtime == ServerRuntime.UNDERTOW) {
+                port = serverConfig.getInt("http.port");
+            } else {
+                port = serverConfig.getInt("port");
+            }
+            if (port > 0) {
+                this.logger.info("Resolved port from server({}) configs!", runtime.getName());
+            }
             if (port == 0) {
                 // Fallback
-                port = config.getInt("kernel.server.port");
+                port = appConfig.getInt("kernel.server.port");
+                this.logger.info("Resolved port from kernel configs!");
             }
-            this.logger.info("No port specified via system property: [{}], using default port: [{}]", SYS_PROP_SERVER_PORT, port);
         }
-        this.logger.info("Starting {} on port: {}", serverName, port);
+        this.logger.info("Starting {} on port: {}", runtime.getName(), port);
         return port;
     }
 }
