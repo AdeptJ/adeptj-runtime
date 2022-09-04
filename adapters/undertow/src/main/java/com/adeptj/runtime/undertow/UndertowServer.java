@@ -189,7 +189,7 @@ public class UndertowServer extends AbstractServer {
 
     @Override
     public void addServletContextAttribute(String name, Object value) {
-
+        this.deploymentManager.getDeployment().getServletContext().setAttribute(name, value);
     }
 
     private void gracefulShutdown() {
