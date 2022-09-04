@@ -21,6 +21,8 @@
 package com.adeptj.runtime.config;
 
 import com.adeptj.runtime.common.Environment;
+import com.adeptj.runtime.kernel.ConfigProvider;
+import com.adeptj.runtime.kernel.ServerRuntime;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -29,12 +31,10 @@ import java.io.File;
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.MAIN_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.RESTEASY_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.common.Constants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.UNDERTOW_CONF_SECTION;
 
 /**
  * Initializes the application configurations.
@@ -48,10 +48,10 @@ public enum Configs {
     /**
      * This will include system properties as well.
      */
-    private final Config root;
+    private Config root;
 
     Configs() {
-        this.root = this.loadConf();
+        // this.root = this.loadConf();
     }
 
     public Config root() {
@@ -59,11 +59,11 @@ public enum Configs {
     }
 
     public Config main() {
-        return this.root.getConfig(MAIN_CONF_SECTION);
+        return ConfigProvider.getInstance().getMainConfig();
     }
 
-    public Config undertow() {
-        return this.main().getConfig(UNDERTOW_CONF_SECTION);
+    public Config undertow(ServerRuntime runtime) {
+        return ConfigProvider.getInstance().getServerConfig(runtime);
     }
 
     public Config felix() {

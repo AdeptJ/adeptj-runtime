@@ -2,7 +2,6 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.kernel.Server;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
-import com.adeptj.runtime.server.DefaultStartupAware;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

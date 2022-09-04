@@ -15,12 +15,21 @@ public enum ConfigProvider {
         this.weakReference = new WeakReference<>(ConfigFactory.load());
     }
 
-    public Config getReferenceConfig() {
+    public Config getApplicationConfig() {
         return this.weakReference.get();
     }
 
+    public Config getMainConfig() {
+        return this.getApplicationConfig().getConfig("main");
+    }
+
+    public Config getKernelConfig() {
+        return this.getApplicationConfig().getConfig("kernel");
+    }
+
     public Config getServerConfig(ServerRuntime runtime) {
-        return this.getReferenceConfig().getConfig(runtime.getName().toLowerCase());
+        Config applicationConfig = this.getApplicationConfig();
+        return applicationConfig.getConfig(runtime.getName().toLowerCase());
     }
 
     public static ConfigProvider getInstance() {

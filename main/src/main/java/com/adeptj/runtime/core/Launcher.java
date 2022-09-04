@@ -94,7 +94,7 @@ public final class Launcher {
             Server server = ServiceLoader.load(Server.class).iterator().next();
             ServerRuntime runtime = server.getRuntime();
             logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
-            launcher.populateCredentialsStore(Configs.of().undertow());
+            launcher.populateCredentialsStore(Configs.of().undertow(runtime));
             if (runtime == TOMCAT) {
                 new TomcatBootstrapper().bootstrap(server, args);
             } else if (runtime == JETTY) {

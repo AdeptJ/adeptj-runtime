@@ -22,7 +22,6 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.common.ResponseUtil;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.htmlrender.TemplateData;
 import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
@@ -35,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
-import static com.adeptj.runtime.common.Constants.KEY_SYSTEM_CONSOLE_PATH;
 import static com.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
 import static java.lang.Boolean.TRUE;
 
@@ -72,7 +70,7 @@ public class AdminServlet extends HttpServlet {
             RequestUtil.logout(req);
         }
         // if someone is requesting logout URI anonymously, redirect to /system/console/bundles.
-        ResponseUtil.redirect(resp, Configs.of().undertow().getString(KEY_SYSTEM_CONSOLE_PATH));
+        ResponseUtil.redirect(resp, "/system/console/bundles");
     }
 
     /**

@@ -17,26 +17,31 @@
 #                                                                             #
 ###############################################################################
 */
-package com.adeptj.runtime.predicate;
 
-import io.undertow.predicate.Predicate;
-import io.undertow.server.HttpServerExchange;
+package com.adeptj.runtime.core;
+
+import com.adeptj.runtime.common.Servlets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletContext;
 
 /**
- * Predicate just checks if the request path is / i.e. root
+ * DefaultStartupAware is a {@link StartupAware} that registers the bridge listeners and servlet.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public class ContextPathPredicate implements Predicate {
+public class DefaultStartupAware implements StartupAware {
 
-    private final String contextPath;
-
-    public ContextPathPredicate(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean resolve(HttpServerExchange value) {
-        return value.getRequestPath().equals(this.contextPath);
+    public void onStartup(ServletContext servletContext) {
+        Logger logger = LoggerFactory.getLogger(DefaultStartupAware.class);
+        Servlets.registerBridgeListeners(servletContext);
+        logger.info("OSGi bridge listeners registered successfully!!");
+        Servlets.registerBridgeServlet(servletContext);
+        logger.info("BridgeServlet registered successfully!!");
     }
 }

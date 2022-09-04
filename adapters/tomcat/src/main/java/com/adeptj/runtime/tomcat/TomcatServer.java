@@ -35,7 +35,7 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config config = ConfigProvider.getInstance().getReferenceConfig();
+        Config config = ConfigProvider.getInstance().getApplicationConfig();
         this.tomcat = new Tomcat();
         this.tomcat.setPort(this.resolvePort(config));
         this.tomcat.setBaseDir("tomcat-deployment");

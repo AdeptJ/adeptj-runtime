@@ -43,7 +43,7 @@ public class JettyServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config config = ConfigProvider.getInstance().getReferenceConfig();
+        Config config = ConfigProvider.getInstance().getApplicationConfig();
         int minThreads = config.getInt("jetty.qtp.minThreads");
         int maxThreads = config.getInt("jetty.qtp.maxThreads");
         int idleTimeout = config.getInt("jetty.qtp.idleTimeout");
