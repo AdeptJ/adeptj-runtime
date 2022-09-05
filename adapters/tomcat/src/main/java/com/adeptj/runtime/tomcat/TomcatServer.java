@@ -22,6 +22,17 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_BASE_DIR;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_CTX_PATH;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_DOC_BASE;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_INTERNAL_PATH;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_WEBAPP_MT;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_LIB_PATH;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_MAIN_COMMON;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_RELAXED_PATH_CHARS;
+import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_WEBAPP_JAR_NAME;
+import static com.adeptj.runtime.tomcat.Constants.SYMBOL_DASH;
+
 public class TomcatServer extends AbstractServer {
 
     private Tomcat tomcat;
@@ -35,22 +46,25 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config config = ConfigProvider.getInstance().getApplicationConfig();
+        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
+        Config serverConfig = appConfig.getConfig(this.getRuntime().getName().toLowerCase());
         this.tomcat = new Tomcat();
-        this.tomcat.setPort(this.resolvePort(config));
-        this.tomcat.setBaseDir("tomcat-deployment");
+        this.tomcat.setPort(this.resolvePort(appConfig));
+        this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
         this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
         Connector connector = this.tomcat.getConnector();
         ProtocolHandler ph = connector.getProtocolHandler();
         if (ph instanceof Http11NioProtocol) {
-            ((Http11NioProtocol) ph).setRelaxedPathChars("[]|");
+            ((Http11NioProtocol) ph).setRelaxedPathChars(serverConfig.getString(CFG_KEY_RELAXED_PATH_CHARS));
         }
-        this.context = (StandardContext) tomcat.addContext("", new File(".").getAbsolutePath());
+        String contextPath = serverConfig.getString(CFG_KEY_CTX_PATH);
+        String docBase = serverConfig.getString(CFG_KEY_DOC_BASE);
+        this.context = (StandardContext) tomcat.addContext(contextPath, new File(docBase).getAbsolutePath());
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
         this.registerServlets(deployment.getServletInfos());
-        new SecurityConfigurer().configure(this.context, this.getUserManager());
-        new GeneralConfigurer().configure(this.context);
+        new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig.getConfig(CFG_KEY_MAIN_COMMON));
+        new GeneralConfigurer().configure(this.context, serverConfig);
         Tomcat.addDefaultMimeTypeMappings(this.context);
         try {
             this.tomcat.start();
@@ -59,7 +73,7 @@ public class TomcatServer extends AbstractServer {
             throw new RuntimeException(e);
         }
         // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
-        this.addJarResourceSet(this.context);
+        this.addJarResourceSet(this.context, serverConfig);
     }
 
     @Override
@@ -90,12 +104,12 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     protected void doRegisterFilter(FilterInfo info) {
-
+        // NOOP
     }
 
     @Override
     public void registerErrorPages(List<Integer> errorCodes) {
-
+        // NOOP
     }
 
     @Override
@@ -103,20 +117,22 @@ public class TomcatServer extends AbstractServer {
         this.context.getServletContext().setAttribute(name, value);
     }
 
-    private void addJarResourceSet(Context context) {
+    private void addJarResourceSet(Context context, Config serverConfig) {
+        String libPath = serverConfig.getString(CFG_KEY_LIB_PATH);
         String docBase = context.getDocBase();
-        File[] jars = new File(docBase.substring(0, docBase.length() - 1) + "/lib").listFiles();
+        File[] jars = new File(docBase.substring(0, docBase.length() - 1) + libPath).listFiles();
         if (jars == null) {
             return;
         }
+        String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
         Stream.of(jars)
-                .filter(jar -> jar.getName().startsWith("adeptj-runtime") && jar.getName().split("-").length == 3)
+                .filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3)
                 .findAny()
                 .ifPresent(jar -> {
                     JarResourceSet resourceSet = new JarResourceSet();
                     resourceSet.setBase(jar.getAbsolutePath());
-                    resourceSet.setInternalPath("/webapp");
-                    resourceSet.setWebAppMount("/");
+                    resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
+                    resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
                     context.getResources().addJarResources(resourceSet);
                 });
     }

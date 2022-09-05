@@ -9,6 +9,7 @@ import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
+import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -96,6 +97,17 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
+    public void postStart() {
+        super.postStart();
+        try {
+            this.jetty.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ServerException(e);
+        }
+    }
+
+    @Override
     public void stop() {
         try {
             super.preStop();
@@ -116,12 +128,12 @@ public class JettyServer extends AbstractServer {
 
     @Override
     protected void doRegisterFilter(FilterInfo info) {
-
+        // NOOP
     }
 
     @Override
     public void registerErrorPages(List<Integer> errorCodes) {
-
+        // NOOP
     }
 
     @Override

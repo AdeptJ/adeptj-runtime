@@ -1,6 +1,5 @@
 package com.adeptj.runtime.tomcat;
 
-import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
 import org.apache.catalina.authenticator.FormAuthenticator;
@@ -13,8 +12,7 @@ import java.util.List;
 
 public class SecurityConfigurer {
 
-    public void configure(StandardContext context, UserManager userManager) {
-        Config commonCfg = ConfigProvider.getInstance().getMainConfig().getConfig("common");
+    public void configure(StandardContext context, UserManager userManager, Config commonCfg) {
         // SecurityConstraint
         SecurityConstraint constraint = new SecurityConstraint();
         List<String> authRoles = commonCfg.getStringList("auth-roles");
