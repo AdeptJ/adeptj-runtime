@@ -1,6 +1,5 @@
 package com.adeptj.runtime.jetty;
 
-import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -13,8 +12,8 @@ import java.util.List;
 
 public class SecurityConfigurer {
 
-    public void configure(ServletContextHandler context, UserManager userManager) {
-        Config commonCfg = ConfigProvider.getInstance().getMainConfig().getConfig("common");
+    public void configure(ServletContextHandler context, UserManager userManager, Config config) {
+        Config commonCfg = config.getConfig("main.common");
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__FORM_AUTH);
         List<String> authRoles = commonCfg.getStringList("auth-roles");

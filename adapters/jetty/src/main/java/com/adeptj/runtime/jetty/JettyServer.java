@@ -45,9 +45,9 @@ public class JettyServer extends AbstractServer {
     @Override
     public void start(String[] args, ServletDeployment deployment) {
         Config config = ConfigProvider.getInstance().getApplicationConfig();
-        int minThreads = config.getInt("jetty.qtp.minThreads");
-        int maxThreads = config.getInt("jetty.qtp.maxThreads");
-        int idleTimeout = config.getInt("jetty.qtp.idleTimeout");
+        int minThreads = config.getInt("jetty.qtp.min-threads");
+        int maxThreads = config.getInt("jetty.qtp.max-threads");
+        int idleTimeout = config.getInt("jetty.qtp.idle-timeout");
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         this.jetty = new Server(threadPool);
         HttpConfiguration httpConfig = new HttpConfiguration();
@@ -67,8 +67,8 @@ public class JettyServer extends AbstractServer {
         this.context.addServletContainerInitializer(new ServletContainerInitializerHolder(sciInfo.getSciInstance(),
                 sciInfo.getHandleTypesArray()));
         this.registerServlets(deployment.getServletInfos());
-        new SecurityConfigurer().configure(this.context, this.getUserManager());
-        new ErrorHandlerConfigurer().configure(this.context);
+        new SecurityConfigurer().configure(this.context, this.getUserManager(), config);
+        new ErrorHandlerConfigurer().configure(this.context, config);
         this.jetty.setHandler(this.createRootHandler(this.context));
         try {
             this.jetty.start();

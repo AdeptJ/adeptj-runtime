@@ -57,12 +57,7 @@ public abstract class AbstractServer implements Server {
         Integer port = Integer.getInteger("adeptj.rt.port");
         if (port == null || port == 0) {
             this.logger.info("No port specified via system property: [{}], will resolve port from configs", SYS_PROP_SERVER_PORT);
-            Config serverConfig = appConfig.getConfig(runtime.getName().toLowerCase());
-            if (runtime == ServerRuntime.UNDERTOW) {
-                port = serverConfig.getInt("http.port");
-            } else {
-                port = serverConfig.getInt("port");
-            }
+            port = appConfig.getConfig(runtime.getName().toLowerCase()).getInt("http.port");
             if (port > 0) {
                 this.logger.info("Resolved port from server({}) configs!", runtime.getName());
             }
