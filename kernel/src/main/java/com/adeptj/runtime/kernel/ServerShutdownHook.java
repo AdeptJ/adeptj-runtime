@@ -1,10 +1,10 @@
 package com.adeptj.runtime.kernel;
 
-public final class ShutdownHook extends Thread {
+public final class ServerShutdownHook extends Thread {
 
     private final Server server;
 
-    public ShutdownHook(Server server, String threadName) {
+    public ServerShutdownHook(Server server, String threadName) {
         super(threadName);
         this.server = server;
     }

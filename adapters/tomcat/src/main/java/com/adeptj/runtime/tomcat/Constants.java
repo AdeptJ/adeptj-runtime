@@ -6,7 +6,11 @@ public class Constants {
 
     public static final String CFG_KEY_BASE_DIR = "base-dir";
 
-    public static final String CFG_KEY_RELAXED_PATH_CHARS = "relaxed-path-chars";
+    public static final String CFG_KEY_RELAXED_PATH_CHARS = "connector.relaxed-path-chars";
+
+    public static final String CFG_KEY_CONNECTOR_PROTOCOL = "connector.protocol";
+
+    public static final String CFG_KEY_CONNECTOR_SERVER = "connector.server";
 
     public static final String CFG_KEY_CTX_PATH = "context-path";
 

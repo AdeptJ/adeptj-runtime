@@ -9,6 +9,7 @@ import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
+import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
 import org.eclipse.jetty.server.Handler;
@@ -25,6 +26,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -32,6 +35,8 @@ import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 
 public class JettyServer extends AbstractServer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
 
     private Server jetty;
 
@@ -73,8 +78,8 @@ public class JettyServer extends AbstractServer {
         try {
             this.jetty.start();
         } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            LOGGER.error(e.getMessage(), e);
+            throw new RuntimeInitializationException(e);
         }
     }
 
@@ -97,8 +102,12 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
     public void postStart() {
-        super.postStart();
         try {
             this.jetty.join();
         } catch (InterruptedException e) {
@@ -108,17 +117,8 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
-    public void stop() {
-        try {
-            super.preStop();
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
-        try {
-            this.jetty.stop();
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
+    protected void doStop() throws Exception {
+        this.jetty.stop();
     }
 
     @Override

@@ -1,33 +1,51 @@
 package com.adeptj.runtime.kernel;
 
 import com.adeptj.runtime.kernel.security.MVStoreUserManager;
+import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static com.adeptj.runtime.kernel.Constants.SYS_PROP_SERVER_PORT;
 
 public abstract class AbstractServer implements Server {
 
-    protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final UserManager userManager;
+
+    private ServerPostStopTask postStopTask;
 
     public AbstractServer() {
         this.userManager = new MVStoreUserManager();
     }
 
+    public void setServerPostStopTask(ServerPostStopTask postStopTask) {
+        this.postStopTask = postStopTask;
+    }
+
+    protected abstract Logger getLogger();
+
     @Override
     public void postStart() {
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(this, "AdeptJ Terminator"));
+        // NOOP
     }
 
     @Override
-    public void preStop() {
-        this.logger.info("Stopping {}", this.getRuntime().getName());
+    public void stop() {
+        long startTime = System.nanoTime();
+        this.getLogger().info("Stopping AdeptJ Runtime!!");
+        try {
+            this.doStop();
+            this.getLogger().info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
+        } catch (Throwable ex) { // NOSONAR
+            this.getLogger().error("Exception while stopping AdeptJ Runtime!!", ex);
+        } finally {
+            this.postStopTask.execute();
+        }
     }
+
+    protected abstract void doStop() throws Exception;
 
     @Override
     public void registerServlets(List<ServletInfo> servletInfos) {
@@ -53,21 +71,22 @@ public abstract class AbstractServer implements Server {
     protected abstract void doRegisterFilter(FilterInfo info);
 
     protected int resolvePort(Config appConfig) {
+        ResourceBundle rb = ResourceBundle.getBundle("i18n/kernel");
         ServerRuntime runtime = this.getRuntime();
         Integer port = Integer.getInteger("adeptj.rt.port");
         if (port == null || port == 0) {
-            this.logger.info("No port specified via system property: [{}], will resolve port from configs", SYS_PROP_SERVER_PORT);
+            this.getLogger().info(rb.getString("ajrt.port.system.property.not.specified"), SYS_PROP_SERVER_PORT);
             port = appConfig.getConfig(runtime.getName().toLowerCase()).getInt("http.port");
             if (port > 0) {
-                this.logger.info("Resolved port from server({}) configs!", runtime.getName());
+                this.getLogger().info("Resolved port from server({}) configs!", runtime.getName());
             }
             if (port == 0) {
                 // Fallback
                 port = appConfig.getInt("kernel.server.port");
-                this.logger.info("Resolved port from kernel configs!");
+                this.getLogger().info("Resolved port from kernel configs!");
             }
         }
-        this.logger.info("Starting {} on port: {}", runtime.getName(), port);
+        this.getLogger().info("Starting {} on port: {}", runtime.getName(), port);
         return port;
     }
 }

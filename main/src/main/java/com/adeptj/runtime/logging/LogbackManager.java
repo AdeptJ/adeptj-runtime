@@ -40,6 +40,7 @@ import com.adeptj.runtime.config.Configs;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.SystemUtils;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -150,7 +151,9 @@ public final class LogbackManager {
         PatternLayout.DEFAULT_CONVERTER_MAP.put(HIGHLIGHT_EXT, DebugLevelHighlightingConverter.class.getName());
     }
 
-    public void stopLogback() {
+    public void cleanup() {
+        SLF4JBridgeHandler.uninstall();
+        // Let Logback cleans up it's state.
         this.loggerContext.stop();
     }
 
@@ -249,8 +252,7 @@ public final class LogbackManager {
 
     void addServerConfigLoggers(Config loggingCfg) {
         for (Config config : loggingCfg.getConfigList(KEY_LOGGERS)) {
-            this.addLogger(config.getString(KEY_LOGGER_NAME).trim(), config.getString(KEY_LOGGER_LEVEL).trim(),
-                    config.getBoolean(KEY_LOGGER_ADDITIVITY));
+            this.addLogger(config.getString(KEY_LOGGER_NAME).trim(), config.getString(KEY_LOGGER_LEVEL).trim(), config.getBoolean(KEY_LOGGER_ADDITIVITY));
         }
     }
 
@@ -331,19 +333,7 @@ public final class LogbackManager {
     }
 
     private FileAppenderConfig createFileAppenderConfig(Config loggingCfg) {
-        return FileAppenderConfig.builder()
-                .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
-                .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
-                .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
-                .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
-                .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
-                .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
-                .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
-                .logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
-                .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
-                .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
-                .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
-                .build();
+        return FileAppenderConfig.builder().appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME)).logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE)).pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE)).immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH)).logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE)).rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE)).logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY)).logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC)).asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME)).asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE)).asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD)).build();
     }
 
     void initLevelChangePropagator() {

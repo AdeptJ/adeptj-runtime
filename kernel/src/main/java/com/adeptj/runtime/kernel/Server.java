@@ -10,8 +10,6 @@ public interface Server {
 
     void postStart();
 
-    void preStop();
-
     void stop();
 
     void registerServlets(List<ServletInfo> servletInfos);

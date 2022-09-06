@@ -150,24 +150,18 @@ public class UndertowServer extends AbstractServer {
     }
 
     @Override
-    public void stop() {
-        long startTime = System.nanoTime();
-        LOGGER.info("Stopping AdeptJ Runtime!!");
-        try {
-            this.gracefulShutdown();
-            // Calls stop on LifecycleObjects - io.undertow.servlet.core.Lifecycle
-            this.deploymentManager.stop();
-            // Calls contextDestroyed on all registered ServletContextListener and performs other cleanup tasks.
-            this.deploymentManager.undeploy();
-            this.undertow.stop();
-            LOGGER.info("AdeptJ Runtime stopped in [{}] ms!!", Times.elapsedMillis(startTime));
-        } catch (Throwable ex) { // NOSONAR
-            LOGGER.error("Exception while stopping AdeptJ Runtime!!", ex);
-        } finally {
-            // SLF4JBridgeHandler.uninstall();
-            // Let the Logback cleans up it's state.
-            // LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
-        }
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        this.gracefulShutdown();
+        // Calls stop on LifecycleObjects - io.undertow.servlet.core.Lifecycle
+        this.deploymentManager.stop();
+        // Calls contextDestroyed on all registered ServletContextListener and performs other cleanup tasks.
+        this.deploymentManager.undeploy();
+        this.undertow.stop();
     }
 
     @Override

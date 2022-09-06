@@ -25,8 +25,10 @@ import com.adeptj.runtime.common.IOUtils;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.AbstractServer;
 import com.adeptj.runtime.kernel.Server;
 import com.adeptj.runtime.kernel.ServerRuntime;
+import com.adeptj.runtime.kernel.ServerShutdownHook;
 import com.adeptj.runtime.osgi.FrameworkManager;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +36,6 @@ import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,9 +46,6 @@ import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static com.adeptj.runtime.common.Constants.BANNER_TXT;
 import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
-import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
-import static com.adeptj.runtime.kernel.ServerRuntime.TOMCAT;
-import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
 
@@ -88,21 +86,15 @@ public final class Launcher {
         launcher.printBanner(logger);
         try {
             logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
-            //Lifecycle lifecycle = new Server();
-            //lifecycle.start(args);
-            //Runtime.getRuntime().addShutdownHook(new ShutdownHook(lifecycle, SERVER_STOP_THREAD_NAME));
-            Server server = ServiceLoader.load(Server.class).iterator().next();
+            AbstractServer server = (AbstractServer) ServiceLoader.load(Server.class).iterator().next();
+            server.setServerPostStopTask(new LoggerCleanupTask());
             ServerRuntime runtime = server.getRuntime();
-            logger.info("Bootstrapping AdeptJ Runtime based on {}.", runtime.getName());
+            logger.info("Initializing AdeptJ Runtime based on {}.", runtime.getName());
             launcher.populateCredentialsStore(Configs.of().main());
-            if (runtime == TOMCAT) {
-                new TomcatBootstrapper().bootstrap(server, args);
-            } else if (runtime == JETTY) {
-                new JettyBootstrapper().bootstrap(server, args);
-            } else if (runtime == UNDERTOW) {
-                new UndertowBootstrapper().bootstrap(server, args);
-            }
+            ServerBootstrapperResolver.resolve(runtime).bootstrap(server, args);
+            // OSGi Framework is initialized by this time and BundleContext is available as well.
             server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
+            Runtime.getRuntime().addShutdownHook(new ServerShutdownHook(server, "AdeptJ Terminator"));
             logger.info("AdeptJ Runtime initialized in [{}] ms!!", Times.elapsedMillis(startTime));
             server.postStart();
         } catch (Throwable th) { // NOSONAR
@@ -118,9 +110,7 @@ public final class Launcher {
                     logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
                     FrameworkManager.getInstance().stopFramework();
                 });
-        // Let the LOGBACK cleans up it's state.
-        SLF4JBridgeHandler.uninstall();
-        LogbackManagerHolder.getInstance().getLogbackManager().stopLogback();
+        LogbackManagerHolder.getInstance().getLogbackManager().cleanup();
         System.exit(-1); // NOSONAR
     }
 

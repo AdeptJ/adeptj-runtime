@@ -20,8 +20,6 @@
 
 package com.adeptj.runtime.common;
 
-import org.xnio.streams.Streams;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +49,15 @@ public final class IOUtils {
 
     private static ByteArrayOutputStream toByteArrayOutputStream(InputStream source) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Streams.copyStream(source, out, false);
-        return out;
+        // Below section is borrowed (with much appreciation) from JBoss Xnio Streams.copyStream :)
+        final byte[] buffer = new byte[8192];
+        int res;
+        for (; ; ) {
+            res = source.read(buffer);
+            if (res == -1) {
+                return out;
+            }
+            out.write(buffer, 0, res);
+        }
     }
 }

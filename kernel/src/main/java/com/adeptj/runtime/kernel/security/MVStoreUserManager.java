@@ -5,6 +5,7 @@ import com.adeptj.runtime.kernel.UserManager;
 import com.adeptj.runtime.kernel.util.PasswordEncoder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
 import java.nio.ByteBuffer;
@@ -22,7 +23,7 @@ public class MVStoreUserManager implements UserManager {
     @Override
     public String getPassword(String username) {
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
-            return (String) store.openMap(H2_MAP_ADMIN_CREDENTIALS).get(username);
+            return store.openMap(H2_MAP_ADMIN_CREDENTIALS, new MVMap.Builder<String, String>()).get(username);
         }
     }
 

@@ -7,16 +7,15 @@ import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
+import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.typesafe.config.Config;
 import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.VersionLoggerListener;
 import org.apache.catalina.webresources.JarResourceSet;
-import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.http11.Http11NioProtocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -29,11 +28,12 @@ import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_INTERNAL_PATH;
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_WEBAPP_MT;
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_LIB_PATH;
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_MAIN_COMMON;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_RELAXED_PATH_CHARS;
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_WEBAPP_JAR_NAME;
 import static com.adeptj.runtime.tomcat.Constants.SYMBOL_DASH;
 
 public class TomcatServer extends AbstractServer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TomcatServer.class);
 
     private Tomcat tomcat;
 
@@ -46,53 +46,44 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-        Config serverConfig = appConfig.getConfig(this.getRuntime().getName().toLowerCase());
-        this.tomcat = new Tomcat();
-        this.tomcat.setPort(this.resolvePort(appConfig));
-        this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
-        this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
-        Connector connector = this.tomcat.getConnector();
-        ProtocolHandler ph = connector.getProtocolHandler();
-        if (ph instanceof Http11NioProtocol) {
-            ((Http11NioProtocol) ph).setRelaxedPathChars(serverConfig.getString(CFG_KEY_RELAXED_PATH_CHARS));
-        }
-        String contextPath = serverConfig.getString(CFG_KEY_CTX_PATH);
-        String docBase = serverConfig.getString(CFG_KEY_DOC_BASE);
-        this.context = (StandardContext) tomcat.addContext(contextPath, new File(docBase).getAbsolutePath());
-        SciInfo sciInfo = deployment.getSciInfo();
-        this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
-        this.registerServlets(deployment.getServletInfos());
-        new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig.getConfig(CFG_KEY_MAIN_COMMON));
-        new GeneralConfigurer().configure(this.context, serverConfig);
-        Tomcat.addDefaultMimeTypeMappings(this.context);
         try {
+            Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
+            Config serverConfig = appConfig.getConfig(this.getRuntime().getName().toLowerCase());
+            this.tomcat = new Tomcat();
+            this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
+            this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
+            int port = this.resolvePort(appConfig);
+            new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
+            String contextPath = serverConfig.getString(CFG_KEY_CTX_PATH);
+            String docBase = serverConfig.getString(CFG_KEY_DOC_BASE);
+            this.context = (StandardContext) this.tomcat.addContext(contextPath, new File(docBase).getAbsolutePath());
+            SciInfo sciInfo = deployment.getSciInfo();
+            this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
+            this.registerServlets(deployment.getServletInfos());
+            new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig.getConfig(CFG_KEY_MAIN_COMMON));
+            new GeneralConfigurer().configure(this.context, serverConfig);
+            Tomcat.addDefaultMimeTypeMappings(this.context);
             this.tomcat.start();
-        } catch (LifecycleException e) {
-            this.logger.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+            // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
+            this.addJarResourceSet(this.context, serverConfig);
+        } catch (Exception e) { // NOSONAR
+            LOGGER.error(e.getMessage(), e);
+            throw new RuntimeInitializationException(e);
         }
-        // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
-        this.addJarResourceSet(this.context, serverConfig);
     }
 
     @Override
-    public void stop() {
-        try {
-            super.preStop();
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
-        try {
-            this.tomcat.stop();
-        } catch (LifecycleException e) {
-            throw new RuntimeException(e);
-        }
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        this.tomcat.stop();
     }
 
     @Override
     public void postStart() {
-        super.postStart();
         this.tomcat.getServer().await();
     }
 
@@ -125,15 +116,12 @@ public class TomcatServer extends AbstractServer {
             return;
         }
         String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
-        Stream.of(jars)
-                .filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3)
-                .findAny()
-                .ifPresent(jar -> {
-                    JarResourceSet resourceSet = new JarResourceSet();
-                    resourceSet.setBase(jar.getAbsolutePath());
-                    resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
-                    resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
-                    context.getResources().addJarResources(resourceSet);
-                });
+        Stream.of(jars).filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3).findAny().ifPresent(jar -> {
+            JarResourceSet resourceSet = new JarResourceSet();
+            resourceSet.setBase(jar.getAbsolutePath());
+            resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
+            resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
+            context.getResources().addJarResources(resourceSet);
+        });
     }
 }
