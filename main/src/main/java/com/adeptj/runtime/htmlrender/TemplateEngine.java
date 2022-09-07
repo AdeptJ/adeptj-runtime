@@ -20,8 +20,8 @@
 
 package com.adeptj.runtime.htmlrender;
 
-import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;

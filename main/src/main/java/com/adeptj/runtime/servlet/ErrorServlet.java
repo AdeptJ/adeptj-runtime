@@ -20,11 +20,11 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.Environment;
-import com.adeptj.runtime.common.RequestUtil;
 import com.adeptj.runtime.htmlrender.TemplateData;
 import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
+import com.adeptj.runtime.kernel.util.Environment;
+import com.adeptj.runtime.kernel.util.RequestUtil;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

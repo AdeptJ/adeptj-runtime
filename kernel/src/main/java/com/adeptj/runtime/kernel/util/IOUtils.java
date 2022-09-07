@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.common;
+package com.adeptj.runtime.kernel.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

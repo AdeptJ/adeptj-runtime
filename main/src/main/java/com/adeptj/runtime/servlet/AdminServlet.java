@@ -20,11 +20,12 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.common.RequestUtil;
-import com.adeptj.runtime.common.ResponseUtil;
 import com.adeptj.runtime.htmlrender.TemplateData;
 import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
+import com.adeptj.runtime.kernel.ConfigProvider;
+import com.adeptj.runtime.kernel.util.RequestUtil;
+import com.adeptj.runtime.kernel.util.ResponseUtil;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -69,8 +70,9 @@ public class AdminServlet extends HttpServlet {
             // Invalidate the session.
             RequestUtil.logout(req);
         }
+        String redirectUrl = ConfigProvider.getInstance().getMainConfig().getString("common.system-console-path");
         // if someone is requesting logout URI anonymously, redirect to /system/console/bundles.
-        ResponseUtil.redirect(resp, "/system/console/bundles");
+        ResponseUtil.redirect(resp, redirectUrl);
     }
 
     /**

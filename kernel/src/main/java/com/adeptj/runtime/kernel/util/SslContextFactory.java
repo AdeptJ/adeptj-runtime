@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.common;
+package com.adeptj.runtime.kernel.util;
 
 import com.typesafe.config.Config;
 
@@ -27,14 +27,14 @@ import javax.net.ssl.SSLContext;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
-import static com.adeptj.runtime.common.Constants.KEY_KEYSTORE_TYPE;
-import static com.adeptj.runtime.common.Constants.KEY_P12_FILE_LOCATION;
-import static com.adeptj.runtime.common.Constants.KEY_P12_PASSWORD;
-import static com.adeptj.runtime.common.Constants.KEY_TLS_VERSION;
-import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_FILE_EXTERNAL;
-import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_FILE_LOCATION;
-import static com.adeptj.runtime.common.Constants.SYS_PROP_P12_PASSWORD;
-import static com.adeptj.runtime.common.Constants.SYS_PROP_TLS_VERSION;
+import static com.adeptj.runtime.kernel.Constants.KEY_KEYSTORE_TYPE;
+import static com.adeptj.runtime.kernel.Constants.KEY_P12_FILE_LOCATION;
+import static com.adeptj.runtime.kernel.Constants.KEY_P12_PASSWORD;
+import static com.adeptj.runtime.kernel.Constants.KEY_TLS_VERSION;
+import static com.adeptj.runtime.kernel.Constants.SYS_PROP_P12_FILE_EXTERNAL;
+import static com.adeptj.runtime.kernel.Constants.SYS_PROP_P12_FILE_LOCATION;
+import static com.adeptj.runtime.kernel.Constants.SYS_PROP_P12_PASSWORD;
+import static com.adeptj.runtime.kernel.Constants.SYS_PROP_TLS_VERSION;
 
 /**
  * Utilities for SSL/TLS.

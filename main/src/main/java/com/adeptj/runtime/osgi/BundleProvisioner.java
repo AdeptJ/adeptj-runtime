@@ -21,7 +21,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.OSGiUtil;
-import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Bundle;

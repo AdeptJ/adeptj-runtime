@@ -1,6 +1,6 @@
 /*
 ###############################################################################
-#                                                                             # 
+#                                                                             #
 #    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
@@ -18,16 +18,35 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.common;
+package com.adeptj.runtime.kernel.util;
+
+import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 
 /**
- * Anything that want to be stopped as a result of shutdown hook can implement this interface.
+ * Utilities for Java KeyStore.
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-public interface Lifecycle {
+final class KeyStores {
 
-    void start(String[] args);
+    private KeyStores() {
+    }
 
-    void stop();
+    static KeyStore getKeyStore(boolean p12FileExternal, String type, String p12Loc, char[] p12Pwd) {
+        try (InputStream is = p12FileExternal
+                ? Files.newInputStream(Paths.get(p12Loc)) : KeyStores.class.getResourceAsStream(p12Loc)) {
+            KeyStore keyStore = KeyStore.getInstance(type);
+            keyStore.load(is, p12Pwd);
+            return keyStore;
+        } catch (IOException | GeneralSecurityException ex) {
+            throw new RuntimeInitializationException(ex);
+        }
+    }
 }

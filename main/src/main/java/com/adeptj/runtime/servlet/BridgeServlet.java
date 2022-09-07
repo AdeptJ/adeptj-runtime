@@ -22,8 +22,8 @@ package com.adeptj.runtime.servlet;
 
 import com.adeptj.runtime.common.BridgeServletConfigHolder;
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.ResponseUtil;
-import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.kernel.util.ResponseUtil;
+import com.adeptj.runtime.kernel.util.Times;
 import com.adeptj.runtime.osgi.ServiceTrackers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

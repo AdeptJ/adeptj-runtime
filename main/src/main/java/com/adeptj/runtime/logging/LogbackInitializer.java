@@ -25,8 +25,8 @@ import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 

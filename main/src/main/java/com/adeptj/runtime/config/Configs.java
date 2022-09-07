@@ -20,9 +20,9 @@
 
 package com.adeptj.runtime.config;
 
-import com.adeptj.runtime.common.Environment;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.ServerRuntime;
+import com.adeptj.runtime.kernel.util.Environment;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

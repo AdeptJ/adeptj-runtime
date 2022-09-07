@@ -20,10 +20,10 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.common.Environment;
-import com.adeptj.runtime.common.IOUtils;
-import com.adeptj.runtime.common.Times;
 import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.util.Environment;
+import com.adeptj.runtime.kernel.util.IOUtils;
+import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;

@@ -21,7 +21,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.ServletContextHolder;
-import com.adeptj.runtime.common.Times;
+import com.adeptj.runtime.kernel.util.Times;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
