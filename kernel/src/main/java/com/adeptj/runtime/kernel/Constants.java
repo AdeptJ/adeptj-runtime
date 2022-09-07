@@ -96,6 +96,8 @@ public final class Constants {
 
     public static final String SERVER_CONF_FILE = "server.conf";
 
+    public static final String CONF_DIR = "conf";
+
     public static final String SERVER_CONF_CP_RESOURCE = "/server.conf";
 
     public static final String KEY_HOST = "host";
@@ -132,7 +134,7 @@ public final class Constants {
 
     public static final String KEY_KEYSTORE_TYPE = "keystore-type";
 
-    public static final String SYS_PROP_OVERWRITE_SERVER_CONF = "overwrite.server.conf.file";
+    public static final String SYS_PROP_OVERWRITE_CONF_FILES = "overwrite.conf.files";
 
     /**
      * Deny direct instantiation.

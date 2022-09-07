@@ -22,18 +22,12 @@ package com.adeptj.runtime.config;
 
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.ServerRuntime;
-import com.adeptj.runtime.kernel.util.Environment;
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
-import java.io.File;
 
 import static com.adeptj.runtime.common.Constants.COMMON_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.RESTEASY_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.SERVER_CONF_FILE;
-import static com.adeptj.runtime.common.Constants.SYS_PROP_OVERWRITE_SERVER_CONF;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 
 /**
@@ -51,7 +45,6 @@ public enum Configs {
     private Config root;
 
     Configs() {
-        // this.root = this.loadConf();
     }
 
     public Config root() {
@@ -84,24 +77,6 @@ public enum Configs {
 
     public Config resteasy() {
         return this.main().getConfig(RESTEASY_CONF_SECTION);
-    }
-
-    private Config loadConf() {
-        Config config;
-        File configFile = Environment.getServerConfPath().toFile();
-        if (configFile.exists()) {
-            // if overwrite.server.conf.file system property is provided, then load the configs from classpath.
-            if (Boolean.getBoolean(SYS_PROP_OVERWRITE_SERVER_CONF)) {
-                config = ConfigFactory.load(SERVER_CONF_FILE);
-            } else {
-                config = ConfigFactory.parseFile(configFile)
-                        .withFallback(ConfigFactory.systemProperties())
-                        .resolve();
-            }
-        } else {
-            config = ConfigFactory.load(SERVER_CONF_FILE);
-        }
-        return config;
     }
 
     public static Configs of() {

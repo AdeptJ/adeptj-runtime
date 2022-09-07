@@ -23,12 +23,11 @@ package com.adeptj.runtime.kernel.util;
 import com.adeptj.runtime.kernel.ServerMode;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
+import static com.adeptj.runtime.kernel.Constants.CONF_DIR;
 import static com.adeptj.runtime.kernel.Constants.DIR_ADEPTJ_RUNTIME;
 import static com.adeptj.runtime.kernel.Constants.DIR_DEPLOYMENT;
 import static com.adeptj.runtime.kernel.Constants.FRAMEWORK_CONF_FILE;
-import static com.adeptj.runtime.kernel.Constants.SERVER_CONF_FILE;
 import static com.adeptj.runtime.kernel.Constants.SYS_PROP_SERVER_MODE;
 import static org.apache.commons.lang3.SystemUtils.USER_DIR;
 
@@ -49,11 +48,11 @@ public final class Environment {
         return ServerMode.DEV.toString().equalsIgnoreCase(System.getProperty(SYS_PROP_SERVER_MODE));
     }
 
-    public static Path getServerConfPath() {
-        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, SERVER_CONF_FILE);
+    public static Path getConfDirPath() {
+        return Path.of(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, CONF_DIR);
     }
 
     public static Path getFrameworkConfPath() {
-        return Paths.get(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, FRAMEWORK_CONF_FILE);
+        return Path.of(USER_DIR, DIR_ADEPTJ_RUNTIME, DIR_DEPLOYMENT, FRAMEWORK_CONF_FILE);
     }
 }
