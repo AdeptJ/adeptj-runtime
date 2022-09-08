@@ -31,6 +31,7 @@ import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
 import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML_UTF8;
+import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
 import static com.adeptj.runtime.common.Constants.UTF8;
 import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
 import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
@@ -72,7 +73,7 @@ public enum TemplateEngine {
 
     TemplateEngine() {
         long startTime = System.nanoTime();
-        Config config = ConfigProvider.getInstance().getMainConfig();
+        Config config = ConfigProvider.getInstance().getMainConfig().getConfig(TRIMOU_CONF_SECTION);
         this.mustacheEngine = MustacheEngineBuilder.newBuilder()
                 .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
                 .addTemplateLocator(ClassPathTemplateLocator.builder()
