@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.common;
 
-import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.osgi.BridgeHttpSessionIdListener;
 import com.adeptj.runtime.osgi.BridgeHttpSessionListener;
@@ -113,7 +113,8 @@ public class Servlets {
     public static ServiceRegistration<Servlet> osgiErrorServlet(BundleContext ctx, HttpServlet servlet) {
         WebServlet webServlet = checkWebServletAnnotation(servlet);
         Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
-        List<String> errors = Configs.of().undertow(ServerRuntime.UNDERTOW).getStringList("common.osgi-error-pages");
+        List<String> errors = ConfigProvider.getInstance()
+                .getServerConfig(ServerRuntime.UNDERTOW).getStringList("common.osgi-error-pages");
         properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
         // Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
         properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, ALL_CONTEXT_SELECT_FILTER);

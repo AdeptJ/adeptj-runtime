@@ -20,7 +20,7 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.IOUtils;
 import com.adeptj.runtime.kernel.util.Times;
@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
+import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -103,7 +104,7 @@ public enum FrameworkManager {
         try {
             long startTime = System.nanoTime();
             LOGGER.info("Starting the OSGi Framework!!");
-            Config felixConf = Configs.of().felix();
+            Config felixConf = ConfigProvider.getInstance().getMainConfig().getConfig(FELIX_CONF_SECTION);
             FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
             Map<String, String> frameworkConfigs = this.newFrameworkConfigs(felixConf);
             BundleContext bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);

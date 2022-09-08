@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.htmlrender;
 
-import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public enum TemplateEngine {
 
     TemplateEngine() {
         long startTime = System.nanoTime();
-        Config config = Configs.of().trimou();
+        Config config = ConfigProvider.getInstance().getMainConfig();
         this.mustacheEngine = MustacheEngineBuilder.newBuilder()
                 .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
                 .addTemplateLocator(ClassPathTemplateLocator.builder()

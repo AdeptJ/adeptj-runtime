@@ -22,8 +22,8 @@ package com.adeptj.runtime.core;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.LogbackManagerHolder;
-import com.adeptj.runtime.config.Configs;
 import com.adeptj.runtime.kernel.AbstractServer;
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.Server;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServerShutdownHook;
@@ -90,7 +90,7 @@ public final class Launcher {
             server.setServerPostStopTask(new LoggerCleanupTask());
             ServerRuntime runtime = server.getRuntime();
             logger.info("Initializing AdeptJ Runtime based on {}.", runtime.getName());
-            launcher.populateCredentialsStore(Configs.of().main());
+            launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig());
             ServerBootstrapperResolver.resolve(runtime).bootstrap(server, args);
             // OSGi Framework is initialized by this time and BundleContext is available as well.
             server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
@@ -123,11 +123,11 @@ public final class Launcher {
         }
     }
 
-    private void populateCredentialsStore(Config undertowConf) {
+    private void populateCredentialsStore(Config mainConf) {
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
             MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
             // put the default password only when it is not set from web console.
-            undertowConf.getObject(KEY_USER_CREDENTIAL_MAPPING)
+            mainConf.getObject(KEY_USER_CREDENTIAL_MAPPING)
                     .entrySet()
                     .stream()
                     .filter(entry -> StringUtils.isEmpty(credentials.get(entry.getKey())))

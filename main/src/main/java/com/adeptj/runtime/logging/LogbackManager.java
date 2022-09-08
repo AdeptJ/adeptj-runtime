@@ -35,7 +35,7 @@ import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.ContextUtil;
 import ch.qos.logback.core.util.FileSize;
 import com.adeptj.runtime.common.OSGiUtil;
-import com.adeptj.runtime.config.Configs;
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.SystemUtils;
@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.osgi.framework.Constants.SERVICE_PID;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
@@ -187,7 +188,7 @@ public final class LogbackManager {
         this.loggerContext.reset();
         this.consoleAppender = null;
         this.fileAppender = null;
-        Config loggingCfg = Configs.of().logging();
+        Config loggingCfg = ConfigProvider.getInstance().getMainConfig().getConfig(LOGGING_CONF_SECTION);
         this.initConsoleAppender(loggingCfg);
         this.initRollingFileAppender(loggingCfg);
         this.contextUtil.addInfo(APPENDERS_REINITIALIZED_MSG);
