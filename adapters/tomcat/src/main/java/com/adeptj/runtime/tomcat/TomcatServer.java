@@ -14,6 +14,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.VersionLoggerListener;
 import org.apache.catalina.webresources.JarResourceSet;
+import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +101,13 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     public void registerErrorPages(List<Integer> errorCodes) {
-        // NOOP
+        Config serverConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime());
+        for (Integer errorCode : errorCodes) {
+            ErrorPage errorPage = new ErrorPage();
+            errorPage.setErrorCode(errorCode);
+            errorPage.setLocation(serverConfig.getString("error-handler-path"));
+            this.context.addErrorPage(errorPage);
+        }
     }
 
     @Override
@@ -116,12 +123,15 @@ public class TomcatServer extends AbstractServer {
             return;
         }
         String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
-        Stream.of(jars).filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3).findAny().ifPresent(jar -> {
-            JarResourceSet resourceSet = new JarResourceSet();
-            resourceSet.setBase(jar.getAbsolutePath());
-            resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
-            resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
-            context.getResources().addJarResources(resourceSet);
-        });
+        Stream.of(jars)
+                .filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3)
+                .findFirst()
+                .ifPresent(jar -> {
+                    JarResourceSet resourceSet = new JarResourceSet();
+                    resourceSet.setBase(jar.getAbsolutePath());
+                    resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
+                    resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
+                    context.getResources().addJarResources(resourceSet);
+                });
     }
 }
