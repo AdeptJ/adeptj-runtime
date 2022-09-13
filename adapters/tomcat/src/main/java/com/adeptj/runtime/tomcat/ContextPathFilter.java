@@ -1,5 +1,7 @@
 package com.adeptj.runtime.tomcat;
 
+import com.adeptj.runtime.kernel.ConfigProvider;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,7 +31,8 @@ public class ContextPathFilter implements Filter {
                 } else {
                     resp.setStatus(SC_FOUND);
                 }
-                resp.setHeader(HEADER_LOC, "/system/console/bundles");
+                String redirectUrl = ConfigProvider.getInstance().getMainConfig().getString("common.system-console-path");
+                resp.setHeader(HEADER_LOC, redirectUrl);
                 return;
             }
         }
