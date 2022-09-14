@@ -23,7 +23,8 @@ public class MVStoreUserManager implements UserManager {
     @Override
     public String getPassword(String username) {
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
-            return store.openMap(H2_MAP_ADMIN_CREDENTIALS, new MVMap.Builder<String, String>()).get(username);
+            MVMap<String, String> mvMap = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
+            return mvMap.get(username);
         }
     }
 
@@ -64,7 +65,9 @@ public class MVStoreUserManager implements UserManager {
 
     @Override
     public List<String> getRoles(String username) {
-        return ConfigProvider.getInstance().getMainConfig().getStringList("common.user-roles-mapping." + username);
+        return ConfigProvider.getInstance()
+                .getMainConfig()
+                .getStringList("common.user-roles-mapping." + username);
     }
 
     private static byte[] toByteArray(char[] chars) {
