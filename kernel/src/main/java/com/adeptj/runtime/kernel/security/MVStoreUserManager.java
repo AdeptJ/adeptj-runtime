@@ -43,7 +43,7 @@ public class MVStoreUserManager implements UserManager {
     }
 
     @Override
-    public boolean match(char[] inputPassword, char[] storedPassword) {
+    public boolean matchPassword(char[] inputPassword, char[] storedPassword) {
         if (ArrayUtils.isEmpty(inputPassword) || ArrayUtils.isEmpty(storedPassword)) {
             return false;
         }

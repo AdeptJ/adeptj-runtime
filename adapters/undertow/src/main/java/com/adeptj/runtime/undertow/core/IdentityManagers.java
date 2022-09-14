@@ -62,7 +62,7 @@ final class IdentityManagers {
             userManager.encodePassword(new String(credential.getPassword()));
             return null;
         }
-        boolean pwdMatch = userManager.match(credential.getPassword(), password.toCharArray());
+        boolean pwdMatch = userManager.matchPassword(credential.getPassword(), password.toCharArray());
         return rolesByUser.entrySet()
                 .stream()
                 .filter(entry -> StringUtils.equals(entry.getKey(), id) && pwdMatch)

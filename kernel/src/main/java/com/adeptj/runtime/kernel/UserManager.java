@@ -8,7 +8,7 @@ public interface UserManager {
 
     boolean matchPassword(String inputPassword, String storedPassword);
 
-    boolean match(char[] inputPassword, char[] storedPassword);
+    boolean matchPassword(char[] inputPassword, char[] storedPassword);
 
     String encodePassword(String password);
 
