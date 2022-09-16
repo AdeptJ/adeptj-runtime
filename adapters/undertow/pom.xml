@@ -22,6 +22,14 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
+        <wildfly-common.version>1.6.0.Final</wildfly-common.version>
+        <jboss-threads.version>3.5.0.Final</jboss-threads.version>
+        <jboss-logging.version>3.5.0.Final</jboss-logging.version>
+        <jboss-logging-annotations.version>2.2.1.Final</jboss-logging-annotations.version>
+        <jboss-logging-processor.version>2.2.1.Final</jboss-logging-processor.version>
+        <jdeparser.version>2.0.3.Final</jdeparser.version>
+        <jboss-classfilewriter.version>1.2.5.Final</jboss-classfilewriter.version>
     </properties>
 
     <dependencies>
@@ -52,10 +60,11 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- Undertow Dependencies Start -->
+
         <dependency>
             <groupId>org.jboss.xnio</groupId>
             <artifactId>xnio-api</artifactId>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.threads</groupId>
@@ -69,9 +78,15 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+            <version>${xnio.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.logging</groupId>
@@ -87,7 +102,7 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-servlet</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.spec.javax.annotation</groupId>
@@ -96,6 +111,120 @@
                 <exclusion>
                     <groupId>org.jboss.spec.javax.servlet</groupId>
                     <artifactId>jboss-servlet-api_4.0_spec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.client</groupId>
+            <artifactId>wildfly-client-config</artifactId>
+            <version>${wildfly-client-config.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.wildfly.common</groupId>
+                    <artifactId>wildfly-common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly.common</groupId>
+            <artifactId>wildfly-common</artifactId>
+            <version>${wildfly-common.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.threads</groupId>
+            <artifactId>jboss-threads</artifactId>
+            <version>${jboss-threads.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.wildfly.common</groupId>
+                    <artifactId>wildfly-common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${jboss-logging.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logmanager</groupId>
+                    <artifactId>jboss-logmanager</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.jdeparser</groupId>
+            <artifactId>jdeparser</artifactId>
+            <version>${jdeparser.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+            <version>${jboss-logging-annotations.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>${jboss-logging-processor.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.jdeparser</groupId>
+                    <artifactId>jdeparser</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.classfilewriter</groupId>
+            <artifactId>jboss-classfilewriter</artifactId>
+            <version>${jboss-classfilewriter.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-parser-generator</artifactId>
+            <version>${undertow.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.classfilewriter</groupId>
+                    <artifactId>jboss-classfilewriter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

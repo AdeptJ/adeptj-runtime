@@ -22,7 +22,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>2.0.0</slf4j.version>
-        <jetty.version>10.0.11</jetty.version>
+        <jetty.version>10.0.12</jetty.version>
     </properties>
 
     <dependencies>
