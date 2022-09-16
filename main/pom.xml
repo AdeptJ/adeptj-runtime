@@ -38,6 +38,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codename>Virgo</codename>
+        <trimou-core.version>2.5.1.Final</trimou-core.version>
     </properties>
 
     <!-- Project Information -->

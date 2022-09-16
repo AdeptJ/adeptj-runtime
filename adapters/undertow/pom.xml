@@ -20,6 +20,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <xnio.version>3.8.8.Final</xnio.version>
+        <undertow.version>2.2.19.Final</undertow.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.6.0.Final</wildfly-common.version>
         <jboss-threads.version>3.5.0.Final</jboss-threads.version>
@@ -115,6 +117,7 @@
         <dependency>
             <groupId>org.jboss.xnio</groupId>
             <artifactId>xnio-api</artifactId>
+            <version>${xnio.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.threads</groupId>
@@ -136,6 +139,7 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
+            <version>${undertow.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -152,6 +156,7 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-servlet</artifactId>
+            <version>${undertow.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
