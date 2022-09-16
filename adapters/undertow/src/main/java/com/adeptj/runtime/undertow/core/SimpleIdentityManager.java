@@ -53,10 +53,10 @@ public final class SimpleIdentityManager implements IdentityManager {
      */
     private final Map<String, Set<String>> rolesByUser;
 
-    public SimpleIdentityManager(UserManager userManager, Config cfg) {
+    public SimpleIdentityManager(UserManager userManager, Config mainConfig) {
         this.userManager = userManager;
         this.rolesByUser = new HashMap<>();
-        for (Entry<String, ConfigValue> entry : cfg.getObject(KEY_USER_ROLES_MAPPING).entrySet()) {
+        for (Entry<String, ConfigValue> entry : mainConfig.getObject(KEY_USER_ROLES_MAPPING).entrySet()) {
             Set<String> roles = new HashSet<>();
             for (ConfigValue role : (ConfigList) entry.getValue()) {
                 roles.add((String) role.unwrapped());

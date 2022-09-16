@@ -90,21 +90,13 @@ public final class ServerConstants {
 
     public static final String KEY_PROTECTED_PATHS_SECURED_FOR_METHODS = "common.protected-paths-secured-for-methods";
 
-    public static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
-
-    public static final int PWD_START_INDEX = 9;
-
     public static final long DEFAULT_WAIT_TIME = 30000L;
 
     public static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 
-    public static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
-
-    public static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";
-
     public static final String LOGBACK_STATUS_SERVLET_NAME = "Logback ViewStatusMessagesServlet";
 
-    public static final String KEY_HEALTH_CHECK_HANDLER_PATH = "common.health-check-handler-path";
+    public static final String KEY_HEALTH_CHECK_HANDLER_PATH = "common.health-check-path";
 
     public static final String KEY_CONTEXT_PATH = "common.context-path";
 }

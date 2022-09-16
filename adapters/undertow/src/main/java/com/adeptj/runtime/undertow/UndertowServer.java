@@ -29,7 +29,6 @@ import io.undertow.server.handlers.RedirectHandler;
 import io.undertow.server.handlers.RequestBufferingHandler;
 import io.undertow.server.handlers.RequestLimit;
 import io.undertow.server.handlers.RequestLimitingHandler;
-import io.undertow.server.handlers.SetHeaderHandler;
 import io.undertow.servlet.Servlets;
 import io.undertow.servlet.api.CrawlerSessionManagerConfig;
 import io.undertow.servlet.api.DeploymentInfo;
@@ -56,7 +55,6 @@ import static com.adeptj.runtime.kernel.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.kernel.Constants.KEY_ALLOWED_METHODS;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_CODES;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_PATH;
-import static com.adeptj.runtime.kernel.Constants.KEY_HEADER_SERVER;
 import static com.adeptj.runtime.kernel.Constants.KEY_HOST;
 import static com.adeptj.runtime.kernel.Constants.KEY_MAX_CONCURRENT_REQUESTS;
 import static com.adeptj.runtime.kernel.Constants.KEY_PORT;
@@ -97,7 +95,6 @@ import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SYS_TASK
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.undertow.core.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
-import static io.undertow.util.Headers.SERVER_STRING;
 import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
 import static org.xnio.Options.WORKER_TASK_MAX_THREADS;
@@ -119,19 +116,22 @@ public class UndertowServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config undertowConf = ConfigProvider.getInstance().getServerConfig(this.getRuntime());
-        int port = this.resolvePort(ConfigProvider.getInstance().getApplicationConfig());
+        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
+        Config mainConfig = appConfig.getConfig("main");
+        Config undertowConfig = appConfig.getConfig(this.getRuntime().getName().toLowerCase());
+        int port = this.resolvePort(appConfig);
         try {
-            this.deploymentManager = Servlets.defaultContainer().addDeployment(this.deploymentInfo(undertowConf, deployment));
+            DeploymentInfo deploymentInfo = this.deploymentInfo(mainConfig, undertowConfig, deployment);
+            this.deploymentManager = Servlets.defaultContainer().addDeployment(deploymentInfo);
             this.deploymentManager.deploy();
             HttpHandler httpContinueReadHandler = this.deploymentManager.start();
-            this.rootHandler = this.createHandlerChain(httpContinueReadHandler, undertowConf);
+            this.rootHandler = this.createHandlerChain(httpContinueReadHandler, mainConfig, undertowConfig);
             Undertow.Builder undertowBuilder = Undertow.builder();
-            this.setWorkerOptions(undertowBuilder, undertowConf);
-            new SocketOptions().setOptions(undertowBuilder, undertowConf);
-            new ServerOptions().setOptions(undertowBuilder, undertowConf);
-            this.undertow = this.addHttpsListener(undertowBuilder, undertowConf)
-                    .addHttpListener(port, undertowConf.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
+            this.setWorkerOptions(undertowBuilder, undertowConfig);
+            new SocketOptions().setOptions(undertowBuilder, undertowConfig);
+            new ServerOptions().setOptions(undertowBuilder, undertowConfig);
+            this.undertow = this.addHttpsListener(undertowBuilder, undertowConfig)
+                    .addHttpListener(port, undertowConfig.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
                     .setHandler(this.rootHandler)
                     .build();
             this.undertow.start();
@@ -188,7 +188,7 @@ public class UndertowServer extends AbstractServer {
         }
     }
 
-    private void setWorkerOptions(Undertow.Builder builder, Config undertowConf) {
+    private void setWorkerOptions(Undertow.Builder builder, Config undertowConfig) {
         long startTime = System.nanoTime();
         // Note : For a 16 core system, number of worker task core and max threads will be.
         // 1. core task thread: 128 (16[cores] * 8)
@@ -196,7 +196,7 @@ public class UndertowServer extends AbstractServer {
         // Default settings would have set the following.
         // 1. core task thread: 128 (16[cores] * 8)
         // 2. max task thread: 128 (Same as core task thread)
-        Config config = undertowConf.getConfig(KEY_WORKER_OPTIONS);
+        Config config = undertowConfig.getConfig(KEY_WORKER_OPTIONS);
         // defaults to 64
         int cfgCoreTaskThreads = config.getInt(KEY_WORKER_TASK_CORE_THREADS);
         LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
@@ -212,15 +212,15 @@ public class UndertowServer extends AbstractServer {
                 Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
         LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
         WorkerOptions options = new WorkerOptions();
-        options.setOptions(builder, undertowConf);
+        options.setOptions(builder, undertowConfig);
         options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
                 .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
         LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
-    private Undertow.Builder addHttpsListener(Undertow.Builder builder, Config undertowConf) throws GeneralSecurityException {
+    private Undertow.Builder addHttpsListener(Undertow.Builder builder, Config undertowConfig) throws GeneralSecurityException {
         if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = undertowConf.getConfig(KEY_HTTPS);
+            Config httpsConf = undertowConfig.getConfig(KEY_HTTPS);
             int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
             SSLContext sslContext = SslContextFactory.newSslContext(httpsConf);
             builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
@@ -240,39 +240,42 @@ public class UndertowServer extends AbstractServer {
      * 5. And Finally HttpContinueReadHandler
      *
      * @param httpContinueReadHandler the {@link io.undertow.server.handlers.HttpContinueReadHandler}
-     * @param cfg                     the undertow server config object.
+     * @param mainConfig              the main config object in application.conf.
+     * @param undertowConfig          the undertow server config object in reference.conf.
      * @return GracefulShutdownHandler as the root handler
      */
-    private GracefulShutdownHandler createHandlerChain(HttpHandler httpContinueReadHandler, Config cfg) {
-        RedirectHandler contextHandler = Handlers.redirect(cfg.getString(KEY_SYSTEM_CONSOLE_PATH));
-        RequestBufferingHandler requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler,
-                Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, cfg.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
-        HttpHandler headersHandler = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF) ?
-                new SetHeaderHandler(requestBufferingHandler, SERVER_STRING, cfg.getString(KEY_HEADER_SERVER)) :
-                new SetHeaderHandler(httpContinueReadHandler, SERVER_STRING, cfg.getString(KEY_HEADER_SERVER));
-        ContextPathPredicate contextPathPredicate = new ContextPathPredicate(cfg.getString(KEY_CONTEXT_PATH));
-        PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler, headersHandler);
+    private GracefulShutdownHandler createHandlerChain(HttpHandler httpContinueReadHandler, Config mainConfig,
+                                                       Config undertowConfig) {
+        RedirectHandler contextHandler = Handlers.redirect(mainConfig.getString(KEY_SYSTEM_CONSOLE_PATH));
+        HttpHandler requestBufferingHandler = null;
+        if (Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF)) {
+            requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler,
+                    Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, undertowConfig.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
+        }
+        ContextPathPredicate contextPathPredicate = new ContextPathPredicate(mainConfig.getString(KEY_CONTEXT_PATH));
+        PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler,
+                (requestBufferingHandler == null ? httpContinueReadHandler : requestBufferingHandler));
         PathHandler pathHandler = Handlers.path(predicateHandler)
-                .addPrefixPath(cfg.getString(KEY_HEALTH_CHECK_HANDLER_PATH), new HealthCheckHandler());
-        AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(pathHandler, this.allowedMethods(cfg));
-        int maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, cfg.getInt(KEY_MAX_CONCURRENT_REQUESTS));
-        int queueSize = Integer.getInteger(SYS_PROP_REQ_LIMIT_QUEUE_SIZE, cfg.getInt(KEY_REQ_LIMIT_QUEUE_SIZE));
+                .addPrefixPath(mainConfig.getString(KEY_HEALTH_CHECK_HANDLER_PATH), new HealthCheckHandler());
+        AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(pathHandler, this.allowedMethods(mainConfig));
+        int maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, undertowConfig.getInt(KEY_MAX_CONCURRENT_REQUESTS));
+        int queueSize = Integer.getInteger(SYS_PROP_REQ_LIMIT_QUEUE_SIZE, undertowConfig.getInt(KEY_REQ_LIMIT_QUEUE_SIZE));
         RequestLimit limit = new RequestLimit(maxConcurrentRequests, queueSize);
         RequestLimitingHandler requestLimitingHandler = Handlers.requestLimitingHandler(limit, allowedMethodsHandler);
         return Handlers.gracefulShutdown(requestLimitingHandler);
     }
 
-    private Set<HttpString> allowedMethods(Config cfg) {
-        return cfg.getStringList(KEY_ALLOWED_METHODS)
+    private Set<HttpString> allowedMethods(Config mainConfig) {
+        return mainConfig.getStringList(KEY_ALLOWED_METHODS)
                 .stream()
                 .map(HttpString::tryFromString)
                 .collect(Collectors.toSet());
     }
 
-    private List<ErrorPage> errorPages(Config undertowConf) {
-        return undertowConf.getIntList(KEY_ERROR_HANDLER_CODES)
+    private List<ErrorPage> errorPages(Config mainConfig) {
+        return mainConfig.getIntList(KEY_ERROR_HANDLER_CODES)
                 .stream()
-                .map(code -> Servlets.errorPage(undertowConf.getString(KEY_ERROR_HANDLER_PATH), code))
+                .map(code -> Servlets.errorPage(mainConfig.getString(KEY_ERROR_HANDLER_PATH), code))
                 .collect(Collectors.toList());
     }
 
@@ -280,12 +283,12 @@ public class UndertowServer extends AbstractServer {
         return new ServletContainerInitializerInfo(sciInfo.getSciClass(), sciInfo.getHandleTypes());
     }
 
-    private SecurityConstraint securityConstraint(Config cfg) {
+    private SecurityConstraint securityConstraint(Config mainConfig, Config undertowConfig) {
         return Servlets.securityConstraint()
-                .addRolesAllowed(cfg.getStringList(KEY_AUTH_ROLES))
+                .addRolesAllowed(mainConfig.getStringList(KEY_AUTH_ROLES))
                 .addWebResourceCollection(Servlets.webResourceCollection()
-                        .addUrlPatterns(cfg.getStringList(KEY_PROTECTED_PATHS))
-                        .addHttpMethods(cfg.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
+                        .addUrlPatterns(mainConfig.getStringList(KEY_PROTECTED_PATHS))
+                        .addHttpMethods(undertowConfig.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
     }
 
     private List<ServletInfo> servlets(ServletDeployment deployment) {
@@ -298,41 +301,41 @@ public class UndertowServer extends AbstractServer {
         return servlets;
     }
 
-    private MultipartConfigElement defaultMultipartConfig(Config cfg) {
-        return Servlets.multipartConfig(cfg.getString(KEY_MULTIPART_FILE_LOCATION),
-                cfg.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
-                cfg.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
-                cfg.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
+    private MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
+        return Servlets.multipartConfig(undertowConfig.getString(KEY_MULTIPART_FILE_LOCATION),
+                undertowConfig.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
+                undertowConfig.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
+                undertowConfig.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
-    private int sessionTimeout(Config cfg) {
-        return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, cfg.getInt(KEY_SESSION_TIMEOUT));
+    private int sessionTimeout(Config mainConfig) {
+        return Integer.getInteger(SYS_PROP_SESSION_TIMEOUT, mainConfig.getInt(KEY_SESSION_TIMEOUT));
     }
 
-    private ServletSessionConfig sessionConfig(Config cfg) {
-        return new ServletSessionConfig().setHttpOnly(cfg.getBoolean(KEY_HTTP_ONLY));
+    private ServletSessionConfig sessionConfig(Config mainConfig) {
+        return new ServletSessionConfig().setHttpOnly(mainConfig.getBoolean(KEY_HTTP_ONLY));
     }
 
-    private DeploymentInfo deploymentInfo(Config cfg, ServletDeployment deployment) {
+    private DeploymentInfo deploymentInfo(Config mainConfig, Config undertowConfig, ServletDeployment deployment) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
-                .setContextPath(cfg.getString(KEY_CONTEXT_PATH))
+                .setContextPath(mainConfig.getString(KEY_CONTEXT_PATH))
                 .setClassLoader(this.getClass().getClassLoader())
                 .addServletContainerInitializer(this.sciInfo(deployment.getSciInfo()))
-                .setIgnoreFlush(cfg.getBoolean(KEY_IGNORE_FLUSH))
-                .setDefaultEncoding(cfg.getString(KEY_DEFAULT_ENCODING))
-                .setDefaultSessionTimeout(this.sessionTimeout(cfg))
-                .setChangeSessionIdOnLogin(cfg.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN))
-                .setInvalidateSessionOnLogout(cfg.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
-                .setIdentityManager(new SimpleIdentityManager(this.getUserManager(), cfg))
-                .setUseCachedAuthenticationMechanism(cfg.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
+                .setIgnoreFlush(mainConfig.getBoolean(KEY_IGNORE_FLUSH))
+                .setDefaultEncoding(mainConfig.getString(KEY_DEFAULT_ENCODING))
+                .setDefaultSessionTimeout(this.sessionTimeout(mainConfig))
+                .setChangeSessionIdOnLogin(mainConfig.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN))
+                .setInvalidateSessionOnLogout(mainConfig.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
+                .setIdentityManager(new SimpleIdentityManager(this.getUserManager(), mainConfig))
+                .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
-                .addSecurityConstraint(this.securityConstraint(cfg))
+                .addSecurityConstraint(this.securityConstraint(mainConfig, undertowConfig))
                 .addServlets(this.servlets(deployment))
-                .addErrorPages(this.errorPages(cfg))
-                .setDefaultMultipartConfig(this.defaultMultipartConfig(cfg))
+                .addErrorPages(this.errorPages(mainConfig))
+                .setDefaultMultipartConfig(this.defaultMultipartConfig(undertowConfig))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
-                .setServletSessionConfig(this.sessionConfig(cfg))
+                .setServletSessionConfig(this.sessionConfig(mainConfig))
                 .setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
     }
 }
