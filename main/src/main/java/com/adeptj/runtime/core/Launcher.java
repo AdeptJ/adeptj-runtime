@@ -123,11 +123,11 @@ public final class Launcher {
         }
     }
 
-    private void populateCredentialsStore(Config mainConf) {
+    private void populateCredentialsStore(Config mainConfig) {
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
             MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
             // put the default password only when it is not set from web console.
-            mainConf.getObject(KEY_USER_CREDENTIAL_MAPPING)
+            mainConfig.getObject(KEY_USER_CREDENTIAL_MAPPING)
                     .entrySet()
                     .stream()
                     .filter(entry -> StringUtils.isEmpty(credentials.get(entry.getKey())))

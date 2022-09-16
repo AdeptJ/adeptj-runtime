@@ -64,13 +64,25 @@ public enum ConfigProvider {
         return this.getApplicationConfig().getConfig("main");
     }
 
+    public Config getMainConfig(Config appConfig) {
+        return appConfig.getConfig("main");
+    }
+
     public Config getKernelConfig() {
         return this.getApplicationConfig().getConfig("kernel");
+    }
+
+    public Config getKernelConfig(Config appConfig) {
+        return appConfig.getConfig("kernel");
     }
 
     public Config getServerConfig(ServerRuntime runtime) {
         Config applicationConfig = this.getApplicationConfig();
         return applicationConfig.getConfig(runtime.getName().toLowerCase());
+    }
+
+    public Config getServerConfig(ServerRuntime runtime, Config appConfig) {
+        return appConfig.getConfig(runtime.getName().toLowerCase());
     }
 
     public static ConfigProvider getInstance() {
