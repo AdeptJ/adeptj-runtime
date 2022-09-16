@@ -13,7 +13,7 @@ public class HealthCheckHandler extends HandlerWrapper {
     @Override
     public void handle(String target, Request baseRequest,
                        HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/hc")) {
+        if (request.getRequestURI().equals("/hc") || request.getRequestURI().equals("/health")) {
             response.setStatus(HttpServletResponse.SC_OK);
             baseRequest.setHandled(true);
             return;

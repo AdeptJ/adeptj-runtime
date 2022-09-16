@@ -33,7 +33,12 @@ public class GeneralConfigurer {
             Wrapper servlet = context.createWrapper();
             servlet.setName(config.getString("name"));
             servlet.setServletClass(config.getString("class"));
-            servlet.setLoadOnStartup(config.getInt("load-on-startup"));
+            if (config.hasPath("load-on-startup")) {
+                servlet.setLoadOnStartup(config.getInt("load-on-startup"));
+            }
+            if (config.hasPath("async")) {
+                servlet.setAsyncSupported(config.getBoolean("async"));
+            }
             for (Map.Entry<String, ConfigValue> entry : config.getConfig("init-params").entrySet()) {
                 servlet.addInitParameter(entry.getKey(), (String) entry.getValue().unwrapped());
             }
