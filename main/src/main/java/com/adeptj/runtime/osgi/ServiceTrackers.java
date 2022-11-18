@@ -25,7 +25,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 /**
  * Utility for performing operations on OSGi {@link org.osgi.util.tracker.ServiceTracker} instances.

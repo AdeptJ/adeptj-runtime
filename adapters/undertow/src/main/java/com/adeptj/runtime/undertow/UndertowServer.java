@@ -39,11 +39,11 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletSessionConfig;
 import io.undertow.util.HttpString;
+import jakarta.servlet.MultipartConfigElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
-import javax.servlet.MultipartConfigElement;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +95,7 @@ import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SYS_TASK
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_TASK_THREAD_MULTIPLIER;
 import static com.adeptj.runtime.undertow.core.ServerConstants.WORKER_TASK_THREAD_MULTIPLIER;
-import static javax.servlet.http.HttpServletRequest.FORM_AUTH;
+import static jakarta.servlet.http.HttpServletRequest.FORM_AUTH;
 import static org.xnio.Options.WORKER_TASK_CORE_THREADS;
 import static org.xnio.Options.WORKER_TASK_MAX_THREADS;
 

@@ -24,15 +24,15 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 
-import javax.servlet.ServletContextAttributeEvent;
-import javax.servlet.ServletContextAttributeListener;
+import jakarta.servlet.ServletContextAttributeEvent;
+import jakarta.servlet.ServletContextAttributeListener;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 
 /**
  * A {@link ServletContextAttributeListener} which initializes the {@link EventDispatcherTracker}
- * when {@link BundleContext} is being set as a {@link javax.servlet.ServletContext} attribute and again closes
- * and opens when {@link BundleContext} is replaced as a {@link javax.servlet.ServletContext} attribute.
+ * when {@link BundleContext} is being set as a {@link jakarta.servlet.ServletContext} attribute and again closes
+ * and opens when {@link BundleContext} is replaced as a {@link jakarta.servlet.ServletContext} attribute.
  *
  * @author Rakesh.Kumar, AdeptJ
  */

@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.common;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * This Enum provides the access to the {@link ServletContext} and corresponding attributes.

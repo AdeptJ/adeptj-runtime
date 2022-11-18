@@ -20,7 +20,7 @@
 
 package com.adeptj.runtime.common;
 
-import javax.servlet.ServletConfig;
+import jakarta.servlet.ServletConfig;
 
 /**
  * Maintains the BridgeServlet's {@link ServletConfig} instance.

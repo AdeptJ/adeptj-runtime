@@ -1,6 +1,6 @@
 package com.adeptj.runtime.kernel;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 public class ServletInfo {
 

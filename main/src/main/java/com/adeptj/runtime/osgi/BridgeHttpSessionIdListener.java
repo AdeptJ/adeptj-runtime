@@ -20,11 +20,11 @@
 
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionIdListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionIdListener;
 
 /**
- * An {@link HttpSessionIdListener} which propagates the {@link javax.servlet.http.HttpSession} Id change
+ * An {@link HttpSessionIdListener} which propagates the {@link jakarta.servlet.http.HttpSession} Id change
  * event to Felix {@link org.apache.felix.http.base.internal.EventDispatcher}.
  *
  * @author Rakesh.Kumar, AdeptJ

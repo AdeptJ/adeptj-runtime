@@ -26,13 +26,13 @@ import com.adeptj.runtime.htmlrender.TemplateEngineContext;
 import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.RequestUtil;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
-import static javax.servlet.DispatcherType.ERROR;
+import static jakarta.servlet.DispatcherType.ERROR;
 
 /**
  * ErrorServlet that serves the error page w.r.t error coded(401, 403, 404, 500).

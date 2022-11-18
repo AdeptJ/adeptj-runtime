@@ -23,7 +23,7 @@ package com.adeptj.runtime.htmlrender;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * TemplateContext containing required objects for template rendering.
