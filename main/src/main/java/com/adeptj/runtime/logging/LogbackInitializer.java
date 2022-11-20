@@ -74,7 +74,6 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         logbackManager.initLevelChangePropagator();
         // Finally, start LoggerContext and print status information.
         loggerContext.start();
-        StatusPrinter.print(loggerContext);
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
         loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
         return DO_NOT_INVOKE_NEXT_IF_ANY;
