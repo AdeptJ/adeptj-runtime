@@ -30,7 +30,7 @@ import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import static ch.qos.logback.classic.spi.Configurator.ExecutionStatus.NEUTRAL;
+import static ch.qos.logback.classic.spi.Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 
 /**
@@ -74,8 +74,9 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         logbackManager.initLevelChangePropagator();
         // Finally, start LoggerContext and print status information.
         loggerContext.start();
+        StatusPrinter.print(loggerContext);
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
         loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
-        return NEUTRAL;
+        return DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }
