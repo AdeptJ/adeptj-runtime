@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
@@ -105,11 +104,10 @@ public final class Launcher {
 
     private void cleanup(Logger logger) {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
-        Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
-                .ifPresent(context -> {
-                    logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
-                    FrameworkManager.getInstance().stopFramework();
-                });
+        if (BundleContextHolder.getInstance().getBundleContext() != null) {
+            logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
+            FrameworkManager.getInstance().stopFramework();
+        }
         LogbackManagerHolder.getInstance().getLogbackManager().cleanup();
         System.exit(-1); // NOSONAR
     }
@@ -118,8 +116,8 @@ public final class Launcher {
         try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
             logger.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
-            // Just log it, it's not critical.
-            logger.error("Exception while printing server banner!!", ex);
+            // Just debug log it, it's not critical.
+            logger.debug("Exception while printing server banner!!", ex);
         }
     }
 
