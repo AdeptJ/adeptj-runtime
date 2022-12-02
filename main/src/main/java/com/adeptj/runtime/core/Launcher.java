@@ -62,6 +62,8 @@ public final class Launcher {
 
     private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
 
+    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
+
     private static final int PWD_START_INDEX = 9;
 
     /**
@@ -80,7 +82,9 @@ public final class Launcher {
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
+        // This call will initialize the whole logging system.
         Logger logger = LoggerFactory.getLogger(Launcher.class);
+        logger.info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
         Launcher launcher = new Launcher();
         launcher.printBanner(logger);
         try {

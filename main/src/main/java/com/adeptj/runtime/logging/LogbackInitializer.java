@@ -46,8 +46,6 @@ import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
  */
 public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
-    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
-
     /**
      * See class description for details.
      *
@@ -55,7 +53,6 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
      */
     @Override
     public ExecutionStatus configure(LoggerContext loggerContext) {
-        long startTime = System.nanoTime();
         Config loggingCfg = ConfigProvider.getInstance().getMainConfig().getConfig(LOGGING_CONF_SECTION);
         LogbackManager logbackManager = new LogbackManager(loggerContext);
         LogbackManagerHolder.getInstance().setLogbackManager(logbackManager);
@@ -75,7 +72,6 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // Finally, start LoggerContext and print status information.
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
-        loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
         return DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }
