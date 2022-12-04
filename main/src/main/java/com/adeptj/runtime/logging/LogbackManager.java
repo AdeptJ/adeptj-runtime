@@ -253,7 +253,10 @@ public final class LogbackManager {
 
     void addServerConfigLoggers(Config loggingCfg) {
         for (Config config : loggingCfg.getConfigList(KEY_LOGGERS)) {
-            this.addLogger(config.getString(KEY_LOGGER_NAME).trim(), config.getString(KEY_LOGGER_LEVEL).trim(), config.getBoolean(KEY_LOGGER_ADDITIVITY));
+            String name = config.getString(KEY_LOGGER_NAME).trim();
+            String level = config.getString(KEY_LOGGER_LEVEL).trim();
+            boolean additivity = config.getBoolean(KEY_LOGGER_ADDITIVITY);
+            this.addLogger(name, level, additivity);
         }
     }
 

@@ -20,11 +20,11 @@
 
 package com.adeptj.runtime.osgi;
 
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
- * An {@link HttpSessionListener} which propagates the {@link javax.servlet.http.HttpSession} create and destroy
+ * An {@link HttpSessionListener} which propagates the {@link jakarta.servlet.http.HttpSession} create and destroy
  * event to Felix {@link org.apache.felix.http.base.internal.EventDispatcher}.
  *
  * @author Rakesh.Kumar, AdeptJ

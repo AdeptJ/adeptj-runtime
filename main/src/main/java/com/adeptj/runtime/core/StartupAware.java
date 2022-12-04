@@ -20,8 +20,8 @@
 
 package com.adeptj.runtime.core;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 
 /**
  * This will be called by the ServletContainerInitializer while startup is in progress because this is

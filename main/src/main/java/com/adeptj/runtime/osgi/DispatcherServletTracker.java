@@ -26,8 +26,8 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.http.HttpServlet;
 
 /**
  * OSGi ServiceTracker for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.

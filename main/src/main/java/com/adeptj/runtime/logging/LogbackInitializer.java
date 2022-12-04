@@ -30,6 +30,7 @@ import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import static ch.qos.logback.classic.spi.Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 
 /**
@@ -45,16 +46,13 @@ import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
  */
 public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
-    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
-
     /**
      * See class description for details.
      *
      * @param loggerContext the {@link LoggerContext}
      */
     @Override
-    public void configure(LoggerContext loggerContext) {
-        long startTime = System.nanoTime();
+    public ExecutionStatus configure(LoggerContext loggerContext) {
         Config loggingCfg = ConfigProvider.getInstance().getMainConfig().getConfig(LOGGING_CONF_SECTION);
         LogbackManager logbackManager = new LogbackManager(loggerContext);
         LogbackManagerHolder.getInstance().setLogbackManager(logbackManager);
@@ -74,6 +72,6 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // Finally, start LoggerContext and print status information.
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
-        loggerContext.getLogger(this.getClass()).info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
+        return DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }

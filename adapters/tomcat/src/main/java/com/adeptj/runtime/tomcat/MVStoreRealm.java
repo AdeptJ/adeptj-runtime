@@ -21,6 +21,6 @@ public class MVStoreRealm extends RealmBase {
 
     @Override
     protected Principal getPrincipal(String username) {
-        return new GenericPrincipal(username, this.getPassword(username), this.userManager.getRoles(username));
+        return new GenericPrincipal(username, this.userManager.getRoles(username));
     }
 }

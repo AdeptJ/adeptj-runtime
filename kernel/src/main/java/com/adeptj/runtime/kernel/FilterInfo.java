@@ -1,6 +1,6 @@
 package com.adeptj.runtime.kernel;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 public class FilterInfo {
 

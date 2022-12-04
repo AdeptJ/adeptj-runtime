@@ -20,7 +20,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tomcat.version>9.0.69</tomcat.version>
+        <tomcat.version>10.1.2</tomcat.version>
+        <bcel.version>6.6.1</bcel.version>
+        <commons-compress.version>1.22</commons-compress.version>
+        <jakartaee-migration.version>1.0.5</jakartaee-migration.version>
     </properties>
 
     <build>
@@ -110,6 +113,24 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>${tomcat.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+            <version>${bcel.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>jakartaee-migration</artifactId>
+            <version>${jakartaee-migration.version}</version>
         </dependency>
 
     </dependencies>

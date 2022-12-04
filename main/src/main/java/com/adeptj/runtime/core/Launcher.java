@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
@@ -63,6 +62,8 @@ public final class Launcher {
 
     private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
 
+    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
+
     private static final int PWD_START_INDEX = 9;
 
     /**
@@ -81,7 +82,9 @@ public final class Launcher {
     public static void main(String[] args) {
         Thread.currentThread().setName("AdeptJ Launcher");
         long startTime = System.nanoTime();
+        // This call will initialize the whole logging system.
         Logger logger = LoggerFactory.getLogger(Launcher.class);
+        logger.info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
         Launcher launcher = new Launcher();
         launcher.printBanner(logger);
         try {
@@ -105,11 +108,10 @@ public final class Launcher {
 
     private void cleanup(Logger logger) {
         // Check if OSGi Framework was already started, try to stop the framework gracefully.
-        Optional.ofNullable(BundleContextHolder.getInstance().getBundleContext())
-                .ifPresent(context -> {
-                    logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
-                    FrameworkManager.getInstance().stopFramework();
-                });
+        if (BundleContextHolder.getInstance().getBundleContext() != null) {
+            logger.warn("Server startup failed but OSGi Framework already started, stopping it gracefully!!");
+            FrameworkManager.getInstance().stopFramework();
+        }
         LogbackManagerHolder.getInstance().getLogbackManager().cleanup();
         System.exit(-1); // NOSONAR
     }
@@ -118,8 +120,8 @@ public final class Launcher {
         try (InputStream stream = this.getClass().getResourceAsStream(BANNER_TXT)) {
             logger.info(IOUtils.toString(stream)); // NOSONAR
         } catch (IOException ex) {
-            // Just log it, it's not critical.
-            logger.error("Exception while printing server banner!!", ex);
+            // Just debug log it, it's not critical.
+            logger.debug("Exception while printing server banner!!", ex);
         }
     }
 

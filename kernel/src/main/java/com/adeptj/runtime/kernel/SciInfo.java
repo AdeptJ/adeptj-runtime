@@ -1,6 +1,6 @@
 package com.adeptj.runtime.kernel;
 
-import javax.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContainerInitializer;
 import java.util.Set;
 
 public class SciInfo {

@@ -22,7 +22,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.core.StartupAware;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * FrameworkLauncher is a {@link StartupAware} that launches the OSGi Framework.
