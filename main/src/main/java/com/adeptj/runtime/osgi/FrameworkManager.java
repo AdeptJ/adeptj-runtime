@@ -21,6 +21,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.kernel.ConfigProvider;
+import com.adeptj.runtime.kernel.osgi.PackageExportsProvider;
 import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.IOUtils;
 import com.adeptj.runtime.kernel.util.Times;
@@ -49,6 +50,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
+import static com.adeptj.runtime.kernel.osgi.PackageExportsProvider.OSGI_SYSTEM_PACKAGES_EXTRA_HEADER;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
 
 /**
@@ -178,10 +180,27 @@ public enum FrameworkManager {
         if (StringUtils.isNotEmpty(felixLogLevel)) {
             configs.put(LOG_LEVEL_PROP, felixLogLevel);
         }
+        if (Boolean.getBoolean("search.osgi.package.exports.provider")) {
+            // extra packages need not be persisted to file system.
+            this.updatePackageExports(configs);
+        }
         if (LOGGER.isDebugEnabled()) {
             this.printFrameworkConfigs(configs);
         }
         return configs;
+    }
+
+    private void updatePackageExports(Map<String, String> configs) {
+        ServiceLoader.load(PackageExportsProvider.class)
+                .findFirst()
+                .ifPresent(provider -> {
+                    String packageExports = provider.getPackageExports();
+                    if (StringUtils.isNotEmpty(packageExports)) {
+                        String existingExports = configs.get(OSGI_SYSTEM_PACKAGES_EXTRA_HEADER);
+                        String updatedExports = existingExports + ", " + packageExports;
+                        configs.put(OSGI_SYSTEM_PACKAGES_EXTRA_HEADER, updatedExports);
+                    }
+                });
     }
 
     private Map<String, String> loadFrameworkProperties(Config felixConf) {
