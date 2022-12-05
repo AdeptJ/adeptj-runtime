@@ -1,23 +1,31 @@
 package com.adeptj.runtime.jetty.osgi;
 
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.osgi.PackageExportsProvider;
+import org.eclipse.jetty.util.Jetty;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.util.List;
 
 public class JettyPackageExportsProvider implements PackageExportsProvider {
 
     @Override
     public String getPackageExports() {
-        try (InputStream stream = this.getClass().getResourceAsStream("/package-exports.properties")) {
-            Properties properties = new Properties();
-            properties.load(stream);
-            return properties.getProperty(OSGI_SYSTEM_PACKAGES_EXTRA_HEADER);
-        } catch (IOException ex) {
+        StringBuilder packageExportsBuilder = new StringBuilder();
+        try {
+            List<String> packageExports = ConfigProvider.getInstance()
+                    .getApplicationConfig()
+                    .getStringList("jetty.osgi.package-exports");
+            for (String packageExport : packageExports) {
+                packageExportsBuilder.append(packageExport);
+            }
+            packageExportsBuilder.append("version=")
+                    .append("\"")
+                    .append(Jetty.VERSION)
+                    .append("\"");
+        } catch (Exception ex) {
             LoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);
         }
-        return null;
+        return packageExportsBuilder.toString();
     }
 }

@@ -50,8 +50,8 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static com.adeptj.runtime.common.Constants.FELIX_CONF_SECTION;
-import static com.adeptj.runtime.kernel.osgi.PackageExportsProvider.OSGI_SYSTEM_PACKAGES_EXTRA_HEADER;
 import static org.apache.felix.framework.util.FelixConstants.LOG_LEVEL_PROP;
+import static org.osgi.framework.Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA;
 
 /**
  * FrameworkManager: Handles the OSGi Framework(Apache Felix) lifecycle such as startup, shutdown etc.
@@ -196,9 +196,9 @@ public enum FrameworkManager {
                 .ifPresent(provider -> {
                     String packageExports = provider.getPackageExports();
                     if (StringUtils.isNotEmpty(packageExports)) {
-                        String existingExports = configs.get(OSGI_SYSTEM_PACKAGES_EXTRA_HEADER);
+                        String existingExports = configs.get(FRAMEWORK_SYSTEMPACKAGES_EXTRA);
                         String updatedExports = existingExports + ", " + packageExports;
-                        configs.put(OSGI_SYSTEM_PACKAGES_EXTRA_HEADER, updatedExports);
+                        configs.put(FRAMEWORK_SYSTEMPACKAGES_EXTRA, updatedExports);
                     }
                 });
     }

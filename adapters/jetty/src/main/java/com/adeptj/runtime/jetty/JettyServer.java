@@ -64,7 +64,6 @@ public class JettyServer extends AbstractServer {
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
         connector.setPort(this.resolvePort(config));
         connector.setIdleTimeout(30000);
-        connector.addBean(new TimingHttpChannelListener());
         this.jetty.addConnector(connector);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);
         this.context.setContextPath("/");
