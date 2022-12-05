@@ -23,12 +23,17 @@ package com.adeptj.runtime.htmlrender;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
+import io.quarkus.qute.Engine;
+import io.quarkus.qute.ReflectionValueResolver;
+import io.quarkus.qute.Template;
 import org.slf4j.LoggerFactory;
 import org.trimou.Mustache;
 import org.trimou.engine.MustacheEngine;
 import org.trimou.engine.MustacheEngineBuilder;
 import org.trimou.engine.locator.ClassPathTemplateLocator;
 import org.trimou.handlebars.i18n.ResourceBundleHelper;
+
+import java.util.ResourceBundle;
 
 import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML_UTF8;
 import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
@@ -71,6 +76,8 @@ public enum TemplateEngine {
 
     private final MustacheEngine mustacheEngine;
 
+    private final Engine engine;
+
     TemplateEngine() {
         long startTime = System.nanoTime();
         Config config = ConfigProvider.getInstance().getMainConfig().getConfig(TRIMOU_CONF_SECTION);
@@ -89,6 +96,11 @@ public enum TemplateEngine {
                 .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt(KEY_CACHE_EXPIRATION))
                 .build();
         LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
+        this.engine = Engine.builder()
+                .addLocator(new ClasspathTemplateLocator())
+                .addValueResolver(new ReflectionValueResolver())
+                .addDefaults()
+                .build();
     }
 
     /**
@@ -98,6 +110,14 @@ public enum TemplateEngine {
      * @throws TemplateProcessingException if there was some issue while rendering the template.
      */
     public void render(TemplateEngineContext context) {
+        try {
+            Template template = this.engine.getTemplate("greet");
+            ResourceBundle bundle = ResourceBundle.getBundle("webapp/i18n/messages");
+            String render = template.data("msg", bundle).render();
+            System.out.println(render);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         try {
             // Making sure the Content-Type will always be text/html;charset=UTF-8.
             context.getResponse().setContentType(CONTENT_TYPE_HTML_UTF8);
