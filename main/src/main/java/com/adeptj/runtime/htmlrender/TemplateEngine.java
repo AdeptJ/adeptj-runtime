@@ -98,7 +98,7 @@ public enum TemplateEngine {
         LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
         this.engine = Engine.builder()
                 .addLocator(new ClasspathTemplateLocator())
-                .addValueResolver(new ReflectionValueResolver())
+                .addValueResolvers(new ReflectionValueResolver(), new ResourceBundleValueResolver())
                 .addDefaults()
                 .build();
     }
@@ -112,8 +112,8 @@ public enum TemplateEngine {
     public void render(TemplateEngineContext context) {
         try {
             Template template = this.engine.getTemplate("greet");
-            ResourceBundle bundle = ResourceBundle.getBundle("webapp/i18n/messages");
-            String render = template.data("msg", bundle).render();
+            String render = template.data("msg", ResourceBundle.getBundle("webapp/i18n/messages"))
+                    .render();
             System.out.println(render);
         } catch (Exception ex) {
             ex.printStackTrace();
