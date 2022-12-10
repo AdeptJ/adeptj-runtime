@@ -99,28 +99,28 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-io</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -133,14 +133,14 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty-server.version}</version>
+            <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
 
