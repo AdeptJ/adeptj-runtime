@@ -20,10 +20,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tomcat.version>10.1.2</tomcat.version>
-        <bcel.version>6.6.1</bcel.version>
-        <commons-compress.version>1.22</commons-compress.version>
-        <jakartaee-migration.version>1.0.5</jakartaee-migration.version>
+        <tomcat.version>10.1.4</tomcat.version>
     </properties>
 
     <build>
@@ -81,11 +78,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
             <scope>compile</scope>
@@ -113,24 +105,6 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>${tomcat.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.bcel</groupId>
-            <artifactId>bcel</artifactId>
-            <version>${bcel.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>${commons-compress.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>jakartaee-migration</artifactId>
-            <version>${jakartaee-migration.version}</version>
         </dependency>
 
     </dependencies>
