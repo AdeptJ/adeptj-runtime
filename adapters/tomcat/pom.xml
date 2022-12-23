@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>adeptj-runtime-tomcat</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>AdeptJ Runtime :: Server Adapters :: Tomcat</name>
     <description>High performance, dynamic, modular runtime for RESTful APIs, MicroServices and WebApps.</description>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-kernel</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
