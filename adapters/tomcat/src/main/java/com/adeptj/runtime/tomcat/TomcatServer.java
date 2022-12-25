@@ -116,8 +116,11 @@ public class TomcatServer extends AbstractServer {
     }
 
     private void addJarResourceSet(Context context, Config serverConfig) {
+        String webappRoot = serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH);
+        String webAppMount = serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT);
         String libPath = serverConfig.getString(CFG_KEY_LIB_PATH);
         String docBase = context.getDocBase();
+        // Get all the jar files in lib directory.
         File[] jars = new File(docBase.substring(0, docBase.length() - 1) + libPath).listFiles();
         if (jars == null) {
             return;
@@ -126,12 +129,14 @@ public class TomcatServer extends AbstractServer {
         Stream.of(jars)
                 .filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3)
                 .findFirst()
-                .ifPresent(jar -> {
-                    JarResourceSet resourceSet = new JarResourceSet();
-                    resourceSet.setBase(jar.getAbsolutePath());
-                    resourceSet.setInternalPath(serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH));
-                    resourceSet.setWebAppMount(serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT));
-                    context.getResources().addJarResources(resourceSet);
-                });
+                .ifPresent(jar -> this.doAddJarResourceSet(context, jar.getAbsolutePath(), webappRoot, webAppMount));
+    }
+
+    private void doAddJarResourceSet(Context context, String base, String internalPath, String webAppMount) {
+        JarResourceSet resourceSet = new JarResourceSet();
+        resourceSet.setBase(base);
+        resourceSet.setInternalPath(internalPath);
+        resourceSet.setWebAppMount(webAppMount);
+        context.getResources().addJarResources(resourceSet);
     }
 }
