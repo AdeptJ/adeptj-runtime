@@ -17,9 +17,7 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -28,6 +26,7 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.List;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
@@ -85,17 +84,19 @@ public class JettyServer extends AbstractServer {
         ContextPathHandler contextPathHandler = new ContextPathHandler();
         contextPathHandler.setHandler(new HealthCheckHandler());
         rootContext.insertHandler(contextPathHandler);
-        return new ContextHandlerCollection(rootContext, this.createStaticResourcesContextHandler());
-    }
-
-    private ContextHandler createStaticResourcesContextHandler() {
-        ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setDirectoriesListed(false);
-        ContextHandler staticResourcesContextHandler = new ContextHandler();
-        staticResourcesContextHandler.setContextPath("/static");
-        staticResourcesContextHandler.setBaseResource(Resource.newClassPathResource("/webapp/static"));
-        staticResourcesContextHandler.setHandler(resourceHandler);
-        return staticResourcesContextHandler;
+        ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, "/static/*");
+        defaultServlet.setAsyncSupported(true);
+        String resourceBase;
+        URL webappRoot = this.getClass().getResource("/webapp");
+        if (webappRoot == null) {
+            try (Resource resource = Resource.newClassPathResource("/webapp")) {
+                resourceBase = resource.getName();
+            }
+        } else {
+            resourceBase = webappRoot.toExternalForm();
+        }
+        defaultServlet.setInitParameter("resourceBase", resourceBase);
+        return rootContext;
     }
 
     @Override
