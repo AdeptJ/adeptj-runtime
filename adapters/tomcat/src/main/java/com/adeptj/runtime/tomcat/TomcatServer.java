@@ -118,14 +118,19 @@ public class TomcatServer extends AbstractServer {
         String webappRoot = serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH);
         String webAppMount = serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT);
         String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
-        String libPath = serverConfig.getString(CFG_KEY_LIB_PATH);
         String docBase = context.getDocBase();
+        String libDirPath = docBase.substring(0, docBase.length() - 1) + serverConfig.getString(CFG_KEY_LIB_PATH);
         // Get the adeptj-runtime-x.x.x.jar file from the lib directory.
-        File[] jars = new File(docBase.substring(0, docBase.length() - 1) + libPath)
+        File[] jars = new File(libDirPath)
                 .listFiles((dir, name) -> name.startsWith(webappJarName) && name.split(SYMBOL_DASH).length == 3);
-        if (jars != null && jars.length == 1) {
-            this.doAddJarResourceSet(context, jars[0].getAbsolutePath(), webappRoot, webAppMount);
+        // There should be exactly one file in the array.
+        if (jars == null || jars.length != 1) {
+            LOGGER.error("There are multiple or no adeptj-runtime-x.x.x.jar file present, static resources will not be loaded!!");
+            return;
         }
+        String base = jars[0].getAbsolutePath();
+        LOGGER.info("Static resource base resolved to: [{}]", base);
+        this.doAddJarResourceSet(context, base, webappRoot, webAppMount);
     }
 
     private void doAddJarResourceSet(Context context, String base, String internalPath, String webAppMount) {
