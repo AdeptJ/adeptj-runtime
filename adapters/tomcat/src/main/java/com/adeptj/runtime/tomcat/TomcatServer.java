@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_BASE_DIR;
 import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_CTX_PATH;
@@ -118,18 +117,15 @@ public class TomcatServer extends AbstractServer {
     private void addJarResourceSet(Context context, Config serverConfig) {
         String webappRoot = serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH);
         String webAppMount = serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT);
+        String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
         String libPath = serverConfig.getString(CFG_KEY_LIB_PATH);
         String docBase = context.getDocBase();
-        // Get all the jar files in lib directory.
-        File[] jars = new File(docBase.substring(0, docBase.length() - 1) + libPath).listFiles();
-        if (jars == null) {
-            return;
+        // Get the adeptj-runtime-x.x.x.jar file from the lib directory.
+        File[] jars = new File(docBase.substring(0, docBase.length() - 1) + libPath)
+                .listFiles((dir, name) -> name.startsWith(webappJarName) && name.split(SYMBOL_DASH).length == 3);
+        if (jars != null && jars.length == 1) {
+            this.doAddJarResourceSet(context, jars[0].getAbsolutePath(), webappRoot, webAppMount);
         }
-        String webappJarName = serverConfig.getString(CFG_KEY_WEBAPP_JAR_NAME);
-        Stream.of(jars)
-                .filter(jar -> jar.getName().startsWith(webappJarName) && jar.getName().split(SYMBOL_DASH).length == 3)
-                .findFirst()
-                .ifPresent(jar -> this.doAddJarResourceSet(context, jar.getAbsolutePath(), webappRoot, webAppMount));
     }
 
     private void doAddJarResourceSet(Context context, String base, String internalPath, String webAppMount) {
