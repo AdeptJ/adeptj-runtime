@@ -1,7 +1,6 @@
 package com.adeptj.runtime.tomcat;
 
 import com.adeptj.runtime.kernel.ConfigProvider;
-
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +8,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_FOUND;
@@ -31,8 +31,10 @@ public class ContextPathFilter implements Filter {
                 } else {
                     resp.setStatus(SC_FOUND);
                 }
-                String redirectUrl = ConfigProvider.getInstance().getMainConfig().getString("common.system-console-path");
-                resp.setHeader(HEADER_LOC, redirectUrl);
+                String systemConsolePath = ConfigProvider.getInstance()
+                        .getMainConfig()
+                        .getString("common.system-console-path");
+                resp.setHeader(HEADER_LOC, systemConsolePath);
                 return;
             }
         }
