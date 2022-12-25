@@ -86,17 +86,23 @@ public class JettyServer extends AbstractServer {
         rootContext.insertHandler(contextPathHandler);
         ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, "/static/*");
         defaultServlet.setAsyncSupported(true);
+        defaultServlet.setInitParameter("resourceBase", this.getResourceBase());
+        return rootContext;
+    }
+
+    private String getResourceBase() {
         String resourceBase;
         URL webappRoot = this.getClass().getResource("/webapp");
         if (webappRoot == null) {
             try (Resource resource = Resource.newClassPathResource("/webapp")) {
                 resourceBase = resource.getName();
+                LOGGER.info("Static resource base resolved using Jetty Resource.newClassPathResource()");
             }
         } else {
             resourceBase = webappRoot.toExternalForm();
         }
-        defaultServlet.setInitParameter("resourceBase", resourceBase);
-        return rootContext;
+        LOGGER.info("Static resource base resolved to: [{}]", resourceBase);
+        return resourceBase;
     }
 
     @Override
