@@ -2,7 +2,7 @@ package com.adeptj.runtime.jetty.osgi;
 
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.osgi.PackageExportsProvider;
-import org.eclipse.jetty.util.Jetty;
+import org.eclipse.jetty.server.Server;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class JettyPackageExportsProvider implements PackageExportsProvider {
             }
             packageExportsBuilder.append("version=")
                     .append("\"")
-                    .append(Jetty.VERSION)
+                    .append(Server.getVersion())
                     .append("\"");
         } catch (Exception ex) {
             LoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);

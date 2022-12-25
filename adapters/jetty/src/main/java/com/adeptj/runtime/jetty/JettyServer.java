@@ -20,7 +20,6 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -82,22 +81,21 @@ public class JettyServer extends AbstractServer {
         }
     }
 
-    private Handler createRootHandler(ServletContextHandler servletContextHandler) {
-        servletContextHandler.insertHandler(new ContextPathHandler());
-        servletContextHandler.insertHandler(new HealthCheckHandler());
-        GzipHandler gzipHandler = new GzipHandler();
-        gzipHandler.setHandler(new ContextHandlerCollection(servletContextHandler, this.createStaticContextHandler()));
-        return gzipHandler;
+    private Handler createRootHandler(ServletContextHandler rootContext) {
+        ContextPathHandler contextPathHandler = new ContextPathHandler();
+        contextPathHandler.setHandler(new HealthCheckHandler());
+        rootContext.insertHandler(contextPathHandler);
+        return new ContextHandlerCollection(rootContext, this.createStaticResourcesContextHandler());
     }
 
-    private ContextHandler createStaticContextHandler() {
+    private ContextHandler createStaticResourcesContextHandler() {
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setDirectoriesListed(false);
-        ContextHandler staticResourceContext = new ContextHandler();
-        staticResourceContext.setContextPath("/static");
-        staticResourceContext.setBaseResource(Resource.newClassPathResource("/webapp/static"));
-        staticResourceContext.setHandler(resourceHandler);
-        return staticResourceContext;
+        ContextHandler staticResourcesContextHandler = new ContextHandler();
+        staticResourcesContextHandler.setContextPath("/static");
+        staticResourcesContextHandler.setBaseResource(Resource.newClassPathResource("/webapp/static"));
+        staticResourcesContextHandler.setHandler(resourceHandler);
+        return staticResourcesContextHandler;
     }
 
     @Override
