@@ -12,11 +12,13 @@ import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
+import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.Slf4jRequestLogWriter;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.List;
 
+import static org.eclipse.jetty.server.CustomRequestLog.EXTENDED_NCSA_FORMAT;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 
@@ -54,24 +57,27 @@ public class JettyServer extends AbstractServer {
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         this.jetty = new Server(threadPool);
         HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setOutputBufferSize(32768);
-        httpConfig.setRequestHeaderSize(8192);
-        httpConfig.setResponseHeaderSize(8192);
-        httpConfig.setSendServerVersion(false);
-        httpConfig.setSendDateHeader(true);
+        httpConfig.setOutputBufferSize(config.getInt("jetty.http.output-buffer-size"));
+        httpConfig.setRequestHeaderSize(config.getInt("jetty.http.request-header-size"));
+        httpConfig.setResponseHeaderSize(config.getInt("jetty.http.response-header-size"));
+        httpConfig.setSendServerVersion(config.getBoolean("jetty.http.send-server-version"));
+        httpConfig.setSendDateHeader(config.getBoolean("jetty.http.send-date-header"));
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
         connector.setPort(this.resolvePort(config));
-        connector.setIdleTimeout(30000);
+        connector.setIdleTimeout(config.getLong("jetty.connector.idle-timeout"));
         this.jetty.addConnector(connector);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);
-        this.context.setContextPath("/");
+        this.context.setContextPath(config.getString("jetty.context.path"));
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(new ServletContainerInitializerHolder(sciInfo.getSciInstance(),
                 sciInfo.getHandleTypesArray()));
         this.registerServlets(deployment.getServletInfos());
         new SecurityConfigurer().configure(this.context, this.getUserManager(), config);
         new ErrorHandlerConfigurer().configure(this.context, config);
-        this.jetty.setHandler(this.createRootHandler(this.context));
+        this.jetty.setHandler(this.createRootHandler(this.context, config));
+        if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
+            this.jetty.setRequestLog(new CustomRequestLog(new Slf4jRequestLogWriter(), EXTENDED_NCSA_FORMAT));
+        }
         try {
             this.jetty.start();
         } catch (Exception e) {
@@ -80,21 +86,23 @@ public class JettyServer extends AbstractServer {
         }
     }
 
-    private Handler createRootHandler(ServletContextHandler rootContext) {
+    private Handler createRootHandler(ServletContextHandler rootContext, Config appConfig) {
         ContextPathHandler contextPathHandler = new ContextPathHandler();
         contextPathHandler.setHandler(new HealthCheckHandler());
         rootContext.insertHandler(contextPathHandler);
-        ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, "/static/*");
+        String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
+        ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, defaultServletPath);
         defaultServlet.setAsyncSupported(true);
-        defaultServlet.setInitParameter("resourceBase", this.getResourceBase());
+        defaultServlet.setInitParameter("resourceBase", this.getResourceBase(appConfig));
         return rootContext;
     }
 
-    private String getResourceBase() {
+    private String getResourceBase(Config appConfig) {
         String resourceBase;
-        URL webappRoot = this.getClass().getResource("/webapp");
+        String basePath = appConfig.getString("jetty.context.static-resources-base-path");
+        URL webappRoot = this.getClass().getResource(basePath);
         if (webappRoot == null) {
-            try (Resource resource = Resource.newClassPathResource("/webapp")) {
+            try (Resource resource = Resource.newClassPathResource(basePath)) {
                 resourceBase = resource.getName();
                 LOGGER.info("Static resource base resolved using Jetty Resource.newClassPathResource()");
             }
