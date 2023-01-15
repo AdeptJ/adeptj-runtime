@@ -18,7 +18,6 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.Slf4jRequestLogWriter;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.List;
 
-import static org.eclipse.jetty.server.CustomRequestLog.EXTENDED_NCSA_FORMAT;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 
@@ -76,7 +74,7 @@ public class JettyServer extends AbstractServer {
         new ErrorHandlerConfigurer().configure(this.context, config);
         this.jetty.setHandler(this.createRootHandler(this.context, config));
         if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
-            this.jetty.setRequestLog(new CustomRequestLog(new Slf4jRequestLogWriter(), EXTENDED_NCSA_FORMAT));
+            this.jetty.setRequestLog(new CustomRequestLog());
         }
         try {
             this.jetty.start();
