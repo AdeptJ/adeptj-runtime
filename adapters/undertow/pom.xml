@@ -21,7 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <xnio.version>3.8.8.Final</xnio.version>
-        <undertow.version>2.3.3.Final</undertow.version>
+        <undertow.version>2.3.4.Final</undertow.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>1.6.0.Final</wildfly-common.version>
         <jboss-threads.version>3.5.0.Final</jboss-threads.version>
