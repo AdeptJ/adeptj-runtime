@@ -19,6 +19,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <adeptj-runtime-kernel.version>1.0.0</adeptj-runtime-kernel.version>
     </properties>
 
     <build>
@@ -88,7 +89,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-kernel</artifactId>
-            <version>1.0.0</version>
+            <version>${adeptj-runtime-kernel.version}</version>
         </dependency>
 
         <dependency>

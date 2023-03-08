@@ -54,12 +54,7 @@ public class JettyServer extends AbstractServer {
         int idleTimeout = config.getInt("jetty.qtp.idle-timeout");
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         this.jetty = new Server(threadPool);
-        HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setOutputBufferSize(config.getInt("jetty.http.output-buffer-size"));
-        httpConfig.setRequestHeaderSize(config.getInt("jetty.http.request-header-size"));
-        httpConfig.setResponseHeaderSize(config.getInt("jetty.http.response-header-size"));
-        httpConfig.setSendServerVersion(config.getBoolean("jetty.http.send-server-version"));
-        httpConfig.setSendDateHeader(config.getBoolean("jetty.http.send-date-header"));
+        HttpConfiguration httpConfig = this.createHttpConfiguration(config);
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
         connector.setPort(this.resolvePort(config));
         connector.setIdleTimeout(config.getLong("jetty.connector.idle-timeout"));
@@ -82,6 +77,16 @@ public class JettyServer extends AbstractServer {
             LOGGER.error(e.getMessage(), e);
             throw new RuntimeInitializationException(e);
         }
+    }
+
+    private HttpConfiguration createHttpConfiguration(Config config) {
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setOutputBufferSize(config.getInt("jetty.http.output-buffer-size"));
+        httpConfig.setRequestHeaderSize(config.getInt("jetty.http.request-header-size"));
+        httpConfig.setResponseHeaderSize(config.getInt("jetty.http.response-header-size"));
+        httpConfig.setSendServerVersion(config.getBoolean("jetty.http.send-server-version"));
+        httpConfig.setSendDateHeader(config.getBoolean("jetty.http.send-date-header"));
+        return httpConfig;
     }
 
     private Handler createRootHandler(ServletContextHandler rootContext, Config appConfig) {

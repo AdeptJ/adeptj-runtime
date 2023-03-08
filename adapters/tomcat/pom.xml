@@ -9,7 +9,6 @@
         <version>24</version>
         <relativePath/>
     </parent>
-
     <artifactId>adeptj-runtime-tomcat</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -21,6 +20,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <tomcat.version>10.1.7</tomcat.version>
+        <adeptj-runtime-kernel.version>1.0.0</adeptj-runtime-kernel.version>
     </properties>
 
     <build>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-kernel</artifactId>
-            <version>1.0.0</version>
+            <version>${adeptj-runtime-kernel.version}</version>
         </dependency>
 
         <dependency>

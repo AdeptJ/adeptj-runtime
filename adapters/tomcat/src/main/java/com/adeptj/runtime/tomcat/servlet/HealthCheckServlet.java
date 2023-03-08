@@ -1,4 +1,4 @@
-package com.adeptj.runtime.tomcat;
+package com.adeptj.runtime.tomcat.servlet;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
