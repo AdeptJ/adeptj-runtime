@@ -13,6 +13,7 @@ public class Sha256Base64EncodedPassword extends Password {
 
     @Override
     public boolean check(Object credentials) {
-        return super.check(new String(PasswordEncoder.encodePassword((String) credentials), UTF_8));
+        byte[] encodedPassword = PasswordEncoder.encodePassword((String) credentials);
+        return super.check(new String(encodedPassword, UTF_8));
     }
 }
