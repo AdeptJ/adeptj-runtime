@@ -17,7 +17,8 @@ public class ContextPathHandler extends HandlerWrapper {
     @Override
     public void handle(String target, Request baseRequest,
                        HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/") || request.getRequestURI().startsWith("/;jsessionid")) {
+        String requestURI = request.getRequestURI();
+        if (requestURI.equals("/") || requestURI.startsWith("/;jsessionid")) {
             response.setStatus(SC_FOUND);
             String systemConsolePath = ConfigProvider.getInstance()
                     .getMainConfig()

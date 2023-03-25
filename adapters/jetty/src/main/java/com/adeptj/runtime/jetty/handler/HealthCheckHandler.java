@@ -10,10 +10,12 @@ import java.io.IOException;
 
 public class HealthCheckHandler extends HandlerWrapper {
 
+    private static final String HC_URI = "/hc";
+
     @Override
     public void handle(String target, Request baseRequest,
                        HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (request.getRequestURI().equals("/hc")) {
+        if (request.getRequestURI().equals(HC_URI)) {
             response.setStatus(HttpServletResponse.SC_OK);
             baseRequest.setHandled(true);
             return;

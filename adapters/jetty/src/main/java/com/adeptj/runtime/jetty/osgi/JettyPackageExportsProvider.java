@@ -7,6 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * Export Jetty packages with the currently used Jetty version.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class JettyPackageExportsProvider implements PackageExportsProvider {
 
     @Override

@@ -12,7 +12,6 @@ public class MVStoreLoginService extends AbstractLoginService {
 
     private final UserManager userManager;
 
-
     public MVStoreLoginService(UserManager userManager) {
         this.userManager = userManager;
     }
