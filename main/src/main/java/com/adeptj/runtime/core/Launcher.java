@@ -94,7 +94,8 @@ public final class Launcher {
             ServerRuntime runtime = server.getRuntime();
             logger.info("Initializing AdeptJ Runtime based on {}.", runtime.getName());
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig());
-            ServerBootstrapperResolver.resolve(runtime).bootstrap(server, args);
+            ServerBootstrapper bootstrapper = ServerBootstrapperResolver.resolve(runtime);
+            bootstrapper.bootstrap(server, args);
             // OSGi Framework is initialized by this time and BundleContext is available as well.
             server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
             Runtime.getRuntime().addShutdownHook(new ServerShutdownHook(server, "AdeptJ Terminator"));
