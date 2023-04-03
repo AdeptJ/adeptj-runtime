@@ -37,6 +37,8 @@ public class JettyServer extends AbstractServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);
 
+    private static final String PARAM_RESOURCE_BASE = "resourceBase";
+
     private Server jetty;
 
     private ServletContextHandler context;
@@ -90,13 +92,14 @@ public class JettyServer extends AbstractServer {
     }
 
     private Handler createRootHandler(ServletContextHandler rootContext, Config appConfig) {
+        // Sequence will be - HealthCheckHandler -> ContextPathHandler -> ServletContextHandler
         ContextPathHandler contextPathHandler = new ContextPathHandler();
         contextPathHandler.setHandler(new HealthCheckHandler());
         rootContext.insertHandler(contextPathHandler);
         String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
         ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, defaultServletPath);
         defaultServlet.setAsyncSupported(true);
-        defaultServlet.setInitParameter("resourceBase", this.getResourceBase(appConfig));
+        defaultServlet.setInitParameter(PARAM_RESOURCE_BASE, this.getResourceBase(appConfig));
         return rootContext;
     }
 
@@ -104,7 +107,7 @@ public class JettyServer extends AbstractServer {
         String resourceBase;
         String basePath = appConfig.getString("jetty.context.static-resources-base-path");
         URL webappRoot = this.getClass().getResource(basePath);
-        if (webappRoot == null) {
+        if (webappRoot == null) { // Fallback
             try (Resource resource = Resource.newClassPathResource(basePath)) {
                 resourceBase = resource.getName();
                 LOGGER.info("Static resource base resolved using Jetty Resource.newClassPathResource()");
