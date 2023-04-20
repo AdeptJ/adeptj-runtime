@@ -116,9 +116,10 @@ public class UndertowServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-        Config mainConfig = ConfigProvider.getInstance().getMainConfig(appConfig);
-        Config undertowConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime(), appConfig);
+        ConfigProvider configProvider = ConfigProvider.getInstance();
+        Config appConfig = configProvider.getApplicationConfig();
+        Config mainConfig = configProvider.getMainConfig(appConfig);
+        Config undertowConfig = configProvider.getServerConfig(this.getRuntime(), appConfig);
         int port = this.resolvePort(appConfig);
         try {
             DeploymentInfo deploymentInfo = this.deploymentInfo(mainConfig, undertowConfig, deployment);
