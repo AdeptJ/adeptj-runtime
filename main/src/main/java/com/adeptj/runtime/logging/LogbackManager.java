@@ -337,7 +337,19 @@ public final class LogbackManager {
     }
 
     private FileAppenderConfig createFileAppenderConfig(Config loggingCfg) {
-        return FileAppenderConfig.builder().appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME)).logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE)).pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE)).immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH)).logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE)).rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE)).logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY)).logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC)).asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME)).asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE)).asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD)).build();
+        return FileAppenderConfig.builder()
+                .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
+                .logFile(loggingCfg.getString(KEY_SERVER_LOG_FILE))
+                .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
+                .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
+                .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
+                .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
+                .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
+                .logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))
+                .asyncAppenderName(loggingCfg.getString(KEY_ASYNC_APPENDER_NAME))
+                .asyncLogQueueSize(loggingCfg.getInt(KEY_ASYNC_LOG_QUEUE_SIZE))
+                .asyncLogDiscardingThreshold(loggingCfg.getInt(KEY_ASYNC_LOG_DISCARD_THRESHOLD))
+                .build();
     }
 
     void initLevelChangePropagator() {
