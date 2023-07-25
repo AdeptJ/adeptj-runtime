@@ -198,16 +198,19 @@ public class UndertowServer extends AbstractServer {
         LOGGER.info("Configured worker task core threads: [{}]", cfgCoreTaskThreads);
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         LOGGER.info("No. of CPU available: [{}]", availableProcessors);
-        int calcCoreTaskThreads = availableProcessors * Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER, WORKER_TASK_THREAD_MULTIPLIER);
+        int calcCoreTaskThreads = availableProcessors * Integer.getInteger(SYS_PROP_WORKER_TASK_THREAD_MULTIPLIER,
+                WORKER_TASK_THREAD_MULTIPLIER);
         LOGGER.info("Calculated worker task core threads: [{}]", calcCoreTaskThreads);
         // defaults to double of [worker-task-core-threads] i.e 128
         int cfgMaxTaskThreads = config.getInt(KEY_WORKER_TASK_MAX_THREADS);
         LOGGER.info("Configured worker task max threads: [{}]", cfgMaxTaskThreads);
-        int calcMaxTaskThreads = calcCoreTaskThreads * Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER, SYS_TASK_THREAD_MULTIPLIER);
+        int calcMaxTaskThreads = calcCoreTaskThreads * Integer.getInteger(SYS_PROP_SYS_TASK_THREAD_MULTIPLIER,
+                SYS_TASK_THREAD_MULTIPLIER);
         LOGGER.info("Calculated worker task max threads: [{}]", calcMaxTaskThreads);
         WorkerOptions options = new WorkerOptions();
         options.setOptions(builder, undertowConfig);
-        options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads)).overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
+        options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
+                .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
         LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
     }
 
@@ -241,11 +244,14 @@ public class UndertowServer extends AbstractServer {
         RedirectHandler contextHandler = Handlers.redirect(mainConfig.getString(KEY_SYSTEM_CONSOLE_PATH));
         HttpHandler requestBufferingHandler = null;
         if (Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF)) {
-            requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler, Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, undertowConfig.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
+            requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler,
+                    Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, undertowConfig.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
         }
         ContextPathPredicate contextPathPredicate = new ContextPathPredicate(mainConfig.getString(KEY_CONTEXT_PATH));
-        PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler, (requestBufferingHandler == null ? httpContinueReadHandler : requestBufferingHandler));
-        PathHandler pathHandler = Handlers.path(predicateHandler).addPrefixPath(mainConfig.getString(KEY_HEALTH_CHECK_HANDLER_PATH), new HealthCheckHandler());
+        PredicateHandler predicateHandler = Handlers.predicate(contextPathPredicate, contextHandler,
+                (requestBufferingHandler == null ? httpContinueReadHandler : requestBufferingHandler));
+        PathHandler pathHandler = Handlers.path(predicateHandler)
+                .addPrefixPath(mainConfig.getString(KEY_HEALTH_CHECK_HANDLER_PATH), new HealthCheckHandler());
         AllowedMethodsHandler allowedMethodsHandler = new AllowedMethodsHandler(pathHandler, this.allowedMethods(mainConfig));
         int maxConcurrentRequests = Integer.getInteger(SYS_PROP_MAX_CONCUR_REQ, undertowConfig.getInt(KEY_MAX_CONCURRENT_REQUESTS));
         int queueSize = Integer.getInteger(SYS_PROP_REQ_LIMIT_QUEUE_SIZE, undertowConfig.getInt(KEY_REQ_LIMIT_QUEUE_SIZE));
@@ -255,11 +261,17 @@ public class UndertowServer extends AbstractServer {
     }
 
     private Set<HttpString> allowedMethods(Config mainConfig) {
-        return mainConfig.getStringList(KEY_ALLOWED_METHODS).stream().map(HttpString::tryFromString).collect(Collectors.toSet());
+        return mainConfig.getStringList(KEY_ALLOWED_METHODS)
+                .stream()
+                .map(HttpString::tryFromString)
+                .collect(Collectors.toSet());
     }
 
     private List<ErrorPage> errorPages(Config mainConfig) {
-        return mainConfig.getIntList(KEY_ERROR_HANDLER_CODES).stream().map(code -> Servlets.errorPage(mainConfig.getString(KEY_ERROR_HANDLER_PATH), code)).collect(Collectors.toList());
+        return mainConfig.getIntList(KEY_ERROR_HANDLER_CODES)
+                .stream()
+                .map(code -> Servlets.errorPage(mainConfig.getString(KEY_ERROR_HANDLER_PATH), code))
+                .collect(Collectors.toList());
     }
 
     private ServletContainerInitializerInfo sciInfo(SciInfo sciInfo) {
@@ -267,19 +279,28 @@ public class UndertowServer extends AbstractServer {
     }
 
     private SecurityConstraint securityConstraint(Config mainConfig, Config undertowConfig) {
-        return Servlets.securityConstraint().addRolesAllowed(mainConfig.getStringList(KEY_AUTH_ROLES)).addWebResourceCollection(Servlets.webResourceCollection().addUrlPatterns(mainConfig.getStringList(KEY_PROTECTED_PATHS)).addHttpMethods(undertowConfig.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
+        return Servlets.securityConstraint()
+                .addRolesAllowed(mainConfig.getStringList(KEY_AUTH_ROLES))
+                .addWebResourceCollection(Servlets.webResourceCollection()
+                        .addUrlPatterns(mainConfig.getStringList(KEY_PROTECTED_PATHS))
+                        .addHttpMethods(undertowConfig.getStringList(KEY_PROTECTED_PATHS_SECURED_FOR_METHODS)));
     }
 
     private List<ServletInfo> servlets(ServletDeployment deployment) {
         List<ServletInfo> servlets = new ArrayList<>();
         for (com.adeptj.runtime.kernel.ServletInfo info : deployment.getServletInfos()) {
-            servlets.add(Servlets.servlet(info.getServletName(), info.getServletClass()).addMapping(info.getPath()).setAsyncSupported(true));
+            servlets.add(Servlets.servlet(info.getServletName(), info.getServletClass())
+                    .addMapping(info.getPath())
+                    .setAsyncSupported(true));
         }
         return servlets;
     }
 
     private MultipartConfigElement defaultMultipartConfig(Config undertowConfig) {
-        return Servlets.multipartConfig(undertowConfig.getString(KEY_MULTIPART_FILE_LOCATION), undertowConfig.getLong(KEY_MULTIPART_MAX_FILE_SIZE), undertowConfig.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE), undertowConfig.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
+        return Servlets.multipartConfig(undertowConfig.getString(KEY_MULTIPART_FILE_LOCATION),
+                undertowConfig.getLong(KEY_MULTIPART_MAX_FILE_SIZE),
+                undertowConfig.getLong(KEY_MULTIPART_MAX_REQUEST_SIZE),
+                undertowConfig.getInt(KEY_MULTIPART_FILE_SIZE_THRESHOLD));
     }
 
     private int sessionTimeout(Config mainConfig) {
@@ -291,6 +312,24 @@ public class UndertowServer extends AbstractServer {
     }
 
     private DeploymentInfo deploymentInfo(Config mainConfig, Config undertowConfig, ServletDeployment deployment) {
-        return Servlets.deployment().setDeploymentName(DEPLOYMENT_NAME).setContextPath(mainConfig.getString(KEY_CONTEXT_PATH)).setClassLoader(this.getClass().getClassLoader()).addServletContainerInitializer(this.sciInfo(deployment.getSciInfo())).setIgnoreFlush(mainConfig.getBoolean(KEY_IGNORE_FLUSH)).setDefaultEncoding(mainConfig.getString(KEY_DEFAULT_ENCODING)).setDefaultSessionTimeout(this.sessionTimeout(mainConfig)).setChangeSessionIdOnLogin(mainConfig.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN)).setInvalidateSessionOnLogout(mainConfig.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT)).setIdentityManager(new SimpleIdentityManager(this.getUserManager(), mainConfig)).setUseCachedAuthenticationMechanism(undertowConfig.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM)).setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI)).addSecurityConstraint(this.securityConstraint(mainConfig, undertowConfig)).addServlets(this.servlets(deployment)).addErrorPages(this.errorPages(mainConfig)).setDefaultMultipartConfig(this.defaultMultipartConfig(undertowConfig)).addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper()).setServletSessionConfig(this.sessionConfig(mainConfig)).setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
+        return Servlets.deployment()
+                .setDeploymentName(DEPLOYMENT_NAME)
+                .setContextPath(mainConfig.getString(KEY_CONTEXT_PATH))
+                .setClassLoader(this.getClass().getClassLoader())
+                .addServletContainerInitializer(this.sciInfo(deployment.getSciInfo()))
+                .setIgnoreFlush(mainConfig.getBoolean(KEY_IGNORE_FLUSH))
+                .setDefaultEncoding(mainConfig.getString(KEY_DEFAULT_ENCODING))
+                .setDefaultSessionTimeout(this.sessionTimeout(mainConfig))
+                .setChangeSessionIdOnLogin(mainConfig.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN))
+                .setInvalidateSessionOnLogout(mainConfig.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
+                .setIdentityManager(new SimpleIdentityManager(this.getUserManager(), mainConfig))
+                .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
+                .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
+                .addSecurityConstraint(this.securityConstraint(mainConfig, undertowConfig))
+                .addServlets(this.servlets(deployment)).addErrorPages(this.errorPages(mainConfig))
+                .setDefaultMultipartConfig(this.defaultMultipartConfig(undertowConfig))
+                .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
+                .setServletSessionConfig(this.sessionConfig(mainConfig))
+                .setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
     }
 }
