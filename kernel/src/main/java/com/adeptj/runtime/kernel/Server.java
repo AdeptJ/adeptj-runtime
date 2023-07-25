@@ -8,15 +8,20 @@ public interface Server {
 
     void start(String[] args, ServletDeployment deployment);
 
-    void postStart();
+    default void postStart() {
+        // NOOP
+    }
 
     void stop();
 
-    void registerServlets(List<ServletInfo> servletInfos);
+    default void registerServlets(List<ServletInfo> servletInfos) {
+    }
 
-    void registerFilters(List<FilterInfo> filterInfos);
+    default void registerFilters(List<FilterInfo> filterInfos) {
+    }
 
-    void registerErrorPages(List<Integer> errorCodes);
+    default void registerErrorPages(List<Integer> errorCodes) {
+    }
 
     void addServletContextAttribute(String name, Object value);
 

@@ -27,11 +27,6 @@ public abstract class AbstractServer implements Server {
     protected abstract Logger getLogger();
 
     @Override
-    public void postStart() {
-        // NOOP
-    }
-
-    @Override
     public void stop() {
         long startTime = System.nanoTime();
         this.getLogger().info("Stopping AdeptJ Runtime!!");
@@ -73,15 +68,17 @@ public abstract class AbstractServer implements Server {
     protected int resolvePort(Config appConfig) {
         ResourceBundle rb = ResourceBundle.getBundle("i18n/kernel");
         ServerRuntime runtime = this.getRuntime();
+        // First check - system property.
         Integer port = Integer.getInteger("adeptj.rt.port");
         if (port == null || port == 0) {
             this.getLogger().info(rb.getString("ajrt.port.system.property.not.specified"), SYS_PROP_SERVER_PORT);
+            // Second check - server configs.
             port = appConfig.getConfig(runtime.getLowerCaseName()).getInt("http.port");
             if (port > 0) {
                 this.getLogger().info("Resolved port from server({}) configs!", runtime);
             }
             if (port == 0) {
-                // Fallback
+                // Third check - kernel configs.
                 port = appConfig.getInt("kernel.server.port");
                 this.getLogger().info("Resolved port from kernel configs!");
             }

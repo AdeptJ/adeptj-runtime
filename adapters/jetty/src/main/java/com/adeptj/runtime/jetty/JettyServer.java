@@ -58,7 +58,8 @@ public class JettyServer extends AbstractServer {
         this.jetty = new Server(threadPool);
         HttpConfiguration httpConfig = this.createHttpConfiguration(config);
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
-        connector.setPort(this.resolvePort(config));
+        int port = this.resolvePort(config);
+        connector.setPort(port);
         connector.setIdleTimeout(config.getLong("jetty.connector.idle-timeout"));
         this.jetty.addConnector(connector);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);
@@ -146,12 +147,7 @@ public class JettyServer extends AbstractServer {
 
     @Override
     protected void doRegisterFilter(FilterInfo info) {
-        // NOOP
-    }
-
-    @Override
-    public void registerErrorPages(List<Integer> errorCodes) {
-        // NOOP
+        // NOP
     }
 
     @Override

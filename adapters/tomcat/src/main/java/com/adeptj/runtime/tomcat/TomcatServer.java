@@ -95,7 +95,7 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     protected void doRegisterFilter(FilterInfo info) {
-        // NOOP
+        // NOP
     }
 
     @Override
