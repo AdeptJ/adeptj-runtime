@@ -78,11 +78,11 @@ public enum ConfigProvider {
 
     public Config getServerConfig(ServerRuntime runtime) {
         Config applicationConfig = this.getApplicationConfig();
-        return applicationConfig.getConfig(runtime.getName().toLowerCase());
+        return applicationConfig.getConfig(runtime.getLowerCaseName());
     }
 
     public Config getServerConfig(ServerRuntime runtime, Config appConfig) {
-        return appConfig.getConfig(runtime.getName().toLowerCase());
+        return appConfig.getConfig(runtime.getLowerCaseName());
     }
 
     public static ConfigProvider getInstance() {

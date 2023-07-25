@@ -10,10 +10,10 @@ public class ServerBootstrapperResolver {
 
     public static ServerBootstrapper resolve(ServerRuntime runtime) {
         ServerBootstrapper bootstrapper;
-        if (runtime == TOMCAT) {
-            bootstrapper = new TomcatBootstrapper();
-        } else if (runtime == JETTY) {
+        if (runtime == JETTY) {
             bootstrapper = new JettyBootstrapper();
+        } else if (runtime == TOMCAT) {
+            bootstrapper = new TomcatBootstrapper();
         } else if (runtime == UNDERTOW) {
             bootstrapper = new UndertowBootstrapper();
         } else {

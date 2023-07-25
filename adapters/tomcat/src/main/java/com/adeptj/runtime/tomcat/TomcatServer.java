@@ -48,7 +48,7 @@ public class TomcatServer extends AbstractServer {
     public void start(String[] args, ServletDeployment deployment) {
         try {
             Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-            Config serverConfig = appConfig.getConfig(this.getRuntime().getName().toLowerCase());
+            Config serverConfig = appConfig.getConfig(this.getRuntime().getLowerCaseName());
             this.tomcat = new Tomcat();
             this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
             this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());

@@ -92,7 +92,7 @@ public final class Launcher {
             AbstractServer server = (AbstractServer) ServiceLoader.load(Server.class).iterator().next();
             server.setServerPostStopTask(new LoggerCleanupTask());
             ServerRuntime runtime = server.getRuntime();
-            logger.info("Initializing AdeptJ Runtime based on {}.", runtime.getName());
+            logger.info("Initializing AdeptJ Runtime based on {}.", runtime);
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig());
             ServerBootstrapper bootstrapper = ServerBootstrapperResolver.resolve(runtime);
             bootstrapper.bootstrap(server, args);

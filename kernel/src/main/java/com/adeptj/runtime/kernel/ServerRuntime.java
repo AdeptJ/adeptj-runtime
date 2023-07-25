@@ -2,11 +2,11 @@ package com.adeptj.runtime.kernel;
 
 public enum ServerRuntime {
 
-    TOMCAT ("Tomcat"),
+    JETTY("Jetty"),
 
-    JETTY ("Jetty"),
+    TOMCAT("Tomcat"),
 
-    UNDERTOW ("Undertow");
+    UNDERTOW("Undertow");
 
     private final String name;
 
@@ -14,7 +14,12 @@ public enum ServerRuntime {
         this.name = name;
     }
 
-    public String getName() {
+    public String getLowerCaseName() {
+        return name.toLowerCase();
+    }
+
+    @Override
+    public String toString() {
         return name;
     }
 }

@@ -76,9 +76,9 @@ public abstract class AbstractServer implements Server {
         Integer port = Integer.getInteger("adeptj.rt.port");
         if (port == null || port == 0) {
             this.getLogger().info(rb.getString("ajrt.port.system.property.not.specified"), SYS_PROP_SERVER_PORT);
-            port = appConfig.getConfig(runtime.getName().toLowerCase()).getInt("http.port");
+            port = appConfig.getConfig(runtime.getLowerCaseName()).getInt("http.port");
             if (port > 0) {
-                this.getLogger().info("Resolved port from server({}) configs!", runtime.getName());
+                this.getLogger().info("Resolved port from server({}) configs!", runtime);
             }
             if (port == 0) {
                 // Fallback
@@ -86,7 +86,7 @@ public abstract class AbstractServer implements Server {
                 this.getLogger().info("Resolved port from kernel configs!");
             }
         }
-        this.getLogger().info("Starting {} on port: {}", runtime.getName(), port);
+        this.getLogger().info("Starting {} on port: {}", runtime, port);
         return port;
     }
 }

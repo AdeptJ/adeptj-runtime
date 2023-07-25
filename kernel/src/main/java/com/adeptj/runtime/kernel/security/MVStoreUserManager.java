@@ -48,8 +48,8 @@ public class MVStoreUserManager implements UserManager {
         if (ArrayUtils.isEmpty(inputPassword) || ArrayUtils.isEmpty(storedPassword)) {
             return false;
         }
-        byte[] inputPwdBytes = toByteArray(inputPassword);
-        byte[] storedPwdBytes = toByteArray(storedPassword);
+        byte[] inputPwdBytes = this.toByteArray(inputPassword);
+        byte[] storedPwdBytes = this.toByteArray(storedPassword);
         byte[] inputPwdDigest = PasswordEncoder.encodePassword(inputPwdBytes);
         try {
             return MessageDigest.isEqual(inputPwdDigest, storedPwdBytes);
@@ -70,10 +70,10 @@ public class MVStoreUserManager implements UserManager {
                 .getStringList("common.user-roles-mapping." + username);
     }
 
-    private static byte[] toByteArray(char[] chars) {
+    private byte[] toByteArray(char[] chars) {
         ByteBuffer buffer = UTF_8.encode(CharBuffer.wrap(chars));
         byte[] bytes = new byte[buffer.limit()];
-        buffer.get(bytes);
+        System.arraycopy(buffer.array(), 0, bytes, 0, buffer.limit());
         return bytes;
     }
 
