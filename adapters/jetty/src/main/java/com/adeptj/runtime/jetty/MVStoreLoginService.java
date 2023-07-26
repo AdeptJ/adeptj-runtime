@@ -18,13 +18,15 @@ public class MVStoreLoginService extends AbstractLoginService {
 
     @Override
     protected List<RolePrincipal> loadRoleInfo(UserPrincipal user) {
-        return this.userManager.getRoles(user.getName()).stream()
+        return this.userManager.getRoles(user.getName())
+                .stream()
                 .map(RolePrincipal::new)
                 .collect(Collectors.toList());
     }
 
     @Override
     protected UserPrincipal loadUserInfo(String username) {
-        return new UserPrincipal(username, new Sha256Base64EncodedPassword(this.userManager.getPassword(username)));
+        String password = this.userManager.getPassword(username);
+        return new UserPrincipal(username, new Sha256Base64EncodedPassword(password));
     }
 }

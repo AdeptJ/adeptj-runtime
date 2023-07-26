@@ -14,6 +14,14 @@ public class GeneralConfigurer {
 
     public void configure(StandardContext context, Config serverConfig) {
         // Filters
+        this.configFilters(context, serverConfig);
+        // Servlets
+        this.configServlets(context, serverConfig);
+        // Error Pages
+        this.configErrorPages(context, serverConfig);
+    }
+
+    private void configFilters(StandardContext context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("filters")) {
             FilterDef def = new FilterDef();
             def.setAsyncSupported(config.getString("async"));
@@ -28,7 +36,9 @@ public class GeneralConfigurer {
             filterMap.addURLPattern(config.getString("pattern"));
             context.addFilterMap(filterMap);
         }
-        // Servlets
+    }
+
+    private void configServlets(StandardContext context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("servlets")) {
             Wrapper servlet = context.createWrapper();
             servlet.setName(config.getString("name"));
@@ -45,13 +55,14 @@ public class GeneralConfigurer {
             context.addChild(servlet);
             context.addServletMappingDecoded(config.getString("pattern"), config.getString("name"));
         }
-        // Error Pages
-        serverConfig.getIntList("error-codes")
-                .forEach(value -> {
-                    ErrorPage errorPage = new ErrorPage();
-                    errorPage.setErrorCode(value);
-                    errorPage.setLocation(serverConfig.getString("error-handler-path"));
-                    context.addErrorPage(errorPage);
-                });
+    }
+
+    private void configErrorPages(StandardContext context, Config serverConfig) {
+        for (Integer errorCode : serverConfig.getIntList("error-codes")) {
+            ErrorPage errorPage = new ErrorPage();
+            errorPage.setErrorCode(errorCode);
+            errorPage.setLocation(serverConfig.getString("error-handler-path"));
+            context.addErrorPage(errorPage);
+        }
     }
 }
