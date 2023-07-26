@@ -191,16 +191,35 @@ public enum FrameworkManager {
     }
 
     private void updatePackageExports(Map<String, String> configs) {
-        ServiceLoader.load(PackageExportsProvider.class)
-                .findFirst()
-                .ifPresent(provider -> {
-                    String packageExports = provider.getPackageExports();
-                    if (StringUtils.isNotEmpty(packageExports)) {
-                        String existingExports = configs.get(FRAMEWORK_SYSTEMPACKAGES_EXTRA);
-                        String updatedExports = existingExports + ", " + packageExports;
-                        configs.put(FRAMEWORK_SYSTEMPACKAGES_EXTRA, updatedExports);
-                    }
-                });
+        String aggregatedPackageExports = this.getAggregatedPackageExports();
+        if (StringUtils.isNotEmpty(aggregatedPackageExports)) {
+            aggregatedPackageExports = StringUtils.removeEnd(aggregatedPackageExports, ", ");
+            LOGGER.info("OSGi package exports provided by various exports providers: {}", aggregatedPackageExports);
+            String existingExports = configs.get(FRAMEWORK_SYSTEMPACKAGES_EXTRA);
+            String updatedExports = existingExports + ", " + aggregatedPackageExports;
+            configs.put(FRAMEWORK_SYSTEMPACKAGES_EXTRA, updatedExports);
+        }
+    }
+
+    private String getAggregatedPackageExports() {
+        StringBuilder packageExportsBuilder = new StringBuilder();
+        Iterator<PackageExportsProvider> iterator = ServiceLoader.load(PackageExportsProvider.class).iterator();
+        while (iterator.hasNext()) {
+            PackageExportsProvider exportsProvider = iterator.next();
+            String exportsProviderName = exportsProvider.getName();
+            if (StringUtils.isEmpty(exportsProviderName)) {
+                exportsProviderName = exportsProvider.getClass().getName();
+            }
+            LOGGER.info("Asking [{}] for OSGi package exports.", exportsProviderName);
+            String packageExports = exportsProvider.getPackageExports();
+            if (StringUtils.isNotEmpty(packageExports)) {
+                packageExportsBuilder.append(packageExports);
+                if (iterator.hasNext()) {
+                    packageExportsBuilder.append(", ");
+                }
+            }
+        }
+        return packageExportsBuilder.toString();
     }
 
     private Map<String, String> loadFrameworkProperties(Config felixConf) {
@@ -288,7 +307,9 @@ public enum FrameworkManager {
                 builder.append(',').append('\n');
             }
         }
-        LOGGER.debug("OSGi Framework Configurations-\n{}", builder);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("OSGi Framework Configurations-\n{}", builder);
+        }
     }
 
     public static FrameworkManager getInstance() {

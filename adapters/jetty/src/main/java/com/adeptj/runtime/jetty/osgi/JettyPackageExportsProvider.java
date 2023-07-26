@@ -15,6 +15,11 @@ import java.util.List;
 public class JettyPackageExportsProvider implements PackageExportsProvider {
 
     @Override
+    public String getName() {
+        return "Jetty PackageExportsProvider";
+    }
+
+    @Override
     public String getPackageExports() {
         StringBuilder packageExportsBuilder = new StringBuilder();
         try {

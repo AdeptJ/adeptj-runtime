@@ -7,5 +7,7 @@ package com.adeptj.runtime.kernel.osgi;
  */
 public interface PackageExportsProvider {
 
+    String getName();
+
     String getPackageExports();
 }
