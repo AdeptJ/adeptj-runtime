@@ -55,7 +55,7 @@ public class AdminServlet extends HttpServlet {
 
     private static final String J_USERNAME = "j_username";
 
-    private static final String IS_LOGIN_ERROR = "isLoginError";
+    private static final String LOGIN_ERROR = "loginError";
 
     /**
      * Render login page.
@@ -83,7 +83,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         TemplateData templateData = new TemplateData(req.getLocale())
-                .addVariable(IS_LOGIN_ERROR, TRUE)
+                .addVariable(LOGIN_ERROR, TRUE)
                 .addVariable(J_USERNAME, req.getParameter(J_USERNAME));
         TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
                 .templateData(templateData)

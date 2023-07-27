@@ -47,15 +47,17 @@ public class ErrorServlet extends HttpServlet {
 
     private static final String KEY_EXCEPTION = "exception";
 
-    private static final String ERROR_TEMPLATE_FMT = "error/%s";
+    private static final String VAR_ERROR_CODE = "errorCode";
+
+    private static final String ERROR_TEMPLATE = "error/details";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         // Make sure the below code is invoked only on an error dispatch.
         if (req.getDispatcherType() == ERROR) {
-            String template = String.format(ERROR_TEMPLATE_FMT, resp.getStatus());
             TemplateData templateData = new TemplateData(req.getLocale());
-            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp)
+            templateData.addVariable(VAR_ERROR_CODE, resp.getStatus());
+            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(ERROR_TEMPLATE, resp)
                     .templateData(templateData);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
                 templateData.addVariable(KEY_EXCEPTION, RequestUtil.getException(req));

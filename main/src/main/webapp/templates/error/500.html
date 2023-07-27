@@ -1,8 +1,0 @@
-{% extends "error/partial" %}
-{% block title %} {{ i18nMsg("500.page.title.msg") }} {% endblock %}
-{% block content %}
-<h1 class="error-code">{{ i18nMsg("500.page.error.code.msg") }}</h1>
-<p class="message-detail">{{ i18nMsg("500.page.error.details.msg") }}</p>
-<p class="message-detail">{{ i18nMsg("500.page.error.extra.details.msg") }}</p>
-<p class="message-exception-trace">{{exception}}</p>
-{% endblock %}
