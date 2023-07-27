@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{msg "login.page.title.msg"}}</title>
-    <link rel="stylesheet" href="/static/css/vendors/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
-    <meta content="#fafafa" name="theme-color">
+    {% include "head" %}
+    <title>{{ i18nMsg("login.page.title.msg") }}</title>
 </head>
 <body>
 <main class="page-container login" role="main">
@@ -17,10 +12,10 @@
                 <div class="login-block wrapper-middle align-items-center">
                     <div class="row">
                         <div class="col-12 text-center">
-                            <h2>{{msg "login.welcome.msg"}}</h2>
+                            <h2>{{ i18nMsg("login.welcome.msg") }}</h2>
                         </div>
                         <div class="col-12 main-logo">
-                            <img src="/static/img/logo.png" alt="{{msg 'logo.img.alt.msg'}}">
+                            <img src="/static/img/logo.png" alt='{{ i18nMsg("logo.img.alt.msg") }}'>
                         </div>
                     </div>
 
@@ -43,11 +38,11 @@
                                     <button class="btn btn-adeptj-primary" type="submit">Login</button>
                                 </div>
 
-                                {{#isLoginError}}
+                                {% if isLoginError %}
                                 <div class="alert alert-danger" role="alert">
-                                    <span>{{msg "login.error.msg"}}</span>
+                                    <span>{{ i18nMsg("login.error.msg") }}</span>
                                 </div>
-                                {{/isLoginError}}
+                                {% endif %}
                             </form>
                         </div>
                     </div>

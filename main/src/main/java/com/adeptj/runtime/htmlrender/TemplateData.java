@@ -20,48 +20,28 @@
 
 package com.adeptj.runtime.htmlrender;
 
-import org.trimou.engine.resolver.Mapper;
-
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * TemplateData object for storing variables used in template rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
-public final class TemplateData implements Mapper, Iterable<Entry<String, Object>> {
+public final class TemplateData extends HashMap<String, Object> {
 
     private final Locale locale;
-
-    private Map<String, Object> variables;
 
     public TemplateData(Locale locale) {
         this.locale = locale;
     }
 
-    public TemplateData with(String key, Object value) {
-        if (this.variables == null) {
-            this.variables = new HashMap<>(8);
-        }
-        this.variables.put(key, value);
+    public TemplateData addVariable(String key, Object value) {
+        this.put(key, value);
         return this;
     }
 
     public Locale getLocale() {
         return locale;
-    }
-
-    @Override
-    public Object get(String key) {
-        return this.variables.get(key);
-    }
-
-    @Override
-    public Iterator<Entry<String, Object>> iterator() {
-        return this.variables.entrySet().iterator();
     }
 }

@@ -38,7 +38,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <codename>Virgo</codename>
-        <trimou-core.version>2.5.1.Final</trimou-core.version>
+        <adeptj-runtime-kernel.version>1.0.0</adeptj-runtime-kernel.version>
+        <unbescape.version>1.1.6.RELEASE</unbescape.version>
+        <pebble.version>3.2.1</pebble.version>
     </properties>
 
     <!-- Project Information -->
@@ -179,7 +181,7 @@
         <dependency>
             <groupId>com.adeptj</groupId>
             <artifactId>adeptj-runtime-kernel</artifactId>
-            <version>1.0.0</version>
+            <version>${adeptj-runtime-kernel.version}</version>
         </dependency>
 
         <!-- Jakarta Dependencies Start -->
@@ -240,16 +242,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.trimou</groupId>
-            <artifactId>trimou-core</artifactId>
-            <version>${trimou-core.version}</version>
+            <groupId>org.unbescape</groupId>
+            <artifactId>unbescape</artifactId>
+            <version>${unbescape.version}</version>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.pebbletemplates</groupId>
+            <artifactId>pebble</artifactId>
+            <version>${pebble.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

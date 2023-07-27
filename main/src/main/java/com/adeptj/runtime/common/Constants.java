@@ -31,7 +31,7 @@ public final class Constants {
 
     public static final String ATTRIBUTE_BUNDLE_CONTEXT = "org.osgi.framework.BundleContext";
 
-    public static final String TRIMOU_CONF_SECTION = "trimou";
+    public static final String PEBBLE_CONF_SECTION = "pebble";
 
     public static final String FELIX_CONF_SECTION = "felix";
 
@@ -51,8 +51,6 @@ public final class Constants {
     public static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
 
     public static final String BANNER_TXT = "/banner.txt";
-
-    public static final String UTF8 = "UTF-8";
 
     public static final String CONTENT_TYPE_HTML_UTF8 = "text/html;charset=UTF-8";
 

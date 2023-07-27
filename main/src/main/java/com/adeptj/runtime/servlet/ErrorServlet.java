@@ -25,7 +25,6 @@ import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
 import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.RequestUtil;
-
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,9 +54,11 @@ public class ErrorServlet extends HttpServlet {
         // Make sure the below code is invoked only on an error dispatch.
         if (req.getDispatcherType() == ERROR) {
             String template = String.format(ERROR_TEMPLATE_FMT, resp.getStatus());
-            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp);
+            TemplateData templateData = new TemplateData(req.getLocale());
+            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(template, resp)
+                    .templateData(templateData);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
-                builder.templateData(new TemplateData(req.getLocale()).with(KEY_EXCEPTION, RequestUtil.getException(req)));
+                templateData.addVariable(KEY_EXCEPTION, RequestUtil.getException(req));
             }
             TemplateEngine.getInstance().render(builder.build());
         }

@@ -23,25 +23,16 @@ package com.adeptj.runtime.htmlrender;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
+import io.pebbletemplates.pebble.PebbleEngine;
+import io.pebbletemplates.pebble.loader.ClasspathLoader;
+import io.pebbletemplates.pebble.template.PebbleTemplate;
 import org.slf4j.LoggerFactory;
-import org.trimou.Mustache;
-import org.trimou.engine.MustacheEngine;
-import org.trimou.engine.MustacheEngineBuilder;
-import org.trimou.engine.locator.ClassPathTemplateLocator;
-import org.trimou.handlebars.i18n.ResourceBundleHelper;
 
 import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML_UTF8;
-import static com.adeptj.runtime.common.Constants.TRIMOU_CONF_SECTION;
-import static com.adeptj.runtime.common.Constants.UTF8;
-import static org.trimou.engine.config.EngineConfigurationKey.DEFAULT_FILE_ENCODING;
-import static org.trimou.engine.config.EngineConfigurationKey.END_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.START_DELIMITER;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_ENABLED;
-import static org.trimou.engine.config.EngineConfigurationKey.TEMPLATE_CACHE_EXPIRATION_TIMEOUT;
-import static org.trimou.handlebars.i18n.ResourceBundleHelper.Format.MESSAGE;
+import static com.adeptj.runtime.common.Constants.PEBBLE_CONF_SECTION;
 
 /**
- * Trimou based TemplateEngine for rendering the HTML templates.
+ * Pebble based TemplateEngine for rendering the HTML templates.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -51,42 +42,26 @@ public enum TemplateEngine {
 
     private static final String TEMPLATE_ENGINE_INIT_MSG = "TemplateEngine initialized in [{}] ms!!";
 
-    private static final String RB_HELPER_NAME = "msg";
-
-    private static final String KEY_RB_BASE_NAME = "resource-bundle-basename";
-
-    private static final String KEY_START_DELIMITER = "start-delimiter";
-
-    private static final String KEY_END_DELIMITER = "end-delimiter";
-
     private static final String KEY_CACHE_ENABLED = "cache-enabled";
 
-    private static final String KEY_CACHE_EXPIRATION = "cache-expiration";
-
-    private static final String KEY_TEMPLATE_LOCATOR_PRIORITY = "template-locator-priority";
+    private static final String KEY_STRICT_VARIABLES = "strict-variables";
 
     private static final String KEY_PREFIX = "prefix";
 
     private static final String KEY_SUFFIX = "suffix";
 
-    private final MustacheEngine mustacheEngine;
+    private final PebbleEngine pebbleEngine;
 
     TemplateEngine() {
         long startTime = System.nanoTime();
-        Config config = ConfigProvider.getInstance().getMainConfig().getConfig(TRIMOU_CONF_SECTION);
-        this.mustacheEngine = MustacheEngineBuilder.newBuilder()
-                .registerHelper(RB_HELPER_NAME, new ResourceBundleHelper(config.getString(KEY_RB_BASE_NAME), MESSAGE))
-                .addTemplateLocator(ClassPathTemplateLocator.builder()
-                        .setPriority(config.getInt(KEY_TEMPLATE_LOCATOR_PRIORITY))
-                        .setRootPath(config.getString(KEY_PREFIX))
-                        .setSuffix(config.getString(KEY_SUFFIX))
-                        .setScanClasspath(false)
-                        .build())
-                .setProperty(START_DELIMITER, config.getString(KEY_START_DELIMITER))
-                .setProperty(END_DELIMITER, config.getString(KEY_END_DELIMITER))
-                .setProperty(DEFAULT_FILE_ENCODING, UTF8)
-                .setProperty(TEMPLATE_CACHE_ENABLED, config.getBoolean(KEY_CACHE_ENABLED))
-                .setProperty(TEMPLATE_CACHE_EXPIRATION_TIMEOUT, config.getInt(KEY_CACHE_EXPIRATION))
+        Config pebbleConfig = ConfigProvider.getInstance().getMainConfig().getConfig(PEBBLE_CONF_SECTION);
+        ClasspathLoader loader = new ClasspathLoader();
+        loader.setPrefix(pebbleConfig.getString(KEY_PREFIX));
+        loader.setSuffix(pebbleConfig.getString(KEY_SUFFIX));
+        this.pebbleEngine = new PebbleEngine.Builder()
+                .cacheActive(pebbleConfig.getBoolean(KEY_CACHE_ENABLED))
+                .strictVariables(pebbleConfig.getBoolean(KEY_STRICT_VARIABLES))
+                .loader(loader)
                 .build();
         LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
     }
@@ -99,10 +74,10 @@ public enum TemplateEngine {
      */
     public void render(TemplateEngineContext context) {
         try {
+            PebbleTemplate compiledTemplate = this.pebbleEngine.getTemplate(context.getTemplate());
             // Making sure the Content-Type will always be text/html;charset=UTF-8.
             context.getResponse().setContentType(CONTENT_TYPE_HTML_UTF8);
-            Mustache mustache = this.mustacheEngine.getMustache(context.getTemplate());
-            mustache.render(context.getResponse().getWriter(), context.getTemplateData());
+            compiledTemplate.evaluate(context.getResponse().getWriter(), context.getTemplateData());
         } catch (Exception ex) { // NOSONAR
             throw new TemplateProcessingException(ex);
         }

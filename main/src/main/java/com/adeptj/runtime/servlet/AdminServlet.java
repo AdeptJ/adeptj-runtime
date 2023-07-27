@@ -63,7 +63,9 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         if (ADMIN_LOGIN_URI.equals(req.getRequestURI())) {
-            TemplateEngine.getInstance().render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp).build());
+            TemplateEngine.getInstance().render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
+                            .templateData(new TemplateData(req.getLocale()))
+                    .build());
             return;
         }
         if (ADMIN_LOGOUT_URI.equals(req.getRequestURI()) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
@@ -81,8 +83,8 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         TemplateData templateData = new TemplateData(req.getLocale())
-                .with(IS_LOGIN_ERROR, TRUE)
-                .with(J_USERNAME, req.getParameter(J_USERNAME));
+                .addVariable(IS_LOGIN_ERROR, TRUE)
+                .addVariable(J_USERNAME, req.getParameter(J_USERNAME));
         TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
                 .templateData(templateData)
                 .build();
