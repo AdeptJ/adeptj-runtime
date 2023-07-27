@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "head" %}
+    <title>{% block title %}Error{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/error-page.css">
+</head>
+<body>
+<main class="page-container error" role="main">
+    <div class="row">
+        <div class="container">
+            <div class="col-12">
+                <div class="page-error-message wrapper-middle align-items-center text-center">
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
