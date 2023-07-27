@@ -12,8 +12,8 @@ import java.util.List;
 
 public class SecurityConfigurer {
 
-    public void configure(ServletContextHandler context, UserManager userManager, Config config) {
-        Config commonCfg = config.getConfig("main.common");
+    public void configure(ServletContextHandler context, UserManager userManager, Config appConfig) {
+        Config commonCfg = appConfig.getConfig("main.common");
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__FORM_AUTH);
         List<String> authRoles = commonCfg.getStringList("auth-roles");

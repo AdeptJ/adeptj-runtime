@@ -50,27 +50,27 @@ public class JettyServer extends AbstractServer {
 
     @Override
     public void start(String[] args, ServletDeployment deployment) {
-        Config config = ConfigProvider.getInstance().getApplicationConfig();
-        int minThreads = config.getInt("jetty.qtp.min-threads");
-        int maxThreads = config.getInt("jetty.qtp.max-threads");
-        int idleTimeout = config.getInt("jetty.qtp.idle-timeout");
+        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
+        int minThreads = appConfig.getInt("jetty.qtp.min-threads");
+        int maxThreads = appConfig.getInt("jetty.qtp.max-threads");
+        int idleTimeout = appConfig.getInt("jetty.qtp.idle-timeout");
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
         this.jetty = new Server(threadPool);
-        HttpConfiguration httpConfig = this.createHttpConfiguration(config);
+        HttpConfiguration httpConfig = this.createHttpConfiguration(appConfig);
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
-        int port = this.resolvePort(config);
+        int port = this.resolvePort(appConfig);
         connector.setPort(port);
-        connector.setIdleTimeout(config.getLong("jetty.connector.idle-timeout"));
+        connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
         this.jetty.addConnector(connector);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);
-        this.context.setContextPath(config.getString("jetty.context.path"));
+        this.context.setContextPath(appConfig.getString("jetty.context.path"));
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(new ServletContainerInitializerHolder(sciInfo.getSciInstance(),
                 sciInfo.getHandleTypesArray()));
         this.registerServlets(deployment.getServletInfos());
-        new SecurityConfigurer().configure(this.context, this.getUserManager(), config);
-        new ErrorHandlerConfigurer().configure(this.context, config);
-        this.jetty.setHandler(this.createRootHandler(this.context, config));
+        new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig);
+        new ErrorHandlerConfigurer().configure(this.context, appConfig);
+        this.jetty.setHandler(this.createRootHandler(this.context, appConfig));
         if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
             this.jetty.setRequestLog(new CustomRequestLog());
         }
@@ -82,13 +82,13 @@ public class JettyServer extends AbstractServer {
         }
     }
 
-    private HttpConfiguration createHttpConfiguration(Config config) {
+    private HttpConfiguration createHttpConfiguration(Config appConfig) {
         HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setOutputBufferSize(config.getInt("jetty.http.output-buffer-size"));
-        httpConfig.setRequestHeaderSize(config.getInt("jetty.http.request-header-size"));
-        httpConfig.setResponseHeaderSize(config.getInt("jetty.http.response-header-size"));
-        httpConfig.setSendServerVersion(config.getBoolean("jetty.http.send-server-version"));
-        httpConfig.setSendDateHeader(config.getBoolean("jetty.http.send-date-header"));
+        httpConfig.setOutputBufferSize(appConfig.getInt("jetty.http.output-buffer-size"));
+        httpConfig.setRequestHeaderSize(appConfig.getInt("jetty.http.request-header-size"));
+        httpConfig.setResponseHeaderSize(appConfig.getInt("jetty.http.response-header-size"));
+        httpConfig.setSendServerVersion(appConfig.getBoolean("jetty.http.send-server-version"));
+        httpConfig.setSendDateHeader(appConfig.getBoolean("jetty.http.send-date-header"));
         return httpConfig;
     }
 

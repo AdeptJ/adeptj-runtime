@@ -12,22 +12,22 @@ import java.util.List;
 
 public class SecurityConfigurer {
 
-    public void configure(StandardContext context, UserManager userManager, Config commonCfg) {
+    public void configure(StandardContext context, UserManager userManager, Config commonConfig) {
         // SecurityConstraint
         SecurityConstraint constraint = new SecurityConstraint();
-        List<String> authRoles = commonCfg.getStringList("auth-roles");
+        List<String> authRoles = commonConfig.getStringList("auth-roles");
         for (String authRole : authRoles) {
             constraint.addAuthRole(authRole);
         }
         SecurityCollection collection = new SecurityCollection();
-        List<String> protectedPaths = commonCfg.getStringList("protected-paths");
+        List<String> protectedPaths = commonConfig.getStringList("protected-paths");
         for (String protectedPath : protectedPaths) {
             collection.addPattern(protectedPath);
         }
         constraint.addCollection(collection);
         context.addConstraint(constraint);
         // LoginConfig
-        Config formAuthCfg = commonCfg.getConfig("form-auth");
+        Config formAuthCfg = commonConfig.getConfig("form-auth");
         LoginConfig loginConfig = new LoginConfig();
         loginConfig.setAuthMethod(formAuthCfg.getString("method"));
         loginConfig.setLoginPage(formAuthCfg.getString("login-url"));
@@ -37,7 +37,7 @@ public class SecurityConfigurer {
         // Form Auth
         FormAuthenticator valve = new FormAuthenticator();
         valve.setLandingPage("/");
-        valve.setCharacterEncoding(commonCfg.getString("default-encoding"));
+        valve.setCharacterEncoding(commonConfig.getString("default-encoding"));
         context.addValve(valve);
         // Realm and CredentialHandler
         MVStoreRealm realm = new MVStoreRealm(userManager);

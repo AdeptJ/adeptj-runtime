@@ -12,13 +12,13 @@ import java.util.Map;
 
 public class GeneralConfigurer {
 
-    public void configure(StandardContext context, Config serverConfig) {
+    public void configure(StandardContext context, Config commonConfig, Config serverConfig) {
         // Filters
         this.configFilters(context, serverConfig);
         // Servlets
         this.configServlets(context, serverConfig);
         // Error Pages
-        this.configErrorPages(context, serverConfig);
+        this.configErrorPages(context, commonConfig);
     }
 
     private void configFilters(StandardContext context, Config serverConfig) {
@@ -57,11 +57,12 @@ public class GeneralConfigurer {
         }
     }
 
-    private void configErrorPages(StandardContext context, Config serverConfig) {
-        for (Integer errorCode : serverConfig.getIntList("error-codes")) {
+    private void configErrorPages(StandardContext context, Config commonConfig) {
+        String errorHandlerPath = commonConfig.getString("error-handler-path");
+        for (Integer errorCode : commonConfig.getIntList("error-handler-codes")) {
             ErrorPage errorPage = new ErrorPage();
             errorPage.setErrorCode(errorCode);
-            errorPage.setLocation(serverConfig.getString("error-handler-path"));
+            errorPage.setLocation(errorHandlerPath);
             context.addErrorPage(errorPage);
         }
     }

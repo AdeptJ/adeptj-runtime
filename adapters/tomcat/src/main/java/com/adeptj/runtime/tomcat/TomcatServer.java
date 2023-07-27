@@ -60,8 +60,9 @@ public class TomcatServer extends AbstractServer {
             SciInfo sciInfo = deployment.getSciInfo();
             this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
             this.registerServlets(deployment.getServletInfos());
-            new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig.getConfig(CFG_KEY_MAIN_COMMON));
-            new GeneralConfigurer().configure(this.context, serverConfig);
+            Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
+            new SecurityConfigurer().configure(this.context, this.getUserManager(), commonConfig);
+            new GeneralConfigurer().configure(this.context, commonConfig, serverConfig);
             Tomcat.addDefaultMimeTypeMappings(this.context);
             this.tomcat.start();
             // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
