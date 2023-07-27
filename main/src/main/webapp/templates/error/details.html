@@ -1,13 +1,14 @@
 {% extends "error/main" %}
-{% block title %} {{ i18nErrorMsg(errorCode, "page.title.msg") }} {% endblock %}
+{# Note: errorCode variable is set from ErrorServlet #}
+{% block title %} {{ i18nMsgForErrorCode(errorCode, "page.title.msg") }} {% endblock %}
 {% block content %}
-<h1 class="error-code">{{ i18nErrorMsg(errorCode, "page.error.code.msg") }}</h1>
-<p class="message-detail">{{ i18nErrorMsg(errorCode, "page.error.details.msg") }}</p>
-{% if errorCode == 500 %}
-<p class="message-detail">{{ i18nErrorMsg(errorCode, "page.error.extra.details.msg") }}</p>
-<p class="message-exception-trace">{{exception}}</p>
-{% endif %}
-{% if errorCode == 401 or errorCode == 403 or errorCode == 404 or errorCode == 503 %}
-<a href="/" class="btn btn-adeptj-primary" type="submit">{{ i18nMsg("go.home.msg") }}</a>
-{% endif %}
+  <h1 class="error-code">{{ i18nMsgForErrorCode(errorCode, "page.error.code.msg") }}</h1>
+  <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.details.msg") }}</p>
+  {% if errorCode == 500 %}
+    <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.extra.details.msg") }}</p>
+    <p class="message-exception-trace">{{exception}}</p>
+  {% endif %}
+  {% if errorCode == 401 or errorCode == 403 or errorCode == 404 or errorCode == 503 %}
+    <a href="/" class="btn btn-adeptj-primary" type="submit">{{ i18nMsg("go.home.msg") }}</a>
+  {% endif %}
 {% endblock %}

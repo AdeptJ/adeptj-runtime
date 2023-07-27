@@ -55,8 +55,8 @@ public class ErrorServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         // Make sure the below code is invoked only on an error dispatch.
         if (req.getDispatcherType() == ERROR) {
-            TemplateData templateData = new TemplateData(req.getLocale());
-            templateData.addVariable(VAR_ERROR_CODE, resp.getStatus());
+            TemplateData templateData = new TemplateData(req.getLocale())
+                    .addVariable(VAR_ERROR_CODE, resp.getStatus());
             TemplateEngineContext.Builder builder = TemplateEngineContext.builder(ERROR_TEMPLATE, resp)
                     .templateData(templateData);
             if (Environment.isDev() && RequestUtil.hasException(req)) {
