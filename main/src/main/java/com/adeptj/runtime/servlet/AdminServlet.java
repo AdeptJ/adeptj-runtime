@@ -51,7 +51,7 @@ public class AdminServlet extends HttpServlet {
 
     private static final long serialVersionUID = -3339904764769823449L;
 
-    private static final String LOGIN_TEMPLATE = "auth/login";
+    private static final String LOGIN_TEMPLATE = "login";
 
     private static final String J_USERNAME = "j_username";
 

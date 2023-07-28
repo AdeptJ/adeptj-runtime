@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "head" %}
+    {# Note: errorCode variable is set from ErrorServlet #}
+    <title>{{ i18nMsgForErrorCode(errorCode, "page.title.msg") }}</title>
+    <link rel="stylesheet" href="/static/css/error-page.css">
+</head>
+<body>
+<main class="page-container error" role="main">
+    <div class="row">
+        <div class="container">
+            <div class="col-12">
+                <div class="page-error-message wrapper-middle align-items-center text-center">
+                    <h1 class="error-code">{{ i18nMsgForErrorCode(errorCode, "page.error.code.msg") }}</h1>
+                    <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.details.msg") }}</p>
+                    {% if errorCode == 500 %}
+                      <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.extra.details.msg") }}</p>
+                      <p class="message-exception-trace">{{exception}}</p>
+                    {% endif %}
+                    {% if errorCode == 401 or errorCode == 403 or errorCode == 404 or errorCode == 503 %}
+                      <a href="/" class="btn btn-adeptj-primary" type="submit">{{ i18nMsg("go.home.msg") }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

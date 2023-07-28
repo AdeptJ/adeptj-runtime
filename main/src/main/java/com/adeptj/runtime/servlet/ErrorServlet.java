@@ -49,7 +49,7 @@ public class ErrorServlet extends HttpServlet {
 
     private static final String VAR_ERROR_CODE = "errorCode";
 
-    private static final String ERROR_TEMPLATE = "error/main";
+    private static final String ERROR_TEMPLATE = "error";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
