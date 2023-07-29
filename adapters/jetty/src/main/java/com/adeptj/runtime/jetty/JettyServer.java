@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.List;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
