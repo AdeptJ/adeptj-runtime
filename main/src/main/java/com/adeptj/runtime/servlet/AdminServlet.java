@@ -20,13 +20,11 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.htmlrender.TemplateData;
 import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.RequestUtil;
 import com.adeptj.runtime.kernel.util.ResponseUtil;
-
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -63,9 +61,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         if (ADMIN_LOGIN_URI.equals(req.getRequestURI())) {
-            TemplateEngine.getInstance().render(TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
-                            .templateData(new TemplateData(req.getLocale()))
-                    .build());
+            TemplateEngine.getInstance().render(TemplateEngineContext.builder(LOGIN_TEMPLATE, req, resp).build());
             return;
         }
         if (ADMIN_LOGOUT_URI.equals(req.getRequestURI()) && req.isUserInRole(OSGI_ADMIN_ROLE)) {
@@ -82,11 +78,9 @@ public class AdminServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        TemplateData templateData = new TemplateData(req.getLocale())
-                .addVariable(LOGIN_ERROR, TRUE)
-                .addVariable(J_USERNAME, req.getParameter(J_USERNAME));
-        TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, resp)
-                .templateData(templateData)
+        TemplateEngineContext templateEngineContext = TemplateEngineContext.builder(LOGIN_TEMPLATE, req, resp)
+                .addTemplateVariable(LOGIN_ERROR, TRUE)
+                .addTemplateVariable(J_USERNAME, req.getParameter(J_USERNAME))
                 .build();
         TemplateEngine.getInstance().render(templateEngineContext);
     }

@@ -1,7 +1,0 @@
-{% macro i18nMsg(key) %}
-  {{ i18n("webapp/i18n/messages", key) }}
-{% endmacro %}
-
-{% macro i18nMsgForErrorCode(code, key) %}
-  {{ i18n("webapp/i18n/messages", code + "." + key) }}
-{% endmacro %}

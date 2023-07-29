@@ -20,7 +20,6 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.htmlrender.TemplateData;
 import com.adeptj.runtime.htmlrender.TemplateEngine;
 import com.adeptj.runtime.htmlrender.TemplateEngineContext;
 import com.adeptj.runtime.kernel.util.Environment;
@@ -31,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.VAR_ERROR_CODE;
 import static jakarta.servlet.DispatcherType.ERROR;
 
 /**
@@ -47,20 +47,16 @@ public class ErrorServlet extends HttpServlet {
 
     private static final String KEY_EXCEPTION = "exception";
 
-    private static final String VAR_ERROR_CODE = "errorCode";
-
     private static final String ERROR_TEMPLATE = "error";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) {
         // Make sure the below code is invoked only on an error dispatch.
         if (req.getDispatcherType() == ERROR) {
-            TemplateData templateData = new TemplateData(req.getLocale())
-                    .addVariable(VAR_ERROR_CODE, resp.getStatus());
-            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(ERROR_TEMPLATE, resp)
-                    .templateData(templateData);
+            TemplateEngineContext.Builder builder = TemplateEngineContext.builder(ERROR_TEMPLATE, req, resp)
+                    .addTemplateVariable(VAR_ERROR_CODE, resp.getStatus());
             if (Environment.isDev() && RequestUtil.hasException(req)) {
-                templateData.addVariable(KEY_EXCEPTION, RequestUtil.getException(req));
+                builder.addTemplateVariable(KEY_EXCEPTION, RequestUtil.getException(req));
             }
             TemplateEngine.getInstance().render(builder.build());
         }

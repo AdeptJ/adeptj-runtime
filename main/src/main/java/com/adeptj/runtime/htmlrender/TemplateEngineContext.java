@@ -20,13 +20,16 @@
 
 package com.adeptj.runtime.htmlrender;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * TemplateContext containing required objects for template rendering.
+ * TemplateEngineContext containing required objects for template rendering.
  *
  * @author Rakesh.Kumar, AdeptJ.
  */
@@ -34,29 +37,36 @@ public final class TemplateEngineContext {
 
     private final String template;
 
+    private final HttpServletRequest request;
+
     private final HttpServletResponse response;
 
-    private TemplateData templateData;
+    private Map<String, Object> templateVariables;
 
-    private TemplateEngineContext(String template, HttpServletResponse resp) {
+    private TemplateEngineContext(String template, HttpServletRequest request, HttpServletResponse response) {
         this.template = template;
-        this.response = resp;
+        this.request = request;
+        this.response = response;
     }
 
     String getTemplate() {
-        return template;
+        return this.template;
     }
 
-    TemplateData getTemplateData() {
-        return templateData;
+    HttpServletRequest getRequest() {
+        return this.request;
     }
 
     HttpServletResponse getResponse() {
-        return response;
+        return this.response;
     }
 
-    public static Builder builder(String template, HttpServletResponse resp) {
-        return new Builder(template, resp);
+    Map<String, Object> getTemplateVariables() {
+        return this.templateVariables;
+    }
+
+    public static Builder builder(String template, HttpServletRequest request, HttpServletResponse response) {
+        return new Builder(template, request, response);
     }
 
     /**
@@ -68,24 +78,28 @@ public final class TemplateEngineContext {
 
         private final String template;
 
-        private TemplateData templateData;
+        private final HttpServletRequest request;
 
         private final HttpServletResponse response;
 
-        private Builder(String template, HttpServletResponse resp) {
+        private final Map<String, Object> templateVariables;
+
+        private Builder(String template, HttpServletRequest request, HttpServletResponse response) {
             Validate.isTrue(StringUtils.isNotEmpty(template), "Template name can't be null!");
             this.template = template;
-            this.response = resp;
+            this.request = request;
+            this.response = response;
+            this.templateVariables = new HashMap<>();
         }
 
-        public Builder templateData(TemplateData templateData) {
-            this.templateData = templateData;
+        public Builder addTemplateVariable(String key, Object value) {
+            this.templateVariables.put(key, value);
             return this;
         }
 
         public TemplateEngineContext build() {
-            TemplateEngineContext context = new TemplateEngineContext(this.template, this.response);
-            context.templateData = this.templateData;
+            TemplateEngineContext context = new TemplateEngineContext(this.template, this.request, this.response);
+            context.templateVariables = this.templateVariables;
             return context;
         }
     }

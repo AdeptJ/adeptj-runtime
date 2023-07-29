@@ -26,6 +26,7 @@ import com.typesafe.config.Config;
 import io.pebbletemplates.pebble.PebbleEngine;
 import io.pebbletemplates.pebble.loader.ClasspathLoader;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;
 
 import static com.adeptj.runtime.common.Constants.CONTENT_TYPE_HTML_UTF8;
@@ -50,6 +51,8 @@ public enum TemplateEngine {
 
     private static final String KEY_SUFFIX = "suffix";
 
+    private static final String KEY_RB_DIR = "resource-bundle-dir";
+
     private final PebbleEngine pebbleEngine;
 
     TemplateEngine() {
@@ -61,6 +64,7 @@ public enum TemplateEngine {
         this.pebbleEngine = new PebbleEngine.Builder()
                 .cacheActive(pebbleConfig.getBoolean(KEY_CACHE_ENABLED))
                 .strictVariables(pebbleConfig.getBoolean(KEY_STRICT_VARIABLES))
+                .extension(new I18nSupport(pebbleConfig.getString(KEY_RB_DIR)))
                 .loader(loader)
                 .build();
         LoggerFactory.getLogger(this.getClass()).info(TEMPLATE_ENGINE_INIT_MSG, Times.elapsedMillis(startTime));
@@ -76,8 +80,9 @@ public enum TemplateEngine {
         try {
             PebbleTemplate compiledTemplate = this.pebbleEngine.getTemplate(context.getTemplate());
             // Making sure the Content-Type will always be text/html;charset=UTF-8.
-            context.getResponse().setContentType(CONTENT_TYPE_HTML_UTF8);
-            compiledTemplate.evaluate(context.getResponse().getWriter(), context.getTemplateData());
+            HttpServletResponse response = context.getResponse();
+            response.setContentType(CONTENT_TYPE_HTML_UTF8);
+            compiledTemplate.evaluate(response.getWriter(), context.getTemplateVariables());
         } catch (Exception ex) { // NOSONAR
             throw new TemplateProcessingException(ex);
         }

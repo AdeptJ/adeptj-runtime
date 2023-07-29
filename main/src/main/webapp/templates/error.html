@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% include "head" %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="#fafafa" name="theme-color">
     {# Note: errorCode variable is set from ErrorServlet #}
-    <title>{{ i18nMsgForErrorCode(errorCode, "page.title.msg") }}</title>
+    <title>{{ i18n("messages", "page.title.msg") }}</title>
+    <link rel="stylesheet" href="/static/css/vendors/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
     <link rel="stylesheet" href="/static/css/error-page.css">
 </head>
 <body>
@@ -12,14 +17,14 @@
         <div class="container">
             <div class="col-12">
                 <div class="page-error-message wrapper-middle align-items-center text-center">
-                    <h1 class="error-code">{{ i18nMsgForErrorCode(errorCode, "page.error.code.msg") }}</h1>
-                    <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.details.msg") }}</p>
+                    <h1 class="error-code">{{ i18n("messages", "page.error.code.msg") }}</h1>
+                    <p class="message-detail">{{ i18n("messages", "page.error.details.msg") }}</p>
                     {% if errorCode == 500 %}
-                      <p class="message-detail">{{ i18nMsgForErrorCode(errorCode, "page.error.extra.details.msg") }}</p>
-                      <p class="message-exception-trace">{{exception}}</p>
+                    <p class="message-detail">{{ i18n("messages", "page.error.extra.details.msg") }}</p>
+                    <p class="message-exception-trace">{{exception}}</p>
                     {% endif %}
                     {% if errorCode == 401 or errorCode == 403 or errorCode == 404 or errorCode == 503 %}
-                      <a href="/" class="btn btn-adeptj-primary" type="submit">{{ i18nMsg("go.home.msg") }}</a>
+                    <a href="/" class="btn btn-adeptj-primary" type="submit">{{ i18n("messages", "go.home.msg") }}</a>
                     {% endif %}
                 </div>
             </div>
