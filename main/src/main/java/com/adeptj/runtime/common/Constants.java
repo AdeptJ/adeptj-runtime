@@ -49,8 +49,11 @@ public final class Constants {
 
     public static final String ERROR_SERVLET_URI = "/ErrorHandler";
 
-
     public static final String ERROR_SERVLET_NAME = "AdeptJ ErrorServlet";
+
+    public static final String LOGBACK_VIEW_SERVLET_NAME = "Logback ViewStatusMessagesServlet";
+
+    public static final String LOGBACK_VIEW_SERVLET_URI = "/admin/logback-status";
 
     public static final String BANNER_TXT = "/banner.txt";
 

@@ -13,6 +13,8 @@ import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_NAME;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.LOGBACK_VIEW_SERVLET_NAME;
+import static com.adeptj.runtime.common.Constants.LOGBACK_VIEW_SERVLET_URI;
 
 public abstract class AbstractServerBootstrapper implements ServerBootstrapper {
 
@@ -44,13 +46,12 @@ public abstract class AbstractServerBootstrapper implements ServerBootstrapper {
     }
 
     protected ServletInfo createLogbackViewStatusMessagesServlet(boolean createServletInstance) {
-        ServletInfo errorServletInfo = new ServletInfo("Logback ViewStatusMessagesServlet",
-                "/admin/logback-status");
+        ServletInfo logbackStatusServletInfo = new ServletInfo(LOGBACK_VIEW_SERVLET_NAME, LOGBACK_VIEW_SERVLET_URI);
         if (createServletInstance) {
-            errorServletInfo.setServletInstance(new ViewStatusMessagesServlet());
+            logbackStatusServletInfo.setServletInstance(new ViewStatusMessagesServlet());
         } else {
-            errorServletInfo.setServletClass(ViewStatusMessagesServlet.class);
+            logbackStatusServletInfo.setServletClass(ViewStatusMessagesServlet.class);
         }
-        return errorServletInfo;
+        return logbackStatusServletInfo;
     }
 }
