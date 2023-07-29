@@ -12,9 +12,10 @@ public class UndertowBootstrapper extends AbstractServerBootstrapper {
         // ServletInfo
         ServletInfo adminServletInfo = this.createAdminServletInfo(false);
         ServletInfo errorServletInfo = this.createErrorServletInfo(false);
+        ServletInfo logbackStatusServletInfo = this.createLogbackViewStatusMessagesServlet(false);
         // ServletDeployment
         ServletDeployment deployment = new ServletDeployment(new SciInfo(RuntimeInitializer.class, this.getHandleTypes()));
-        deployment.addServletInfos(adminServletInfo, errorServletInfo);
+        deployment.addServletInfos(adminServletInfo, errorServletInfo, logbackStatusServletInfo);
         // Start
         server.start(args, deployment);
     }

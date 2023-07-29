@@ -1,5 +1,6 @@
 package com.adeptj.runtime.core;
 
+import ch.qos.logback.classic.ViewStatusMessagesServlet;
 import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
@@ -38,6 +39,17 @@ public abstract class AbstractServerBootstrapper implements ServerBootstrapper {
             errorServletInfo.setServletInstance(new ErrorServlet());
         } else {
             errorServletInfo.setServletClass(ErrorServlet.class);
+        }
+        return errorServletInfo;
+    }
+
+    protected ServletInfo createLogbackViewStatusMessagesServlet(boolean createServletInstance) {
+        ServletInfo errorServletInfo = new ServletInfo("Logback ViewStatusMessagesServlet",
+                "/admin/logback-status");
+        if (createServletInstance) {
+            errorServletInfo.setServletInstance(new ViewStatusMessagesServlet());
+        } else {
+            errorServletInfo.setServletClass(ViewStatusMessagesServlet.class);
         }
         return errorServletInfo;
     }

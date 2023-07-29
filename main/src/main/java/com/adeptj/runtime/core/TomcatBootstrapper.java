@@ -12,9 +12,10 @@ public class TomcatBootstrapper extends AbstractServerBootstrapper {
         // ServletInfo
         ServletInfo adminServletInfo = this.createAdminServletInfo(true);
         ServletInfo errorServletInfo = this.createErrorServletInfo(true);
+        ServletInfo logbackStatusServletInfo = this.createLogbackViewStatusMessagesServlet(true);
         // ServletDeployment
         ServletDeployment deployment = new ServletDeployment(new SciInfo(new RuntimeInitializer(), this.getHandleTypes()));
-        deployment.addServletInfos(adminServletInfo, errorServletInfo);
+        deployment.addServletInfos(adminServletInfo, errorServletInfo, logbackStatusServletInfo);
         // Start
         server.start(args, deployment);
     }

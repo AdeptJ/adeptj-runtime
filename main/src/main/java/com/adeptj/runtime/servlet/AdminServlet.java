@@ -39,7 +39,7 @@ import static java.lang.Boolean.TRUE;
 /**
  * AdminServlet does the following:
  * <p>
- * 1. Renders the login page and handles the validation failure on wrong credentials submission.
+ * 1. Renders the login page and handles the validation failure on wrong credential submission.
  * 2. Logout the currently logged in Admin user and renders the login page again.
  *
  * @author Rakesh.Kumar, AdeptJ
