@@ -50,11 +50,7 @@ public class JettyServer extends AbstractServer {
     @Override
     public void start(String[] args, ServletDeployment deployment) {
         Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-        int minThreads = appConfig.getInt("jetty.qtp.min-threads");
-        int maxThreads = appConfig.getInt("jetty.qtp.max-threads");
-        int idleTimeout = appConfig.getInt("jetty.qtp.idle-timeout");
-        QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
-        this.jetty = new Server(threadPool);
+        this.jetty = new Server(this.getQueuedThreadPool(appConfig));
         HttpConfiguration httpConfig = this.createHttpConfiguration(appConfig);
         ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
         int port = this.resolvePort(appConfig);
@@ -79,6 +75,13 @@ public class JettyServer extends AbstractServer {
             LOGGER.error(e.getMessage(), e);
             throw new RuntimeInitializationException(e);
         }
+    }
+
+    private QueuedThreadPool getQueuedThreadPool(Config appConfig) {
+        int minThreads = appConfig.getInt("jetty.qtp.min-threads");
+        int maxThreads = appConfig.getInt("jetty.qtp.max-threads");
+        int idleTimeout = appConfig.getInt("jetty.qtp.idle-timeout");
+        return new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
     }
 
     private HttpConfiguration createHttpConfiguration(Config appConfig) {

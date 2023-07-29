@@ -6,7 +6,6 @@ import com.typesafe.config.Config;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static com.adeptj.runtime.kernel.Constants.SYS_PROP_SERVER_PORT;
 
@@ -66,12 +65,12 @@ public abstract class AbstractServer implements Server {
     protected abstract void doRegisterFilter(FilterInfo info);
 
     protected int resolvePort(Config appConfig) {
-        ResourceBundle rb = ResourceBundle.getBundle("i18n/kernel");
         ServerRuntime runtime = this.getRuntime();
         // First check - system property.
         Integer port = Integer.getInteger("adeptj.rt.port");
         if (port == null || port == 0) {
-            this.getLogger().info(rb.getString("ajrt.port.system.property.not.specified"), SYS_PROP_SERVER_PORT);
+            this.getLogger().info("No port specified via system property: [{}], will resolve port from configs!",
+                    SYS_PROP_SERVER_PORT);
             // Second check - server configs.
             port = appConfig.getConfig(runtime.getLowerCaseName()).getInt("http.port");
             if (port > 0) {
