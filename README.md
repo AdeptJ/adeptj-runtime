@@ -8,20 +8,20 @@
    <img src="https://img.shields.io/badge/OSGi-R8-orange?style=flat">
   </a>
 
-  <a href="https://travis-ci.org/AdeptJ/adeptj-runtime/builds">
-     <img src="https://api.travis-ci.org/AdeptJ/adeptj-runtime.svg?branch=master&style=flat">
+  <a href="https://app.circleci.com/pipelines/github/AdeptJ/adeptj-runtime">
+     <img src="https://img.shields.io/circleci/build/github/AdeptJ/adeptj-runtime/main">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
-     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=reliability_rating">
+  <a href="https://sonarcloud.io/project/overview?id=AdeptJ_adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=reliability_rating&view=list">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
-     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=security_rating">
+  <a href="https://sonarcloud.io/project/overview?id=AdeptJ_adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=security_rating">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
-     <img src="https://sonarcloud.io/api/project_badges/measure?project=adeptj-runtime&metric=vulnerabilities">
+  <a href="https://sonarcloud.io/project/overview?id=AdeptJ_adeptj-runtime">
+     <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=vulnerabilities">
   </a>
 
   <a href="https://gitter.im/AdeptJ/adeptj-runtime?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge">
