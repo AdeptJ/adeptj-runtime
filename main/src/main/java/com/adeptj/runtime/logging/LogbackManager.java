@@ -259,21 +259,19 @@ public final class LogbackManager {
 
     private void addLogger(String name, Level level) {
         Logger logger = this.loggerContext.getLogger(name.trim());
-        // Must be set to false otherwise there will be two log statement for each logged info.
+        logger.setLevel(level);
+        // Must be set to false otherwise there will be two log entries for each logged statement.
         logger.setAdditive(false);
-        this.setLevelAndAddAppenders(logger, level);
+        logger.addAppender(this.consoleAppender);
+        logger.addAppender(this.fileAppender);
     }
 
     void configureRootLogger(Config loggingCfg) {
         Logger root = this.loggerContext.getLogger(ROOT_LOGGER_NAME);
         Level level = Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL));
-        this.setLevelAndAddAppenders(root, level);
-    }
-
-    private void setLevelAndAddAppenders(Logger logger, Level level) {
-        logger.setLevel(level);
-        logger.addAppender(this.consoleAppender);
-        logger.addAppender(this.fileAppender);
+        root.setLevel(level);
+        root.addAppender(this.consoleAppender);
+        root.addAppender(this.fileAppender);
     }
 
     void initConsoleAppender(Config loggingCfg) {
