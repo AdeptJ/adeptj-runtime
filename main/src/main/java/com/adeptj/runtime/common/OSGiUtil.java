@@ -28,6 +28,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.jar.Manifest;
@@ -134,7 +135,11 @@ public final class OSGiUtil {
 
     public static Set<String> arrayToSet(ServiceReference<?> reference, String key) {
         // Not doing any type check as the property has to be an array type suggested by method name itself.
-        return Stream.of((String[]) reference.getProperty(key))
+        String[] values = (String[]) reference.getProperty(key);
+        if (values == null || values.length == 0) {
+            return Collections.emptySet();
+        }
+        return Stream.of(values)
                 .filter(StringUtils::isNotBlank)
                 .map(String::trim)
                 .collect(Collectors.toSet());

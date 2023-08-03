@@ -171,6 +171,10 @@ public final class LogbackManager {
     public void resetLoggers(ServiceReference<?> reference) {
         Logger logger = this.loggerContext.getLogger(this.getClass());
         String pid = OSGiUtil.getString(reference, SERVICE_PID);
+        if (this.configByPid == null) {
+            logger.warn("Logger configuration does not exist for this pid: ({})", pid);
+            return;
+        }
         OSGiLoggerConfig config = this.configByPid.remove(pid);
         // If LoggerConfig is null for the given pid then there is no need to reset LoggerContext.
         // It also means that the logger config was never captured for this pid, log and return right away.
@@ -248,26 +252,31 @@ public final class LogbackManager {
     }
 
     void addServerConfigLoggers(Config loggingCfg) {
-        for (Map.Entry<String, ConfigValue> entry : loggingCfg.getConfig(KEY_LOGGERS).entrySet()) {
-            Level level = Level.toLevel(entry.getKey());
-            ConfigList loggers = (ConfigList) entry.getValue();
-            for (ConfigValue config : loggers) {
-                this.addLogger(config.toString().trim(), level);
+        for (Map.Entry<String, ConfigValue> loggerNamesByLevel : loggingCfg.getConfig(KEY_LOGGERS).entrySet()) {
+            Level level = Level.toLevel(loggerNamesByLevel.getKey());
+            ConfigList loggerNames = (ConfigList) loggerNamesByLevel.getValue();
+            for (ConfigValue config : loggerNames) {
+                this.addLogger((String) config.unwrapped(), level);
             }
         }
     }
 
     private void addLogger(String name, Level level) {
-        // appenders are already attached to ROOT logger and with default additivity as true so no need to do it again.
-        Logger logger = this.loggerContext.getLogger(name);
-        logger.setLevel(level);
+        Logger logger = this.loggerContext.getLogger(name.trim());
+        logger.setAdditive(false);
+        this.setLevelAndAddAppenders(logger, level);
     }
 
     void configureRootLogger(Config loggingCfg) {
         Logger root = this.loggerContext.getLogger(ROOT_LOGGER_NAME);
-        root.setLevel(Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL)));
-        root.addAppender(this.consoleAppender);
-        root.addAppender(this.fileAppender);
+        Level level = Level.toLevel(loggingCfg.getString(KEY_ROOT_LOG_LEVEL));
+        this.setLevelAndAddAppenders(root, level);
+    }
+
+    private void setLevelAndAddAppenders(Logger logger, Level level) {
+        logger.setLevel(level);
+        logger.addAppender(this.consoleAppender);
+        logger.addAppender(this.fileAppender);
     }
 
     void initConsoleAppender(Config loggingCfg) {
