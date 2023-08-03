@@ -38,6 +38,9 @@ import com.adeptj.runtime.common.OSGiUtil;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
+import com.typesafe.config.ConfigList;
+import com.typesafe.config.ConfigValue;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -66,12 +69,6 @@ public final class LogbackManager {
 
     private static final String KEY_LOGGERS = "loggers";
 
-    private static final String KEY_LOGGER_NAME = "name";
-
-    private static final String KEY_LOGGER_LEVEL = "level";
-
-    private static final String KEY_LOGGER_ADDITIVITY = "additivity";
-
     private static final String KEY_SERVER_LOG_FILE = "server-log-file";
 
     private static final String KEY_ROLLOVER_SERVER_LOG_FILE = "rollover-server-log-file";
@@ -86,6 +83,8 @@ public final class LogbackManager {
 
     private static final String KEY_LOG_MAX_SIZE = "log-max-size";
 
+    private static final String KEY_TOTAL_CAP_SIZE = "total-cap-size";
+
     private static final String KEY_ASYNC_LOG_QUEUE_SIZE = "async-log-queue-size";
 
     private static final String KEY_ASYNC_LOG_DISCARD_THRESHOLD = "async-log-discardingThreshold";
@@ -95,8 +94,6 @@ public final class LogbackManager {
     private static final String KEY_OSGI_LOGGER_NAMES = "logger.names";
 
     private static final String KEY_OSGI_LOGGER_LEVEL = "logger.level";
-
-    private static final String KEY_OSGI_LOGGER_ADDITIVITY = "logger.additivity";
 
     private static final String SYS_PROP_LOG_ASYNC = "log.async";
 
@@ -143,7 +140,7 @@ public final class LogbackManager {
     private final ContextUtil contextUtil;
 
     // This map instance is only initialized when logger config is added first time from OSGi.
-    private Map<String, LoggerConfig> configByPid;
+    private Map<String, OSGiLoggerConfig> configByPid;
 
     LogbackManager(LoggerContext loggerContext) {
         this.loggerContext = loggerContext;
@@ -163,11 +160,10 @@ public final class LogbackManager {
         if (this.validateCategories(categories)) {
             String pid = OSGiUtil.getString(reference, SERVICE_PID);
             String level = OSGiUtil.getString(reference, KEY_OSGI_LOGGER_LEVEL);
-            boolean additivity = OSGiUtil.getBoolean(reference, KEY_OSGI_LOGGER_ADDITIVITY);
-            this.configByPid.put(pid, new LoggerConfig(pid, categories, level, additivity));
+            this.configByPid.put(pid, new OSGiLoggerConfig(pid, categories, level));
             this.loggerContext.getLogger(this.getClass()).info(ADDING_LOGGERS_MSG, categories, level);
             for (String category : categories) {
-                this.addLogger(category, level, additivity);
+                this.addLogger(category, Level.toLevel(level));
             }
         }
     }
@@ -175,7 +171,7 @@ public final class LogbackManager {
     public void resetLoggers(ServiceReference<?> reference) {
         Logger logger = this.loggerContext.getLogger(this.getClass());
         String pid = OSGiUtil.getString(reference, SERVICE_PID);
-        LoggerConfig config = this.configByPid.remove(pid);
+        OSGiLoggerConfig config = this.configByPid.remove(pid);
         // If LoggerConfig is null for the given pid then there is no need to reset LoggerContext.
         // It also means that the logger config was never captured for this pid, log and return right away.
         if (config == null) {
@@ -226,7 +222,7 @@ public final class LogbackManager {
             // No need to check the categories if configByPid map is initialized first time, return true right away.
             return true;
         }
-        for (LoggerConfig config : this.configByPid.values()) {
+        for (OSGiLoggerConfig config : this.configByPid.values()) {
             // If a category is already defined in current LoggerConfig then log as error and return false right away.
             for (String category : config.getCategories()) {
                 if (categories.contains(category)) {
@@ -241,31 +237,30 @@ public final class LogbackManager {
 
     private void reconfigureOSGiLoggers() {
         Logger logger = this.loggerContext.getLogger(this.getClass());
-        for (LoggerConfig config : this.configByPid.values()) {
+        for (OSGiLoggerConfig config : this.configByPid.values()) {
             Set<String> categories = config.getCategories();
-            String level = config.getLevel();
+            Level level = Level.toLevel(config.getLevel());
             for (String category : categories) {
-                this.addLogger(category, level, config.isAdditivity());
+                this.addLogger(category, level);
             }
             logger.info(OSGI_LOGGERS_RECONFIGURED_MSG, categories, level);
         }
     }
 
     void addServerConfigLoggers(Config loggingCfg) {
-        for (Config config : loggingCfg.getConfigList(KEY_LOGGERS)) {
-            String name = config.getString(KEY_LOGGER_NAME).trim();
-            String level = config.getString(KEY_LOGGER_LEVEL).trim();
-            boolean additivity = config.getBoolean(KEY_LOGGER_ADDITIVITY);
-            this.addLogger(name, level, additivity);
+        for (Map.Entry<String, ConfigValue> entry : loggingCfg.getConfig(KEY_LOGGERS).entrySet()) {
+            Level level = Level.toLevel(entry.getKey());
+            ConfigList loggers = (ConfigList) entry.getValue();
+            for (ConfigValue config : loggers) {
+                this.addLogger(config.toString().trim(), level);
+            }
         }
     }
 
-    private void addLogger(String name, String level, boolean additivity) {
+    private void addLogger(String name, Level level) {
+        // appenders are already attached to ROOT logger and with default additivity as true so no need to do it again.
         Logger logger = this.loggerContext.getLogger(name);
-        logger.setLevel(Level.toLevel(level));
-        logger.setAdditive(additivity);
-        logger.addAppender(this.consoleAppender);
-        logger.addAppender(this.fileAppender);
+        logger.setLevel(level);
     }
 
     void configureRootLogger(Config loggingCfg) {
@@ -300,15 +295,9 @@ public final class LogbackManager {
         if (!fileAppender.isImmediateFlush()) {
             fileAppender.setImmediateFlush(appenderConfig.isImmediateFlush());
         }
-        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new SizeAndTimeBasedRollingPolicy<>();
-        rollingPolicy.setContext(this.loggerContext);
-        rollingPolicy.setParent(fileAppender);
-        rollingPolicy.setMaxFileSize(FileSize.valueOf(appenderConfig.getLogMaxSize()));
-        rollingPolicy.setFileNamePattern(appenderConfig.getRolloverFile());
-        rollingPolicy.setMaxHistory(appenderConfig.getLogMaxHistory());
-        rollingPolicy.start();
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = this.newRollingPolicy(fileAppender, appenderConfig);
+        // This will also set the TriggeringPolicy
         fileAppender.setRollingPolicy(rollingPolicy);
-        fileAppender.setTriggeringPolicy(rollingPolicy);
         fileAppender.start();
         // Add AsyncAppender support.
         if (appenderConfig.isLogAsync()) {
@@ -317,13 +306,26 @@ public final class LogbackManager {
         this.fileAppender = fileAppender;
     }
 
-    private PatternLayoutEncoder newLayoutEncoder(String logPattern) {
-        PatternLayoutEncoder layoutEncoder = new PatternLayoutEncoder();
-        layoutEncoder.setContext(this.loggerContext);
-        layoutEncoder.setPattern(logPattern);
-        layoutEncoder.setCharset(UTF_8);
-        layoutEncoder.start();
-        return layoutEncoder;
+    private SizeAndTimeBasedRollingPolicy<ILoggingEvent> newRollingPolicy(FileAppender<ILoggingEvent> fileAppender,
+                                                                          FileAppenderConfig appenderConfig) {
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new SizeAndTimeBasedRollingPolicy<>();
+        rollingPolicy.setContext(this.loggerContext);
+        rollingPolicy.setParent(fileAppender);
+        rollingPolicy.setFileNamePattern(appenderConfig.getRolloverFile());
+        // Rollover once the file reaches configured (default is 10MB) in size.
+        rollingPolicy.setMaxFileSize(FileSize.valueOf(appenderConfig.getLogMaxSize()));
+        // Keep the log files for configured number of days (default is 30 days).
+        rollingPolicy.setMaxHistory(appenderConfig.getLogMaxHistory());
+        // Start purging the oldest files once the total size of log files reach the configured threshold (10GB).
+        if (Boolean.getBoolean("log.purge.files")) {
+            String totalCapSize = System.getProperty("log.files.total.cap.size");
+            if (StringUtils.isEmpty(totalCapSize)) {
+                totalCapSize = appenderConfig.getTotalCapSize();
+            }
+            rollingPolicy.setTotalSizeCap(FileSize.valueOf(totalCapSize));
+        }
+        rollingPolicy.start();
+        return rollingPolicy;
     }
 
     private void initAsyncAppender(FileAppenderConfig rollingFileConfig, FileAppender<ILoggingEvent> fileAppender) {
@@ -336,6 +338,15 @@ public final class LogbackManager {
         asyncAppender.start();
     }
 
+    private PatternLayoutEncoder newLayoutEncoder(String logPattern) {
+        PatternLayoutEncoder layoutEncoder = new PatternLayoutEncoder();
+        layoutEncoder.setContext(this.loggerContext);
+        layoutEncoder.setPattern(logPattern);
+        layoutEncoder.setCharset(UTF_8);
+        layoutEncoder.start();
+        return layoutEncoder;
+    }
+
     private FileAppenderConfig createFileAppenderConfig(Config loggingCfg) {
         return FileAppenderConfig.builder()
                 .appenderName(loggingCfg.getString(KEY_FILE_APPENDER_NAME))
@@ -343,6 +354,7 @@ public final class LogbackManager {
                 .pattern(loggingCfg.getString(KEY_LOG_PATTERN_FILE))
                 .immediateFlush(loggingCfg.getBoolean(KEY_IMMEDIATE_FLUSH))
                 .logMaxSize(loggingCfg.getString(KEY_LOG_MAX_SIZE))
+                .totalCapSize(loggingCfg.getString(KEY_TOTAL_CAP_SIZE))
                 .rolloverFile(loggingCfg.getString(KEY_ROLLOVER_SERVER_LOG_FILE))
                 .logMaxHistory(loggingCfg.getInt(KEY_LOG_MAX_HISTORY))
                 .logAsync(Boolean.getBoolean(SYS_PROP_LOG_ASYNC))

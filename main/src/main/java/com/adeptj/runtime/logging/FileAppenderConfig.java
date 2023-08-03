@@ -39,6 +39,8 @@ class FileAppenderConfig {
 
     private String logMaxSize;
 
+    private String totalCapSize;
+
     private boolean immediateFlush;
 
     private boolean logAsync;
@@ -74,6 +76,14 @@ class FileAppenderConfig {
 
     public String getLogMaxSize() {
         return logMaxSize;
+    }
+
+    public String getTotalCapSize() {
+        return totalCapSize;
+    }
+
+    public void setTotalCapSize(String totalCapSize) {
+        this.totalCapSize = totalCapSize;
     }
 
     public boolean isImmediateFlush() {
@@ -117,6 +127,8 @@ class FileAppenderConfig {
 
         private String logMaxSize;
 
+        private String totalCapSize;
+
         private boolean immediateFlush;
 
         private boolean logAsync;
@@ -152,6 +164,11 @@ class FileAppenderConfig {
 
         public Builder logMaxHistory(int logMaxHistory) {
             this.logMaxHistory = logMaxHistory;
+            return this;
+        }
+
+        public Builder totalCapSize(String totalCapSize) {
+            this.totalCapSize = totalCapSize;
             return this;
         }
 
@@ -193,6 +210,7 @@ class FileAppenderConfig {
             config.pattern = this.pattern;
             config.logMaxHistory = this.logMaxHistory;
             config.logMaxSize = this.logMaxSize;
+            config.totalCapSize = this.totalCapSize;
             config.immediateFlush = this.immediateFlush;
             config.logAsync = this.logAsync;
             config.asyncAppenderName = this.asyncAppenderName;

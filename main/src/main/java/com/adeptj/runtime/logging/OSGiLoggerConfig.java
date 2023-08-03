@@ -27,7 +27,7 @@ import java.util.Set;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-class LoggerConfig {
+class OSGiLoggerConfig {
 
     private final String configPid;
 
@@ -35,13 +35,10 @@ class LoggerConfig {
 
     private final String level;
 
-    private final boolean additivity;
-
-    LoggerConfig(String configPid, Set<String> categories, String level, boolean additivity) {
+    OSGiLoggerConfig(String configPid, Set<String> categories, String level) {
         this.configPid = configPid;
         this.categories = categories;
         this.level = level;
-        this.additivity = additivity;
     }
 
     public String getConfigPid() {
@@ -54,9 +51,5 @@ class LoggerConfig {
 
     public String getLevel() {
         return this.level;
-    }
-
-    public boolean isAdditivity() {
-        return this.additivity;
     }
 }
