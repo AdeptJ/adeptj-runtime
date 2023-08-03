@@ -171,15 +171,11 @@ public final class LogbackManager {
     public void resetLoggers(ServiceReference<?> reference) {
         Logger logger = this.loggerContext.getLogger(this.getClass());
         String pid = OSGiUtil.getString(reference, SERVICE_PID);
-        if (this.configByPid == null) {
-            logger.warn("Logger configuration does not exist for this pid: ({})", pid);
-            return;
-        }
-        OSGiLoggerConfig config = this.configByPid.remove(pid);
+        OSGiLoggerConfig config = (this.configByPid == null) ? null : this.configByPid.remove(pid);
         // If LoggerConfig is null for the given pid then there is no need to reset LoggerContext.
         // It also means that the logger config was never captured for this pid, log and return right away.
         if (config == null) {
-            logger.info(NO_LOGGER_CFG_FOR_PID_MSG, pid);
+            logger.warn(NO_LOGGER_CFG_FOR_PID_MSG, pid);
             return;
         }
         long startTime = System.nanoTime();
@@ -263,6 +259,7 @@ public final class LogbackManager {
 
     private void addLogger(String name, Level level) {
         Logger logger = this.loggerContext.getLogger(name.trim());
+        // Must be set to false otherwise there will be two log statement for each logged info.
         logger.setAdditive(false);
         this.setLevelAndAddAppenders(logger, level);
     }
