@@ -62,11 +62,11 @@ public class EventDispatcherTracker extends BridgeServiceTracker<EventListener> 
      */
     @Override
     protected EventListener addingService(EventListener eventListener) {
-        if (eventListener instanceof HttpSessionListener) {
-            this.sessionListener = (HttpSessionListener) eventListener;
+        if (eventListener instanceof HttpSessionListener listener) {
+            this.sessionListener = listener;
         }
-        if (eventListener instanceof HttpSessionIdListener) {
-            this.sessionIdListener = (HttpSessionIdListener) eventListener;
+        if (eventListener instanceof HttpSessionIdListener listener) {
+            this.sessionIdListener = listener;
         }
         return eventListener;
     }

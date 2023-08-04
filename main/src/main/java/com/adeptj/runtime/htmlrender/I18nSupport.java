@@ -66,8 +66,7 @@ public class I18nSupport extends AbstractExtension implements Function {
             phraseObject = bundle.getObject(errorCode + "." + key);
         }
         if (params != null) {
-            if (params instanceof List) {
-                List<?> list = (List<?>) params;
+            if (params instanceof List<?> list) {
                 phraseObject = MessageFormat.format(phraseObject.toString(), list.toArray());
             } else {
                 phraseObject = MessageFormat.format(phraseObject.toString(), params);

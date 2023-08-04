@@ -22,9 +22,7 @@ public class ContextPathFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-            HttpServletRequest req = (HttpServletRequest) request;
-            HttpServletResponse resp = (HttpServletResponse) response;
+        if (request instanceof HttpServletRequest req && response instanceof HttpServletResponse resp) {
             if (req.getRequestURI().equals("/") || req.getRequestURI().startsWith("/;jsessionid")) {
                 if (HTTP_1_1.equals(request.getProtocol())) {
                     resp.setStatus(SC_SEE_OTHER);
