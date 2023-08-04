@@ -25,14 +25,15 @@ import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.kernel.util.ResponseUtil;
 import com.adeptj.runtime.kernel.util.Times;
 import com.adeptj.runtime.osgi.ServiceTrackers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * BridgeServlet acts as a bridge between ServletContainer and embedded OSGi HttpService.
@@ -48,7 +49,8 @@ import java.io.IOException;
  */
 public class BridgeServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 702778293237417284L;
+    @Serial
+    private static final long serialVersionUID = -3839776749856344540L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BridgeServlet.class);
 

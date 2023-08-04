@@ -30,6 +30,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
@@ -47,7 +49,8 @@ import static java.lang.Boolean.TRUE;
 @WebServlet(name = "AdeptJ AdminServlet", urlPatterns = ADMIN_SERVLET_URI, asyncSupported = true)
 public class AdminServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -3339904764769823449L;
+    @Serial
+    private static final long serialVersionUID = -8401648641965144307L;
 
     private static final String LOGIN_TEMPLATE = "login";
 

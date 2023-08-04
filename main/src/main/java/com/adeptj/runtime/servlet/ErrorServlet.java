@@ -29,6 +29,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.Serial;
+
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.VAR_ERROR_CODE;
 import static jakarta.servlet.DispatcherType.ERROR;
@@ -43,7 +45,8 @@ import static jakarta.servlet.DispatcherType.ERROR;
 @WebServlet(name = "AdeptJ ErrorServlet", urlPatterns = ERROR_SERVLET_URI)
 public class ErrorServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -3339904764769823449L;
+    @Serial
+    private static final long serialVersionUID = 3178276466531152040L;
 
     private static final String KEY_EXCEPTION = "exception";
 
