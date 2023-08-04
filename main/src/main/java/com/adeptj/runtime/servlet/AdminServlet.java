@@ -74,7 +74,7 @@ public class AdminServlet extends HttpServlet {
     }
 
     /**
-     * Handle "/admin/auth/j_security_check" validation failure, render the login page again with validation message.
+     * Handle "/admin/login/j_security_check" validation failure, render the login page again with validation message.
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
