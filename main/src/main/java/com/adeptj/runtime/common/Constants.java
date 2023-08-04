@@ -39,8 +39,6 @@ public final class Constants {
 
     public static final String VAR_ERROR_CODE = "errorCode";
 
-    public static final String ADMIN_LOGIN_URI = "/admin/login";
-
     public static final String ADMIN_LOGOUT_URI = "/admin/logout";
 
     public static final String ADMIN_SERVLET_NAME = "AdeptJ AdminServlet";

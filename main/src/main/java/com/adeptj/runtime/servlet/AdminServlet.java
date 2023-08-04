@@ -32,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.Serial;
 
-import static com.adeptj.runtime.common.Constants.ADMIN_LOGIN_URI;
+import static com.adeptj.runtime.kernel.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_LOGOUT_URI;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.OSGI_ADMIN_ROLE;
