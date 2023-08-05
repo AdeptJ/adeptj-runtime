@@ -42,6 +42,7 @@ import java.util.EventListener;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT;
@@ -88,7 +89,11 @@ public class Servlets {
         // This will ensure that the Felix DispatcherServlet is available as an OSGi service and can be tracked.
         // BridgeServlet delegates all the service calls to the Felix DispatcherServlet.
         ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET, new BridgeServlet());
-        bridgeServlet.addMapping(ROOT_MAPPING);
+        Set<String> existingMappings = bridgeServlet.addMapping(ROOT_MAPPING);
+        if (!existingMappings.isEmpty()) {
+            LOGGER.error("Servlet mapping [/] is already taken, this may be a misconfiguration because BridgeServlet" +
+                    " must be mounted at [/]!");
+        }
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
         // Otherwise, the request processing fails throwing exception.
         // [java.lang.IllegalStateException: UT010026: Async is not supported for this request, as not all filters or Servlets
