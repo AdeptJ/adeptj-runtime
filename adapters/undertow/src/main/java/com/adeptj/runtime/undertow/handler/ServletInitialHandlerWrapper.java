@@ -36,7 +36,7 @@ import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
  * Handler returned by this HandlerWrapper is invoked before any Servlet handlers are invoked.
  * <p>
  * Here it registers Undertow's ClassPath based ResourceHandler for serving static content.
- * If the Predicate grouping is true then it invokes the non blocking ResourceHandler
+ * If the Predicate grouping is true then it invokes the non-blocking ResourceHandler
  * completely bypassing security handler chain, which is desirable as we don't need security
  * and blocking I/O to kick in while serving static content.
  * <p>

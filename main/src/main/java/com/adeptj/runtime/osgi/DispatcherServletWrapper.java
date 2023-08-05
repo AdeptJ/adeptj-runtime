@@ -30,6 +30,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServlet;
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * {@link HttpServlet} wrapper for Felix {@link org.apache.felix.http.base.internal.dispatch.DispatcherServlet}.
@@ -38,7 +39,8 @@ import java.io.IOException;
  */
 public class DispatcherServletWrapper extends HttpServlet {
 
-    private static final long serialVersionUID = 282686082848634854L;
+    @Serial
+    private static final long serialVersionUID = 3090993776785941111L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletWrapper.class);
 

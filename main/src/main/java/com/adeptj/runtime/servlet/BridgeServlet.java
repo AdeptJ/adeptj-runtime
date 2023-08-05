@@ -43,9 +43,9 @@ import java.io.Serial;
  * a registry of managed HttpServlet/Filter(s) etc.
  * <p>
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
- * <b>BridgeServlet is mounted at "/" i.e root.<b>
+ * <b>BridgeServlet is mounted at "/" i.e. root.<b>
  *
- * @author Rakesh.Kumar, AdeptJ
+ * @author Rakesh Kumar, AdeptJ
  */
 public class BridgeServlet extends HttpServlet {
 
