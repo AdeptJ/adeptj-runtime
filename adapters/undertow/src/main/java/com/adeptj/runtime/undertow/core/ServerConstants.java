@@ -94,8 +94,6 @@ public final class ServerConstants {
 
     public static final String SYS_PROP_SHUTDOWN_WAIT_TIME = "shutdown.wait.time";
 
-    public static final String LOGBACK_STATUS_SERVLET_NAME = "Logback ViewStatusMessagesServlet";
-
     public static final String KEY_HEALTH_CHECK_HANDLER_PATH = "common.health-check-path";
 
     public static final String KEY_CONTEXT_PATH = "common.context-path";

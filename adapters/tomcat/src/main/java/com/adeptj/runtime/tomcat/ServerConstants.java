@@ -1,6 +1,6 @@
 package com.adeptj.runtime.tomcat;
 
-public class Constants {
+public class ServerConstants {
 
     public static final String SYMBOL_DASH = "-";
 

@@ -53,7 +53,7 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
              * Now open the EventDispatcherTracker with fresh BundleContext which is already hold by
              * BundleContextHolder after being set in FrameworkLifecycleListener.
              *
-             * Rationale: If we use the BundleContext contained in the passed event which is a stale
+             * Rationale: If we use the BundleContext contained in the event passed which is a stale
              * BundleContext in case of a framework restart event and results in an IllegalStateException.
              */
             ServiceTrackers.getInstance()

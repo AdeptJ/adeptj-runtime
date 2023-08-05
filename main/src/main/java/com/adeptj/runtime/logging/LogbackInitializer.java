@@ -21,7 +21,9 @@
 package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.spi.Configurator;
+import ch.qos.logback.classic.spi.ConfiguratorRank;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.spi.Configurator;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
@@ -29,29 +31,30 @@ import com.adeptj.runtime.kernel.ConfigProvider;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import static ch.qos.logback.classic.spi.Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
+import static ch.qos.logback.core.spi.Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 
 /**
  * This Class initializes the Logback logging framework.
  * <p>
- * Usually Logback is initialized via logback.xml file on CLASSPATH.
- * But using that approach Logback takes longer to initialize(5+ seconds) which is reduced drastically
- * to ~ 200 milliseconds using programmatic approach.
+ * Usually Logback is initialized via logback.xml file on classpath but programmatic approach is faster and takes
+ * about ~ 140 milliseconds to fully bootstrap Logback.
  * <p>
- * This is huge improvement on total startup time.
+ * Note: 05-Aug-2023 - {@link ConfiguratorRank} was introduced in Logback v1.4.9
  *
  * @author Rakesh.Kumar, AdeptJ
  */
+@ConfiguratorRank(value = ConfiguratorRank.CUSTOM_TOP_PRIORITY)
 public final class LogbackInitializer extends ContextAwareBase implements Configurator {
 
     /**
      * See class description for details.
      *
-     * @param loggerContext the {@link LoggerContext}
+     * @param context the {@link LoggerContext}
      */
     @Override
-    public ExecutionStatus configure(LoggerContext loggerContext) {
+    public ExecutionStatus configure(Context context) {
+        LoggerContext loggerContext = (LoggerContext) context;
         Config loggingCfg = ConfigProvider.getInstance().getMainConfig().getConfig(LOGGING_CONF_SECTION);
         LogbackManager logbackManager = new LogbackManager(loggerContext);
         LogbackManagerHolder.getInstance().setLogbackManager(logbackManager);

@@ -21,15 +21,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.List;
 
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_BASE_DIR;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_CTX_PATH;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_DOC_BASE;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_INTERNAL_PATH;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_JAR_RES_WEBAPP_MT;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_LIB_PATH;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_MAIN_COMMON;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_WEBAPP_JAR_NAME;
-import static com.adeptj.runtime.tomcat.Constants.SYMBOL_DASH;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_BASE_DIR;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CTX_PATH;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_DOC_BASE;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_JAR_RES_INTERNAL_PATH;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_JAR_RES_WEBAPP_MT;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_LIB_PATH;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_MAIN_COMMON;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_WEBAPP_JAR_NAME;
+import static com.adeptj.runtime.tomcat.ServerConstants.SYMBOL_DASH;
 
 public class TomcatServer extends AbstractServer {
 

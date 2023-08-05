@@ -53,6 +53,7 @@ import java.util.stream.Collectors;
 import static com.adeptj.runtime.kernel.Constants.ADMIN_LOGIN_URI;
 import static com.adeptj.runtime.kernel.Constants.DEPLOYMENT_NAME;
 import static com.adeptj.runtime.kernel.Constants.KEY_ALLOWED_METHODS;
+import static com.adeptj.runtime.kernel.Constants.KEY_ENABLE_REQ_BUFFERING;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_CODES;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.kernel.Constants.KEY_HOST;
@@ -243,7 +244,11 @@ public class UndertowServer extends AbstractServer {
     private GracefulShutdownHandler createHandlerChain(HttpHandler httpContinueReadHandler, Config mainConfig, Config undertowConfig) {
         RedirectHandler contextHandler = Handlers.redirect(mainConfig.getString(KEY_SYSTEM_CONSOLE_PATH));
         HttpHandler requestBufferingHandler = null;
-        if (Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF)) {
+        boolean reqBufferingEnabled = Boolean.getBoolean(SYS_PROP_ENABLE_REQ_BUFF);
+        if (!reqBufferingEnabled) {
+            reqBufferingEnabled = undertowConfig.getBoolean(KEY_ENABLE_REQ_BUFFERING);
+        }
+        if (reqBufferingEnabled) {
             requestBufferingHandler = new RequestBufferingHandler(httpContinueReadHandler,
                     Integer.getInteger(SYS_PROP_REQ_BUFF_MAX_BUFFERS, undertowConfig.getInt(KEY_REQ_BUFF_MAX_BUFFERS)));
         }

@@ -5,9 +5,9 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_CONNECTOR_PROTOCOL;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_CONNECTOR_SERVER;
-import static com.adeptj.runtime.tomcat.Constants.CFG_KEY_RELAXED_PATH_CHARS;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_PROTOCOL;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_SERVER;
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_RELAXED_PATH_CHARS;
 
 public class ConnectorConfigurer {
 

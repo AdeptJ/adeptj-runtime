@@ -35,6 +35,8 @@ public final class Constants {
 
     public static final String KEY_REQ_LIMIT_QUEUE_SIZE = "common.req-limit-queue-size";
 
+    public static final String KEY_ENABLE_REQ_BUFFERING = "common.enable-req-buffering";
+
     public static final String KEY_REQ_BUFF_MAX_BUFFERS = "common.req-buffering-maxBuffers";
 
     public static final String KEY_ALLOWED_METHODS = "common.server-allowed-methods";
