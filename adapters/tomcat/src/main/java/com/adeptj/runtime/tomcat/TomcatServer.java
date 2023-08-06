@@ -56,8 +56,8 @@ public class TomcatServer extends AbstractServer {
         this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
         this.context = this.tomcat.addContext(serverConfig.getString(CFG_KEY_CTX_PATH), docBase);
         int port = this.resolvePort(appConfig);
-        new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
         Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
+        new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
         new SecurityConfigurer().configure(this.context, this.getUserManager(), commonConfig);
         new GeneralConfigurer().configure(this.context, commonConfig, serverConfig);
         SciInfo sciInfo = deployment.getSciInfo();
@@ -65,8 +65,6 @@ public class TomcatServer extends AbstractServer {
         this.registerServlets(deployment.getServletInfos());
         Tomcat.addDefaultMimeTypeMappings(this.context);
         this.tomcat.start();
-        // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
-        // This has to be done after Tomcat is started otherwise this.context.getResources() will resolve to null.
         this.addJarResourceSet(webappBasePath, serverConfig);
     }
 
@@ -115,6 +113,13 @@ public class TomcatServer extends AbstractServer {
         return jars[0].getAbsolutePath();
     }
 
+    /**
+     * Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
+     * This has to be done after Tomcat is started otherwise this.context.getResources() will resolve to null.
+     *
+     * @param webappBasePath the base path of the jar containing the webapp directory.
+     * @param serverConfig   the server config
+     */
     private void addJarResourceSet(String webappBasePath, Config serverConfig) {
         String internalPath = serverConfig.getString(CFG_KEY_JAR_RES_INTERNAL_PATH);
         String webAppMount = serverConfig.getString(CFG_KEY_JAR_RES_WEBAPP_MT);
