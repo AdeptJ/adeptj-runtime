@@ -1,7 +1,6 @@
 package com.adeptj.runtime.tomcat;
 
 import com.adeptj.runtime.kernel.AbstractServer;
-import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.FilterInfo;
 import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
@@ -13,12 +12,10 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.VersionLoggerListener;
 import org.apache.catalina.webresources.JarResourceSet;
-import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.List;
 
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_BASE_DIR;
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CTX_PATH;
@@ -90,17 +87,6 @@ public class TomcatServer extends AbstractServer {
     @Override
     protected void doRegisterFilter(FilterInfo info) {
         // NOP
-    }
-
-    @Override
-    public void registerErrorPages(List<Integer> errorCodes) {
-        Config serverConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime());
-        for (Integer errorCode : errorCodes) {
-            ErrorPage errorPage = new ErrorPage();
-            errorPage.setErrorCode(errorCode);
-            errorPage.setLocation(serverConfig.getString("error-handler-path"));
-            this.context.addErrorPage(errorPage);
-        }
     }
 
     @Override
