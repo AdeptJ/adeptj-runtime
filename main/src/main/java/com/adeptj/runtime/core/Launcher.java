@@ -47,6 +47,7 @@ import static com.adeptj.runtime.common.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.common.Constants.MV_CREDENTIALS_STORE;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_NAME;
 import static org.apache.commons.lang3.SystemUtils.JAVA_RUNTIME_VERSION;
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 
 /**
  * Entry point for launching the AdeptJ Runtime.
@@ -88,11 +89,11 @@ public final class Launcher {
         Launcher launcher = new Launcher();
         launcher.printBanner(logger);
         try {
-            logger.info("JRE: [{}], Version: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION);
+            logger.info("JRE: [{}], Version: [{}], Vendor: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION, JAVA_VM_VENDOR);
             AbstractServer server = (AbstractServer) ServiceLoader.load(Server.class).iterator().next();
             server.setServerPostStopTask(new LoggerCleanupTask());
             ServerRuntime runtime = server.getRuntime();
-            logger.info("Initializing AdeptJ Runtime based on {}.", runtime);
+            logger.info("Initializing AdeptJ Runtime based on {}.", server.getUnderlyingServerInfo());
             Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig(appConfig));
             ServerBootstrapper bootstrapper = launcher.resolveServerBootstrapper(runtime);
@@ -139,8 +140,7 @@ public final class Launcher {
         try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
             MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
             // put the default password only when it is not set from web console.
-            mainConfig.getObject(KEY_USER_CREDENTIAL_MAPPING)
-                    .entrySet()
+            mainConfig.getObject(KEY_USER_CREDENTIAL_MAPPING).entrySet()
                     .stream()
                     .filter(entry -> StringUtils.isEmpty(credentials.get(entry.getKey())))
                     .forEach(entry -> credentials.put(entry.getKey(), ((String) entry.getValue().unwrapped())

@@ -2,6 +2,7 @@ package com.adeptj.runtime.tomcat;
 
 import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
+import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.FormAuthenticator;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class SecurityConfigurer {
 
-    public void configure(StandardContext context, UserManager userManager, Config commonConfig) {
+    public void configure(Context context, UserManager userManager, Config commonConfig) {
         // SecurityConstraint
         context.addConstraint(this.getSecurityConstraint(commonConfig));
         // LoginConfig
@@ -21,7 +22,7 @@ public class SecurityConfigurer {
         FormAuthenticator valve = new FormAuthenticator();
         valve.setLandingPage("/");
         valve.setCharacterEncoding(commonConfig.getString("default-encoding"));
-        context.addValve(valve);
+        ((StandardContext)context).addValve(valve);
         // Realm and CredentialHandler
         MVStoreRealm realm = new MVStoreRealm(userManager);
         realm.setCredentialHandler(new MVStoreCredentialHandler(userManager));

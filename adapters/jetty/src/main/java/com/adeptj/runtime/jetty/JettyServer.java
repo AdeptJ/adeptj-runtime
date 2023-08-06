@@ -46,6 +46,11 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
+    public String getUnderlyingServerInfo() {
+        return "Eclipse " + this.getRuntime() + "/" + Server.getVersion();
+    }
+
+    @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         this.jetty = this.initJetty(appConfig);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);

@@ -2,8 +2,8 @@ package com.adeptj.runtime.tomcat;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigValue;
+import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class GeneralConfigurer {
 
-    public void configure(StandardContext context, Config commonConfig, Config serverConfig) {
+    public void configure(Context context, Config commonConfig, Config serverConfig) {
         // Filters
         this.configureFilters(context, serverConfig);
         // Servlets
@@ -21,7 +21,7 @@ public class GeneralConfigurer {
         this.configureErrorPages(context, commonConfig);
     }
 
-    private void configureFilters(StandardContext context, Config serverConfig) {
+    private void configureFilters(Context context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("filters")) {
             FilterDef def = new FilterDef();
             def.setAsyncSupported(config.getString("async"));
@@ -38,7 +38,7 @@ public class GeneralConfigurer {
         }
     }
 
-    private void configureServlets(StandardContext context, Config serverConfig) {
+    private void configureServlets(Context context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("servlets")) {
             Wrapper servlet = context.createWrapper();
             servlet.setName(config.getString("name"));
@@ -57,7 +57,7 @@ public class GeneralConfigurer {
         }
     }
 
-    private void configureErrorPages(StandardContext context, Config commonConfig) {
+    private void configureErrorPages(Context context, Config commonConfig) {
         String errorHandlerPath = commonConfig.getString("error-handler-path");
         for (Integer errorCode : commonConfig.getIntList("error-handler-codes")) {
             ErrorPage errorPage = new ErrorPage();

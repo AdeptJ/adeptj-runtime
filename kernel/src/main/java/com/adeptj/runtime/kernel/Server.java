@@ -8,6 +8,8 @@ public interface Server {
 
     ServerRuntime getRuntime();
 
+    String getUnderlyingServerInfo();
+
     /**
      * Starts the given {@link Server} instance.
      *

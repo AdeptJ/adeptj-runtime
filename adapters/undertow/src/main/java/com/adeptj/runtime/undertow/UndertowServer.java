@@ -19,6 +19,7 @@ import com.adeptj.runtime.undertow.predicate.ContextPathPredicate;
 import com.typesafe.config.Config;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.Version;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.AllowedMethodsHandler;
 import io.undertow.server.handlers.GracefulShutdownHandler;
@@ -112,6 +113,11 @@ public class UndertowServer extends AbstractServer {
     @Override
     public ServerRuntime getRuntime() {
         return ServerRuntime.UNDERTOW;
+    }
+
+    @Override
+    public String getUnderlyingServerInfo() {
+        return "JBoss " + this.getRuntime() + "/" + Version.getVersionString();
     }
 
     @Override
