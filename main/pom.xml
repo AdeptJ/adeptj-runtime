@@ -243,11 +243,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-        </dependency>
-
         <!-- Misc Dependencies End -->
 
         <!-- OSGi/Apache Felix Dependencies Start -->
