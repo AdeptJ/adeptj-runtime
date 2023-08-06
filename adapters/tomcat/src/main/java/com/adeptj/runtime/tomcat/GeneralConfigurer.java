@@ -9,6 +9,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class GeneralConfigurer {
 
@@ -19,6 +20,8 @@ public class GeneralConfigurer {
         this.configureServlets(context, serverConfig);
         // Error Pages
         this.configureErrorPages(context, commonConfig);
+        int sessionMaxAge = (int) TimeUnit.SECONDS.toMinutes(commonConfig.getInt("session-timeout"));
+        context.setSessionTimeout(sessionMaxAge);
     }
 
     private void configureFilters(Context context, Config serverConfig) {
