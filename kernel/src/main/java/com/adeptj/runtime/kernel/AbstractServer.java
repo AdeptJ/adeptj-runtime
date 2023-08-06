@@ -43,16 +43,12 @@ public abstract class AbstractServer implements Server {
 
     @Override
     public void registerServlets(List<ServletInfo> servletInfos) {
-        for (ServletInfo info : servletInfos) {
-            this.doRegisterServlet(info);
-        }
+        servletInfos.forEach(this::doRegisterServlet);
     }
 
     @Override
     public void registerFilters(List<FilterInfo> filterInfos) {
-        for (FilterInfo info : filterInfos) {
-            this.doRegisterFilter(info);
-        }
+        filterInfos.forEach(this::doRegisterFilter);
     }
 
     @Override

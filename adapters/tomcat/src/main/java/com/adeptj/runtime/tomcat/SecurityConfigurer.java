@@ -14,6 +14,31 @@ public class SecurityConfigurer {
 
     public void configure(StandardContext context, UserManager userManager, Config commonConfig) {
         // SecurityConstraint
+        context.addConstraint(this.getSecurityConstraint(commonConfig));
+        // LoginConfig
+        context.setLoginConfig(this.getLoginConfig(commonConfig));
+        // Form Auth
+        FormAuthenticator valve = new FormAuthenticator();
+        valve.setLandingPage("/");
+        valve.setCharacterEncoding(commonConfig.getString("default-encoding"));
+        context.addValve(valve);
+        // Realm and CredentialHandler
+        MVStoreRealm realm = new MVStoreRealm(userManager);
+        realm.setCredentialHandler(new MVStoreCredentialHandler(userManager));
+        context.setRealm(realm);
+    }
+
+    private LoginConfig getLoginConfig(Config commonConfig) {
+        Config formAuthCfg = commonConfig.getConfig("form-auth");
+        LoginConfig loginConfig = new LoginConfig();
+        loginConfig.setAuthMethod(formAuthCfg.getString("method"));
+        loginConfig.setLoginPage(formAuthCfg.getString("login-url"));
+        loginConfig.setErrorPage(formAuthCfg.getString("error-url"));
+        loginConfig.setRealmName(formAuthCfg.getString("realm"));
+        return loginConfig;
+    }
+
+    private SecurityConstraint getSecurityConstraint(Config commonConfig) {
         SecurityConstraint constraint = new SecurityConstraint();
         List<String> authRoles = commonConfig.getStringList("auth-roles");
         for (String authRole : authRoles) {
@@ -25,23 +50,6 @@ public class SecurityConfigurer {
             collection.addPattern(protectedPath);
         }
         constraint.addCollection(collection);
-        context.addConstraint(constraint);
-        // LoginConfig
-        Config formAuthCfg = commonConfig.getConfig("form-auth");
-        LoginConfig loginConfig = new LoginConfig();
-        loginConfig.setAuthMethod(formAuthCfg.getString("method"));
-        loginConfig.setLoginPage(formAuthCfg.getString("login-url"));
-        loginConfig.setErrorPage(formAuthCfg.getString("error-url"));
-        loginConfig.setRealmName(formAuthCfg.getString("realm"));
-        context.setLoginConfig(loginConfig);
-        // Form Auth
-        FormAuthenticator valve = new FormAuthenticator();
-        valve.setLandingPage("/");
-        valve.setCharacterEncoding(commonConfig.getString("default-encoding"));
-        context.addValve(valve);
-        // Realm and CredentialHandler
-        MVStoreRealm realm = new MVStoreRealm(userManager);
-        realm.setCredentialHandler(new MVStoreCredentialHandler(userManager));
-        context.setRealm(realm);
+        return constraint;
     }
 }
