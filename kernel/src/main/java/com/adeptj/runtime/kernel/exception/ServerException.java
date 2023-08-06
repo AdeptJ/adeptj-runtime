@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.kernel.exception;
 
+import java.io.Serial;
+
 /**
  * ServerException: Exception thrown by AdeptJ Runtime.
  *
@@ -27,7 +29,8 @@ package com.adeptj.runtime.kernel.exception;
  */
 public class ServerException extends RuntimeException {
 
-    private static final long serialVersionUID = 2206058386357128479L;
+    @Serial
+    private static final long serialVersionUID = -1812814226481606887L;
 
     public ServerException(Throwable cause) {
         super(cause);

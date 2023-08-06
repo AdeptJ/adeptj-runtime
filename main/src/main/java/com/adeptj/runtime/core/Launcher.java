@@ -72,9 +72,9 @@ public final class Launcher {
      * It does the following tasks in order.
      * <p>
      * 1. Initializes the Logback logging framework.
-     * 2. Does the deployment to embedded UNDERTOW.
+     * 2. Does the deployment to embedded Jetty or Tomcat or Undertow basis the server adapter chosen.
      * 3. Starts the OSGi Framework.
-     * 4. Starts the Undertow server.
+     * 4. Starts the Jetty or Tomcat or Undertow basis the server adapter server.
      * 5. Registers the runtime ShutdownHook.
      *
      * @param args command line arguments for the Launcher.
@@ -93,9 +93,10 @@ public final class Launcher {
             server.setServerPostStopTask(new LoggerCleanupTask());
             ServerRuntime runtime = server.getRuntime();
             logger.info("Initializing AdeptJ Runtime based on {}.", runtime);
-            launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig());
-            ServerBootstrapper bootstrapper = ServerBootstrapperResolver.resolve(runtime);
-            bootstrapper.bootstrap(server, args);
+            Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
+            launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig(appConfig));
+            ServerBootstrapper bootstrapper = launcher.resolveServerBootstrapper(runtime);
+            bootstrapper.bootstrap(server, appConfig, args);
             // OSGi Framework is initialized by this time and BundleContext is available as well.
             server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
             Runtime.getRuntime().addShutdownHook(new ServerShutdownHook(server, "AdeptJ Terminator"));
@@ -105,6 +106,14 @@ public final class Launcher {
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
         }
+    }
+
+    private ServerBootstrapper resolveServerBootstrapper(ServerRuntime runtime) {
+        return switch (runtime) {
+            case JETTY -> new JettyBootstrapper();
+            case TOMCAT -> new TomcatBootstrapper();
+            case UNDERTOW -> new UndertowBootstrapper();
+        };
     }
 
     private void cleanup(Logger logger) {

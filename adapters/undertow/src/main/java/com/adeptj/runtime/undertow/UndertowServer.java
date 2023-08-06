@@ -7,7 +7,6 @@ import com.adeptj.runtime.kernel.FilterInfo;
 import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
-import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.adeptj.runtime.kernel.util.SslContextFactory;
 import com.adeptj.runtime.kernel.util.Times;
 import com.adeptj.runtime.undertow.core.ServerOptions;
@@ -116,30 +115,24 @@ public class UndertowServer extends AbstractServer {
     }
 
     @Override
-    public void start(String[] args, ServletDeployment deployment) {
-        ConfigProvider configProvider = ConfigProvider.getInstance();
-        Config appConfig = configProvider.getApplicationConfig();
-        Config mainConfig = configProvider.getMainConfig(appConfig);
-        Config undertowConfig = configProvider.getServerConfig(this.getRuntime(), appConfig);
+    public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
+        Config mainConfig = ConfigProvider.getInstance().getMainConfig(appConfig);
+        Config undertowConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime(), appConfig);
         int port = this.resolvePort(appConfig);
-        try {
-            DeploymentInfo deploymentInfo = this.deploymentInfo(mainConfig, undertowConfig, deployment);
-            this.deploymentManager = Servlets.defaultContainer().addDeployment(deploymentInfo);
-            this.deploymentManager.deploy();
-            HttpHandler httpContinueReadHandler = this.deploymentManager.start();
-            this.rootHandler = this.createHandlerChain(httpContinueReadHandler, mainConfig, undertowConfig);
-            Undertow.Builder undertowBuilder = Undertow.builder();
-            this.setWorkerOptions(undertowBuilder, undertowConfig);
-            new SocketOptions().setOptions(undertowBuilder, undertowConfig);
-            new ServerOptions().setOptions(undertowBuilder, undertowConfig);
-            this.undertow = this.addHttpsListener(undertowBuilder, undertowConfig)
-                    .addHttpListener(port, undertowConfig.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
-                    .setHandler(this.rootHandler)
-                    .build();
-            this.undertow.start();
-        } catch (Exception ex) { // NOSONAR
-            throw new RuntimeInitializationException(ex);
-        }
+        DeploymentInfo deploymentInfo = this.deploymentInfo(mainConfig, undertowConfig, deployment);
+        this.deploymentManager = Servlets.defaultContainer().addDeployment(deploymentInfo);
+        this.deploymentManager.deploy();
+        HttpHandler httpContinueReadHandler = this.deploymentManager.start();
+        this.rootHandler = this.createHandlerChain(httpContinueReadHandler, mainConfig, undertowConfig);
+        Undertow.Builder undertowBuilder = Undertow.builder();
+        this.setWorkerOptions(undertowBuilder, undertowConfig);
+        new SocketOptions().setOptions(undertowBuilder, undertowConfig);
+        new ServerOptions().setOptions(undertowBuilder, undertowConfig);
+        this.undertow = this.addHttpsListener(undertowBuilder, undertowConfig)
+                .addHttpListener(port, undertowConfig.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
+                .setHandler(this.rootHandler)
+                .build();
+        this.undertow.start();
     }
 
     @Override

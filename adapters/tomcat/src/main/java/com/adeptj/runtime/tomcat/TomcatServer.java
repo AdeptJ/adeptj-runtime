@@ -7,7 +7,6 @@ import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
-import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.typesafe.config.Config;
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
@@ -45,32 +44,26 @@ public class TomcatServer extends AbstractServer {
     }
 
     @Override
-    public void start(String[] args, ServletDeployment deployment) {
-        try {
-            Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-            Config serverConfig = appConfig.getConfig(this.getRuntime().getLowerCaseName());
-            this.tomcat = new Tomcat();
-            this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
-            this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
-            int port = this.resolvePort(appConfig);
-            new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
-            String contextPath = serverConfig.getString(CFG_KEY_CTX_PATH);
-            String docBase = serverConfig.getString(CFG_KEY_DOC_BASE);
-            this.context = (StandardContext) this.tomcat.addContext(contextPath, new File(docBase).getAbsolutePath());
-            SciInfo sciInfo = deployment.getSciInfo();
-            this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
-            this.registerServlets(deployment.getServletInfos());
-            Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
-            new SecurityConfigurer().configure(this.context, this.getUserManager(), commonConfig);
-            new GeneralConfigurer().configure(this.context, commonConfig, serverConfig);
-            Tomcat.addDefaultMimeTypeMappings(this.context);
-            this.tomcat.start();
-            // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
-            this.addJarResourceSet(this.context, serverConfig);
-        } catch (Exception e) { // NOSONAR
-            LOGGER.error(e.getMessage(), e);
-            throw new RuntimeInitializationException(e);
-        }
+    public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
+        Config serverConfig = appConfig.getConfig(this.getRuntime().getLowerCaseName());
+        this.tomcat = new Tomcat();
+        this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
+        this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
+        int port = this.resolvePort(appConfig);
+        new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
+        String contextPath = serverConfig.getString(CFG_KEY_CTX_PATH);
+        String docBase = serverConfig.getString(CFG_KEY_DOC_BASE);
+        this.context = (StandardContext) this.tomcat.addContext(contextPath, new File(docBase).getAbsolutePath());
+        SciInfo sciInfo = deployment.getSciInfo();
+        this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypes());
+        this.registerServlets(deployment.getServletInfos());
+        Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
+        new SecurityConfigurer().configure(this.context, this.getUserManager(), commonConfig);
+        new GeneralConfigurer().configure(this.context, commonConfig, serverConfig);
+        Tomcat.addDefaultMimeTypeMappings(this.context);
+        this.tomcat.start();
+        // Needed by Tomcat's DefaultServlet for serving static content from adeptj-runtime jar.
+        this.addJarResourceSet(this.context, serverConfig);
     }
 
     @Override

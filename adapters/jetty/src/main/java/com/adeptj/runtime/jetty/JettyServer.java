@@ -3,13 +3,11 @@ package com.adeptj.runtime.jetty;
 import com.adeptj.runtime.jetty.handler.ContextPathHandler;
 import com.adeptj.runtime.jetty.handler.HealthCheckHandler;
 import com.adeptj.runtime.kernel.AbstractServer;
-import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.FilterInfo;
 import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
-import com.adeptj.runtime.kernel.exception.RuntimeInitializationException;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
 import org.eclipse.jetty.server.CustomRequestLog;
@@ -48,15 +46,8 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
-    public void start(String[] args, ServletDeployment deployment) {
-        Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
-        this.jetty = new Server(this.getQueuedThreadPool(appConfig));
-        HttpConfiguration httpConfig = this.createHttpConfiguration(appConfig);
-        ServerConnector connector = new ServerConnector(this.jetty, new HttpConnectionFactory(httpConfig));
-        int port = this.resolvePort(appConfig);
-        connector.setPort(port);
-        connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
-        this.jetty.addConnector(connector);
+    public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
+        this.jetty = this.initJetty(appConfig);
         this.context = new ServletContextHandler(SESSIONS | SECURITY);
         this.context.setContextPath(appConfig.getString("jetty.context.path"));
         SciInfo sciInfo = deployment.getSciInfo();
@@ -65,16 +56,21 @@ public class JettyServer extends AbstractServer {
         this.registerServlets(deployment.getServletInfos());
         new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig);
         new ErrorHandlerConfigurer().configure(this.context, appConfig);
-        this.jetty.setHandler(this.createRootHandler(this.context, appConfig));
+        this.jetty.setHandler(this.getRootHandler(this.context, appConfig));
         if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
             this.jetty.setRequestLog(new CustomRequestLog());
         }
-        try {
-            this.jetty.start();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new RuntimeInitializationException(e);
-        }
+        this.jetty.start();
+    }
+
+    private Server initJetty(Config appConfig) {
+        Server jetty = new Server(this.getQueuedThreadPool(appConfig));
+        HttpConnectionFactory connectionFactory = new HttpConnectionFactory(this.getHttpConfiguration(appConfig));
+        ServerConnector connector = new ServerConnector(jetty, connectionFactory);
+        connector.setPort(this.resolvePort(appConfig));
+        connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
+        jetty.addConnector(connector);
+        return jetty;
     }
 
     private QueuedThreadPool getQueuedThreadPool(Config appConfig) {
@@ -84,7 +80,7 @@ public class JettyServer extends AbstractServer {
         return new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
     }
 
-    private HttpConfiguration createHttpConfiguration(Config appConfig) {
+    private HttpConfiguration getHttpConfiguration(Config appConfig) {
         HttpConfiguration httpConfig = new HttpConfiguration();
         httpConfig.setOutputBufferSize(appConfig.getInt("jetty.http.output-buffer-size"));
         httpConfig.setRequestHeaderSize(appConfig.getInt("jetty.http.request-header-size"));
@@ -94,7 +90,7 @@ public class JettyServer extends AbstractServer {
         return httpConfig;
     }
 
-    private Handler createRootHandler(ServletContextHandler rootContext, Config appConfig) {
+    private Handler getRootHandler(ServletContextHandler rootContext, Config appConfig) {
         // Sequence will be - HealthCheckHandler -> ContextPathHandler -> ServletContextHandler
         ContextPathHandler contextPathHandler = new ContextPathHandler();
         contextPathHandler.setHandler(new HealthCheckHandler());
