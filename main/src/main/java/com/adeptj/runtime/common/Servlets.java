@@ -20,37 +20,16 @@
 
 package com.adeptj.runtime.common;
 
-import com.adeptj.runtime.kernel.ConfigProvider;
-import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.osgi.BridgeHttpSessionIdListener;
 import com.adeptj.runtime.osgi.BridgeHttpSessionListener;
 import com.adeptj.runtime.osgi.BridgeServletContextAttributeListener;
 import com.adeptj.runtime.servlet.BridgeServlet;
-import org.apache.commons.lang3.ArrayUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.Servlet;
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletRegistration;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import java.util.Dictionary;
-import java.util.EventListener;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ERROR_PAGE;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME;
-import static org.osgi.service.http.whiteboard.HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN;
 
 /**
  * Utility for servlet, filters and listeners
@@ -65,17 +44,7 @@ public class Servlets {
 
     private static final String ROOT_MAPPING = "/";
 
-    private static final String ALL_CONTEXT_SELECT_FILTER = "(osgi.http.whiteboard.context.name=*)";
-
     private Servlets() {
-    }
-
-    public static void registerListener(ServletContext servletContext, EventListener listener) {
-        servletContext.addListener(listener);
-    }
-
-    public static void registerListeners(ServletContext servletContext, List<EventListener> listeners) {
-        listeners.forEach(servletContext::addListener);
     }
 
     public static void registerBridgeListeners(ServletContext servletContext) {
@@ -101,50 +70,5 @@ public class Servlets {
         bridgeServlet.setAsyncSupported(true);
         // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
         bridgeServlet.setLoadOnStartup(0);
-    }
-
-    public static ServiceRegistration<Servlet> osgiServlet(BundleContext ctx, HttpServlet servlet) {
-        WebServlet webServlet = checkWebServletAnnotation(servlet);
-        Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
-        properties.put(HTTP_WHITEBOARD_SERVLET_PATTERN,
-                ArrayUtils.isEmpty(webServlet.urlPatterns()) ? webServlet.value() : webServlet.urlPatterns());
-        properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
-        handleInitParams(webServlet, properties);
-        String servletName = resolveServletName(servlet, webServlet.name(), properties);
-        LOGGER.info("Registering OSGi Servlet: [{}]", servletName);
-        return ctx.registerService(Servlet.class, servlet, properties);
-    }
-
-    public static ServiceRegistration<Servlet> osgiErrorServlet(BundleContext ctx, HttpServlet servlet) {
-        WebServlet webServlet = checkWebServletAnnotation(servlet);
-        Dictionary<String, Object> properties = new Hashtable<>(); // NOSONAR
-        List<String> errors = ConfigProvider.getInstance()
-                .getServerConfig(ServerRuntime.UNDERTOW).getStringList("common.osgi-error-pages");
-        properties.put(HTTP_WHITEBOARD_SERVLET_ERROR_PAGE, errors);
-        // Apply this ErrorServlet to all the ServletContext instances registered with OSGi.
-        properties.put(HTTP_WHITEBOARD_CONTEXT_SELECT, ALL_CONTEXT_SELECT_FILTER);
-        properties.put(HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, webServlet.asyncSupported());
-        handleInitParams(webServlet, properties);
-        String servletName = resolveServletName(servlet, webServlet.name(), properties);
-        LOGGER.info("Registering OSGi ErrorServlet: [{}]", servletName);
-        return ctx.registerService(Servlet.class, servlet, properties);
-    }
-
-    private static WebServlet checkWebServletAnnotation(HttpServlet servlet) {
-        return Optional.ofNullable(servlet.getClass().getAnnotation(WebServlet.class))
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Can't register a servlet without @WebServlet annotation!!"));
-    }
-
-    private static void handleInitParams(WebServlet webServlet, Dictionary<String, Object> properties) {
-        Stream.of(webServlet.initParams())
-                .forEach(initParam ->
-                        properties.put(HTTP_WHITEBOARD_SERVLET_INIT_PARAM_PREFIX + initParam.name(), initParam.value()));
-    }
-
-    private static String resolveServletName(HttpServlet servlet, String name, Dictionary<String, Object> props) {
-        String servletName = name.isEmpty() ? servlet.getClass().getSimpleName() : name;
-        props.put(HTTP_WHITEBOARD_SERVLET_NAME, servletName);
-        return servletName;
     }
 }

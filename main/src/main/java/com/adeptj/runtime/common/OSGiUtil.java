@@ -26,10 +26,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -52,10 +50,6 @@ public final class OSGiUtil {
 
     private static final String EQ = "=";
 
-    private static final String ASTERISK = "*";
-
-    private static final String PARENTHESIS_OPEN = "(";
-
     private static final String PARENTHESIS_CLOSE = ")";
 
     // No instantiation. Utility methods only.
@@ -74,19 +68,6 @@ public final class OSGiUtil {
         return manifest != null && StringUtils.isEmpty(manifest.getMainAttributes().getValue(BUNDLE_SYMBOLICNAME));
     }
 
-    public static Filter filter(BundleContext context, String objectClassFQN) {
-        try {
-            return context.createFilter(PARENTHESIS_OPEN +
-                    OBJECTCLASS +
-                    EQ +
-                    objectClassFQN +
-                    PARENTHESIS_CLOSE);
-        } catch (InvalidSyntaxException ex) {
-            // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
     public static Filter filter(BundleContext context, Class<?> objectClass, String filterExpr) {
         try {
             return context.createFilter(FILTER_AND +
@@ -102,35 +83,12 @@ public final class OSGiUtil {
         }
     }
 
-    public static Filter anyServiceFilter(BundleContext context, String filterExpr) {
-        try {
-            return context.createFilter(FILTER_AND +
-                    OBJECTCLASS +
-                    EQ +
-                    ASTERISK +
-                    PARENTHESIS_CLOSE +
-                    filterExpr +
-                    PARENTHESIS_CLOSE);
-        } catch (InvalidSyntaxException ex) {
-            // Filter expression is malformed, not RFC-1960 based Filter.
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    public static void unregisterService(ServiceRegistration<?> registration) {
-        Optional.ofNullable(registration).ifPresent(ServiceRegistration::unregister);
-    }
-
     public static String getServiceDesc(ServiceReference<?> reference) {
         return getString(reference, SERVICE_DESCRIPTION);
     }
 
     public static String getString(ServiceReference<?> reference, String key) {
         return (String) reference.getProperty(key);
-    }
-
-    public static boolean getBoolean(ServiceReference<?> reference, String key) {
-        return (boolean) reference.getProperty(key);
     }
 
     public static Set<String> arrayToSet(ServiceReference<?> reference, String key) {

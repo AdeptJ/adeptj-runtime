@@ -51,17 +51,12 @@ public class LoggerConfigFactoryListener implements ServiceListener {
     @Override
     public void serviceChanged(ServiceEvent event) {
         this.lock.lock();
+        LogbackManager logbackManager = LogbackManagerHolder.getInstance().getLogbackManager();
         try {
-            LogbackManager logbackManager = LogbackManagerHolder.getInstance().getLogbackManager();
             switch (event.getType()) {
-                case REGISTERED:
-                    logbackManager.addOSGiLoggers(event.getServiceReference());
-                    break;
-                case UNREGISTERING:
-                    logbackManager.resetLoggers(event.getServiceReference());
-                    break;
-                default:
-                    LOGGER.warn("Ignored ServiceEvent: [{}]", event.getType());
+                case REGISTERED -> logbackManager.addOSGiLoggers(event.getServiceReference());
+                case UNREGISTERING -> logbackManager.resetLoggers(event.getServiceReference());
+                default -> LOGGER.warn("Ignored ServiceEvent: [{}]", event.getType());
             }
         } finally {
             this.lock.unlock();

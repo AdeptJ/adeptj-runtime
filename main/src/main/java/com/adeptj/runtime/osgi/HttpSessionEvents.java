@@ -21,12 +21,12 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.kernel.util.Times;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionIdListener;
 import jakarta.servlet.http.HttpSessionListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
@@ -48,17 +48,14 @@ public enum HttpSessionEvents {
 
     public static void handleHttpSessionEvent(HttpSessionEvents type, HttpSessionEvent event) {
         switch (type) {
-            case SESSION_CREATED:
+            case SESSION_CREATED -> {
                 logSessionCreated(event);
                 sessionListener().ifPresent(listener -> listener.sessionCreated(event));
-                break;
-            case SESSION_DESTROYED:
+            }
+            case SESSION_DESTROYED -> {
                 logSessionDestroyed(event);
                 sessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
-                break;
-            default:
-                // NO-OP
-                break;
+            }
         }
     }
 

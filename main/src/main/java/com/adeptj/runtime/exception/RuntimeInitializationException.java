@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.exception;
 
+import java.io.Serial;
+
 /**
  * RuntimeInitializationException: Exception thrown by AdeptJ Runtime initialization code.
  *
@@ -27,7 +29,8 @@ package com.adeptj.runtime.exception;
  */
 public class RuntimeInitializationException extends RuntimeException {
 
-    private static final long serialVersionUID = 6443421220206654015L;
+    @Serial
+    private static final long serialVersionUID = -1731078900410045078L;
 
     public RuntimeInitializationException(Throwable cause) {
         super(cause);
