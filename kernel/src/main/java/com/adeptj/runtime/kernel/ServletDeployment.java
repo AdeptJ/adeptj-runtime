@@ -28,8 +28,8 @@ public class ServletDeployment {
         return servletInfos;
     }
 
-    public void addServletInfos(ServletInfo... infos) {
-        Collections.addAll(this.servletInfos, infos);
+    public void addServletInfos(List<ServletInfo> infos) {
+        this.servletInfos.addAll(infos);
     }
 
     public List<FilterInfo> getFilterInfos() {

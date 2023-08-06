@@ -83,8 +83,8 @@ public class TomcatServer extends AbstractServer {
 
     @Override
     protected void doRegisterServlet(ServletInfo info) {
-        Tomcat.addServlet(this.context, info.getServletName(), info.getServletInstance());
-        this.context.addServletMappingDecoded(info.getPath(), info.getServletName());
+        Tomcat.addServlet(this.context, info.servletName(), info.servletClass().getName());
+        this.context.addServletMappingDecoded(info.path(), info.servletName());
     }
 
     @Override

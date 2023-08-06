@@ -140,7 +140,7 @@ public class JettyServer extends AbstractServer {
 
     @Override
     protected void doRegisterServlet(ServletInfo info) {
-        this.context.addServlet(new ServletHolder(info.getServletName(), info.getServletClass()), info.getPath());
+        this.context.addServlet(new ServletHolder(info.servletName(), info.servletClass()), info.path());
     }
 
     @Override

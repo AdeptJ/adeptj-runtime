@@ -287,8 +287,8 @@ public class UndertowServer extends AbstractServer {
     private List<ServletInfo> servlets(ServletDeployment deployment) {
         List<ServletInfo> servlets = new ArrayList<>();
         for (com.adeptj.runtime.kernel.ServletInfo info : deployment.getServletInfos()) {
-            servlets.add(Servlets.servlet(info.getServletName(), info.getServletClass())
-                    .addMapping(info.getPath())
+            servlets.add(Servlets.servlet(info.servletName(), info.servletClass())
+                    .addMapping(info.path())
                     .setAsyncSupported(true));
         }
         return servlets;
@@ -324,7 +324,8 @@ public class UndertowServer extends AbstractServer {
                 .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addSecurityConstraint(this.securityConstraint(mainConfig, undertowConfig))
-                .addServlets(this.servlets(deployment)).addErrorPages(this.errorPages(mainConfig))
+                .addServlets(this.servlets(deployment))
+                .addErrorPages(this.errorPages(mainConfig))
                 .setDefaultMultipartConfig(this.defaultMultipartConfig(undertowConfig))
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
                 .setServletSessionConfig(this.sessionConfig(mainConfig))

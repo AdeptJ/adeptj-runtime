@@ -14,14 +14,14 @@ public class GeneralConfigurer {
 
     public void configure(StandardContext context, Config commonConfig, Config serverConfig) {
         // Filters
-        this.configFilters(context, serverConfig);
+        this.configureFilters(context, serverConfig);
         // Servlets
-        this.configServlets(context, serverConfig);
+        this.configureServlets(context, serverConfig);
         // Error Pages
-        this.configErrorPages(context, commonConfig);
+        this.configureErrorPages(context, commonConfig);
     }
 
-    private void configFilters(StandardContext context, Config serverConfig) {
+    private void configureFilters(StandardContext context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("filters")) {
             FilterDef def = new FilterDef();
             def.setAsyncSupported(config.getString("async"));
@@ -38,7 +38,7 @@ public class GeneralConfigurer {
         }
     }
 
-    private void configServlets(StandardContext context, Config serverConfig) {
+    private void configureServlets(StandardContext context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("servlets")) {
             Wrapper servlet = context.createWrapper();
             servlet.setName(config.getString("name"));
@@ -57,7 +57,7 @@ public class GeneralConfigurer {
         }
     }
 
-    private void configErrorPages(StandardContext context, Config commonConfig) {
+    private void configureErrorPages(StandardContext context, Config commonConfig) {
         String errorHandlerPath = commonConfig.getString("error-handler-path");
         for (Integer errorCode : commonConfig.getIntList("error-handler-codes")) {
             ErrorPage errorPage = new ErrorPage();

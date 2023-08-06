@@ -6,7 +6,9 @@ import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_NAME;
@@ -25,33 +27,11 @@ public abstract class AbstractServerBootstrapper implements ServerBootstrapper {
         return handleTypes;
     }
 
-    protected ServletInfo createAdminServletInfo(boolean createServletInstance) {
-        ServletInfo adminServletInfo = new ServletInfo(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URI);
-        if (createServletInstance) {
-            adminServletInfo.setServletInstance(new AdminServlet());
-        } else {
-            adminServletInfo.setServletClass(AdminServlet.class);
-        }
-        return adminServletInfo;
-    }
-
-    protected ServletInfo createErrorServletInfo(boolean createServletInstance) {
-        ServletInfo errorServletInfo = new ServletInfo(ERROR_SERVLET_NAME, ERROR_SERVLET_URI);
-        if (createServletInstance) {
-            errorServletInfo.setServletInstance(new ErrorServlet());
-        } else {
-            errorServletInfo.setServletClass(ErrorServlet.class);
-        }
-        return errorServletInfo;
-    }
-
-    protected ServletInfo createLogbackViewStatusMessagesServlet(boolean createServletInstance) {
-        ServletInfo logbackStatusServletInfo = new ServletInfo(LOGBACK_VIEW_SERVLET_NAME, LOGBACK_VIEW_SERVLET_URI);
-        if (createServletInstance) {
-            logbackStatusServletInfo.setServletInstance(new ViewStatusMessagesServlet());
-        } else {
-            logbackStatusServletInfo.setServletClass(ViewStatusMessagesServlet.class);
-        }
-        return logbackStatusServletInfo;
+    protected List<ServletInfo> getServlets() {
+        List<ServletInfo> servletInfos = new ArrayList<>();
+        servletInfos.add(new ServletInfo(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URI, AdminServlet.class));
+        servletInfos.add(new ServletInfo(ERROR_SERVLET_NAME, ERROR_SERVLET_URI, ErrorServlet.class));
+        servletInfos.add(new ServletInfo(LOGBACK_VIEW_SERVLET_NAME, LOGBACK_VIEW_SERVLET_URI, ViewStatusMessagesServlet.class));
+        return servletInfos;
     }
 }
