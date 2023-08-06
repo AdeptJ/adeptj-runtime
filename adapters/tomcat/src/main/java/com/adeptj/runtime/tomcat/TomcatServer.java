@@ -48,13 +48,13 @@ public class TomcatServer extends AbstractServer {
     @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         Config serverConfig = appConfig.getConfig(this.getRuntime().getLowerCaseName());
+        String docBase = new File(serverConfig.getString(CFG_KEY_DOC_BASE)).getAbsolutePath();
+        // Resolve webappBasePath eagerly to prevent issues later.
+        String webappBasePath = this.getWebappBasePath(docBase, serverConfig);
         this.tomcat = new Tomcat();
         this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
         this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
-        this.context = this.tomcat.addContext(serverConfig.getString(CFG_KEY_CTX_PATH),
-                new File(serverConfig.getString(CFG_KEY_DOC_BASE)).getAbsolutePath());
-        // Resolve webappBasePath eagerly to prevent issues later.
-        String webappBasePath = this.getWebappBasePath(this.context.getDocBase(), serverConfig);
+        this.context = this.tomcat.addContext(serverConfig.getString(CFG_KEY_CTX_PATH), docBase);
         int port = this.resolvePort(appConfig);
         new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
         Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
