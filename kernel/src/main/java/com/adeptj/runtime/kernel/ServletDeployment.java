@@ -1,7 +1,6 @@
 package com.adeptj.runtime.kernel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ServletDeployment {
@@ -28,15 +27,17 @@ public class ServletDeployment {
         return servletInfos;
     }
 
-    public void addServletInfos(List<ServletInfo> infos) {
-        this.servletInfos.addAll(infos);
+    public ServletDeployment addServletInfo(ServletInfo info) {
+        this.servletInfos.add(info);
+        return this;
     }
 
     public List<FilterInfo> getFilterInfos() {
         return filterInfos;
     }
 
-    public void addFilterInfos(FilterInfo... infos) {
-        Collections.addAll(this.filterInfos, infos);
+    public ServletDeployment addFilterInfo(FilterInfo info) {
+        this.filterInfos.add(info);
+        return this;
     }
 }

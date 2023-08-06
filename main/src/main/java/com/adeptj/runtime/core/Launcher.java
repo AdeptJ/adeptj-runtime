@@ -96,8 +96,7 @@ public final class Launcher {
             logger.info("Initializing AdeptJ Runtime based on {}.", server.getUnderlyingServerInfo());
             Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig(appConfig));
-            ServerBootstrapper bootstrapper = launcher.resolveServerBootstrapper(runtime);
-            bootstrapper.bootstrap(server, appConfig, args);
+            ServerBootstrapper.bootstrap(server, appConfig, args);
             // OSGi Framework is initialized by this time and BundleContext is available as well.
             server.addServletContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, BundleContextHolder.getInstance().getBundleContext());
             Runtime.getRuntime().addShutdownHook(new ServerShutdownHook(server, "AdeptJ Terminator"));
@@ -107,14 +106,6 @@ public final class Launcher {
             logger.error("Exception while initializing AdeptJ Runtime!!", th);
             launcher.cleanup(logger);
         }
-    }
-
-    private ServerBootstrapper resolveServerBootstrapper(ServerRuntime runtime) {
-        return switch (runtime) {
-            case JETTY -> new JettyBootstrapper();
-            case TOMCAT -> new TomcatBootstrapper();
-            case UNDERTOW -> new UndertowBootstrapper();
-        };
     }
 
     private void cleanup(Logger logger) {
