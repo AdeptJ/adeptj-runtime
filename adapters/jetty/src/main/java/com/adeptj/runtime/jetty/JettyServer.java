@@ -116,8 +116,8 @@ public class JettyServer extends AbstractServer {
         sessionHandler.setMaxInactiveInterval(commonConfig.getInt("session-timeout"));
         contextHandler.setSessionHandler(sessionHandler);
         // ErrorHandler
-        String errorHandlerPath = commonConfig.getString("error-handler-path");
         ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+        String errorHandlerPath = commonConfig.getString("error-handler-path");
         commonConfig.getIntList("error-handler-codes")
                 .forEach(value -> errorHandler.addErrorPage(value, errorHandlerPath));
         contextHandler.setErrorHandler(errorHandler);
@@ -125,15 +125,13 @@ public class JettyServer extends AbstractServer {
     }
 
     private void configureDefaultServlet(Config appConfig) {
-        String resourceBase;
         String basePath = appConfig.getString("jetty.context.static-resources-base-path");
         URL webappRoot = this.getClass().getResource(basePath);
         if (webappRoot == null) {
             throw new IllegalStateException("Jetty could not be started because there are multiple or no" +
                     " adeptj-runtime-x.x.x.jar file present at classpath which has the static resources!!");
-        } else {
-            resourceBase = webappRoot.toExternalForm();
         }
+        String resourceBase = webappRoot.toExternalForm();
         LOGGER.info("Static resource base path resolved to: [{}]", resourceBase);
         String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
         ServletHolder defaultServlet = this.context.addServlet(DefaultServlet.class, defaultServletPath);
