@@ -26,7 +26,6 @@ public class MVStoreLoginService extends AbstractLoginService {
 
     @Override
     protected UserPrincipal loadUserInfo(String username) {
-        String password = this.userManager.getPassword(username);
-        return new UserPrincipal(username, new Sha256Base64EncodedPassword(password));
+        return new UserPrincipal(username, new Sha256Base64EncodedPassword(this.userManager.getPassword(username)));
     }
 }

@@ -10,17 +10,18 @@ import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.server.CustomRequestLog;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +54,15 @@ public class JettyServer extends AbstractServer {
     @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         this.jetty = this.initJetty(appConfig);
-        this.context = new ServletContextHandler(SESSIONS | SECURITY);
-        this.context.setContextPath(appConfig.getString("jetty.context.path"));
+        this.context = this.initServletContextHandler(appConfig);
+        // Handler sequence will be -  ContextPathHandler -> HealthCheckHandler -> SessionHandler -> SecurityHandler
+        HandlerList chain = new HandlerList(new ContextPathHandler(), new HealthCheckHandler(), this.context);
+        this.jetty.setHandler(chain);
+        // Servlet deployment
         SciInfo sciInfo = deployment.getSciInfo();
-        this.context.addServletContainerInitializer(new ServletContainerInitializerHolder(sciInfo.getSciInstance(),
-                sciInfo.getHandleTypesArray()));
+        this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypesArray());
         this.registerServlets(deployment.getServletInfos());
-        new SecurityConfigurer().configure(this.context, this.getUserManager(), appConfig);
-        new ErrorHandlerConfigurer().configure(this.context, appConfig);
-        this.jetty.setHandler(this.getRootHandler(this.context, appConfig));
+        this.configureDefaultServlet(appConfig);
         if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
             this.jetty.setRequestLog(new CustomRequestLog());
         }
@@ -95,32 +96,49 @@ public class JettyServer extends AbstractServer {
         return httpConfig;
     }
 
-    private Handler getRootHandler(ServletContextHandler rootContext, Config appConfig) {
-        // Sequence will be - HealthCheckHandler -> ContextPathHandler -> ServletContextHandler
-        ContextPathHandler contextPathHandler = new ContextPathHandler();
-        contextPathHandler.setHandler(new HealthCheckHandler());
-        rootContext.insertHandler(contextPathHandler);
-        String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
-        ServletHolder defaultServlet = rootContext.addServlet(DefaultServlet.class, defaultServletPath);
-        defaultServlet.setAsyncSupported(true);
-        defaultServlet.setInitParameter(PARAM_RESOURCE_BASE, this.getResourceBase(appConfig));
-        return rootContext;
+    /**
+     * Initializes the {@link ServletContextHandler}
+     *
+     * @param appConfig the application config.
+     * @return a fully configured {@link ServletContextHandler}
+     */
+    private ServletContextHandler initServletContextHandler(Config appConfig) {
+        ServletContextHandler contextHandler = new ServletContextHandler(SESSIONS | SECURITY);
+        contextHandler.setContextPath(appConfig.getString("jetty.context.path"));
+        Config commonConfig = appConfig.getConfig("main.common");
+        // SecurityHandler - for Servlet container security
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        new SecurityConfigurer().configure(securityHandler, this.getUserManager(), commonConfig);
+        contextHandler.setSecurityHandler(securityHandler);
+        // SessionHandler
+        SessionHandler sessionHandler = new SessionHandler();
+        sessionHandler.setHttpOnly(commonConfig.getBoolean("session-cookie-httpOnly"));
+        sessionHandler.setMaxInactiveInterval(commonConfig.getInt("session-timeout"));
+        contextHandler.setSessionHandler(sessionHandler);
+        // ErrorHandler
+        String errorHandlerPath = commonConfig.getString("error-handler-path");
+        ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+        commonConfig.getIntList("error-handler-codes")
+                .forEach(value -> errorHandler.addErrorPage(value, errorHandlerPath));
+        contextHandler.setErrorHandler(errorHandler);
+        return contextHandler;
     }
 
-    private String getResourceBase(Config appConfig) {
+    private void configureDefaultServlet(Config appConfig) {
         String resourceBase;
         String basePath = appConfig.getString("jetty.context.static-resources-base-path");
         URL webappRoot = this.getClass().getResource(basePath);
-        if (webappRoot == null) { // Fallback
-            try (Resource resource = Resource.newClassPathResource(basePath)) {
-                resourceBase = resource.getName();
-                LOGGER.info("Static resource base resolved using Jetty Resource.newClassPathResource()");
-            }
+        if (webappRoot == null) {
+            throw new IllegalStateException("Jetty could not be started because there are multiple or no" +
+                    " adeptj-runtime-x.x.x.jar file present at classpath which has the static resources!!");
         } else {
             resourceBase = webappRoot.toExternalForm();
         }
-        LOGGER.info("Static resource base resolved to: [{}]", resourceBase);
-        return resourceBase;
+        LOGGER.info("Static resource base path resolved to: [{}]", resourceBase);
+        String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
+        ServletHolder defaultServlet = this.context.addServlet(DefaultServlet.class, defaultServletPath);
+        defaultServlet.setAsyncSupported(true);
+        defaultServlet.setInitParameter(PARAM_RESOURCE_BASE, resourceBase);
     }
 
     @Override
