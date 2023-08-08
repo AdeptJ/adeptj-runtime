@@ -2,10 +2,16 @@ package com.adeptj.runtime.jetty;
 
 import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.authentication.FormAuthenticator;
-import org.eclipse.jetty.util.security.Constraint;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.eclipse.jetty.security.Constraint.Authorization.SPECIFIC_ROLE;
+import static org.eclipse.jetty.security.Constraint.Transport.INHERIT;
 
 public class SecurityConfigurer {
 
@@ -24,20 +30,13 @@ public class SecurityConfigurer {
     }
 
     private void addConstraintMapping(ConstraintSecurityHandler securityHandler, Config commonCfg) {
-        Constraint constraint = this.getConstraint(commonCfg);
+        Set<String> roles = new HashSet<>(commonCfg.getStringList("auth-roles"));
+        Constraint constraint = Constraint.from("AdeptJ Security Constraint", INHERIT, SPECIFIC_ROLE, roles);
         for (String protectedPath : commonCfg.getStringList("protected-paths")) {
             ConstraintMapping constraintMapping = new ConstraintMapping();
             constraintMapping.setConstraint(constraint);
             constraintMapping.setPathSpec(protectedPath);
             securityHandler.addConstraintMapping(constraintMapping);
         }
-    }
-
-    private Constraint getConstraint(Config commonCfg) {
-        Constraint constraint = new Constraint();
-        constraint.setName("AdeptJ Security Constraint");
-        constraint.setRoles(commonCfg.getStringList("auth-roles").toArray(new String[0]));
-        constraint.setAuthenticate(true);
-        return constraint;
     }
 }
