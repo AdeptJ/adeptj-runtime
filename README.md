@@ -40,7 +40,7 @@
 
 **Built upon**
 
-1. Battle tested [Tomcat](https://tomcat.apache.org/)/[Jetty](https://www.eclipse.org/jetty/)/[Undertow](http://undertow.io/) Servlet containers.
+1. Battle tested [Tomcat(10.1.x)](https://tomcat.apache.org/)/[Jetty(12.0.x)](https://www.eclipse.org/jetty/)/[Undertow(2.3.x)](http://undertow.io/) Servlet 6 containers.
 2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix](http://felix.apache.org/) as implementation).
 
 **Modules:**
@@ -51,10 +51,10 @@
 4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.2) or MyBatis v3.5.13 or MongoDB sync driver v4.10.2.
 5. Hikari(v5.0.1) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
 6. Caffeine(v3.1.7) - a high performance in memory cache.
-7. SLF4J(v2.0.7) & Logback(v1.4.8) based logging - add or remove loggers in running server which will survive the server restart.
+7. SLF4J(v2.0.7) & Logback(v1.4.9) based logging - add or remove loggers in running server which will survive the server restart.
 8. Crypto module for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding) based on battle tested Spring Security crypto.
 9. Java Bean Validation(Hibernate Validator v8.0.1).
-10. RestClient for server side API calls, there are few adapters based on Apache HttpClient v4.x and Jetty HttpClient v11.x.
+10. RestClient for server side API calls, there are few adapters based on Apache HttpClient v4.x and Jetty HttpClient v12.x.
 11. Email module for sending plain text and html based emails using Eclipse Angus Mail.
 
 **Toolchain:**
