@@ -6,10 +6,9 @@
     <parent>
         <groupId>com.adeptj</groupId>
         <artifactId>adeptj-parent</artifactId>
-        <version>26</version>
+        <version>27</version>
         <relativePath/>
     </parent>
-
     <artifactId>adeptj-runtime-undertow</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
