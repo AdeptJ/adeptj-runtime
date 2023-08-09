@@ -22,6 +22,7 @@ package com.adeptj.runtime.undertow.core;
 
 import io.undertow.security.idm.Account;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.util.Set;
 
@@ -32,7 +33,8 @@ import java.util.Set;
  */
 final class SimpleAccount implements Account {
 
-    private static final long serialVersionUID = -2090504892837494810L;
+    @Serial
+    private static final long serialVersionUID = -6710801164493273235L;
 
     private final SimplePrincipal principal;
 

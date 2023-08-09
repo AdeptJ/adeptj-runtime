@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.undertow.core;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Objects;
@@ -31,7 +32,8 @@ import java.util.Objects;
  */
 final class SimplePrincipal implements Principal, Serializable {
 
-    private static final long serialVersionUID = 7723547817002486608L;
+    @Serial
+    private static final long serialVersionUID = 1237481553907680848L;
 
     private final String name;
 

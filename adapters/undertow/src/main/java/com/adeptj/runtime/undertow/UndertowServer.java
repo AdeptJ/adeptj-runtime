@@ -326,7 +326,7 @@ public class UndertowServer extends AbstractServer {
                 .setDefaultSessionTimeout(this.sessionTimeout(mainConfig))
                 .setChangeSessionIdOnLogin(mainConfig.getBoolean(KEY_CHANGE_SESSION_ID_ON_LOGIN))
                 .setInvalidateSessionOnLogout(mainConfig.getBoolean(KEY_INVALIDATE_SESSION_ON_LOGOUT))
-                .setIdentityManager(new SimpleIdentityManager(this.getUserManager(), mainConfig))
+                .setIdentityManager(new SimpleIdentityManager(this.getUserManager()))
                 .setUseCachedAuthenticationMechanism(undertowConfig.getBoolean(KEY_USE_CACHED_AUTH_MECHANISM))
                 .setLoginConfig(Servlets.loginConfig(FORM_AUTH, REALM, ADMIN_LOGIN_URI, ADMIN_LOGIN_URI))
                 .addSecurityConstraint(this.securityConstraint(mainConfig, undertowConfig))

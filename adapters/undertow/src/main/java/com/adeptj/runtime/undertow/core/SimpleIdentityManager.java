@@ -21,20 +21,14 @@
 package com.adeptj.runtime.undertow.core;
 
 import com.adeptj.runtime.kernel.UserManager;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigList;
-import com.typesafe.config.ConfigValue;
 import io.undertow.security.idm.Account;
 import io.undertow.security.idm.Credential;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.Map.Entry;
+import java.util.List;
 
 /**
  * Simple IdentityManager implementation that does the authentication from provisioning file or from
@@ -44,25 +38,10 @@ import static java.util.Map.Entry;
  */
 public final class SimpleIdentityManager implements IdentityManager {
 
-    private static final String KEY_USER_ROLES_MAPPING = "common.user-roles-mapping";
-
     private final UserManager userManager;
 
-    /**
-     * User to Roles mapping.
-     */
-    private final Map<String, Set<String>> rolesByUser;
-
-    public SimpleIdentityManager(UserManager userManager, Config mainConfig) {
+    public SimpleIdentityManager(UserManager userManager) {
         this.userManager = userManager;
-        this.rolesByUser = new HashMap<>();
-        for (Entry<String, ConfigValue> entry : mainConfig.getObject(KEY_USER_ROLES_MAPPING).entrySet()) {
-            Set<String> roles = new HashSet<>();
-            for (ConfigValue role : (ConfigList) entry.getValue()) {
-                roles.add((String) role.unwrapped());
-            }
-            this.rolesByUser.put(entry.getKey(), roles);
-        }
     }
 
     /**
@@ -72,7 +51,9 @@ public final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(Account account) {
-        return IdentityManagers.verifyAccount(this.rolesByUser, account) ? account : null;
+        List<String> roles = this.userManager.getRoles(account.getPrincipal().getName());
+        boolean match = account.getRoles().stream().anyMatch(roles::contains);
+        return match ? account : null;
     }
 
     /**
@@ -80,7 +61,18 @@ public final class SimpleIdentityManager implements IdentityManager {
      */
     @Override
     public Account verify(String id, Credential credential) {
-        return IdentityManagers.verifyCredentials(this.rolesByUser, id, (PasswordCredential) credential, this.userManager);
+        PasswordCredential pwdCredential = (PasswordCredential) credential;
+        String password = this.userManager.getPassword(id);
+        if (StringUtils.isEmpty(password)) {
+            // This is just called to waste a bit of time as not to reveal that the user does not exist.
+            this.userManager.encodePassword(new String(pwdCredential.getPassword()));
+            return null;
+        }
+        SimpleAccount account = null;
+        if (this.userManager.matchPassword(pwdCredential.getPassword(), password.toCharArray())) {
+            account = new SimpleAccount(new SimplePrincipal(id), new HashSet<>(this.userManager.getRoles(id)));
+        }
+        return account;
     }
 
     /**
