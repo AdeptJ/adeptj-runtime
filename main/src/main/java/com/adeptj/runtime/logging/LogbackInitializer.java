@@ -21,9 +21,9 @@
 package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ConfiguratorRank;
 import ch.qos.logback.core.Context;
-import ch.qos.logback.core.spi.Configurator;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
@@ -31,7 +31,6 @@ import com.adeptj.runtime.kernel.ConfigProvider;
 import com.typesafe.config.Config;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import static ch.qos.logback.core.spi.Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
 import static com.adeptj.runtime.common.Constants.LOGGING_CONF_SECTION;
 
 /**
@@ -74,6 +73,6 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // Finally, start LoggerContext and print status information.
         loggerContext.start();
         StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
-        return DO_NOT_INVOKE_NEXT_IF_ANY;
+        return ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }
