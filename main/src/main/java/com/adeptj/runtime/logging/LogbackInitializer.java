@@ -23,7 +23,6 @@ package com.adeptj.runtime.logging;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ConfiguratorRank;
-import ch.qos.logback.core.Context;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.util.StatusPrinter;
 import com.adeptj.runtime.common.LogbackManagerHolder;
@@ -52,10 +51,9 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
      * @param context the {@link LoggerContext}
      */
     @Override
-    public ExecutionStatus configure(Context context) {
-        LoggerContext loggerContext = (LoggerContext) context;
+    public ExecutionStatus configure(LoggerContext context) {
         Config loggingCfg = ConfigProvider.getInstance().getMainConfig().getConfig(LOGGING_CONF_SECTION);
-        LogbackManager logbackManager = new LogbackManager(loggerContext);
+        LogbackManager logbackManager = new LogbackManager(context);
         LogbackManagerHolder.getInstance().setLogbackManager(logbackManager);
         // Initialize ConsoleAppender.
         logbackManager.initConsoleAppender(loggingCfg);
@@ -71,8 +69,8 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         // LevelChangePropagator - see http://logback.qos.ch/manual/configuration.html#LevelChangePropagator
         logbackManager.initLevelChangePropagator();
         // Finally, start LoggerContext and print status information.
-        loggerContext.start();
-        StatusPrinter.printInCaseOfErrorsOrWarnings(loggerContext);
+        context.start();
+        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
         return ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }

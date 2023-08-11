@@ -25,7 +25,6 @@ import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.kernel.AbstractServer;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.Server;
-import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServerShutdownHook;
 import com.adeptj.runtime.kernel.util.IOUtils;
 import com.adeptj.runtime.kernel.util.Times;
@@ -92,7 +91,6 @@ public final class Launcher {
             logger.info("JRE: [{}], Version: [{}], Vendor: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION, JAVA_VM_VENDOR);
             AbstractServer server = (AbstractServer) ServiceLoader.load(Server.class).iterator().next();
             server.setServerPostStopTask(new LoggerCleanupTask());
-            ServerRuntime runtime = server.getRuntime();
             logger.info("Initializing AdeptJ Runtime based on {}.", server.getUnderlyingServerInfo());
             Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig(appConfig));
