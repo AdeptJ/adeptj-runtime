@@ -41,6 +41,7 @@
         <adeptj-runtime-kernel.version>1.0.0</adeptj-runtime-kernel.version>
         <unbescape.version>1.1.6.RELEASE</unbescape.version>
         <pebble.version>3.2.1</pebble.version>
+        <logback.version>1.4.11</logback.version>
     </properties>
 
     <!-- Project Information -->
