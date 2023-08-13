@@ -21,12 +21,11 @@
 package com.adeptj.runtime.kernel.util;
 
 import com.adeptj.runtime.kernel.exception.ServerException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 
 import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION;
 
@@ -61,5 +60,13 @@ public final class RequestUtil {
             LOGGER.error(ex.getMessage(), ex);
             throw new ServerException(ex);
         }
+    }
+
+    public static boolean isContextRootRequest(HttpServletRequest req) {
+        return isContextRootRequest(req.getRequestURI());
+    }
+
+    public static boolean isContextRootRequest(String requestPath) {
+        return requestPath.equals("/") || requestPath.startsWith("/;jsessionid");
     }
 }

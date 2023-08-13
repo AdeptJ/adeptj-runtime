@@ -1,5 +1,6 @@
 package com.adeptj.runtime.tomcat.filter;
 
+import com.adeptj.runtime.kernel.util.RequestUtil;
 import com.adeptj.runtime.kernel.util.ResponseUtil;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -15,11 +16,10 @@ public class ContextPathFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request instanceof HttpServletRequest req && response instanceof HttpServletResponse resp) {
-            if (req.getRequestURI().equals("/") || req.getRequestURI().startsWith("/;jsessionid")) {
-                ResponseUtil.redirectToSystemConsole(resp);
-                return;
-            }
+        if (request instanceof HttpServletRequest req
+                && response instanceof HttpServletResponse resp && RequestUtil.isContextRootRequest(req)) {
+            ResponseUtil.redirectToSystemConsole(resp);
+            return;
         }
         chain.doFilter(request, response);
     }
