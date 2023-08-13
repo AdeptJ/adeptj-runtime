@@ -43,7 +43,7 @@ import java.io.Serial;
  * a registry of managed HttpServlet/Filter(s) etc.
  * <p>
  * Depending upon the resolution by Felix Dispatcher the request is being further dispatched to actual HttpServlet/Filter.
- * <b>BridgeServlet is mounted at "/" i.e. root.<b>
+ * <b>BridgeServlet is mounted at "/*"<b>
  *
  * @author Rakesh Kumar, AdeptJ
  */
@@ -57,6 +57,10 @@ public class BridgeServlet extends HttpServlet {
     private static final String UNAVAILABLE_MSG = "Can't process request: [{} {}], DispatcherServlet is unavailable!!";
 
     private static final String PROCESSING_REQUEST_MSG = "Processing [{}] request for [{}]";
+
+    public static final String BRIDGE_SERVLET_NAME = "AdeptJ BridgeServlet";
+
+    public static final String BRIDGE_SERVLET_MOUNT_PATH = "/*";
 
     /**
      * Open the DispatcherServletTracker.

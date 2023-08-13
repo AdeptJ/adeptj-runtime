@@ -31,6 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
+import static com.adeptj.runtime.servlet.BridgeServlet.BRIDGE_SERVLET_NAME;
+import static com.adeptj.runtime.servlet.BridgeServlet.BRIDGE_SERVLET_MOUNT_PATH;
+
 /**
  * Utility for servlet, filters and listeners
  *
@@ -39,10 +42,6 @@ import java.util.Set;
 public class Servlets {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Servlets.class);
-
-    private static final String BRIDGE_SERVLET = "AdeptJ BridgeServlet";
-
-    private static final String ROOT_MAPPING = "/";
 
     private Servlets() {
     }
@@ -57,11 +56,11 @@ public class Servlets {
         // Register the BridgeServlet after the OSGi Framework started successfully.
         // This will ensure that the Felix DispatcherServlet is available as an OSGi service and can be tracked.
         // BridgeServlet delegates all the service calls to the Felix DispatcherServlet.
-        ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET, new BridgeServlet());
-        Set<String> existingMappings = bridgeServlet.addMapping(ROOT_MAPPING);
+        ServletRegistration.Dynamic bridgeServlet = context.addServlet(BRIDGE_SERVLET_NAME, new BridgeServlet());
+        Set<String> existingMappings = bridgeServlet.addMapping(BRIDGE_SERVLET_MOUNT_PATH);
         if (!existingMappings.isEmpty()) {
-            LOGGER.error("Servlet mapping [/] is already taken, this may be a misconfiguration because BridgeServlet" +
-                    " must be mounted at [/]!");
+            LOGGER.error("Servlet mapping [/*] is already taken, this may be a misconfiguration because " +
+                    " BridgeServlet must be mounted at [/*]!");
         }
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
         // Otherwise, the request processing fails throwing exception.

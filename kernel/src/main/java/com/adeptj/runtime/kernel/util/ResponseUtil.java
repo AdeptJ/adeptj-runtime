@@ -20,12 +20,14 @@
 
 package com.adeptj.runtime.kernel.util;
 
+import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.exception.ServerException;
-
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 
 /**
@@ -65,13 +67,20 @@ public final class ResponseUtil {
         }
     }
 
-    public static void redirect(HttpServletResponse resp, String redirectUrl) {
+    public static void redirect(HttpServletResponse resp, String location) {
         try {
-            resp.sendRedirect(resp.encodeRedirectURL(redirectUrl));
+            resp.sendRedirect(resp.encodeRedirectURL(location));
         } catch (IOException ex) {
             // Now what? may be wrap and re-throw. Let the container handle it.
             throw new ServerException(ex);
         }
+    }
+
+    public static void redirectToSystemConsole(HttpServletResponse resp) {
+        String systemConsoleUrl = ConfigProvider.getInstance()
+                .getMainConfig()
+                .getString("common.system-console-path");
+        redirect(resp, systemConsoleUrl);
     }
 
     public static void write(HttpServletResponse resp, String content) {
