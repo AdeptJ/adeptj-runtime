@@ -77,12 +77,12 @@ public enum TemplateEngine {
      * @throws TemplateProcessingException if there was some issue while rendering the template.
      */
     public void render(TemplateEngineContext context) {
+        // Making sure the Content-Type will always be text/html;charset=UTF-8.
+        HttpServletResponse response = context.getResponse();
+        response.setContentType(CONTENT_TYPE_HTML_UTF8);
         try {
-            PebbleTemplate compiledTemplate = this.pebbleEngine.getTemplate(context.getTemplate());
-            // Making sure the Content-Type will always be text/html;charset=UTF-8.
-            HttpServletResponse response = context.getResponse();
-            response.setContentType(CONTENT_TYPE_HTML_UTF8);
-            compiledTemplate.evaluate(response.getWriter(), context.getTemplateVariables());
+            PebbleTemplate template = this.pebbleEngine.getTemplate(context.getTemplate());
+            template.evaluate(response.getWriter(), context.getTemplateVariables());
         } catch (Exception ex) { // NOSONAR
             throw new TemplateProcessingException(ex);
         }
