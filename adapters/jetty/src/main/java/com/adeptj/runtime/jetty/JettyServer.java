@@ -95,6 +95,7 @@ public class JettyServer extends AbstractServer {
         httpConfig.setResponseHeaderSize(appConfig.getInt("jetty.http.response-header-size"));
         httpConfig.setSendServerVersion(appConfig.getBoolean("jetty.http.send-server-version"));
         httpConfig.setSendDateHeader(appConfig.getBoolean("jetty.http.send-date-header"));
+        httpConfig.setRelativeRedirectAllowed(appConfig.getBoolean("jetty.http.relative-redirect-allowed"));
         return httpConfig;
     }
 
