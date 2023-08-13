@@ -5,6 +5,7 @@ import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.Server;
 import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
+import com.adeptj.runtime.kernel.servlet.FaviconServlet;
 import com.adeptj.runtime.osgi.FrameworkLauncher;
 import com.adeptj.runtime.servlet.AdminServlet;
 import com.adeptj.runtime.servlet.ErrorServlet;
@@ -17,6 +18,8 @@ import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_NAME;
 import static com.adeptj.runtime.common.Constants.ADMIN_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_NAME;
 import static com.adeptj.runtime.common.Constants.ERROR_SERVLET_URI;
+import static com.adeptj.runtime.common.Constants.FAVICON_SERVLET_NAME;
+import static com.adeptj.runtime.common.Constants.FAVICON_SERVLET_URI;
 import static com.adeptj.runtime.common.Constants.LOGBACK_VIEW_SERVLET_NAME;
 import static com.adeptj.runtime.common.Constants.LOGBACK_VIEW_SERVLET_URI;
 import static com.adeptj.runtime.kernel.ServerRuntime.UNDERTOW;
@@ -49,6 +52,7 @@ public final class ServerBootstrapper {
         ServletDeployment deployment = new ServletDeployment(sciInfo)
                 .addServletInfo(new ServletInfo(ADMIN_SERVLET_NAME, ADMIN_SERVLET_URI, AdminServlet.class))
                 .addServletInfo(new ServletInfo(ERROR_SERVLET_NAME, ERROR_SERVLET_URI, ErrorServlet.class))
+                .addServletInfo(new ServletInfo(FAVICON_SERVLET_NAME, FAVICON_SERVLET_URI, FaviconServlet.class))
                 .addServletInfo(new ServletInfo(LOGBACK_VIEW_SERVLET_NAME, LOGBACK_VIEW_SERVLET_URI,
                         ViewStatusMessagesServlet.class));
         server.start(deployment, appConfig, args);

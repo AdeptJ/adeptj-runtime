@@ -53,6 +53,10 @@ public final class Constants {
 
     public static final String LOGBACK_VIEW_SERVLET_URI = "/admin/logback-status";
 
+    public static final String FAVICON_SERVLET_NAME = "AdeptJ FaviconServlet";
+
+    public static final String FAVICON_SERVLET_URI = "/favicon.ico";
+
     public static final String BANNER_TXT = "/banner.txt";
 
     public static final String CONTENT_TYPE_HTML_UTF8 = "text/html;charset=UTF-8";
