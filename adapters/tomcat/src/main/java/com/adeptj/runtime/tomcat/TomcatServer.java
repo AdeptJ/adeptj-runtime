@@ -41,11 +41,6 @@ public class TomcatServer extends AbstractServer {
     }
 
     @Override
-    public String getUnderlyingServerInfo() {
-        return ServerInfo.getServerInfo();
-    }
-
-    @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         Config serverConfig = appConfig.getConfig(this.getRuntime().getLowerCaseName());
         String docBase = new File(serverConfig.getString(CFG_KEY_DOC_BASE)).getAbsolutePath();
@@ -129,5 +124,10 @@ public class TomcatServer extends AbstractServer {
         resourceSet.setBase(webappBasePath);
         LOGGER.info("Static resources will be served from: [{}]", webappBasePath);
         this.context.getResources().addJarResources(resourceSet);
+    }
+
+    @Override
+    public String toString() {
+        return ServerInfo.getServerInfo();
     }
 }

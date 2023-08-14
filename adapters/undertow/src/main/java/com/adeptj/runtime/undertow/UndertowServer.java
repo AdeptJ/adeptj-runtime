@@ -116,11 +116,6 @@ public class UndertowServer extends AbstractServer {
     }
 
     @Override
-    public String getUnderlyingServerInfo() {
-        return "JBoss " + this.getRuntime() + "/" + Version.getVersionString();
-    }
-
-    @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         Config mainConfig = ConfigProvider.getInstance().getMainConfig(appConfig);
         Config undertowConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime(), appConfig);
@@ -336,5 +331,10 @@ public class UndertowServer extends AbstractServer {
                 .addInitialHandlerChainWrapper(new ServletInitialHandlerWrapper())
                 .setServletSessionConfig(this.sessionConfig(mainConfig))
                 .setCrawlerSessionManagerConfig(new CrawlerSessionManagerConfig());
+    }
+
+    @Override
+    public String toString() {
+        return "JBoss " + this.getRuntime() + "/" + Version.getVersionString();
     }
 }

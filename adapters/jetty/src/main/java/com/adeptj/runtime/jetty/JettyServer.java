@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.List;
 
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SESSIONS;
@@ -47,19 +48,14 @@ public class JettyServer extends AbstractServer {
     }
 
     @Override
-    public String getUnderlyingServerInfo() {
-        return "Eclipse " + this.getRuntime() + "/" + Server.getVersion();
-    }
-
-    @Override
     public void start(ServletDeployment deployment, Config appConfig, String[] args) throws Exception {
         // Check for base resource upfront to avoid any issues later.
         String baseResource = this.getBaseResource(appConfig);
         this.jetty = this.initJetty(appConfig);
         this.context = this.initServletContextHandler(appConfig);
         // Handler sequence will be -  ContextPathHandler -> HealthCheckHandler -> SessionHandler -> SecurityHandler
-        Handler.Sequence sequence = new Handler.Sequence(new ContextPathHandler(), new HealthCheckHandler(), this.context);
-        this.jetty.setHandler(sequence);
+        List<Handler> handlers = List.of(new ContextPathHandler(), new HealthCheckHandler(), this.context);
+        this.jetty.setHandler(new Handler.Sequence(handlers));
         // Servlet deployment
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypesArray());
@@ -181,5 +177,10 @@ public class JettyServer extends AbstractServer {
     @Override
     public void addServletContextAttribute(String name, Object value) {
         this.context.getServletContext().setAttribute(name, value);
+    }
+
+    @Override
+    public String toString() {
+        return "Eclipse " + this.getRuntime() + "/" + Server.getVersion();
     }
 }

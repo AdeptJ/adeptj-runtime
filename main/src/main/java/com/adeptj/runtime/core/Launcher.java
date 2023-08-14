@@ -91,7 +91,7 @@ public final class Launcher {
             logger.info("JRE: [{}], Version: [{}], Vendor: [{}]", JAVA_RUNTIME_NAME, JAVA_RUNTIME_VERSION, JAVA_VM_VENDOR);
             AbstractServer server = (AbstractServer) ServiceLoader.load(Server.class).iterator().next();
             server.setServerPostStopTask(new LoggerCleanupTask());
-            logger.info("Initializing AdeptJ Runtime based on {}.", server.getUnderlyingServerInfo());
+            logger.info("Initializing AdeptJ Runtime based on {}.", server);
             Config appConfig = ConfigProvider.getInstance().getApplicationConfig();
             launcher.populateCredentialsStore(ConfigProvider.getInstance().getMainConfig(appConfig));
             ServerBootstrapper.bootstrap(server, appConfig, args);
