@@ -2,12 +2,10 @@ package com.adeptj.runtime.undertow;
 
 import com.adeptj.runtime.kernel.AbstractServer;
 import com.adeptj.runtime.kernel.ConfigProvider;
-import com.adeptj.runtime.kernel.Constants;
 import com.adeptj.runtime.kernel.FilterInfo;
 import com.adeptj.runtime.kernel.SciInfo;
 import com.adeptj.runtime.kernel.ServerRuntime;
 import com.adeptj.runtime.kernel.ServletDeployment;
-import com.adeptj.runtime.kernel.util.SslContextFactory;
 import com.adeptj.runtime.kernel.util.Times;
 import com.adeptj.runtime.undertow.core.ServerOptions;
 import com.adeptj.runtime.undertow.core.SimpleIdentityManager;
@@ -43,8 +41,6 @@ import jakarta.servlet.MultipartConfigElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +53,8 @@ import static com.adeptj.runtime.kernel.Constants.KEY_ENABLE_REQ_BUFFERING;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_CODES;
 import static com.adeptj.runtime.kernel.Constants.KEY_ERROR_HANDLER_PATH;
 import static com.adeptj.runtime.kernel.Constants.KEY_HOST;
+import static com.adeptj.runtime.kernel.Constants.KEY_HTTP;
 import static com.adeptj.runtime.kernel.Constants.KEY_MAX_CONCURRENT_REQUESTS;
-import static com.adeptj.runtime.kernel.Constants.KEY_PORT;
 import static com.adeptj.runtime.kernel.Constants.KEY_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.kernel.Constants.KEY_REQ_LIMIT_QUEUE_SIZE;
 import static com.adeptj.runtime.kernel.Constants.KEY_SYSTEM_CONSOLE_PATH;
@@ -68,7 +64,6 @@ import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_CHANGE_SESSIO
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_CONTEXT_PATH;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_DEFAULT_ENCODING;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_HEALTH_CHECK_HANDLER_PATH;
-import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_HTTPS;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_HTTP_ONLY;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_IGNORE_FLUSH;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_INVALIDATE_SESSION_ON_LOGOUT;
@@ -84,12 +79,10 @@ import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_WORKER_OPTION
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_WORKER_TASK_CORE_THREADS;
 import static com.adeptj.runtime.undertow.core.ServerConstants.KEY_WORKER_TASK_MAX_THREADS;
 import static com.adeptj.runtime.undertow.core.ServerConstants.REALM;
-import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_ENABLE_HTTP2;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_ENABLE_REQ_BUFF;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_MAX_CONCUR_REQ;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_REQ_BUFF_MAX_BUFFERS;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_REQ_LIMIT_QUEUE_SIZE;
-import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SERVER_HTTPS_PORT;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SESSION_TIMEOUT;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SHUTDOWN_WAIT_TIME;
 import static com.adeptj.runtime.undertow.core.ServerConstants.SYS_PROP_SYS_TASK_THREAD_MULTIPLIER;
@@ -120,7 +113,7 @@ public class UndertowServer extends AbstractServer {
         Config mainConfig = ConfigProvider.getInstance().getMainConfig(appConfig);
         Config undertowConfig = ConfigProvider.getInstance().getServerConfig(this.getRuntime(), appConfig);
         int port = this.resolvePort(appConfig);
-        DeploymentInfo deploymentInfo = this.deploymentInfo(mainConfig, undertowConfig, deployment);
+        DeploymentInfo deploymentInfo = this.initDeploymentInfo(mainConfig, undertowConfig, deployment);
         this.deploymentManager = Servlets.defaultContainer().addDeployment(deploymentInfo);
         this.deploymentManager.deploy();
         HttpHandler httpContinueReadHandler = this.deploymentManager.start();
@@ -129,8 +122,7 @@ public class UndertowServer extends AbstractServer {
         this.setWorkerOptions(undertowBuilder, undertowConfig);
         new SocketOptions().setOptions(undertowBuilder, undertowConfig);
         new ServerOptions().setOptions(undertowBuilder, undertowConfig);
-        this.undertow = this.addHttpsListener(undertowBuilder, undertowConfig)
-                .addHttpListener(port, undertowConfig.getConfig(Constants.KEY_HTTP).getString(KEY_HOST))
+        this.undertow = undertowBuilder.addHttpListener(port, undertowConfig.getConfig(KEY_HTTP).getString(KEY_HOST))
                 .setHandler(this.rootHandler)
                 .build();
         this.undertow.start();
@@ -173,7 +165,7 @@ public class UndertowServer extends AbstractServer {
         } catch (InterruptedException ie) {
             LOGGER.error("Error while waiting for GracefulShutdownHandler to shutdown!!", ie);
             // SONAR - "InterruptedException" should not be ignored
-            // Can't really rethrow it as we are yet to stop the server and anyway it's a shutdown hook
+            // Can't really rethrow it as we are yet to stop the server, and anyway it's a shutdown hook
             // and JVM itself will be shutting down shortly.
             Thread.currentThread().interrupt();
         }
@@ -207,17 +199,6 @@ public class UndertowServer extends AbstractServer {
         options.overrideOption(builder, WORKER_TASK_CORE_THREADS, Math.max(cfgCoreTaskThreads, calcCoreTaskThreads))
                 .overrideOption(builder, WORKER_TASK_MAX_THREADS, Math.max(cfgMaxTaskThreads, calcMaxTaskThreads));
         LOGGER.info("Undertow WorkerOptions configured in [{}] ms!!", Times.elapsedMillis(startTime));
-    }
-
-    private Undertow.Builder addHttpsListener(Undertow.Builder builder, Config undertowConfig) throws GeneralSecurityException {
-        if (Boolean.getBoolean(SYS_PROP_ENABLE_HTTP2)) {
-            Config httpsConf = undertowConfig.getConfig(KEY_HTTPS);
-            int httpsPort = Integer.getInteger(SYS_PROP_SERVER_HTTPS_PORT, httpsConf.getInt(KEY_PORT));
-            SSLContext sslContext = SslContextFactory.newSslContext(httpsConf);
-            builder.addHttpsListener(httpsPort, httpsConf.getString(KEY_HOST), sslContext);
-            LOGGER.info("HTTP2 enabled @ port: {}.", httpsPort);
-        }
-        return builder;
     }
 
     /**
@@ -310,7 +291,7 @@ public class UndertowServer extends AbstractServer {
         return new ServletSessionConfig().setHttpOnly(mainConfig.getBoolean(KEY_HTTP_ONLY));
     }
 
-    private DeploymentInfo deploymentInfo(Config mainConfig, Config undertowConfig, ServletDeployment deployment) {
+    private DeploymentInfo initDeploymentInfo(Config mainConfig, Config undertowConfig, ServletDeployment deployment) {
         return Servlets.deployment()
                 .setDeploymentName(DEPLOYMENT_NAME)
                 .setContextPath(mainConfig.getString(KEY_CONTEXT_PATH))
