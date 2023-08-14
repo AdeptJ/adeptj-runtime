@@ -16,6 +16,7 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -69,8 +70,11 @@ public class JettyServer extends AbstractServer {
 
     private Server initJetty(Config appConfig) {
         Server jetty = new Server(this.getQueuedThreadPool(appConfig));
-        HttpConnectionFactory connectionFactory = new HttpConnectionFactory(this.getHttpConfiguration(appConfig));
-        ServerConnector connector = new ServerConnector(jetty, connectionFactory);
+        HttpConfiguration httpConfiguration = this.getHttpConfiguration(appConfig);
+        HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfiguration);
+        // This will enable h2c
+        HTTP2CServerConnectionFactory h2cConnectionFactory = new HTTP2CServerConnectionFactory(httpConfiguration);
+        ServerConnector connector = new ServerConnector(jetty, httpConnectionFactory, h2cConnectionFactory);
         connector.setPort(this.resolvePort(appConfig));
         connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
         jetty.addConnector(connector);
