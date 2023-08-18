@@ -13,15 +13,13 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.adeptj.runtime.kernel.Constants.H2_MAP_ADMIN_CREDENTIALS;
-import static com.adeptj.runtime.kernel.Constants.MV_CREDENTIALS_STORE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class MVStoreUserManager implements UserManager {
 
     @Override
     public String getPassword(String username) {
-        return MVStoreUtil.getValue(MV_CREDENTIALS_STORE, H2_MAP_ADMIN_CREDENTIALS, username);
+        return MVStoreUtil.getPassword(username);
     }
 
     @Override
