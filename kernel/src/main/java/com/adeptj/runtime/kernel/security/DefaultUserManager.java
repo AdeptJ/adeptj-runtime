@@ -31,12 +31,7 @@ public class DefaultUserManager implements UserManager {
         }
         byte[] inputPwdBytes = inputPassword.getBytes(UTF_8);
         byte[] storedPwdBytes = storedPassword.getBytes(UTF_8);
-        byte[] digest = PasswordEncoder.encodePassword(inputPwdBytes);
-        try {
-            return MessageDigest.isEqual(digest, storedPwdBytes);
-        } finally {
-            this.nullSafeWipe(inputPwdBytes, digest, storedPwdBytes);
-        }
+        return this.doMatchPassword(inputPwdBytes, storedPwdBytes);
     }
 
     @Override
@@ -46,6 +41,10 @@ public class DefaultUserManager implements UserManager {
         }
         byte[] inputPwdBytes = this.toByteArray(inputPassword);
         byte[] storedPwdBytes = this.toByteArray(storedPassword);
+        return this.doMatchPassword(inputPwdBytes, storedPwdBytes);
+    }
+
+    private boolean doMatchPassword(byte[] inputPwdBytes, byte[] storedPwdBytes) {
         byte[] inputPwdDigest = PasswordEncoder.encodePassword(inputPwdBytes);
         try {
             return MessageDigest.isEqual(inputPwdDigest, storedPwdBytes);
