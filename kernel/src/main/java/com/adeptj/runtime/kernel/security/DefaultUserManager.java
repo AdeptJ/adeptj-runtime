@@ -4,6 +4,7 @@ import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.UserManager;
 import com.adeptj.runtime.kernel.util.MVStoreUtil;
 import com.adeptj.runtime.kernel.util.PasswordEncoder;
+import com.typesafe.config.Config;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,11 +12,12 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class MVStoreUserManager implements UserManager {
+public class DefaultUserManager implements UserManager {
 
     @Override
     public String getPassword(String username) {
@@ -59,9 +61,12 @@ public class MVStoreUserManager implements UserManager {
 
     @Override
     public List<String> getRoles(String username) {
-        return ConfigProvider.getInstance()
-                .getMainConfig()
-                .getStringList("common.user-roles-mapping." + username);
+        String path = "common.user-roles-mapping." + username;
+        Config mainConfig = ConfigProvider.getInstance().getMainConfig();
+        if (mainConfig.hasPath(path)) {
+            return mainConfig.getStringList(path);
+        }
+        return Collections.emptyList();
     }
 
     private byte[] toByteArray(char[] chars) {

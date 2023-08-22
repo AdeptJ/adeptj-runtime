@@ -1,6 +1,6 @@
 package com.adeptj.runtime.kernel;
 
-import com.adeptj.runtime.kernel.security.MVStoreUserManager;
+import com.adeptj.runtime.kernel.security.DefaultUserManager;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ public abstract class AbstractServer implements Server {
     private ServerPostStopTask postStopTask;
 
     public AbstractServer() {
-        this.userManager = new MVStoreUserManager();
+        this.userManager = new DefaultUserManager();
     }
 
     public void setServerPostStopTask(ServerPostStopTask postStopTask) {
