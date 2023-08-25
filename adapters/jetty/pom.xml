@@ -123,17 +123,25 @@
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
             <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty.toolchain</groupId>
-                    <artifactId>jetty-jakarta-servlet-api</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-alpn-server</artifactId>
+            <version>${jetty.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
+            <version>${jetty.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-session</artifactId>
             <version>${jetty.version}</version>
             <scope>compile</scope>
         </dependency>
