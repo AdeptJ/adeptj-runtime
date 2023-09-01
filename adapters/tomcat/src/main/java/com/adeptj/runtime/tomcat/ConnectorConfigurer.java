@@ -8,7 +8,6 @@ import org.apache.coyote.http2.Http2Protocol;
 
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_PROTOCOL;
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_SERVER;
-import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_RELAXED_PATH_CHARS;
 
 public class ConnectorConfigurer {
 
@@ -16,7 +15,6 @@ public class ConnectorConfigurer {
         Connector connector = new Connector(serverConfig.getString(CFG_KEY_CONNECTOR_PROTOCOL));
         connector.setPort(port);
         AbstractHttp11Protocol<?> protocol = (AbstractHttp11Protocol<?>) connector.getProtocolHandler();
-        protocol.setRelaxedPathChars(serverConfig.getString(CFG_KEY_RELAXED_PATH_CHARS));
         protocol.setServer(serverConfig.getString(CFG_KEY_CONNECTOR_SERVER));
         protocol.addUpgradeProtocol(new Http2Protocol()); // This will enable h2c
         tomcat.setConnector(connector);
