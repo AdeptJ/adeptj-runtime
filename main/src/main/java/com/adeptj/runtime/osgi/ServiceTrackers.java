@@ -53,7 +53,7 @@ public enum ServiceTrackers {
         return this.dispatcherServletTracker.getDispatcherServlet();
     }
 
-    public boolean isDispatcherServletTrackerOpened() {
+    public boolean isDispatcherServletTrackerInitialized() {
         return this.dispatcherServletTracker != null;
     }
 
@@ -69,6 +69,12 @@ public enum ServiceTrackers {
             this.eventDispatcherTracker = new EventDispatcherTracker(bundleContext);
             this.eventDispatcherTracker.open();
         }
+    }
+
+    void reinitializeDispatcherServletTracker(BundleContext bundleContext) {
+        this.closeDispatcherServletTracker();
+        LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
+        this.openDispatcherServletTracker(bundleContext);
     }
 
     EventDispatcherTracker getEventDispatcherTracker() {

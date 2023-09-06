@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 import static org.osgi.framework.FrameworkEvent.ERROR;
+import static org.osgi.framework.FrameworkEvent.PACKAGES_REFRESHED;
 import static org.osgi.framework.FrameworkEvent.STARTED;
 
 /**
@@ -47,42 +48,40 @@ public class FrameworkLifecycleListener implements FrameworkListener {
     /**
      * Handles OSGi Framework restart, does following on System Bundle STARTED event.
      * <p>
-     * 1. Removes the BundleContext from ServletContext attributes. <br>
-     * 2. Gets the new BundleContext from System Bundle and sets that to ServletContext. <br>
-     * 3. Closes the DispatcherServletTracker and open again with new BundleContext. <br>
-     * 4. As the BundleContext is removed and added from ServletContext the corresponding BridgeServletContextAttributeListener
+     * 1. Gets the new BundleContext from System Bundle and sets that to ServletContext. <br>
+     * 2. Reinitialize DispatcherServletTracker and open again with new BundleContext. <br>
+     * 3. As the BundleContext attribute is replaced in ServletContext, the corresponding BridgeServletContextAttributeListener
      * is fired with events which in turn closes the EventDispatcherTracker and opens again with new BundleContext.
      */
     @Override
     public void frameworkEvent(FrameworkEvent event) {
         switch (event.getType()) {
-            case STARTED:
-                if (ServiceTrackers.getInstance().isDispatcherServletTrackerOpened()) {
+            case STARTED -> {
+                if (ServiceTrackers.getInstance().isDispatcherServletTrackerInitialized()) {
                     LOGGER.info("Handling OSGi Framework Restart!!");
                     BundleContext bundleContext = event.getBundle().getBundleContext();
                     BundleContextHolder.getInstance().setBundleContext(bundleContext);
                     // Set the new BundleContext as a ServletContext attribute, remove the stale BundleContext.
-                    ServletContextHolder.getInstance()
-                            .getServletContext().setAttribute(ATTRIBUTE_BUNDLE_CONTEXT, bundleContext);
-                    ServiceTrackers.getInstance().closeDispatcherServletTracker();
-                    LOGGER.info("Opening DispatcherServletTracker as OSGi Framework restarted!!");
-                    ServiceTrackers.getInstance().openDispatcherServletTracker(bundleContext);
+                    ServletContextHolder.getInstance().setContextAttribute(ATTRIBUTE_BUNDLE_CONTEXT, bundleContext);
+                    ServiceTrackers.getInstance().reinitializeDispatcherServletTracker(bundleContext);
                 }
-                break;
-            case ERROR:
+            }
+            case ERROR -> {
                 if (Boolean.getBoolean(SYS_PROP_LOG_FRAMEWORK_ERROR)) {
                     Throwable th = event.getThrowable();
                     if (th != null) {
                         LOGGER.error(th.getMessage(), th);
                     }
                 }
-                break;
-            default:
+            }
+            case PACKAGES_REFRESHED -> LOGGER.info("OSGi refresh packages operation performed!");
+            default -> {
                 // log it and ignore as we are not interested in any other event.
                 String eventType = FrameworkEvents.asString(event.getType());
                 if (!StringUtils.equals(FrameworkEvents.UNKNOWN.toString(), eventType)) {
                     LOGGER.debug("Ignoring the OSGi FrameworkEvent: [{}]", eventType);
                 }
+            }
         }
     }
 
