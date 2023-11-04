@@ -22,7 +22,7 @@
         <xnio.version>3.8.12.Final</xnio.version>
         <undertow.version>2.3.10.Final</undertow.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
-        <wildfly-common.version>1.6.0.Final</wildfly-common.version>
+        <wildfly-common.version>1.7.0.Final</wildfly-common.version>
         <jboss-threads.version>3.5.1.Final</jboss-threads.version>
         <jboss-classfilewriter.version>1.3.0.Final</jboss-classfilewriter.version>
     </properties>
