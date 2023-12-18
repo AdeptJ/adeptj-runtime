@@ -130,6 +130,20 @@
             <artifactId>jetty-security</artifactId>
             <version>${jetty.version}</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.directory.api</groupId>
+                    <artifactId>api-asn1-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.directory.api</groupId>
+                    <artifactId>api-ldap-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.directory.api</groupId>
+                    <artifactId>api-util</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
