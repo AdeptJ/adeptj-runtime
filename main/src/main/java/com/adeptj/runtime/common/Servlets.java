@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-import static com.adeptj.runtime.servlet.BridgeServlet.BRIDGE_SERVLET_NAME;
 import static com.adeptj.runtime.servlet.BridgeServlet.BRIDGE_SERVLET_MOUNT_PATH;
+import static com.adeptj.runtime.servlet.BridgeServlet.BRIDGE_SERVLET_NAME;
 
 /**
  * Utility for servlet, filters and listeners
@@ -64,8 +64,8 @@ public class Servlets {
         }
         // Required if [osgi.http.whiteboard.servlet.asyncSupported] is declared true for OSGi HttpService managed Servlets.
         // Otherwise, the request processing fails throwing exception.
-        // [java.lang.IllegalStateException: UT010026: Async is not supported for this request, as not all filters or Servlets
-        // were marked as supporting async]
+        // Undertow throws [java.lang.IllegalStateException: UT010026: Async is not supported for this request,
+        // as not all filters or Servlets were marked as supporting async]
         bridgeServlet.setAsyncSupported(true);
         // Load early to detect any issue with OSGi Felix DispatcherServlet initialization.
         bridgeServlet.setLoadOnStartup(0);
