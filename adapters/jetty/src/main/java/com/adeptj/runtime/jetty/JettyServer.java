@@ -144,7 +144,7 @@ public class JettyServer extends AbstractServer {
         } else {
             baseResource = webappRoot.toExternalForm();
         }
-        LOGGER.info("Static resource base path resolved to: [{}]", baseResource);
+        LOGGER.info("Jetty static resource base path resolved to: [{}]", baseResource);
         return baseResource;
     }
 
