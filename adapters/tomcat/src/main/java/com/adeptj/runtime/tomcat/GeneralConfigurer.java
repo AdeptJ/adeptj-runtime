@@ -11,6 +11,8 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_ASYNC;
+
 public class GeneralConfigurer {
 
     public void configure(Context context, Config commonConfig, Config serverConfig) {
@@ -27,7 +29,7 @@ public class GeneralConfigurer {
     private void configureFilters(Context context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("filters")) {
             FilterDef def = new FilterDef();
-            def.setAsyncSupported(config.getString("async"));
+            def.setAsyncSupported(config.getString(CFG_KEY_ASYNC));
             def.setFilterName(config.getString("name"));
             def.setFilterClass(config.getString("class"));
             for (Map.Entry<String, ConfigValue> entry : config.getConfig("init-params").entrySet()) {
@@ -49,8 +51,8 @@ public class GeneralConfigurer {
             if (config.hasPath("load-on-startup")) {
                 servlet.setLoadOnStartup(config.getInt("load-on-startup"));
             }
-            if (config.hasPath("async")) {
-                servlet.setAsyncSupported(config.getBoolean("async"));
+            if (config.hasPath(CFG_KEY_ASYNC)) {
+                servlet.setAsyncSupported(config.getBoolean(CFG_KEY_ASYNC));
             }
             for (Map.Entry<String, ConfigValue> entry : config.getConfig("init-params").entrySet()) {
                 servlet.addInitParameter(entry.getKey(), (String) entry.getValue().unwrapped());

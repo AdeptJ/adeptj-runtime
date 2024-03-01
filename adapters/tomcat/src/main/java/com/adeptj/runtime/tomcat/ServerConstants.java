@@ -25,4 +25,9 @@ public class ServerConstants {
     public static final String CFG_KEY_JAR_RES_INTERNAL_PATH = "jar-resource-internal-path";
 
     public static final String CFG_KEY_JAR_RES_WEBAPP_MT = "jar-resource-webapp-mount";
+
+    public static final String CFG_KEY_ASYNC = "async";
+
+    private ServerConstants() {
+    }
 }

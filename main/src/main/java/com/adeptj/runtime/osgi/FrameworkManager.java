@@ -88,13 +88,13 @@ public enum FrameworkManager {
 
     private static final String CFG_KEY_FILE_INSTALL_LOG_LEVEL = "felix-fileinstall-log-level";
 
-    private final static String FILE_INSTALL_DIR = "felix.fileinstall.dir";
+    private static final String FILE_INSTALL_DIR = "felix.fileinstall.dir";
 
-    private final static String FILE_INSTALL_POLL_INTERVAL = "felix.fileinstall.poll";
+    private static final String FILE_INSTALL_POLL_INTERVAL = "felix.fileinstall.poll";
 
-    private final static String FILE_INSTALL_CONFIG_ENCODING = "felix.fileinstall.configEncoding";
+    private static final String FILE_INSTALL_CONFIG_ENCODING = "felix.fileinstall.configEncoding";
 
-    private final static String FILE_INSTALL_LOG_LEVEL = "felix.fileinstall.log.level";
+    private static final String FILE_INSTALL_LOG_LEVEL = "felix.fileinstall.log.level";
 
     private Framework framework;
 

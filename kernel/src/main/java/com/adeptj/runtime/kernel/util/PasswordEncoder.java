@@ -24,4 +24,7 @@ public class PasswordEncoder {
             throw new IllegalArgumentException(ex);
         }
     }
+
+    private PasswordEncoder() {
+    }
 }

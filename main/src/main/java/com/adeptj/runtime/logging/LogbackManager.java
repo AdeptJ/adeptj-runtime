@@ -275,39 +275,39 @@ public final class LogbackManager {
     }
 
     void initConsoleAppender(Config loggingCfg) {
-        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
-        consoleAppender.setContext(this.loggerContext);
-        consoleAppender.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
-        consoleAppender.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
+        ConsoleAppender<ILoggingEvent> ca = new ConsoleAppender<>();
+        ca.setContext(this.loggerContext);
+        ca.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
+        ca.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
         // we assume Jansi lib is on classpath, use the Jansi maven profile while building runtime.
         if (SystemUtils.IS_OS_WINDOWS) {
-            consoleAppender.setWithJansi(true);
+            ca.setWithJansi(true);
         }
-        consoleAppender.start();
-        this.consoleAppender = consoleAppender;
+        ca.start();
+        this.consoleAppender = ca;
     }
 
     void initRollingFileAppender(Config loggingCfg) {
         FileAppenderConfig appenderConfig = this.createFileAppenderConfig(loggingCfg);
-        RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
-        fileAppender.setContext(this.loggerContext);
-        fileAppender.setName(appenderConfig.getAppenderName());
-        fileAppender.setFile(appenderConfig.getLogFile());
-        fileAppender.setAppend(true);
-        fileAppender.setEncoder(this.newLayoutEncoder(appenderConfig.getPattern()));
-        fileAppender.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
-        if (!fileAppender.isImmediateFlush()) {
-            fileAppender.setImmediateFlush(appenderConfig.isImmediateFlush());
+        RollingFileAppender<ILoggingEvent> fa = new RollingFileAppender<>();
+        fa.setContext(this.loggerContext);
+        fa.setName(appenderConfig.getAppenderName());
+        fa.setFile(appenderConfig.getLogFile());
+        fa.setAppend(true);
+        fa.setEncoder(this.newLayoutEncoder(appenderConfig.getPattern()));
+        fa.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
+        if (!fa.isImmediateFlush()) {
+            fa.setImmediateFlush(appenderConfig.isImmediateFlush());
         }
-        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = this.newRollingPolicy(fileAppender, appenderConfig);
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = this.newRollingPolicy(fa, appenderConfig);
         // This will also set the TriggeringPolicy
-        fileAppender.setRollingPolicy(rollingPolicy);
-        fileAppender.start();
+        fa.setRollingPolicy(rollingPolicy);
+        fa.start();
         // Add AsyncAppender support.
         if (appenderConfig.isLogAsync()) {
-            this.initAsyncAppender(appenderConfig, fileAppender);
+            this.initAsyncAppender(appenderConfig, fa);
         }
-        this.fileAppender = fileAppender;
+        this.fileAppender = fa;
     }
 
     private SizeAndTimeBasedRollingPolicy<ILoggingEvent> newRollingPolicy(FileAppender<ILoggingEvent> fileAppender,

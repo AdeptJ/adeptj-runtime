@@ -47,15 +47,12 @@ public enum HttpSessionEvents {
     // <<---------- HttpSessionListener ---------->>
 
     public static void handleHttpSessionEvent(HttpSessionEvents type, HttpSessionEvent event) {
-        switch (type) {
-            case SESSION_CREATED -> {
-                logSessionCreated(event);
-                sessionListener().ifPresent(listener -> listener.sessionCreated(event));
-            }
-            case SESSION_DESTROYED -> {
-                logSessionDestroyed(event);
-                sessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
-            }
+        if (type == SESSION_CREATED) {
+            logSessionCreated(event);
+            sessionListener().ifPresent(listener -> listener.sessionCreated(event));
+        } else if (type == SESSION_DESTROYED) {
+            logSessionDestroyed(event);
+            sessionListener().ifPresent(listener -> listener.sessionDestroyed(event));
         }
     }
 

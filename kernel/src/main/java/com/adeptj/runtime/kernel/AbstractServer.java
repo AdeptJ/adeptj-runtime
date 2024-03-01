@@ -15,7 +15,7 @@ public abstract class AbstractServer implements Server {
 
     private ServerPostStopTask postStopTask;
 
-    public AbstractServer() {
+    protected AbstractServer() {
         this.userManager = new DefaultUserManager();
     }
 

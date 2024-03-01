@@ -69,16 +69,16 @@ public class JettyServer extends AbstractServer {
     }
 
     private Server initJetty(Config appConfig) {
-        Server jetty = new Server(this.getQueuedThreadPool(appConfig));
+        Server server = new Server(this.getQueuedThreadPool(appConfig));
         HttpConfiguration httpConfiguration = this.getHttpConfiguration(appConfig);
         HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfiguration);
         // This will enable h2c
         HTTP2CServerConnectionFactory h2cConnectionFactory = new HTTP2CServerConnectionFactory(httpConfiguration);
-        ServerConnector connector = new ServerConnector(jetty, httpConnectionFactory, h2cConnectionFactory);
+        ServerConnector connector = new ServerConnector(server, httpConnectionFactory, h2cConnectionFactory);
         connector.setPort(this.resolvePort(appConfig));
         connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
-        jetty.addConnector(connector);
-        return jetty;
+        server.addConnector(connector);
+        return server;
     }
 
     private QueuedThreadPool getQueuedThreadPool(Config appConfig) {

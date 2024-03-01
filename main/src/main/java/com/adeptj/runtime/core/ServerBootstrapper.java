@@ -57,4 +57,7 @@ public final class ServerBootstrapper {
                         ViewStatusMessagesServlet.class));
         server.start(deployment, appConfig, args);
     }
+
+    private ServerBootstrapper() {
+    }
 }

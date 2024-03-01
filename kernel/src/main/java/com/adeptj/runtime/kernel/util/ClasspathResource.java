@@ -13,4 +13,7 @@ public class ClasspathResource {
     public static Enumeration<URL> toUrls(String resourceName, ClassLoader cl) throws IOException {
         return cl.getResources(resourceName);
     }
+
+    private ClasspathResource() {
+    }
 }
