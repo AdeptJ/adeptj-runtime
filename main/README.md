@@ -1,5 +1,5 @@
 <p>
-  
+
   <a href="https://www.apache.org/licenses/LICENSE-2.0">
    <img src="https://img.shields.io/badge/license-Apache%202-blue.svg">  
   </a>
@@ -12,22 +12,22 @@
      <img src="https://img.shields.io/circleci/build/github/AdeptJ/adeptj-runtime/main">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+  <a href="https://sonarcloud.io/dashboard?id=AdeptJ_adeptj-runtime">
      <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=reliability_rating">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+  <a href="https://sonarcloud.io/dashboard?id=AdeptJ_adeptj-runtime">
      <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=security_rating">
   </a>
 
-  <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
+  <a href="https://sonarcloud.io/dashboard?id=AdeptJ_adeptj-runtime">
      <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=vulnerabilities">
   </a>
 
   <a href="https://twitter.com/_AdeptJ">
      <img src="https://img.shields.io/badge/twitter-AdeptJ-f08d1c.svg?style=social&style=flat"> 
   </a>
-  
+
 </p>
 
 **AdeptJ Runtime**
@@ -87,18 +87,18 @@ Many thanks to JetBrains for generously sponsoring our Open Source projects with
 
 **LICENSE**
 
-   Copyright 2016-2022, AdeptJ (https://www.adeptj.com)
-   
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
- 
+Copyright 2016-2022, AdeptJ (https://www.adeptj.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
        https://www.apache.org/licenses/LICENSE-2.0
- 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 
