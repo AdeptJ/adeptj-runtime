@@ -8,8 +8,8 @@
    <img src="https://img.shields.io/badge/OSGi-R8-orange?style=flat">
   </a>
   
-  <a href="https://app.circleci.com/pipelines/github/AdeptJ/adeptj-modules">
-     <img src="https://img.shields.io/circleci/build/github/AdeptJ/adeptj-modules/main">
+  <a href="https://app.circleci.com/pipelines/github/AdeptJ/adeptj-runtime">
+     <img src="https://img.shields.io/circleci/build/github/AdeptJ/adeptj-runtime/main">
   </a>
   
   <a href="https://sonarcloud.io/dashboard?id=adeptj-runtime">
