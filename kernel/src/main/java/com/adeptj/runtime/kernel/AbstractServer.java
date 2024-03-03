@@ -1,3 +1,22 @@
+/*
+###############################################################################
+#                                                                             #
+#    Copyright 2016-2024, AdeptJ (http://www.adeptj.com)                      #
+#                                                                             #
+#    Licensed under the Apache License, Version 2.0 (the "License");          #
+#    you may not use this file except in compliance with the License.         #
+#    You may obtain a copy of the License at                                  #
+#                                                                             #
+#        http://www.apache.org/licenses/LICENSE-2.0                           #
+#                                                                             #
+#    Unless required by applicable law or agreed to in writing, software      #
+#    distributed under the License is distributed on an "AS IS" BASIS,        #
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. #
+#    See the License for the specific language governing permissions and      #
+#    limitations under the License.                                           #
+#                                                                             #
+###############################################################################
+*/
 package com.adeptj.runtime.kernel;
 
 import com.adeptj.runtime.kernel.security.DefaultUserManager;
@@ -9,6 +28,11 @@ import java.util.List;
 
 import static com.adeptj.runtime.kernel.Constants.SYS_PROP_SERVER_PORT;
 
+/**
+ * AbstractServer providing the common code for Server implementations such as Jetty, Tomcat and Undertow.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public abstract class AbstractServer implements Server {
 
     private final UserManager userManager;
@@ -69,13 +93,12 @@ public abstract class AbstractServer implements Server {
                     SYS_PROP_SERVER_PORT);
             // Second check - server configs.
             port = appConfig.getConfig(runtime.getLowerCaseName()).getInt("http.port");
-            if (port > 0) {
-                this.getLogger().info("Resolved port from server({}) configs!", runtime);
-            }
             if (port == 0) {
-                // Third check - kernel configs.
+                // Third and last check - kernel configs.
                 port = appConfig.getInt("kernel.server.port");
-                this.getLogger().info("Resolved port from kernel configs!");
+                this.getLogger().info("Resolved port({}) from kernel configs!", port);
+            } else {
+                this.getLogger().info("Resolved port({}) from server({}) configs!", port, runtime);
             }
         }
         this.getLogger().info("Starting {} on port: {}", runtime, port);

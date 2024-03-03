@@ -15,11 +15,11 @@ public enum ServerRuntime {
     }
 
     public String getLowerCaseName() {
-        return name.toLowerCase();
+        return this.name.toLowerCase();
     }
 
     @Override
     public String toString() {
-        return name;
+        return this.name;
     }
 }
