@@ -26,6 +26,11 @@ import java.io.Serial;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Jetty {@link Password} extension for SHA 256/Base 64 encoded password matching.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class Sha256Base64EncodedPassword extends Password {
 
     @Serial

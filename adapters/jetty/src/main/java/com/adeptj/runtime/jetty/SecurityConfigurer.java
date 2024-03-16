@@ -32,6 +32,11 @@ import java.util.Set;
 import static org.eclipse.jetty.security.Constraint.Authorization.SPECIFIC_ROLE;
 import static org.eclipse.jetty.security.Constraint.Transport.INHERIT;
 
+/**
+ * Jetty security configurer.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class SecurityConfigurer {
 
     public void configure(ConstraintSecurityHandler securityHandler, UserManager userManager, Config commonCfg) {

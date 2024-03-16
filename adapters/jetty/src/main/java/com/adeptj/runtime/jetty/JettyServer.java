@@ -52,6 +52,11 @@ import java.util.List;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SESSIONS;
 
+/**
+ * AdeptJ Runtime server implementation using Jetty.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class JettyServer extends AbstractServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServer.class);

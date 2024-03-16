@@ -29,6 +29,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Jetty login service for authenticating admin user(s).
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class MVStoreLoginService extends AbstractLoginService {
 
     private final UserManager userManager;

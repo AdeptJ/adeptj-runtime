@@ -26,6 +26,11 @@ import org.eclipse.jetty.util.Callback;
 
 import static org.eclipse.jetty.http.HttpStatus.OK_200;
 
+/**
+ * Jetty Handler for health check handling.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class HealthCheckHandler extends Handler.Abstract {
 
     private static final String HC_URI = "/hc";
