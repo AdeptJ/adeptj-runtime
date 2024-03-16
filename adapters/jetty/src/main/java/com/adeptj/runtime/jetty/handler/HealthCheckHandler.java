@@ -27,7 +27,7 @@ import org.eclipse.jetty.util.Callback;
 import static org.eclipse.jetty.http.HttpStatus.OK_200;
 
 /**
- * Jetty Handler for health check handling.
+ * Jetty handler for health checks.
  *
  * @author Rakesh Kumar, AdeptJ
  */

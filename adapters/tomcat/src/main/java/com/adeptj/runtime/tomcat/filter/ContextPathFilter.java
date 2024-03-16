@@ -31,6 +31,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Tomcat servlet filter for context path handling.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class ContextPathFilter implements Filter {
 
     @Override

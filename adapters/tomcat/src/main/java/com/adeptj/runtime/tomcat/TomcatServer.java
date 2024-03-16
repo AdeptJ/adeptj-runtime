@@ -46,6 +46,11 @@ import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_MAIN_COMMON;
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_WEBAPP_JAR_NAME;
 import static com.adeptj.runtime.tomcat.ServerConstants.SYMBOL_DASH;
 
+/**
+ * AdeptJ Runtime server implementation using Tomcat.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class TomcatServer extends AbstractServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TomcatServer.class);

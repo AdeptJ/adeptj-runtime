@@ -25,6 +25,11 @@ import org.apache.catalina.realm.RealmBase;
 
 import java.security.Principal;
 
+/**
+ * Tomcat Catalina Realm implementation.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class MVStoreRealm extends RealmBase {
 
     private final UserManager userManager;

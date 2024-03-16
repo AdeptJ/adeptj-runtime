@@ -19,6 +19,13 @@
 */
 package com.adeptj.runtime.tomcat;
 
+import org.apache.catalina.connector.Connector;
+
+/**
+ * General constants for Tomcat server adapter.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class ServerConstants {
 
     public static final String SYMBOL_DASH = "-";

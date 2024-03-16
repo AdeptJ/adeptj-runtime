@@ -28,6 +28,11 @@ import org.apache.coyote.http2.Http2Protocol;
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_PROTOCOL;
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_CONNECTOR_SERVER;
 
+/**
+ * Tomcat Catalina {@link Connector} configuration.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class ConnectorConfigurer {
 
     public void configure(int port, Tomcat tomcat, Config serverConfig) {

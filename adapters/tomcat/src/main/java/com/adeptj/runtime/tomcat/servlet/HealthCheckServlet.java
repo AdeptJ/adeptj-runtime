@@ -25,6 +25,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.Serial;
 
+/**
+ * Tomcat servlet for health checks.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class HealthCheckServlet extends HttpServlet {
 
     @Serial

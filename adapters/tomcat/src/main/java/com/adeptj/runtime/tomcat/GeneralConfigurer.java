@@ -32,6 +32,11 @@ import java.util.concurrent.TimeUnit;
 
 import static com.adeptj.runtime.tomcat.ServerConstants.CFG_KEY_ASYNC;
 
+/**
+ * Tomcat general configurations for Servlets, Filters, Error Pages and HttpSession.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class GeneralConfigurer {
 
     public void configure(Context context, Config commonConfig, Config serverConfig) {

@@ -27,7 +27,7 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
 
 /**
- * Jetty Handler for context path handling.
+ * Jetty handler for context path handling.
  *
  * @author Rakesh Kumar, AdeptJ
  */

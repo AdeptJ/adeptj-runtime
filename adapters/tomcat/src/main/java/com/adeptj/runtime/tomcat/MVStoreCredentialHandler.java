@@ -22,6 +22,11 @@ package com.adeptj.runtime.tomcat;
 import com.adeptj.runtime.kernel.UserManager;
 import org.apache.catalina.CredentialHandler;
 
+/**
+ * Tomcat Catalina {@link CredentialHandler} implementation for authenticating AdeptJ Runtime admin(s).
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class MVStoreCredentialHandler implements CredentialHandler {
 
     private final UserManager userManager;

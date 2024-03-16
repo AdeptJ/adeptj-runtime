@@ -23,6 +23,7 @@ import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.FormAuthenticator;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -30,6 +31,11 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 import java.util.List;
 
+/**
+ * Tomcat Catalina security configuration.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class SecurityConfigurer {
 
     public void configure(Context context, UserManager userManager, Config commonConfig) {
