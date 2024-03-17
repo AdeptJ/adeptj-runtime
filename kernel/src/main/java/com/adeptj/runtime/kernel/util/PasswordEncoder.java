@@ -26,6 +26,11 @@ import java.util.Base64;
 import static com.adeptj.runtime.kernel.Constants.SHA_256;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Password encoding utility.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class PasswordEncoder {
 
     public static byte[] encodePassword(byte[] password) {

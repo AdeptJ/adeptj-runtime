@@ -21,6 +21,11 @@ package com.adeptj.runtime.kernel;
 
 import jakarta.servlet.Filter;
 
+/**
+ * {@link Filter} info object needed for deployment on AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class FilterInfo {
 
     private final String filterName;

@@ -19,6 +19,11 @@
 */
 package com.adeptj.runtime.kernel;
 
+/**
+ * A task that needs to be executed while server is stopping.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public interface ServerPostStopTask {
 
     void execute();

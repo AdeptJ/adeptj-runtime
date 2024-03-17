@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
+/**
+ * Utility for accessing classpath resources such as files etc.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class ClasspathResource {
 
     public static URL toUrl(String resourceName, ClassLoader cl) {

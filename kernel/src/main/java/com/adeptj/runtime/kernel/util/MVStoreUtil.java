@@ -25,6 +25,11 @@ import org.h2.mvstore.MVStore;
 import static com.adeptj.runtime.kernel.Constants.H2_MAP_ADMIN_CREDENTIALS;
 import static com.adeptj.runtime.kernel.Constants.MV_CREDENTIALS_STORE;
 
+/**
+ * Utility for MV Store.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public final class MVStoreUtil {
 
     private MVStoreUtil() {

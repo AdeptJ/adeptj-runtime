@@ -21,6 +21,11 @@ package com.adeptj.runtime.kernel;
 
 import java.util.List;
 
+/**
+ * UserManager interface for handling user authentication on AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public interface UserManager {
 
     String getPassword(String username);

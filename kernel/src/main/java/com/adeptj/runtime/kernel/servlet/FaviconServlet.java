@@ -27,6 +27,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serial;
 
+/**
+ * {@link HttpServlet} implementation for serving Favicon.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class FaviconServlet extends HttpServlet {
 
     @Serial

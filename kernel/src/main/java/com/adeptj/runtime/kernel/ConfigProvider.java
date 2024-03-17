@@ -37,6 +37,11 @@ import java.util.Enumeration;
 
 import static com.adeptj.runtime.kernel.Constants.SYS_PROP_OVERWRITE_CONF_FILES;
 
+/**
+ * Application configurations provider.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public enum ConfigProvider {
 
     INSTANCE;

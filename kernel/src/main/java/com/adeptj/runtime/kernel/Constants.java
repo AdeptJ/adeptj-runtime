@@ -22,7 +22,7 @@ package com.adeptj.runtime.kernel;
 /**
  * Constants, common constants for AdeptJ Runtime.
  *
- * @author Rakesh.Kumar, AdeptJ
+ * @author Rakesh Kumar, AdeptJ
  */
 public final class Constants {
 

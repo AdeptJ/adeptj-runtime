@@ -19,6 +19,11 @@
 */
 package com.adeptj.runtime.kernel;
 
+/**
+ * A shutdown hook which stops the underlying server powering AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public final class ServerShutdownHook extends Thread {
 
     private final Server server;

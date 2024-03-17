@@ -19,6 +19,11 @@
 */
 package com.adeptj.runtime.kernel;
 
+/**
+ * Enum denoting the Server adapters supported by AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public enum ServerRuntime {
 
     JETTY("Jetty"),

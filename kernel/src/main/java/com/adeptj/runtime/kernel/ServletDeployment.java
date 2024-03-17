@@ -22,6 +22,11 @@ package com.adeptj.runtime.kernel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Deployment info object composing the {@link SciInfo}, Servlets and Filters needed to be deployed bu AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class ServletDeployment {
 
     private final SciInfo sciInfo;

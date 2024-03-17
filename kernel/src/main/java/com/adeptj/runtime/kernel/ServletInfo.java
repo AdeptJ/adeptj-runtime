@@ -21,5 +21,10 @@ package com.adeptj.runtime.kernel;
 
 import jakarta.servlet.http.HttpServlet;
 
+/**
+ * {@link HttpServlet} info object needed for deployment on AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public record ServletInfo(String servletName, String path, Class<? extends HttpServlet> servletClass) {
 }

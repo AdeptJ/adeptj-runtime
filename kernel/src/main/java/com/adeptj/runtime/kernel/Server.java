@@ -20,9 +20,15 @@
 package com.adeptj.runtime.kernel;
 
 import com.typesafe.config.Config;
+import jakarta.servlet.ServletContainerInitializer;
 
 import java.util.List;
 
+/**
+ * Server interface to be implemented by a given server adapter such as Tomcat, Jetty, Undertow etc.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public interface Server {
 
     ServerRuntime getRuntime();

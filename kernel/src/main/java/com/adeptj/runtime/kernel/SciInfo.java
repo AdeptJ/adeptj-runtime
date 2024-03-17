@@ -22,6 +22,11 @@ package com.adeptj.runtime.kernel;
 import jakarta.servlet.ServletContainerInitializer;
 import java.util.Set;
 
+/**
+ * {@link ServletContainerInitializer} info object needed for deployment on AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class SciInfo {
 
     private ServletContainerInitializer sci;

@@ -36,6 +36,11 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * Default UserManager implementation for handling user authentication on AdeptJ Runtime.
+ *
+ * @author Rakesh Kumar, AdeptJ
+ */
 public class DefaultUserManager implements UserManager {
 
     @Override
