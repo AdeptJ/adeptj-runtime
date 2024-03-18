@@ -47,7 +47,7 @@
 4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.2) or MyBatis v3.5.15 or MongoDB sync driver v4.11.1.
 5. Hikari(v5.1.0) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
 6. Caffeine(v3.1.8) - a high performance in memory cache.
-7. SLF4J(v2.0.12) & Logback(v1.5.1) based logging - add or remove loggers in running server which will survive the server restart.
+7. SLF4J(v2.0.12) & Logback(v1.5.3) based logging - add or remove loggers in running server which will survive the server restart.
 8. Crypto module based on Spring security crypto for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
 9. Java Bean Validation(Hibernate Validator v8.0.1).
 10. RestClient for server side API calls, there are few adapters based on Apache HttpClient(v4.x) and Jetty HttpClient(v12.0.x).
