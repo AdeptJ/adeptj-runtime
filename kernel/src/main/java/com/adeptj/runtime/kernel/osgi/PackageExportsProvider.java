@@ -26,7 +26,9 @@ package com.adeptj.runtime.kernel.osgi;
  */
 public interface PackageExportsProvider {
 
-    String getName();
+    default String getName() {
+        return this.getClass().getName();
+    }
 
     String getPackageExports();
 }

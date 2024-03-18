@@ -207,9 +207,6 @@ public enum FrameworkManager {
         while (iterator.hasNext()) {
             PackageExportsProvider exportsProvider = iterator.next();
             String exportsProviderName = exportsProvider.getName();
-            if (StringUtils.isEmpty(exportsProviderName)) {
-                exportsProviderName = exportsProvider.getClass().getName();
-            }
             LOGGER.info("Asking [{}] for OSGi package exports.", exportsProviderName);
             String packageExports = exportsProvider.getPackageExports();
             if (StringUtils.isNotEmpty(packageExports)) {
