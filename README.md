@@ -42,13 +42,13 @@
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.10.
-2. JAX-RS 3.1(RESTEasy v6.2.7) with JWT support.
+2. JAX-RS 3.1(RESTEasy v6.2.8) with JWT support.
 3. JWT module for creating and verifying the JWTs issued by AdeptJ Runtime and verification of JWT issued by third party systems.
 4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.2) or MyBatis v3.5.15 or MongoDB sync driver v4.11.1.
 5. Hikari(v5.1.0) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
 6. Caffeine(v3.1.8) - a high performance in memory cache.
 7. SLF4J(v2.0.12) & Logback(v1.5.3) based logging - add or remove loggers in running server which will survive the server restart.
-8. Crypto module based on Spring security crypto for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
+8. Crypto module based on Spring security crypto(v6.2.3) for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
 9. Java Bean Validation(Hibernate Validator v8.0.1).
 10. RestClient for server side API calls, there are few adapters based on Apache HttpClient(v4.x) and Jetty HttpClient(v12.0.x).
 11. Email(Jakarta Mail/Eclipse Angus Mail v2.x) module for sending plain text and html based emails.
