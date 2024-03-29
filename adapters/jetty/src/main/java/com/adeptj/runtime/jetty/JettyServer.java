@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.List;
 
+import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SESSIONS;
 
@@ -69,7 +70,7 @@ public class JettyServer extends AbstractServer {
 
     @Override
     public ServerRuntime getRuntime() {
-        return ServerRuntime.JETTY;
+        return JETTY;
     }
 
     @Override
@@ -165,9 +166,8 @@ public class JettyServer extends AbstractServer {
         if (webappRoot == null) {
             throw new IllegalStateException("Jetty could not be started because there are multiple or no" +
                     " adeptj-runtime-x.x.x.jar file present at classpath which has the static resources!!");
-        } else {
-            baseResource = webappRoot.toExternalForm();
         }
+        baseResource = webappRoot.toExternalForm();
         LOGGER.info("Jetty static resource base path resolved to: [{}]", baseResource);
         return baseResource;
     }
@@ -181,9 +181,9 @@ public class JettyServer extends AbstractServer {
     public void postStart() {
         try {
             this.jetty.join();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            throw new ServerException(e);
+            throw new ServerException(ex);
         }
     }
 
