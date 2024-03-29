@@ -19,8 +19,6 @@
 */
 package com.adeptj.runtime.tomcat;
 
-import org.apache.catalina.connector.Connector;
-
 /**
  * General constants for Tomcat server adapter.
  *
@@ -31,8 +29,6 @@ public class ServerConstants {
     public static final String SYMBOL_DASH = "-";
 
     public static final String CFG_KEY_BASE_DIR = "base-dir";
-
-    public static final String CFG_KEY_RELAXED_PATH_CHARS = "connector.relaxed-path-chars";
 
     public static final String CFG_KEY_CONNECTOR_PROTOCOL = "connector.protocol";
 
