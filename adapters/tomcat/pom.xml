@@ -19,7 +19,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tomcat.version>10.1.20</tomcat.version>
+        <tomcat.version>10.1.23</tomcat.version>
         <adeptj-runtime-kernel.version>1.0.0</adeptj-runtime-kernel.version>
     </properties>
 
