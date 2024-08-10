@@ -29,8 +29,8 @@ import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
-import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.servlet.ResourceServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
@@ -86,7 +86,7 @@ public class JettyServer extends AbstractServer {
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypesArray());
         this.registerServlets(deployment.getServletInfos());
-        this.configureDefaultServlet(appConfig, baseResource);
+        this.configureResourceServlet(appConfig, baseResource);
         if (Boolean.getBoolean("adeptj.rt.jetty.req.logging")) {
             this.jetty.setRequestLog(new CustomRequestLog());
         }
@@ -152,11 +152,11 @@ public class JettyServer extends AbstractServer {
         return contextHandler;
     }
 
-    private void configureDefaultServlet(Config appConfig, String baseResource) {
-        String defaultServletPath = appConfig.getString("jetty.context.default-servlet-path");
-        ServletHolder defaultServlet = this.context.addServlet(DefaultServlet.class, defaultServletPath);
-        defaultServlet.setAsyncSupported(true);
-        defaultServlet.setInitParameter(PARAM_BASE_RESOURCE, baseResource);
+    private void configureResourceServlet(Config appConfig, String baseResource) {
+        String resourceServletPath = appConfig.getString("jetty.context.resource-servlet-path");
+        ServletHolder resourceServlet = this.context.addServlet(ResourceServlet.class, resourceServletPath);
+        resourceServlet.setAsyncSupported(true);
+        resourceServlet.setInitParameter(PARAM_BASE_RESOURCE, baseResource);
     }
 
     private String getBaseResource(Config appConfig) {
