@@ -24,7 +24,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ConfiguratorRank;
 import ch.qos.logback.core.spi.ContextAwareBase;
-import ch.qos.logback.core.util.StatusPrinter;
+import ch.qos.logback.core.util.StatusPrinter2;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.typesafe.config.Config;
@@ -70,7 +70,7 @@ public final class LogbackInitializer extends ContextAwareBase implements Config
         logbackManager.initLevelChangePropagator();
         // Finally, start LoggerContext and print status information.
         context.start();
-        StatusPrinter.printInCaseOfErrorsOrWarnings(context);
+        new StatusPrinter2().printInCaseOfErrorsOrWarnings(context);
         return ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
     }
 }
