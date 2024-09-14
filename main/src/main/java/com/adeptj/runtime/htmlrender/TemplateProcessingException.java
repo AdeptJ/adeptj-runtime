@@ -20,6 +20,8 @@
 
 package com.adeptj.runtime.htmlrender;
 
+import java.io.Serial;
+
 /**
  * The {@link TemplateProcessingException} thrown when an exception occurred while processing a given template.
  *
@@ -27,6 +29,7 @@ package com.adeptj.runtime.htmlrender;
  */
 final class TemplateProcessingException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = -8077495079692215520L;
 
     TemplateProcessingException(Throwable cause) {
