@@ -87,7 +87,7 @@ Many thanks to JetBrains for generously sponsoring our Open Source projects with
 
 **LICENSE**
 
-Copyright 2016-2022, AdeptJ (https://www.adeptj.com)
+Copyright 2016-2024, AdeptJ (https://www.adeptj.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
