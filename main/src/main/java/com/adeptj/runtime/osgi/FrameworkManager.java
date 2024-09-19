@@ -107,7 +107,8 @@ public enum FrameworkManager {
             long startTime = System.nanoTime();
             LOGGER.info("Starting the OSGi Framework!!");
             Config felixConf = ConfigProvider.getInstance().getMainConfig().getConfig(FELIX_CONF_SECTION);
-            FrameworkFactory frameworkFactory = ServiceLoader.load(FrameworkFactory.class).iterator().next();
+            ServiceLoader<FrameworkFactory> loader = ServiceLoader.load(FrameworkFactory.class);
+            FrameworkFactory frameworkFactory = loader.iterator().next();
             Map<String, String> frameworkConfigs = this.newFrameworkConfigs(felixConf);
             BundleContext bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);
             boolean restartFramework = new BundleProvisioner().installUpdateBundles(felixConf, bundleContext);
@@ -291,16 +292,14 @@ public enum FrameworkManager {
 
     private void printFrameworkConfigs(Map<String, String> configs) {
         StringBuilder builder = new StringBuilder();
-        Iterator<Map.Entry<String, String>> iterator = configs.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, String> entry = iterator.next();
-            builder.append(entry.getKey());
-            builder.append('=').append('"');
+        for (Iterator<Map.Entry<String, String>> it = configs.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<String, String> entry = it.next();
+            builder.append(entry.getKey()).append('=').append('"');
             if (!StringUtils.startsWith(entry.getKey(), "crypto")) {
                 builder.append(entry.getValue());
             }
             builder.append('"');
-            if (iterator.hasNext()) {
+            if (it.hasNext()) {
                 builder.append(',').append('\n');
             }
         }
