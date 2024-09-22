@@ -100,7 +100,7 @@ public class JettyServer extends AbstractServer {
         // This will enable h2c
         HTTP2CServerConnectionFactory h2cConnectionFactory = new HTTP2CServerConnectionFactory(httpConfiguration);
         ServerConnector connector = new ServerConnector(server, httpConnectionFactory, h2cConnectionFactory);
-        connector.setPort(this.resolvePort(appConfig));
+        connector.setPort(this.getPort(appConfig));
         connector.setIdleTimeout(appConfig.getLong("jetty.connector.idle-timeout"));
         server.addConnector(connector);
         return server;
@@ -153,10 +153,10 @@ public class JettyServer extends AbstractServer {
     }
 
     private void configureResourceServlet(Config appConfig, String baseResource) {
-        String resourceServletPath = appConfig.getString("jetty.context.resource-servlet-path");
-        ServletHolder resourceServlet = this.context.addServlet(ResourceServlet.class, resourceServletPath);
-        resourceServlet.setAsyncSupported(true);
-        resourceServlet.setInitParameter(PARAM_BASE_RESOURCE, baseResource);
+        ServletHolder holderDef = new ServletHolder("adeptjStaticResServlet", ResourceServlet.class);
+        holderDef.setAsyncSupported(true);
+        holderDef.setInitParameter(PARAM_BASE_RESOURCE, baseResource);
+        this.context.addServlet(holderDef, appConfig.getString("jetty.context.resource-servlet-path"));
     }
 
     private String getBaseResource(Config appConfig) {

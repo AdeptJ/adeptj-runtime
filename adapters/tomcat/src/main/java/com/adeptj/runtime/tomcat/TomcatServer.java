@@ -74,8 +74,7 @@ public class TomcatServer extends AbstractServer {
         this.tomcat.setBaseDir(serverConfig.getString(CFG_KEY_BASE_DIR));
         this.tomcat.getServer().addLifecycleListener(new VersionLoggerListener());
         this.context = this.tomcat.addContext(serverConfig.getString(CFG_KEY_CTX_PATH), docBase);
-        int port = this.resolvePort(appConfig);
-        new ConnectorConfigurer().configure(port, this.tomcat, serverConfig);
+        new ConnectorConfigurer().configure(this.getPort(appConfig), this.tomcat, serverConfig);
         Config commonConfig = appConfig.getConfig(CFG_KEY_MAIN_COMMON);
         new SecurityConfigurer().configure(this.context, this.getUserManager(), commonConfig);
         new GeneralConfigurer().configure(this.context, commonConfig, serverConfig);

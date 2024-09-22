@@ -84,7 +84,7 @@ public abstract class AbstractServer implements Server {
 
     protected abstract void doRegisterFilter(FilterInfo info);
 
-    protected int resolvePort(Config appConfig) {
+    protected int getPort(Config appConfig) {
         ServerRuntime runtime = this.getRuntime();
         // First check - system property.
         Integer port = Integer.getInteger("adeptj.rt.port");
