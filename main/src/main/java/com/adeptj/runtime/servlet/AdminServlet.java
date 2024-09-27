@@ -20,8 +20,8 @@
 
 package com.adeptj.runtime.servlet;
 
-import com.adeptj.runtime.htmlrender.TemplateEngine;
-import com.adeptj.runtime.htmlrender.TemplateEngineContext;
+import com.adeptj.runtime.html.TemplateEngine;
+import com.adeptj.runtime.html.TemplateEngineContext;
 import com.adeptj.runtime.kernel.util.PasswordEncoder;
 import com.adeptj.runtime.kernel.util.RequestUtil;
 import com.adeptj.runtime.kernel.util.ResponseUtil;

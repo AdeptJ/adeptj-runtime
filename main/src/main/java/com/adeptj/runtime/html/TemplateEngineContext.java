@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.htmlrender;
+package com.adeptj.runtime.html;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,4 +1,4 @@
-package com.adeptj.runtime.htmlrender;
+package com.adeptj.runtime.html;
 
 import io.pebbletemplates.pebble.extension.AbstractExtension;
 import io.pebbletemplates.pebble.extension.Function;

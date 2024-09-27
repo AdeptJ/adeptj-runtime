@@ -18,7 +18,7 @@
 ###############################################################################
 */
 
-package com.adeptj.runtime.htmlrender;
+package com.adeptj.runtime.html;
 
 import com.adeptj.runtime.kernel.ConfigProvider;
 import com.adeptj.runtime.kernel.util.Times;
