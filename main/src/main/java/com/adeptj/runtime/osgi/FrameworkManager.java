@@ -25,6 +25,9 @@ import com.adeptj.runtime.kernel.osgi.PackageExportsProvider;
 import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.IOUtils;
 import com.adeptj.runtime.kernel.util.Times;
+import com.adeptj.runtime.osgi.provisioning.BundleProvisioner;
+import com.adeptj.runtime.osgi.provisioning.JarProtocolProvisioner;
+import com.adeptj.runtime.osgi.provisioning.ReferenceProtocolProvisioner;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -111,7 +114,7 @@ public enum FrameworkManager {
             FrameworkFactory frameworkFactory = loader.iterator().next();
             Map<String, String> frameworkConfigs = this.newFrameworkConfigs(felixConf);
             BundleContext bundleContext = this.initFramework(frameworkFactory, frameworkConfigs);
-            boolean restartFramework = new BundleProvisioner().installUpdateBundles(felixConf, bundleContext);
+            boolean restartFramework = this.getProvisioner(felixConf).installOrUpdateBundles(felixConf, bundleContext);
             if (restartFramework) {
                 LOGGER.info("Restarting OSGi Framework!");
                 this.stopFramework();
@@ -151,6 +154,20 @@ public enum FrameworkManager {
         this.framework = frameworkFactory.newFramework(frameworkConfigs);
         this.framework.init();
         return this.framework.getBundleContext();
+    }
+
+    private BundleProvisioner getProvisioner(Config felixConf) {
+        String provisioningProtocol = System.getProperty("osgi.bundle.provisioning.protocol");
+        if (StringUtils.isEmpty(provisioningProtocol)) {
+            provisioningProtocol = felixConf.getString("bundle-provisioning-protocol");
+        }
+        BundleProvisioner provisioner;
+        if (StringUtils.equals(provisioningProtocol, "jar")) {
+            provisioner = new JarProtocolProvisioner();
+        } else {
+            provisioner = new ReferenceProtocolProvisioner();
+        }
+        return provisioner;
     }
 
     private void addListeners(BundleContext bundleContext) throws InvalidSyntaxException {
