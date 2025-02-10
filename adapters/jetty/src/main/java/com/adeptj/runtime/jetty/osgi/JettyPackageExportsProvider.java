@@ -38,6 +38,11 @@ public class JettyPackageExportsProvider implements PackageExportsProvider {
         return "Jetty PackageExportsProvider";
     }
 
+    /**
+     * Prepares the package list from the packages declared in Jetty's config along with Jetty's version.
+     *
+     * @return packages with Jetty's version.
+     */
     @Override
     public String getPackageExports() {
         StringBuilder packageExportsBuilder = new StringBuilder();

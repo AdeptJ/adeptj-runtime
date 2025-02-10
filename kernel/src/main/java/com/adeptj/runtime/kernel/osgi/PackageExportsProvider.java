@@ -30,5 +30,10 @@ public interface PackageExportsProvider {
         return this.getClass().getName();
     }
 
+    /**
+     * Gets the java packages to be exported by OSGi from system bundle.
+     *
+     * @return comma separated packages with version number, if any.
+     */
     String getPackageExports();
 }
