@@ -153,7 +153,7 @@ public class JettyServer extends AbstractServer {
     }
 
     private void configureResourceServlet(Config appConfig, String baseResource) {
-        ServletHolder holderDef = new ServletHolder("adeptjStaticResServlet", ResourceServlet.class);
+        ServletHolder holderDef = new ServletHolder("AdeptJStaticResourceServlet", ResourceServlet.class);
         holderDef.setAsyncSupported(true);
         holderDef.setInitParameter(PARAM_BASE_RESOURCE, baseResource);
         this.context.addServlet(holderDef, appConfig.getString("jetty.context.resource-servlet-path"));
