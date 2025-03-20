@@ -26,6 +26,12 @@ package com.adeptj.runtime.kernel;
  */
 public final class Constants {
 
+    /**
+     * Deny direct instantiation.
+     */
+    private Constants() {
+    }
+
     public static final String SHA_256 = "SHA-256";
 
     public static final String ADMIN_LOGIN_URI = "/admin/login";
@@ -56,8 +62,6 @@ public final class Constants {
 
     public static final String KEY_HOST = "host";
 
-    public static final String KEY_PORT = "port";
-
     public static final String KEY_HTTP = "http";
 
     public static final String MV_CREDENTIALS_STORE = "credentials.dat";
@@ -87,10 +91,4 @@ public final class Constants {
     public static final String KEY_KEYSTORE_TYPE = "keystore-type";
 
     public static final String SYS_PROP_OVERWRITE_CONF_FILES = "overwrite.conf.files";
-
-    /**
-     * Deny direct instantiation.
-     */
-    private Constants() {
-    }
 }
