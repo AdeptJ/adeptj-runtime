@@ -31,7 +31,7 @@ import org.eclipse.jetty.util.Callback;
  *
  * @author Rakesh Kumar, AdeptJ
  */
-public class ContextPathHandler extends Handler.Abstract {
+public class ContextPathHandler extends Handler.Abstract.NonBlocking {
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) {

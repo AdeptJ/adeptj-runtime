@@ -31,7 +31,7 @@ import static org.eclipse.jetty.http.HttpStatus.OK_200;
  *
  * @author Rakesh Kumar, AdeptJ
  */
-public class HealthCheckHandler extends Handler.Abstract {
+public class HealthCheckHandler extends Handler.Abstract.NonBlocking {
 
     private static final String HC_URI = "/hc";
 

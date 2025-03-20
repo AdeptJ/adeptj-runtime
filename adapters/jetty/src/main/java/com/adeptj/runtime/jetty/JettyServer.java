@@ -131,8 +131,8 @@ public class JettyServer extends AbstractServer {
      * @return a fully configured {@link ServletContextHandler}
      */
     private ServletContextHandler initServletContextHandler(Config appConfig) {
-        ServletContextHandler contextHandler = new ServletContextHandler(SESSIONS | SECURITY);
-        contextHandler.setContextPath(appConfig.getString("jetty.context.path"));
+        String contextPath = appConfig.getString("jetty.context.path");
+        ServletContextHandler contextHandler = new ServletContextHandler(contextPath, SESSIONS | SECURITY);
         Config commonConfig = appConfig.getConfig("main.common");
         // SecurityHandler - for Servlet container based security
         ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
