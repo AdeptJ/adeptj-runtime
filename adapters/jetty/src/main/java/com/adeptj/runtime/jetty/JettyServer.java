@@ -42,12 +42,13 @@ import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.GracefulHandler;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.List;
 
 import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
 import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SECURITY;
@@ -79,9 +80,11 @@ public class JettyServer extends AbstractServer {
         String baseResource = this.getBaseResource(appConfig);
         this.jetty = this.initJetty(appConfig);
         this.context = this.initServletContextHandler(appConfig);
-        // Handler sequence will be -  ContextPathHandler -> HealthCheckHandler -> SessionHandler -> SecurityHandler
-        List<Handler> handlers = List.of(new ContextPathHandler(), new HealthCheckHandler(), this.context);
-        this.jetty.setHandler(new Handler.Sequence(handlers));
+        // Handler sequence will be - GracefulHandler ->
+        // ContextPathHandler -> HealthCheckHandler -> GzipHandler -> SessionHandler -> SecurityHandler
+        this.jetty.setHandler(new Handler.Sequence(new GracefulHandler(), new ContextPathHandler(),
+                new HealthCheckHandler(),
+                this.initGzipHandler(this.context)));
         // Servlet deployment
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypesArray());
@@ -93,8 +96,21 @@ public class JettyServer extends AbstractServer {
         this.jetty.start();
     }
 
+    private GzipHandler initGzipHandler(ServletContextHandler handler) {
+        // Create and configure GzipHandler.
+        GzipHandler gzipHandler = new GzipHandler(handler);
+        // Only compress response content larger than this.
+        gzipHandler.setMinGzipSize(1024);
+        // Also compress POST responses.
+        gzipHandler.addIncludedMethods("POST");
+        // Do not compress these mime types.
+        gzipHandler.addExcludedMimeTypes("font/ttf");
+        return gzipHandler;
+    }
+
     private Server initJetty(Config appConfig) {
         Server server = new Server(this.getQueuedThreadPool(appConfig));
+        server.setStopTimeout(10_000);
         HttpConfiguration httpConfiguration = this.getHttpConfiguration(appConfig);
         HttpConnectionFactory httpConnectionFactory = new HttpConnectionFactory(httpConfiguration);
         // This will enable h2c

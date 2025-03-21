@@ -40,6 +40,7 @@ public class ContextPathHandler extends Handler.Abstract.NonBlocking {
                     .getMainConfig()
                     .getString("common.system-console-path");
             Response.sendRedirect(request, response, callback, systemConsolePath);
+            callback.succeeded();
             return true;
         }
         return false;
