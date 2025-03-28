@@ -36,8 +36,8 @@
 
 **Built upon**
 
-1. Battle tested [Tomcat](https://tomcat.apache.org/)/[Jetty](https://www.eclipse.org/jetty/)/[Undertow](http://undertow.io/) Servlet containers.
-2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix](http://felix.apache.org/) as implementation).
+1. Battle tested [Tomcat v11.x](https://tomcat.apache.org/)/[Jetty v12.0.x](https://www.eclipse.org/jetty/)/[Undertow v2.3.x](https://undertow.io/) Servlet containers.
+2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix v7.0.5](https://felix.apache.org/documentation/index.html) as implementation).
 
 **Modules:**
 
