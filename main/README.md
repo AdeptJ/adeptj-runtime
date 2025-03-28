@@ -42,20 +42,20 @@
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.12.
-2. JAX-RS 3.1(RESTEasy v6.2.10) with JWT support.
+2. JAX-RS 3.1(RESTEasy v6.2.12) with JWT support.
 3. JWT module for creating and verifying the JWTs issued by AdeptJ Runtime and verification of JWT issued by third party systems.
-4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.4) or MyBatis v3.5.16 or MongoDB sync driver v5.1.4.
-5. Hikari(v5.1.0) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
-6. Caffeine(v3.1.8) - a high performance in memory cache.
+4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.5) or MyBatis v3.5.19 or MongoDB sync driver v5.4.0.
+5. Hikari(v6.2.1) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
+6. Caffeine(v3.2.0) - a high performance in memory cache.
 7. SLF4J(v2.0.16) & Logback(v1.5.8) based logging - add or remove loggers in running server which will survive the server restart.
-8. Crypto module based on Spring security crypto(v6.3.3) for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
-9. Java Bean Validation(Hibernate Validator v8.0.1).
+8. Crypto module based on Spring security crypto(v6.4.4) for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
+9. Java Bean Validation(Hibernate Validator v8.0.2).
 10. RestClient for server side API calls, there are few adapters based on Apache HttpClient(v4.x) and Jetty HttpClient(v12.0.x).
 11. Email(Jakarta Mail/Eclipse Angus Mail v2.x) module for sending plain text and html based emails.
 
 **Toolchain:**
 
-AdeptJ Maven Plugin for bundle deployment to boost developer productivity.
+AdeptJ Maven Plugin(v1.8.x) for bundle deployment to boost developer productivity.
 
 Most of the services are highly configurable using OSGi Configuration Admin.
 
@@ -73,7 +73,7 @@ Please check [AdeptJ Runtime Launcher](https://github.com/AdeptJ/adeptj-runtime-
 
 **Want to contribute**:
 
-Please feel free to fork the repos or drop a note to me @ irakeshkAToutlookDOTcom so that I could add you to the AdeptJ organization.
+Please feel free to fork the repos or drop a note to me @ irakeshk[AT]outlook[DOT]com so that I could add you to the AdeptJ organization.
 
 **Sponsors**:
 
