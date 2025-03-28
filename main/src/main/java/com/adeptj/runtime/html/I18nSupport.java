@@ -54,23 +54,24 @@ public class I18nSupport extends AbstractExtension implements Function {
     @Override
     public Object execute(Map<String, Object> args, PebbleTemplate self, EvaluationContext context, int lineNumber) {
         String basename = (String) args.get("bundle");
-        String key = (String) args.get("key");
-        Object params = args.get("params");
-        ResourceBundle bundle = ResourceBundle.getBundle(this.rbDir + basename, context.getLocale(),
+        ResourceBundle rb = ResourceBundle.getBundle(this.rbDir + basename, context.getLocale(),
                 new UTF8Control());
+        String key = (String) args.get("key");
         Object errorCode = context.getVariable(VAR_ERROR_CODE);
         Object phraseObject;
         if (errorCode == null || StringUtils.equals(key, "go.home.msg")) {
-            phraseObject = bundle.getObject(key);
+            phraseObject = rb.getObject(key);
         } else {
-            phraseObject = bundle.getObject(errorCode + "." + key);
+            phraseObject = rb.getObject(errorCode + "." + key);
         }
-        if (params != null) {
-            if (params instanceof List<?> list) {
-                phraseObject = MessageFormat.format(phraseObject.toString(), list.toArray());
-            } else {
-                phraseObject = MessageFormat.format(phraseObject.toString(), params);
-            }
+        Object params = args.get("params");
+        if (params == null) {
+            return phraseObject;
+        }
+        if (params instanceof List<?> list) {
+            phraseObject = MessageFormat.format(phraseObject.toString(), list.toArray());
+        } else {
+            phraseObject = MessageFormat.format(phraseObject.toString(), params);
         }
         return phraseObject;
     }
