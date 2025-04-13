@@ -33,7 +33,7 @@
     <modules>
 
         <module>kernel</module>
-        <module>adapters</module>
+        <module>server-adapters</module>
         <module>main</module>
 
     </modules>
