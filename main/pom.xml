@@ -83,17 +83,6 @@
         <system>GitHub Issues</system>
     </issueManagement>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh-adeptj</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh-adeptj</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <scm>
         <url>https://github.com/AdeptJ/adeptj-runtime</url>
         <connection>scm:git:git@github.com:AdeptJ/adeptj-runtime.git</connection>
