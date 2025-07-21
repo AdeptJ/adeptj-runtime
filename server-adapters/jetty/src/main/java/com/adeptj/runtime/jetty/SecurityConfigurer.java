@@ -21,8 +21,8 @@ package com.adeptj.runtime.jetty;
 
 import com.adeptj.runtime.kernel.UserManager;
 import com.typesafe.config.Config;
-import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
-import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee11.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.authentication.FormAuthenticator;
 

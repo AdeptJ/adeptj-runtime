@@ -29,12 +29,12 @@ import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
-import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.ee10.servlet.ResourceServlet;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
-import org.eclipse.jetty.ee10.servlet.SessionHandler;
-import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.ee11.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee11.servlet.ResourceServlet;
+import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee11.servlet.ServletHolder;
+import org.eclipse.jetty.ee11.servlet.SessionHandler;
+import org.eclipse.jetty.ee11.servlet.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
 import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.Handler;
@@ -51,8 +51,8 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 
 import static com.adeptj.runtime.kernel.ServerRuntime.JETTY;
-import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SECURITY;
-import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.SESSIONS;
+import static org.eclipse.jetty.ee11.servlet.ServletContextHandler.SECURITY;
+import static org.eclipse.jetty.ee11.servlet.ServletContextHandler.SESSIONS;
 
 /**
  * AdeptJ Runtime server implementation using Jetty.
