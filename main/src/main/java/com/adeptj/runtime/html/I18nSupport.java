@@ -5,7 +5,7 @@ import io.pebbletemplates.pebble.extension.Function;
 import io.pebbletemplates.pebble.extension.i18n.UTF8Control;
 import io.pebbletemplates.pebble.template.EvaluationContext;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class I18nSupport extends AbstractExtension implements Function {
         String key = (String) args.get("key");
         Object errorCode = context.getVariable(VAR_ERROR_CODE);
         Object phraseObject;
-        if (errorCode == null || StringUtils.equals(key, "go.home.msg")) {
+        if (errorCode == null || Strings.CS.equals(key, "go.home.msg")) {
             phraseObject = rb.getObject(key);
         } else {
             phraseObject = rb.getObject(errorCode + "." + key);

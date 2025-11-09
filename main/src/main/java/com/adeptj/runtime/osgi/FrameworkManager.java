@@ -27,6 +27,7 @@ import com.adeptj.runtime.kernel.util.IOUtils;
 import com.adeptj.runtime.kernel.util.Times;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkEvent;
@@ -194,7 +195,7 @@ public enum FrameworkManager {
     private void updatePackageExports(Map<String, String> configs) {
         String aggregatedPackageExports = this.getAggregatedPackageExports();
         if (StringUtils.isNotEmpty(aggregatedPackageExports)) {
-            aggregatedPackageExports = StringUtils.removeEnd(aggregatedPackageExports, ", ");
+            aggregatedPackageExports = Strings.CS.removeEnd(aggregatedPackageExports, ", ");
             LOGGER.info("OSGi package exports provided by various exports providers: {}", aggregatedPackageExports);
             String existingExports = configs.get(FRAMEWORK_SYSTEMPACKAGES_EXTRA);
             String updatedExports = existingExports + ", " + aggregatedPackageExports;
@@ -295,7 +296,7 @@ public enum FrameworkManager {
         for (Iterator<Map.Entry<String, String>> it = configs.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, String> entry = it.next();
             builder.append(entry.getKey()).append('=').append('"');
-            if (!StringUtils.startsWith(entry.getKey(), "crypto")) {
+            if (!Strings.CS.startsWith(entry.getKey(), "crypto")) {
                 builder.append(entry.getValue());
             }
             builder.append('"');

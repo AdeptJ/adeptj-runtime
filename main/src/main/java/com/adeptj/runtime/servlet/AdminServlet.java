@@ -29,7 +29,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 
@@ -119,7 +119,7 @@ public class AdminServlet extends HttpServlet {
         TemplateEngineContext.Builder builder = TemplateEngineContext.builder(TEMPLATE_CHANGE_PWD, req, resp);
         String password = req.getParameter("password");
         String confirmPassword = req.getParameter("confirmPassword");
-        if (StringUtils.equals(password, confirmPassword)) {
+        if (Strings.CS.equals(password, confirmPassword)) {
             try (MVStore store = MVStore.open(MV_CREDENTIALS_STORE)) {
                 MVMap<String, String> credentials = store.openMap(H2_MAP_ADMIN_CREDENTIALS);
                 String encodedPwd = new String(PasswordEncoder.encodePassword(password), UTF_8);

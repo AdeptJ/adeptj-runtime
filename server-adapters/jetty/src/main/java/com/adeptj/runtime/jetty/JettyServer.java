@@ -29,6 +29,7 @@ import com.adeptj.runtime.kernel.ServletDeployment;
 import com.adeptj.runtime.kernel.ServletInfo;
 import com.adeptj.runtime.kernel.exception.ServerException;
 import com.typesafe.config.Config;
+import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.ee11.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.ee11.servlet.ResourceServlet;
 import org.eclipse.jetty.ee11.servlet.ServletContextHandler;
@@ -43,7 +44,6 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.GracefulHandler;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class JettyServer extends AbstractServer {
         // ContextPathHandler -> HealthCheckHandler -> GzipHandler -> SessionHandler -> SecurityHandler
         this.jetty.setHandler(new Handler.Sequence(new GracefulHandler(), new ContextPathHandler(),
                 new HealthCheckHandler(),
-                this.initGzipHandler(this.context)));
+                new CompressionHandler(this.context)));
         // Servlet deployment
         SciInfo sciInfo = deployment.getSciInfo();
         this.context.addServletContainerInitializer(sciInfo.getSciInstance(), sciInfo.getHandleTypesArray());
@@ -94,18 +94,6 @@ public class JettyServer extends AbstractServer {
             this.jetty.setRequestLog(new CustomRequestLog());
         }
         this.jetty.start();
-    }
-
-    private GzipHandler initGzipHandler(ServletContextHandler handler) {
-        // Create and configure GzipHandler.
-        GzipHandler gzipHandler = new GzipHandler(handler);
-        // Only compress response content larger than this.
-        gzipHandler.setMinGzipSize(1024);
-        // Also compress POST responses.
-        gzipHandler.addIncludedMethods("POST");
-        // Do not compress these mime types.
-        gzipHandler.addExcludedMimeTypes("font/ttf");
-        return gzipHandler;
     }
 
     private Server initJetty(Config appConfig) {

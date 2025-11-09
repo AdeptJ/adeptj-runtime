@@ -21,11 +21,10 @@
 package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
-import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
-
 import jakarta.servlet.ServletContextAttributeEvent;
 import jakarta.servlet.ServletContextAttributeListener;
+import org.apache.commons.lang3.Strings;
+import org.osgi.framework.BundleContext;
 
 import static com.adeptj.runtime.common.Constants.ATTRIBUTE_BUNDLE_CONTEXT;
 
@@ -40,14 +39,14 @@ public class BridgeServletContextAttributeListener implements ServletContextAttr
 
     @Override
     public void attributeAdded(ServletContextAttributeEvent event) {
-        if (StringUtils.equals(event.getName(), ATTRIBUTE_BUNDLE_CONTEXT)) {
+        if (Strings.CS.equals(event.getName(), ATTRIBUTE_BUNDLE_CONTEXT)) {
             ServiceTrackers.getInstance().openEventDispatcherTracker((BundleContext) event.getValue());
         }
     }
 
     @Override
     public void attributeReplaced(ServletContextAttributeEvent event) {
-        if (StringUtils.equals(event.getName(), ATTRIBUTE_BUNDLE_CONTEXT)) {
+        if (Strings.CS.equals(event.getName(), ATTRIBUTE_BUNDLE_CONTEXT)) {
             ServiceTrackers.getInstance().closeEventDispatcherTracker();
             /*
              * Now open the EventDispatcherTracker with fresh BundleContext which is already hold by

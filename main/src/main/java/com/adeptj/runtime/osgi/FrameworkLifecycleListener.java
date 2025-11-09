@@ -22,7 +22,7 @@ package com.adeptj.runtime.osgi;
 
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.ServletContextHolder;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
@@ -78,7 +78,7 @@ public class FrameworkLifecycleListener implements FrameworkListener {
             default -> {
                 // log it and ignore as we are not interested in any other event.
                 String eventType = FrameworkEvents.asString(event.getType());
-                if (!StringUtils.equals(FrameworkEvents.UNKNOWN.toString(), eventType)) {
+                if (!Strings.CS.equals(FrameworkEvents.UNKNOWN.toString(), eventType)) {
                     LOGGER.debug("Ignoring the OSGi FrameworkEvent: [{}]", eventType);
                 }
             }

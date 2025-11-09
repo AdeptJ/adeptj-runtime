@@ -21,6 +21,7 @@
 package com.adeptj.runtime.common;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -61,7 +62,7 @@ public final class OSGiUtil {
     }
 
     public static boolean isSystemBundleFragment(Bundle bundle) {
-        return StringUtils.contains(bundle.getHeaders().get(FRAGMENT_HOST), EXTENSION_DIRECTIVE);
+        return Strings.CS.contains(bundle.getHeaders().get(FRAGMENT_HOST), EXTENSION_DIRECTIVE);
     }
 
     public static boolean isNotBundle(Manifest manifest) {

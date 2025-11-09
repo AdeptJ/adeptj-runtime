@@ -25,7 +25,7 @@ import com.adeptj.runtime.kernel.util.Environment;
 import com.adeptj.runtime.kernel.util.IOUtils;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.io.File;
 import java.io.IOException;
@@ -169,15 +169,15 @@ public enum ConfigProvider {
 
     private Path getConfFilePath(URL confResource, Path confDir) {
         String confFileName;
-        if (StringUtils.endsWith(confResource.getPath(), APPLICATION_CONF)) {
+        if (Strings.CS.endsWith(confResource.getPath(), APPLICATION_CONF)) {
             confFileName = MAIN_CONF;
-        } else if (StringUtils.contains(confResource.getPath(), RT_JETTY)) {
+        } else if (Strings.CS.contains(confResource.getPath(), RT_JETTY)) {
             confFileName = JETTY_CONF;
-        } else if (StringUtils.contains(confResource.getPath(), RT_TOMCAT)) {
+        } else if (Strings.CS.contains(confResource.getPath(), RT_TOMCAT)) {
             confFileName = TOMCAT_CONF;
-        } else if (StringUtils.contains(confResource.getPath(), RT_UNDERTOW)) {
+        } else if (Strings.CS.contains(confResource.getPath(), RT_UNDERTOW)) {
             confFileName = UNDERTOW_CONF;
-        } else if (StringUtils.contains(confResource.getPath(), RT_KERNEL)) {
+        } else if (Strings.CS.contains(confResource.getPath(), RT_KERNEL)) {
             confFileName = KERNEL_CONF;
         } else {
             confFileName = UNKNOWN_CONF;

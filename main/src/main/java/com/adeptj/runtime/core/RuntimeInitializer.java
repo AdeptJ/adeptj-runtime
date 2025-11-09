@@ -23,13 +23,13 @@ package com.adeptj.runtime.core;
 import com.adeptj.runtime.common.ServletContextHolder;
 import com.adeptj.runtime.exception.RuntimeInitializationException;
 import com.adeptj.runtime.osgi.FrameworkShutdownHandler;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.HandlesTypes;
+import org.apache.commons.lang3.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -57,7 +57,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
         // Always initialize the FrameworkLauncher first.
         this.handleFrameworkLauncher(startupAwareClasses, context, logger);
         for (Class<?> startupAwareClass : startupAwareClasses) {
-            if (!StringUtils.equals(startupAwareClass.getName(), FRAMEWORK_LAUNCHER_CLASS)) {
+            if (!Strings.CS.equals(startupAwareClass.getName(), FRAMEWORK_LAUNCHER_CLASS)) {
                 this.invokeOnStartup(startupAwareClass, context, logger);
             }
         }
@@ -67,7 +67,7 @@ public class RuntimeInitializer implements ServletContainerInitializer {
 
     private void handleFrameworkLauncher(Set<Class<?>> startupAwareClasses, ServletContext context, Logger logger) {
         for (Class<?> startupAwareClass : startupAwareClasses) {
-            if (StringUtils.equals(startupAwareClass.getName(), FRAMEWORK_LAUNCHER_CLASS)) {
+            if (Strings.CS.equals(startupAwareClass.getName(), FRAMEWORK_LAUNCHER_CLASS)) {
                 this.invokeOnStartup(startupAwareClass, context, logger);
                 break;
             }
