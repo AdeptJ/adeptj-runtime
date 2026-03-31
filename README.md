@@ -24,6 +24,10 @@
      <img src="https://sonarcloud.io/api/project_badges/measure?project=AdeptJ_adeptj-runtime&metric=vulnerabilities">
   </a>
 
+  <a href="https://discord.gg/TM4VJ8EtFr">
+    <img src="https://img.shields.io/discord/938360266498904095?logo=discord" alt="Discord">
+  </a>
+
   <a href="https://twitter.com/_AdeptJ">
      <img src="https://img.shields.io/badge/twitter-AdeptJ-f08d1c.svg?style=social&style=flat"> 
   </a>
