@@ -45,7 +45,7 @@
 
 **Modules:**
 
-1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.12.
+1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.14.
 2. JAX-RS 3.1(RESTEasy v7.0.1) with JWT support.
 3. JWT module for creating and verifying the JWTs issued by AdeptJ Runtime and verification of JWT issued by third party systems.
 4. Persistence(SQL/NO-SQL) layer - JPA 3.2.0(EclipseLink v5.0.0) or MyBatis v3.5.19 or MongoDB sync driver v5.6.4.
