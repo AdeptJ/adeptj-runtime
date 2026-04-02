@@ -46,9 +46,9 @@
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.14.
-2. JAX-RS 3.1(RESTEasy v7.0.1) with JWT support.
+2. Jakarta REST 4.0(RESTEasy v7.0.1) with JWT support.
 3. JWT module for creating and verifying the JWTs issued by AdeptJ Runtime and verification of JWT issued by third party systems.
-4. Persistence(SQL/NO-SQL) layer - JPA 3.2.0(EclipseLink v5.0.0) or MyBatis v3.5.19 or MongoDB sync driver v5.6.4.
+4. Persistence(SQL/NO-SQL) layer - Jakarta Persistence 3.2.0(EclipseLink v5.0.0) or MyBatis v3.5.19 or MongoDB sync driver v5.6.4.
 5. Hikari(v7.0.2) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
 6. Caffeine(v3.2.3) - a high performance in memory cache.
 7. SLF4J(v2.0.17) & Logback(v1.5.32) based logging - add or remove loggers in running server which will survive the server restart.
