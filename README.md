@@ -40,21 +40,21 @@
 
 **Built upon**
 
-1. Battle tested [Tomcat v11.0.x](https://tomcat.apache.org/)/[Jetty v12.0.x](https://jetty.org/)/[Undertow v2.3.x](https://undertow.io/) Servlet containers.
+1. Battle tested [Tomcat v11.0.x](https://tomcat.apache.org/)/[Jetty v12.1.x](https://jetty.org/)/[Undertow v2.3.x](https://undertow.io/) Servlet containers.
 2. [OSGi](https://www.osgi.org) Framework R8(Apache [Felix v7.0.5](https://felix.apache.org/documentation/index.html) as implementation).
 
 **Modules:**
 
 1. Dependency Injection (OSGi Declarative Services) Felix SCR v2.2.12.
-2. JAX-RS 3.1(RESTEasy v6.2.12) with JWT support.
+2. JAX-RS 3.1(RESTEasy v7.0.1) with JWT support.
 3. JWT module for creating and verifying the JWTs issued by AdeptJ Runtime and verification of JWT issued by third party systems.
-4. Persistence(SQL/NO-SQL) layer - JPA 3.1(EclipseLink v4.0.6) or MyBatis v3.5.19 or MongoDB sync driver v5.4.0.
-5. Hikari(v6.3.0) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
-6. Caffeine(v3.2.0) - a high performance in memory cache.
-7. SLF4J(v2.0.17) & Logback(v1.5.18) based logging - add or remove loggers in running server which will survive the server restart.
-8. Crypto module based on Spring security crypto(v6.4.4) for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
-9. Java Bean Validation(Hibernate Validator v8.0.2).
-10. RestClient for server side API calls, there are few adapters based on Apache HttpClient(v4.x) and Jetty HttpClient(v12.0.x).
+4. Persistence(SQL/NO-SQL) layer - JPA 3.2.0(EclipseLink v5.0.0) or MyBatis v3.5.19 or MongoDB sync driver v5.6.4.
+5. Hikari(v7.0.2) JDBC Connection Pool Provider(Only if JPA or MyBatis is opted).
+6. Caffeine(v3.2.3) - a high performance in memory cache.
+7. SLF4J(v2.0.17) & Logback(v1.5.32) based logging - add or remove loggers in running server which will survive the server restart.
+8. Crypto module based on Spring security crypto(v7.0.4) for hashing(BCrypt) and encryption/decryption with (AES/GCM/NoPadding).
+9. Java Bean Validation(Hibernate Validator v9.1.0).
+10. RestClient for server side API calls, there are few adapters based on Apache HttpClient(v4.x & v5.x) and Jetty HttpClient(v12.1.x).
 11. Email(Jakarta Mail/Eclipse Angus Mail v2.x) module for sending plain text and html based emails.
 
 **Toolchain:**
