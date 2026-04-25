@@ -27,29 +27,5 @@ import java.util.Set;
  *
  * @author Rakesh.Kumar, AdeptJ
  */
-class OSGiLoggerConfig {
-
-    private final String configPid;
-
-    private final Set<String> categories;
-
-    private final String level;
-
-    OSGiLoggerConfig(String configPid, Set<String> categories, String level) {
-        this.configPid = configPid;
-        this.categories = categories;
-        this.level = level;
-    }
-
-    public String getConfigPid() {
-        return configPid;
-    }
-
-    public Set<String> getCategories() {
-        return this.categories;
-    }
-
-    public String getLevel() {
-        return this.level;
-    }
+record OSGiLoggerConfig(String configPid, Set<String> categories, String level) {
 }

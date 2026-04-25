@@ -179,7 +179,7 @@ public final class LogbackManager {
             return;
         }
         long startTime = System.nanoTime();
-        logger.info(REMOVING_LOGGERS_MSG, config.getCategories(), config.getLevel());
+        logger.info(REMOVING_LOGGERS_MSG, config.categories(), config.level());
         this.contextUtil.addInfo(String.format(RESETTING_LC_MSG, this.loggerContext.getName()));
         this.loggerContext.reset();
         this.consoleAppender = null;
@@ -224,9 +224,9 @@ public final class LogbackManager {
         }
         for (OSGiLoggerConfig config : this.configByPid.values()) {
             // If a category is already defined in current LoggerConfig then log as error and return false right away.
-            for (String category : config.getCategories()) {
+            for (String category : config.categories()) {
                 if (categories.contains(category)) {
-                    logger.error(CATEGORY_ALREADY_DEFINED_MSG, category, config.getConfigPid());
+                    logger.error(CATEGORY_ALREADY_DEFINED_MSG, category, config.configPid());
                     return false;
                 }
             }
@@ -238,8 +238,8 @@ public final class LogbackManager {
     private void reconfigureOSGiLoggers() {
         Logger logger = this.loggerContext.getLogger(this.getClass());
         for (OSGiLoggerConfig config : this.configByPid.values()) {
-            Set<String> categories = config.getCategories();
-            Level level = Level.toLevel(config.getLevel());
+            Set<String> categories = config.categories();
+            Level level = Level.toLevel(config.level());
             for (String category : categories) {
                 this.addLogger(category, level);
             }
