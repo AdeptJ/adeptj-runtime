@@ -39,7 +39,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <xnio.version>3.8.17.Final</xnio.version>
-        <undertow.version>2.3.24.Final</undertow.version>
+        <undertow-core.version>2.4.1.Final</undertow-core.version>
+        <undertow-servlet-ee.version>2.0.0.Final</undertow-servlet-ee.version>
         <smallrye-common.version>2.18.1</smallrye-common.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>2.0.1</wildfly-common.version>
@@ -207,19 +208,13 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
-            <version>${undertow.version}</version>
+            <version>${undertow-core.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>io.undertow</groupId>
+            <groupId>io.undertow.ee</groupId>
             <artifactId>undertow-servlet</artifactId>
-            <version>${undertow.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.undertow</groupId>
-            <artifactId>undertow-parser-generator</artifactId>
-            <version>${undertow.version}</version>
+            <version>${undertow-servlet-ee.version}</version>
         </dependency>
 
         <!-- Undertow Dependencies End -->
