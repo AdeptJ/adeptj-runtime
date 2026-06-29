@@ -39,8 +39,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <xnio.version>3.8.17.Final</xnio.version>
-        <undertow-core.version>2.4.1.Final</undertow-core.version>
-        <undertow-servlet-ee.version>2.0.0.Final</undertow-servlet-ee.version>
+        <undertow-core.version>2.4.2.Final</undertow-core.version>
+        <undertow-servlet-ee.version>2.0.1.Final</undertow-servlet-ee.version>
         <smallrye-common.version>2.19.0</smallrye-common.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>2.0.1</wildfly-common.version>
