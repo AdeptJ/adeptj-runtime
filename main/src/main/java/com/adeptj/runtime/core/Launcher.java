@@ -20,6 +20,7 @@
 
 package com.adeptj.runtime.core;
 
+import ch.qos.logback.classic.util.ClassicVersionUtil;
 import com.adeptj.runtime.common.BundleContextHolder;
 import com.adeptj.runtime.common.LogbackManagerHolder;
 import com.adeptj.runtime.kernel.AbstractServer;
@@ -62,7 +63,7 @@ public final class Launcher {
 
     private static final String KEY_USER_CREDENTIAL_MAPPING = "common.user-credential-mapping";
 
-    private static final String LOGBACK_INIT_MSG = "Logback initialized in [{}] ms!!";
+    private static final String LOGBACK_INIT_MSG = "Logback({}) initialized in [{}] ms!!";
 
     private static final int PWD_START_INDEX = 9;
 
@@ -84,7 +85,7 @@ public final class Launcher {
         long startTime = System.nanoTime();
         // This call will initialize the whole logging system.
         Logger logger = LoggerFactory.getLogger(Launcher.class);
-        logger.info(LOGBACK_INIT_MSG, Times.elapsedMillis(startTime));
+        logger.info(LOGBACK_INIT_MSG, ClassicVersionUtil.getVersionBySelfDeclaredProperties(), Times.elapsedMillis(startTime));
         Launcher launcher = new Launcher();
         launcher.printBanner(logger);
         try {
