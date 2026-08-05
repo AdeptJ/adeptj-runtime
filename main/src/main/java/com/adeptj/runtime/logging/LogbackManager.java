@@ -28,8 +28,8 @@ import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.jul.LevelChangePropagator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.ContextUtil;
@@ -133,7 +133,7 @@ public final class LogbackManager {
 
     private ConsoleAppender<ILoggingEvent> consoleAppender;
 
-    private RollingFileAppender<ILoggingEvent> fileAppender;
+    private Appender<ILoggingEvent> fileAppender;
 
     private final LoggerContext loggerContext;
 
@@ -289,32 +289,33 @@ public final class LogbackManager {
 
     void initRollingFileAppender(Config loggingCfg) {
         FileAppenderConfig appenderConfig = this.createFileAppenderConfig(loggingCfg);
-        RollingFileAppender<ILoggingEvent> fa = new RollingFileAppender<>();
-        fa.setContext(this.loggerContext);
-        fa.setName(appenderConfig.getAppenderName());
-        fa.setFile(appenderConfig.getLogFile());
-        fa.setAppend(true);
-        fa.setEncoder(this.newLayoutEncoder(appenderConfig.getPattern()));
-        fa.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
-        if (!fa.isImmediateFlush()) {
-            fa.setImmediateFlush(appenderConfig.isImmediateFlush());
+        RollingFileAppender<ILoggingEvent> rfa = new RollingFileAppender<>();
+        rfa.setContext(this.loggerContext);
+        rfa.setName(appenderConfig.getAppenderName());
+        rfa.setFile(appenderConfig.getLogFile());
+        rfa.setAppend(true);
+        rfa.setEncoder(this.newLayoutEncoder(appenderConfig.getPattern()));
+        rfa.setImmediateFlush(Boolean.getBoolean(SYS_PROP_LOG_IMMEDIATE_FLUSH));
+        if (!rfa.isImmediateFlush()) {
+            rfa.setImmediateFlush(appenderConfig.isImmediateFlush());
         }
-        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = this.newRollingPolicy(fa, appenderConfig);
+        SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = this.newRollingPolicy(rfa, appenderConfig);
         // This will also set the TriggeringPolicy
-        fa.setRollingPolicy(rollingPolicy);
-        fa.start();
+        rfa.setRollingPolicy(rollingPolicy);
+        rfa.start();
         // Add AsyncAppender support.
         if (appenderConfig.isLogAsync()) {
-            this.initAsyncAppender(appenderConfig, fa);
+            this.fileAppender = this.initAsyncAppender(appenderConfig, rfa);
+        } else {
+            this.fileAppender = rfa;
         }
-        this.fileAppender = fa;
     }
 
-    private SizeAndTimeBasedRollingPolicy<ILoggingEvent> newRollingPolicy(FileAppender<ILoggingEvent> fileAppender,
+    private SizeAndTimeBasedRollingPolicy<ILoggingEvent> newRollingPolicy(RollingFileAppender<ILoggingEvent> rfa,
                                                                           FileAppenderConfig appenderConfig) {
         SizeAndTimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new SizeAndTimeBasedRollingPolicy<>();
         rollingPolicy.setContext(this.loggerContext);
-        rollingPolicy.setParent(fileAppender);
+        rollingPolicy.setParent(rfa);
         rollingPolicy.setFileNamePattern(appenderConfig.getRolloverFile());
         // Rollover once the file reaches configured (default is 10MB) in size.
         rollingPolicy.setMaxFileSize(FileSize.valueOf(appenderConfig.getLogMaxSize()));
@@ -332,14 +333,15 @@ public final class LogbackManager {
         return rollingPolicy;
     }
 
-    private void initAsyncAppender(FileAppenderConfig rollingFileConfig, FileAppender<ILoggingEvent> fileAppender) {
+    private AsyncAppender initAsyncAppender(FileAppenderConfig rollingFileConfig, RollingFileAppender<ILoggingEvent> rfa) {
         AsyncAppender asyncAppender = new AsyncAppender();
         asyncAppender.setContext(this.loggerContext);
         asyncAppender.setName(rollingFileConfig.getAsyncAppenderName());
         asyncAppender.setQueueSize(rollingFileConfig.getAsyncLogQueueSize());
         asyncAppender.setDiscardingThreshold(rollingFileConfig.getAsyncLogDiscardingThreshold());
-        asyncAppender.addAppender(fileAppender);
+        asyncAppender.addAppender(rfa);
         asyncAppender.start();
+        return asyncAppender;
     }
 
     private PatternLayoutEncoder newLayoutEncoder(String logPattern) {
