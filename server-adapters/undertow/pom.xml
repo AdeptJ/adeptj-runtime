@@ -44,7 +44,7 @@
         <smallrye-common.version>2.20.0</smallrye-common.version>
         <wildfly-client-config.version>1.0.1.Final</wildfly-client-config.version>
         <wildfly-common.version>2.0.1</wildfly-common.version>
-        <jboss-threads.version>3.9.2</jboss-threads.version>
+        <jboss-threads.version>3.10.1</jboss-threads.version>
     </properties>
 
     <build>
