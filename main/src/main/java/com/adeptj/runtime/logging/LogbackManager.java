@@ -1,7 +1,7 @@
 /*
 ###############################################################################
 #                                                                             #
-#    Copyright 2016, AdeptJ (http://www.adeptj.com)                           #
+#    Copyright 2016-2026, AdeptJ (http://www.adeptj.com)                      #
 #                                                                             #
 #    Licensed under the Apache License, Version 2.0 (the "License");          #
 #    you may not use this file except in compliance with the License.         #
@@ -17,7 +17,6 @@
 #                                                                             #
 ###############################################################################
 */
-
 package com.adeptj.runtime.logging;
 
 import ch.qos.logback.classic.AsyncAppender;
@@ -41,7 +40,6 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigList;
 import com.typesafe.config.ConfigValue;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -279,10 +277,6 @@ public final class LogbackManager {
         ca.setContext(this.loggerContext);
         ca.setName(loggingCfg.getString(KEY_CONSOLE_APPENDER_NAME));
         ca.setEncoder(this.newLayoutEncoder(loggingCfg.getString(KEY_LOG_PATTERN_CONSOLE)));
-        // we assume Jansi lib is on classpath, use the Jansi maven profile while building runtime.
-        if (SystemUtils.IS_OS_WINDOWS) {
-            ca.setWithJansi(true);
-        }
         ca.start();
         this.consoleAppender = ca;
     }
