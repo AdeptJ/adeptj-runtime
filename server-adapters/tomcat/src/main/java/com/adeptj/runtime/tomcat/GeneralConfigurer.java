@@ -69,8 +69,9 @@ public class GeneralConfigurer {
 
     private void configureServlets(Context context, Config serverConfig) {
         for (Config config : serverConfig.getConfigList("servlets")) {
+            String servletName = config.getString("name");
             Wrapper servlet = context.createWrapper();
-            servlet.setName(config.getString("name"));
+            servlet.setName(servletName);
             servlet.setServletClass(config.getString("class"));
             if (config.hasPath("load-on-startup")) {
                 servlet.setLoadOnStartup(config.getInt("load-on-startup"));
@@ -82,7 +83,7 @@ public class GeneralConfigurer {
                 servlet.addInitParameter(entry.getKey(), (String) entry.getValue().unwrapped());
             }
             context.addChild(servlet);
-            context.addServletMappingDecoded(config.getString("pattern"), config.getString("name"));
+            context.addServletMapping(config.getString("pattern"), servletName);
         }
     }
 
