@@ -19,6 +19,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+        <skipTests>false</skipTests>
     </properties>
 
     <build>
@@ -35,6 +37,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skipTests>${skipTests}</skipTests>
+                    <!-- Fix for mockito inline warnings on Java 21-->
+                    <argLine>
+                        -XX:+EnableDynamicAgentLoading
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                        --add-opens java.base/sun.net.www.protocol.https=ALL-UNNAMED
+                    </argLine>
                 </configuration>
             </plugin>
 
